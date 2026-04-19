@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>현장지휘관 무전 훈련</title>
+  <style>
+    body {
+      font-family: 'Malgun Gothic', sans-serif;
+      text-align: center;
+      margin-top: 100px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      font-size: 36px;
+      margin-bottom: 40px;
+    }
+    button {
+      font-size: 18px;
+      padding: 15px 30px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    #startBtn { background-color: #4CAF50; color: white; }
+    #stopBtn { background-color: #f44336; color: white; }
+    #result {
+      margin-top: 30px;
+      font-size: 20px;
+      padding: 20px;
+      background: white;
+      width: 60%;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>현장지휘관 무전 훈련</h1>
+
+  <button id="startBtn">🎙️ 녹음 시작</button>
+  <button id="stopBtn">⏹️ 녹음 중지</button>
+
+  <div id="result">여기에 음성이 텍스트로 변환됩니다.</div>
+
+  <script>
+    const resultDiv = document.getElementById("result");
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("이 브라우저는 음성 인식을 지원하지 않습니다. (Chrome 사용 권장)");
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "ko-KR";
+    recognition.interimResults = true;
+    recognition.continuous = true;
+
+    let finalTranscript = "";
+
+    recognition.onresult = function(event) {
+      let interimTranscript = "";
+
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript + " ";
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+
+      resultDiv.innerHTML = finalTranscript + "<span style='color:gray'>" + interimTranscript + "</span>";
+    };
+
+    document.getElementById("startBtn").onclick = function() {
+      recognition.start();
+    };
+
+    document.getElementById("stopBtn").onclick = function() {
+      recognition.stop();
+    };
+  </script>
+
+</body>
+</html>
