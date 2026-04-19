@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>현장지휘관 무전 훈련</title>
+
+<style>
+body {
+  font-family: 'Malgun Gothic', sans-serif;
+  text-align: center;
+  background: #111;
+  color: white;
+  margin: 0;
+  padding: 20px;
+}
+
+h1 { font-size: 24px; }
+
+button {
+  width: 90%;
+  max-width: 320px;
+  font-size: 20px;
+  padding: 15px;
+  margin: 10px auto;
+  border: none;
+  border-radius: 12px;
+  display: block;
+}
+
+#startBtn { background: #00c853; }
+#stopBtn { background: #d50000; }
+
+#status { margin-top: 10px; color: #bbb; }
+
+#result {
+  margin-top: 20px;
+  font-size: 18px;
+  background: #222;
+  padding: 15px;
+  border-radius: 10px;
+  min-height: 120px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🚒 현장지휘관 무전 훈련</h1>
+
+<button id="startBtn">🎙️ 녹음 시작</button>
+<button id="stopBtn">⏹️ 녹음 중지</button>
+
+<div id="status">상태: 대기 중</div>
+<div id="result"></div>
+
+<script>
+const resultDiv = document.getElementById("result");
+const statusDiv = document.getElementById("status");
+
+let recognition;
+let isRecording = false;
+let finalTranscript = "";
+let lastResultIndex = 0;
+
+// 초기화
+function init() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    statusDiv.innerText = "❌ Chrome에서 실행하세요";
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = "ko-KR";
+  recognition.interimResults = true;
+  recognition.continuous = true;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    statusDiv.innerText = "🟢 녹음 중...";
+  };
+
+  recognition.onend = () => {
+    // 🔥 자동 중지 방지 핵심
+    if (isRecording) {
+      try {
+        recognition.start();
+      } catch(e) {}
+    } else {
+      statusDiv.innerText = "⏹️ 중지됨";
+    }
+  };
+
+  recognition.onerror = (e) => {
+    statusDiv.innerText = "⚠️ 오류: " + e.error;
+  };
+
+  recognition.onresult = (event) => {
+    let interim = "";
+
+    // 🔥 핵심: 새 결과만 처리
+    for (let i = lastResultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+
+      if (event.results[i].isFinal) {
+        finalTranscript += transcript + " ";
+      } else {
+        interim += transcript;
+      }
+    }
+
+    lastResultIndex = event.results.length;
+
+    resultDiv.innerHTML =
+      finalTranscript +
+      "<span style='color:gray'>" + interim + "</span>";
+  };
+}
+
+init();
+
+// 녹음 시작
+document.getElementById("startBtn").onclick = () => {
+  if (!recognition) return;
+
+  finalTranscript = "";
+  lastResultIndex = 0;
+  resultDiv.innerHTML = "";
+
+  isRecording = true;
+
+  try {
+    recognition.start();
+  } catch(e) {
+    statusDiv.innerText = "⚠️ 이미 실행 중";
+  }
+};
+
+// 녹음 중지
+document.getElementById("stopBtn").onclick = () => {
+  if (!recognition) return;
+
+  isRecording = false;
+  recognition.stop();
+};
+</script>
+
+</body>
+</html>
