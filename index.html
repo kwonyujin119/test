@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>현장지휘관 무전 훈련</title>
+
+<style>
+body {
+  font-family: 'Malgun Gothic', sans-serif;
+  text-align: center;
+  background: #111;
+  color: white;
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+button {
+  width: 90%;
+  max-width: 300px;
+  font-size: 20px;
+  padding: 15px;
+  margin: 10px auto;
+  border: none;
+  border-radius: 12px;
+  display: block;
+}
+
+#startBtn { background: #00c853; color: white; }
+#stopBtn { background: #d50000; color: white; }
+
+#status {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #bbb;
+}
+
+#result {
+  margin-top: 20px;
+  font-size: 18px;
+  background: #222;
+  padding: 15px;
+  border-radius: 10px;
+  min-height: 120px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🚒 현장지휘관 무전 훈련</h1>
+
+<button id="startBtn">🎙️ 녹음 시작</button>
+<button id="stopBtn">⏹️ 녹음 중지</button>
+
+<div id="status">상태: 대기 중</div>
+<div id="result">음성 인식 결과가 여기에 표시됩니다.</div>
+
+<script>
+const resultDiv = document.getElementById("result");
+const statusDiv = document.getElementById("status");
+
+let recognition;
+let isRunning = false;
+
+function initRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    statusDiv.innerText = "❌ 이 브라우저는 음성 인식을 지원하지 않습니다 (Chrome 권장)";
+    return null;
+  }
+
+  const recog = new SpeechRecognition();
+  recog.lang = "ko-KR";
+  recog.interimResults = true;
+  recog.continuous = true;
+
+  let finalTranscript = "";
+
+  recog.onstart = () => {
+    statusDiv.innerText = "🟢 녹음 중...";
+    isRunning = true;
+  };
+
+  recog.onend = () => {
+    if (isRunning) {
+      // 자동 재시작 (끊김 방지)
+      recog.start();
+    } else {
+      statusDiv.innerText = "⏹️ 중지됨";
+    }
+  };
+
+  recog.onerror = (event) => {
+    statusDiv.innerText = "⚠️ 오류: " + event.error;
+  };
+
+  recog.onresult = (event) => {
+    let interim = "";
+
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        finalTranscript += event.results[i][0].transcript + " ";
+      } else {
+        interim += event.results[i][0].transcript;
+      }
+    }
+
+    resultDiv.innerHTML =
+      finalTranscript +
+      "<span style='color:gray'>" + interim + "</span>";
+  };
+
+  return recog;
+}
+
+recognition = initRecognition();
+
+document.getElementById("startBtn").onclick = () => {
+  if (!recognition) return;
+
+  try {
+    isRunning = true;
+    recognition.start();
+  } catch (e) {
+    statusDiv.innerText = "⚠️ 이미 실행 중이거나 권한 문제 발생";
+  }
+};
+
+document.getElementById("stopBtn").onclick = () => {
+  if (!recognition) return;
+
+  isRunning = false;
+  recognition.stop();
+};
+</script>
+
+</body>
+</html>
