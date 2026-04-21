@@ -1,705 +1,210 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <title>방명록 · 건의사항 — 현장지휘관 훈련 포털</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>현장지휘관 훈련 플랫폼 v1</title>
+    <style>
+        :root {
+            --primary-red: #d32f2f;
+            --bg-dark: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+        }
 
-  <!--
-    Pretendard: 네이버·카카오 UI에서 가장 많이 쓰이는
-    한국 대표 산세리프. NanumSquareNeo / KakaoFont의
-    공개 대체재로 사실상 표준.
-  -->
-  <link rel="preconnect" href="https://cdn.jsdelivr.net"/>
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
-  />
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-  <style>
-    /* ════════════════════════════════════
-       DESIGN TOKENS
-    ════════════════════════════════════ */
-    :root {
-      --bg:         #ffffff;
-      --surface:    #fafafa;
-      --surface2:   #f4f4f4;
-      --yellow:     #ffe566;
-      --yellow-soft:#fff9cc;
-      --yellow-deep:#f5d000;
-      --yellow-text:#b89000;
-      --ink:        #1a1a1a;
-      --ink2:       #444444;
-      --ink3:       #888888;
-      --ink4:       #bbbbbb;
-      --border:     #eeeeee;
-      --border2:    #e0e0e0;
-      --danger:     #ff4d4f;
-      --success:    #00b96b;
-      --radius:     16px;
-      --shadow-xs:  0 1px 4px rgba(0,0,0,0.06);
-      --shadow-sm:  0 2px 12px rgba(0,0,0,0.08);
-      --font: 'Pretendard Variable', 'Pretendard',
-              -apple-system, BlinkMacSystemFont,
-              'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
-    }
+        header {
+            width: 100%;
+            max-width: 800px;
+            border-bottom: 2px solid var(--primary-red);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { -webkit-text-size-adjust: 100%; }
+        h1 { margin: 0; font-size: 1.5rem; color: var(--primary-red); }
 
-    body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--ink);
-      min-height: 100vh;
-      min-height: 100dvh;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
+        /* 탭 스타일 */
+        .tabs {
+            display: flex;
+            width: 100%;
+            max-width: 800px;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 1px solid #333;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .tab.active {
+            background: var(--primary-red);
+            color: white;
+            border-color: var(--primary-red);
+        }
 
-    /* ════════════════════════════════════
-       HEADER
-    ════════════════════════════════════ */
-    header {
-      position: sticky;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      box-shadow: var(--shadow-xs);
-    }
+        /* 훈련 콘텐츠 */
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            text-align: center;
+        }
 
-    .header-banner {
-      background: var(--yellow);
-      text-align: center;
-      padding: 6px 16px;
-      font-size: 10.5px;
-      font-weight: 700;
-      letter-spacing: 2.5px;
-      color: var(--ink2);
-      text-transform: uppercase;
-    }
+        /* 마이크 모양 버튼 */
+        .mic-btn {
+            font-size: 4rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #555;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        .mic-btn.recording {
+            color: var(--primary-red);
+            text-shadow: 0 0 15px rgba(211, 47, 47, 0.6);
+            animation: pulse 1.5s infinite;
+        }
 
-    .header-body {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 20px 12px;
-      max-width: 640px;
-      margin: 0 auto;
-    }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
 
-    .header-badge {
-      width: 44px; height: 44px;
-      flex-shrink: 0;
-      background: var(--yellow);
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
-      box-shadow: 0 2px 8px rgba(245,208,0,0.35);
-    }
+        /* 텍스트 박스 */
+        .stt-box {
+            width: 100%;
+            height: 200px;
+            background: #000;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            color: #00ff00; /* 터미널 느낌의 녹색 텍스트 */
+            font-family: 'Courier New', Courier, monospace;
+            text-align: left;
+            overflow-y: auto;
+            box-sizing: border-box;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
 
-    .header-text { flex: 1; min-width: 0; }
+        .status-msg {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #888;
+        }
 
-    .header-eyebrow {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 1.8px;
-      color: var(--ink3);
-      text-transform: uppercase;
-      margin-bottom: 2px;
-    }
-
-    .header-title {
-      font-size: 17px;
-      font-weight: 800;
-      color: var(--ink);
-      letter-spacing: -0.5px;
-      line-height: 1.2;
-    }
-
-    .header-title em {
-      font-style: normal;
-      background: var(--yellow);
-      border-radius: 4px;
-      padding: 1px 5px;
-    }
-
-    /* 탭바 */
-    .tab-bar {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 0 20px;
-      display: flex;
-    }
-
-    .tab-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 18px 11px;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--ink2);
-      border: none;
-      background: var(--yellow-soft);
-      border-radius: 12px 12px 0 0;
-      cursor: default;
-      letter-spacing: -0.3px;
-      position: relative;
-    }
-
-    .tab-pill::after {
-      content: '';
-      position: absolute;
-      bottom: -1px; left: 0; right: 0;
-      height: 2.5px;
-      background: var(--yellow-deep);
-    }
-
-    .tab-dot {
-      width: 6px; height: 6px;
-      background: var(--yellow-deep);
-      border-radius: 50%;
-    }
-
-    /* ════════════════════════════════════
-       MAIN
-    ════════════════════════════════════ */
-    main {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 20px 16px 120px;
-    }
-
-    /* ════════════════════════════════════
-       FORM SECTION
-    ════════════════════════════════════ */
-    .form-section {
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      margin-bottom: 14px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      padding: 14px 18px 12px;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-    }
-
-    .section-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--yellow);
-      border-radius: 8px;
-      padding: 4px 11px 4px 8px;
-      font-size: 12.5px;
-      font-weight: 700;
-      color: var(--ink2);
-      letter-spacing: -0.2px;
-    }
-
-    /* 필드 행 */
-    .field-row { padding: 0 18px; }
-    .field-row + .field-row { border-top: 1px solid var(--border); }
-
-    .field-inner {
-      position: relative;
-      padding-top: 16px;
-    }
-
-    .field-label {
-      display: block;
-      font-size: 10.5px;
-      font-weight: 700;
-      color: var(--ink4);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-      transition: color .2s;
-    }
-
-    .field-inner:focus-within .field-label { color: var(--yellow-text); }
-
-    .field-input,
-    .field-textarea {
-      width: 100%;
-      border: none;
-      outline: none;
-      background: transparent;
-      font-family: var(--font);
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--ink);
-      padding: 0 0 14px;
-      caret-color: var(--yellow-deep);
-      -webkit-appearance: none;
-      appearance: none;
-      resize: none;
-    }
-
-    .field-textarea { min-height: 110px; line-height: 1.7; }
-
-    .field-input::placeholder,
-    .field-textarea::placeholder {
-      color: var(--ink4);
-      font-weight: 400;
-    }
-
-    /* 언더라인 */
-    .field-line {
-      height: 2px;
-      background: var(--border);
-      border-radius: 1px;
-      margin-bottom: 12px;
-      overflow: hidden;
-    }
-
-    .field-line-fill {
-      height: 100%;
-      width: 0%;
-      background: var(--yellow-deep);
-      border-radius: 1px;
-      transition: width .25s cubic-bezier(.4,0,.2,1);
-    }
-
-    /* 폼 액션 */
-    .form-action {
-      padding: 14px 18px 16px;
-      border-top: 1px solid var(--border);
-      background: var(--surface);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .char-group { display: flex; flex-direction: column; gap: 5px; }
-
-    .char-text {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--ink4);
-      transition: color .2s;
-    }
-
-    .char-track {
-      width: 80px; height: 3px;
-      background: var(--border2);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .char-fill {
-      height: 100%;
-      width: 0%;
-      background: var(--yellow-deep);
-      border-radius: 2px;
-      transition: width .15s, background .2s;
-    }
-
-    /* 버튼 */
-    .btn-submit {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: var(--yellow);
-      border: none;
-      border-radius: 50px;
-      padding: 13px 26px;
-      font-family: var(--font);
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--ink2);
-      letter-spacing: -0.3px;
-      cursor: pointer;
-      transition: background .15s, transform .1s, box-shadow .15s;
-      box-shadow: 0 2px 10px rgba(245,208,0,0.4);
-      -webkit-tap-highlight-color: transparent;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-submit:hover { background: var(--yellow-deep); }
-    .btn-submit:active { transform: scale(0.97); box-shadow: none; }
-
-    .ripple {
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(0,0,0,0.1);
-      transform: scale(0);
-      animation: ripple .5s linear;
-      pointer-events: none;
-    }
-    @keyframes ripple { to { transform: scale(4); opacity: 0; } }
-
-    /* ════════════════════════════════════
-       LINKS SECTION
-    ════════════════════════════════════ */
-    .links-section {
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .links-caption {
-      padding: 13px 18px 11px;
-      font-size: 10.5px;
-      font-weight: 700;
-      color: var(--ink3);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .links-caption::before {
-      content: '';
-      display: inline-block;
-      width: 14px; height: 2px;
-      background: var(--yellow-deep);
-      border-radius: 1px;
-    }
-
-    .link-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 15px 18px;
-      text-decoration: none;
-      color: inherit;
-      transition: background .12s;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .link-row + .link-row { border-top: 1px solid var(--border); }
-    .link-row:active { background: var(--yellow-soft); }
-
-    .link-badge {
-      width: 44px; height: 44px;
-      flex-shrink: 0;
-      border-radius: 13px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-      background: var(--yellow-soft);
-      border: 1.5px solid var(--yellow);
-      transition: background .12s;
-    }
-
-    .link-row:active .link-badge { background: var(--yellow); }
-
-    .link-copy { flex: 1; min-width: 0; }
-
-    .link-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--ink);
-      letter-spacing: -0.3px;
-      margin-bottom: 2px;
-    }
-
-    .link-sub {
-      font-size: 11.5px;
-      color: var(--ink3);
-      font-weight: 400;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .link-chevron {
-      font-size: 20px;
-      color: var(--ink4);
-      flex-shrink: 0;
-    }
-
-    /* ════════════════════════════════════
-       TOAST
-    ════════════════════════════════════ */
-    .toast {
-      position: fixed;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%) translateY(16px);
-      background: var(--ink);
-      color: #fff;
-      padding: 13px 22px;
-      border-radius: 50px;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: -0.2px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.22);
-      z-index: 999;
-      opacity: 0;
-      transition: opacity .25s, transform .25s;
-      pointer-events: none;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .toast-dot {
-      width: 8px; height: 8px;
-      background: var(--yellow);
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    /* ════════════════════════════════════
-       FOOTER
-    ════════════════════════════════════ */
-    footer {
-      text-align: center;
-      padding: 16px 16px 40px;
-      font-size: 11px;
-      color: var(--ink4);
-      letter-spacing: 0.4px;
-      max-width: 640px;
-      margin: 0 auto;
-      line-height: 1.8;
-    }
-
-    footer strong { color: var(--ink3); font-weight: 600; }
-
-    /* Safe area (노치 대응) */
-    @supports (padding: max(0px)) {
-      main { padding-bottom: max(120px, calc(80px + env(safe-area-inset-bottom))); }
-      footer { padding-bottom: max(40px, calc(20px + env(safe-area-inset-bottom))); }
-    }
-
-    /* 데스크탑 패딩 보정 */
-    @media (min-width: 480px) {
-      .header-body { padding: 16px 28px 14px; }
-      .tab-bar { padding: 0 28px; }
-      main { padding: 24px 28px 120px; }
-      .section-header,
-      .field-row,
-      .form-action,
-      .links-caption,
-      .link-row { padding-left: 24px; padding-right: 24px; }
-    }
-
-    @keyframes shake {
-      0%,100% { transform: translateX(0); }
-      20%     { transform: translateX(-7px); }
-      40%     { transform: translateX(7px); }
-      60%     { transform: translateX(-4px); }
-      80%     { transform: translateX(4px); }
-    }
-  </style>
+        .footer-note {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
 
-<!-- ══════ HEADER ══════ -->
-<header>
-  <div class="header-banner">인천소방학교 &nbsp;·&nbsp; INCHEON FIRE SCHOOL &nbsp;·&nbsp; ICTC</div>
-  <div class="header-body">
-    <div class="header-badge">🔥</div>
-    <div class="header-text">
-      <div class="header-eyebrow">Incident Commander Training Center</div>
-      <div class="header-title">현장지휘관 <em>훈련 포털</em></div>
-    </div>
-  </div>
-  <div class="tab-bar">
-    <button class="tab-pill">
-      <span class="tab-dot"></span>방명록 · 건의사항
-    </button>
-  </div>
-</header>
+    <header>
+        <h1>현장지휘관 훈련 플랫폼 v1</h1>
+    </header>
 
+    <nav class="tabs">
+        <div class="tab active">무전 훈련</div>
+    </nav>
 
-<!-- ══════ MAIN ══════ -->
-<main>
+    <div class="container">
+        <button id="micBtn" class="mic-btn" title="한번 클릭: 녹음, 두번 클릭: 정지">
+            🎤
+        </button>
+        <div id="recordingStatus" style="margin-bottom: 10px; font-weight: bold; height: 20px;"></div>
 
-  <!-- 작성 폼 -->
-  <div class="form-section">
-    <div class="section-header">
-      <div class="section-chip">✍️ &nbsp;방명록 · 건의사항 작성</div>
-    </div>
+        <div id="sttResult" class="stt-box" placeholder="무전 내용이 여기에 표시됩니다."></div>
+        
+        <p class="status-msg">마이크를 클릭하여 무전 보고를 시작하세요.</p>
 
-    <!-- 이름 -->
-    <div class="field-row">
-      <div class="field-inner" id="nameWrap">
-        <label class="field-label" for="nameInput">이름 / Name</label>
-        <input
-          class="field-input"
-          type="text"
-          id="nameInput"
-          placeholder="성함을 입력하세요"
-          maxlength="30"
-          autocomplete="off"
-          inputmode="text"
-          enterkeyhint="next"
-        />
-      </div>
-      <div class="field-line"><div class="field-line-fill" id="nameLine"></div></div>
-    </div>
-
-    <!-- 내용 -->
-    <div class="field-row">
-      <div class="field-inner" id="contentWrap">
-        <label class="field-label" for="contentInput">내용 / Message &amp; Suggestion</label>
-        <textarea
-          class="field-textarea"
-          id="contentInput"
-          placeholder="훈련 소감, 건의사항을 자유롭게 작성해 주세요."
-          maxlength="500"
-          enterkeyhint="done"
-        ></textarea>
-      </div>
-      <div class="field-line"><div class="field-line-fill" id="contentLine"></div></div>
-    </div>
-
-    <!-- 액션 -->
-    <div class="form-action">
-      <div class="char-group">
-        <span class="char-text" id="charText">0 / 500자</span>
-        <div class="char-track">
-          <div class="char-fill" id="charFill"></div>
+        <div class="footer-note">
+            (시범 운영중) - 현장지휘관 무전 교육용 프로토타입
         </div>
-      </div>
-      <button class="btn-submit" id="submitBtn" onclick="handleSubmit(event)">
-        ✦ 등록하기
-      </button>
     </div>
-  </div>
 
+    <script>
+        const micBtn = document.getElementById('micBtn');
+        const sttResult = document.getElementById('sttResult');
+        const statusMsg = document.getElementById('recordingStatus');
 
-  <!-- 링크 섹션 -->
-  <div class="links-section">
-    <div class="links-caption">참고하면 좋은 플랫폼</div>
+        // Web Speech API 설정
+        window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.interimResults = true;
+        recognition.lang = 'ko-KR';
+        recognition.continuous = true;
 
-    <a class="link-row" href="https://kwonyujin119.github.io/ictcYUJIN" target="_blank" rel="noopener">
-      <div class="link-badge">🏫</div>
-      <div class="link-copy">
-        <div class="link-title">현장지휘관 훈련 포털</div>
-        <div class="link-sub">kwonyujin119.github.io/ictcYUJIN</div>
-      </div>
-      <span class="link-chevron">›</span>
-    </a>
+        let isRecording = false;
 
-    <a class="link-row" href="https://kwonyujin119.github.io/snowball" target="_blank" rel="noopener">
-      <div class="link-badge">📊</div>
-      <div class="link-copy">
-        <div class="link-title">Today 현장지휘관</div>
-        <div class="link-sub">kwonyujin119.github.io/snowball</div>
-      </div>
-      <span class="link-chevron">›</span>
-    </a>
+        recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+                .map(result => result[0])
+                .map(result => result.transcript)
+                .join('');
+            
+            sttResult.innerText = transcript;
+            sttResult.scrollTop = sttResult.scrollHeight;
+        };
 
-    <a class="link-row" href="https://kwonyujin119.github.io/tb" target="_blank" rel="noopener">
-      <div class="link-badge">🏆</div>
-      <div class="link-copy">
-        <div class="link-title">Today Best</div>
-        <div class="link-sub">kwonyujin119.github.io/tb</div>
-      </div>
-      <span class="link-chevron">›</span>
-    </a>
+        // 클릭 로직 처리 (싱글/더블 클릭 구분)
+        let clickTimer;
+        micBtn.addEventListener('click', () => {
+            if (clickTimer) {
+                // 더블 클릭 발생: 정지
+                clearTimeout(clickTimer);
+                clickTimer = null;
+                stopRecording();
+            } else {
+                clickTimer = setTimeout(() => {
+                    // 싱글 클릭 발생: 녹음 시작
+                    clickTimer = null;
+                    if (!isRecording) startRecording();
+                }, 250);
+            }
+        });
 
-  </div>
+        function startRecording() {
+            isRecording = true;
+            micBtn.classList.add('recording');
+            statusMsg.innerText = "● 녹음 중...";
+            statusMsg.style.color = "#d32f2f";
+            recognition.start();
+            console.log("녹음 시작");
+        }
 
-</main>
+        function stopRecording() {
+            isRecording = false;
+            micBtn.classList.remove('recording');
+            statusMsg.innerText = "정지됨";
+            statusMsg.style.color = "#888";
+            recognition.stop();
+            console.log("녹음 정지");
+        }
 
-
-<!-- ══════ FOOTER ══════ -->
-<footer>
-  <strong>인천소방학교</strong> &nbsp;·&nbsp; 현장지휘관 훈련 포털<br/>
-  ICTC Incident Commander Training Center
-</footer>
-
-
-<!-- 토스트 -->
-<div class="toast" id="toast">
-  <span class="toast-dot"></span>소중한 의견이 등록되었습니다
-</div>
-
-
-<script>
-  const nameInput   = document.getElementById('nameInput');
-  const contentInput = document.getElementById('contentInput');
-  const charText    = document.getElementById('charText');
-  const charFill    = document.getElementById('charFill');
-  const nameLine    = document.getElementById('nameLine');
-  const contentLine = document.getElementById('contentLine');
-
-  /* 포커스 언더라인 */
-  nameInput.addEventListener('focus',  () => nameLine.style.width = '100%');
-  nameInput.addEventListener('blur',   () => nameLine.style.width = '0%');
-  contentInput.addEventListener('focus', () => contentLine.style.width = '100%');
-  contentInput.addEventListener('blur',  () => contentLine.style.width = '0%');
-
-  /* 글자 수 */
-  contentInput.addEventListener('input', updateChar);
-  function updateChar() {
-    const len = contentInput.value.length;
-    const pct = (len / 500) * 100;
-    charText.textContent = len + ' / 500자';
-    charFill.style.width = pct + '%';
-    const over = len > 450;
-    charFill.style.background = over ? '#ff4d4f' : 'var(--yellow-deep)';
-    charText.style.color = over ? '#ff4d4f' : 'var(--ink4)';
-  }
-
-  /* 제출 */
-  function handleSubmit(e) {
-    addRipple(e);
-    const name    = nameInput.value.trim();
-    const content = contentInput.value.trim();
-    if (!name)    { shake(nameInput);    nameInput.focus();    return; }
-    if (!content) { shake(contentInput); contentInput.focus(); return; }
-    showToast();
-    nameInput.value = '';
-    contentInput.value = '';
-    updateChar();
-  }
-
-  /* 리플 */
-  function addRipple(e) {
-    const btn  = document.getElementById('submitBtn');
-    const rect = btn.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    const r = document.createElement('span');
-    r.className = 'ripple';
-    r.style.cssText =
-      `width:${size}px;height:${size}px;` +
-      `left:${(e.clientX ?? rect.left + rect.width/2) - rect.left - size/2}px;` +
-      `top:${(e.clientY  ?? rect.top  + rect.height/2)- rect.top  - size/2}px`;
-    btn.appendChild(r);
-    setTimeout(() => r.remove(), 600);
-  }
-
-  /* 쉐이크 */
-  function shake(el) {
-    el.style.animation = 'none';
-    void el.offsetWidth;
-    el.style.animation = 'shake .3s ease';
-    setTimeout(() => el.style.animation = '', 400);
-  }
-
-  /* 토스트 */
-  function showToast() {
-    const t = document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2800);
-  }
-</script>
-
+        recognition.onerror = (event) => {
+            console.error("Speech recognition error:", event.error);
+            stopRecording();
+        };
+    </script>
 </body>
 </html>
