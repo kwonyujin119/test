@@ -353,7 +353,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <p>INCHEON FIRE ACADEMY · 현장지휘관 단기 실무반 교육 자료</p>
   </div>
   <div class="hdr-right">
-    <div class="hdr-memo">🎗 고 박승원 소방위 · 고 노태영 소방사</div>
     <div class="hdr-clock" id="clk-t">00:00:00</div>
     <div class="hdr-date" id="clk-d">----.--.--</div>
   </div>
@@ -367,8 +366,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   </button>
   <button class="tab" onclick="switchT(2,this)">
     <span class="tn">TAB 02 · 디브리핑</span>
-    <span class="tt">현장지휘관 디브리핑 우선순위 10</span>
-    <span class="ts">긴급 핵심 5 · 중요 3 · 보완 2</span>
+    <span class="tt">현장지휘관 디브리핑 우선순위 9</span>
+    <span class="ts">긴급 핵심 4 · 중요 3 · 보완 2</span>
   </button>
   <button class="tab" onclick="switchT(3,this)">
     <span class="tn">TAB 03 · 교훈</span>
@@ -530,7 +529,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
   <div class="panel-title">
     <div class="pt-badge">TAB 02</div>
-    <div class="pt-text">완도 냉동창고 화재 — 현장지휘관 디브리핑 우선순위 10</div>
+    <div class="pt-text">완도 냉동창고 화재 — 현장지휘관 디브리핑 우선순위 9</div>
     <div class="pt-line"></div>
   </div>
   <div class="panel-sub">5대 역량 기반 질문 · 사실 근거 + 토론 포인트 제공 · 동료질문(Peer-to-Peer) 방식 권장</div>
@@ -541,8 +540,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
   <div class="filter-bar">
     <span class="filter-label">FILTER</span>
-    <button class="fbtn on" onclick="filt('all',this)">전체 <span class="n">10</span></button>
-    <button class="fbtn red" onclick="filt('red',this)">긴급 핵심 <span class="n">5</span></button>
+    <button class="fbtn on" onclick="filt('all',this)">전체 <span class="n">9</span></button>
+    <button class="fbtn red" onclick="filt('red',this)">긴급 핵심 <span class="n">4</span></button>
     <button class="fbtn amber" onclick="filt('amber',this)">중요 <span class="n">3</span></button>
     <button class="fbtn gray" onclick="filt('gray',this)">보완 <span class="n">2</span></button>
   </div>
@@ -635,37 +634,31 @@ var PRIO=[
  p:["유증기는 무색·무취 — 가시 징후 없어도 한계 농도 도달 가능 (LEL 초과)",
     "밀폐 공간일수록 유증기 농도가 빠르게 임계점 초과 → '조용함 = 위험' 역설",
     "대원이 연기를 못 보는 상황 = 시야 제로 → 탈출 방향 판단 불가 위험 동반"]},
-{r:5,lv:"red",d:"지휘체계",l:"긴급 핵심",
- q:"무전 대피 명령이 3~4차례 전달됐지만 2명이 탈출하지 못했습니다. 무전 외 어떤 비상 신호 체계가 있었어야 할까요?",
- f:"지휘팀장이 3~4차례 무전 대피 명령 → 7명 중 5명 탈출, 2명 고립. 출입구 5m·3m 앞에서 발견.",
- p:["폭발·연기 속 무전 수신 불가 가능성 — 호각 비상신호(단음 3회 반복) 병행 필수",
-    "탈출 방향 표시: 형광 유도 줄·표식 사전 설치 여부가 생사를 가를 수 있음",
-    "대피 명령 후 인원 확인(Roll-call) 즉시 실시 → 고립 2명 인지(09:02)를 앞당길 수 있었음"]},
-{r:6,lv:"amber",d:"지휘체계",l:"중요",
+{r:5,lv:"amber",d:"지휘체계",l:"중요",
  q:"1차 진입 후 '완진 판단'을 어떻게 내렸나요? 냉동창고 구조에서 완진 확인 기준은?",
  f:"1차 진입 시 연기 발화원 미확인, 샌드위치 패널 절단 후 일단 철수 → 완진 판단 후 재발생.",
  p:["완진 기준: 전체 공간 탐색 완료 + 열화상카메라로 잔열 없음 확인 + 벤틸레이션 완료",
     "냉동창고는 다수 구획 → 각 구획 개별 확인 없이 전체 완진 불가",
     "'연기 사라짐 = 완진'이 아닌 '잠복 화재(Hidden Fire) 가능성' 인식 필요"]},
-{r:7,lv:"amber",d:"자원관리",l:"중요",
+{r:6,lv:"amber",d:"자원관리",l:"중요",
  q:"대응 1단계 발령은 09:00, 폭발은 08:55입니다. 더 이른 시점에 대응 단계를 상향했어야 한다면 어떤 기준이었을까요?",
  f:"08:25 신고 → 08:31 선착대 도착 → 대응 1단계 발령은 09:00(폭발 5분 뒤). 인력 115명·장비 39대 동원.",
  p:["스프링클러 미설치 + 위험 내장재(우레탄·에폭시) = 선제적 대응 단계 상향 기준 해당",
     "1차 진입에서 발화원 미확인 = '상황 미통제' → 증원 요청 트리거로 삼았어야",
     "2차 진입 결정 시점이 선제적 1단계 발령 트리거가 될 수 있었음"]},
-{r:8,lv:"amber",d:"인명안전",l:"중요",
+{r:7,lv:"amber",d:"인명안전",l:"중요",
  q:"7명 진입 대원의 실시간 위치를 어떻게 파악하고 있었나요? 고립 인지(09:02)를 앞당길 수 있었을까요?",
  f:"7명 진입 → 폭발(08:55) → 5명 탈출 확인 → 09:02 2명 위치 파악 불가. 출입구 5m·3m에서 발견.",
  p:["진입 시 PASS 장치 작동 확인 — 30초 정지 시 자동 경보가 고립 위치 파악 수단",
     "진입 대원 명단·역할 지정 후 대피 후 Roll-call 즉시 실시 원칙",
     "진입 대원과의 무전 확인 주기: 5분 단위 또는 상황 변화 시 즉시 보고 체계"]},
-{r:9,lv:"gray",d:"의사결정",l:"보완",
+{r:8,lv:"gray",d:"의사결정",l:"보완",
  q:"'불길이 크지 않아 막바지 작업'이라는 판단에는 어떤 인지 편향이 작동했을 가능성이 있나요?",
  f:"2차 진입 당시 '막바지 작업'으로 판단 — 이 판단이 안전 확인 절차를 축약했을 가능성.",
  p:["정상화 편향: 여러 번 비슷한 상황을 무사히 넘긴 경험 → '이 정도면 괜찮다'는 습관화",
     "터널 시야: '진압 완료'에 집중 → 새로운 위험 신호(유증기 축적) 인식 실패",
     "시간 압박 편향: 빨리 끝내고 싶은 욕구가 체계적 확인을 단축시킴"]},
-{r:10,lv:"gray",d:"인명안전",l:"보완",
+{r:9,lv:"gray",d:"인명안전",l:"보완",
  q:"두 대원은 출입구 5m·3m 앞에서 발견됐습니다. 이 사실이 탈출 경로 사전 브리핑에 주는 교훈은?",
  f:"박 소방위 출입구 안쪽 5m, 노 소방사 3m 지점 발견. 노 소방사는 내장재 패널에 덮인 상태.",
  p:["출구 근처라도 폭발·패널 붕괴 시 탈출 불가 — 출구 방향 인식보다 '탈출 실행 속도'가 관건",
@@ -678,20 +671,17 @@ var IMP=[
  w:"RIT 도착이 폭발 65분 후(10:00) — 두 대원은 출입구 5m·3m 앞에서 발견됐습니다.",
  p:[{t:"타서 구조대 선제 요청",b:"인명 구조 상황 추정 순간, 1차 진입 전 인근 소방서 구조대에 즉시 지원 요청"},
     {t:"자체 구조대 → RIT 고정",b:"관할 구조대 1개는 내부 진입 대원 전담 지원(RIT) 역할로 고정"},
-    {t:"2차 진입 전 RIT 재확인",b:"재진입 결정 시 RIT 편성·준비 상태를 반드시 재확인하고 진입 허가"}],
- tip:"1개 구조대 체계의 현실적 제약을 인정하되, 그렇기에 타서 요청을 더 빨리·더 자주 해야 함을 강조하세요."},
+    {t:"2차 진입 전 RIT 재확인",b:"재진입 결정 시 RIT 편성·준비 상태를 반드시 재확인하고 진입 허가"}]},
 {n:"02",t:"1선 펌프차 지정 + 대응단계 선제 상향",s:"First-line Assignment · Proactive Escalation",
  w:"대응 1단계 발령이 09:00 — 폭발(08:55) 5분 후. 위험 내장재 조합에도 선제 상향이 없었습니다.",
  p:[{t:"1선 펌프차 역할 고정",b:"도착 즉시 수원 확보·방수 준비 완료 — 진압 라인 확보 전 내부 진입 금지"},
     {t:"위험 내장재 = 즉시 상향",b:"스프링클러 미설치 + 우레탄·에폭시 = 대응단계 선제 상향 트리거"},
-    {t:"발화원 미특정 = 증원 요청",b:"'상황 미통제' 판단 시 즉시 증원 요청 및 대응단계 상향"}],
- tip:"대응단계 상향을 주저하게 되는 심리적 요인(보고 부담, 과잉 반응 우려)을 솔직하게 꺼내 토론해보세요."},
+    {t:"발화원 미특정 = 증원 요청",b:"'상황 미통제' 판단 시 즉시 증원 요청 및 대응단계 상향"}]},
 {n:"03",t:"진입 시 탈출 방안 사전 확보",s:"Pre-entry Exit Strategy",
  w:"두 대원이 출입구 5m·3m 앞 지점에서 발견 — 방향 감각 상실 시 출구 앞에서도 탈출 불가합니다.",
  p:[{t:"진입 전 탈출 경로 전원 공유",b:"주 경로 + 대체 경로를 전 대원이 숙지·상호 확인 · 2차 재진입 시 동일 반복"},
     {t:"PASS 장치 작동 확인 필수",b:"30초 이상 정지 시 자동 경보 → 고립 위치 파악 수단 확보"},
-    {t:"저자세 이동 + 벽면 촉각 훈련",b:"시야 제로 상황에서 벽면 따라 저자세 이동 훈련이 생사를 가름"}],
- tip:"PASS 장치·탈출 경로 브리핑이 실제로 얼마나 지켜지는지 교육생 스스로 돌아보게 하세요."}
+    {t:"저자세 이동 + 벽면 촉각 훈련",b:"시야 제로 상황에서 벽면 따라 저자세 이동 훈련이 생사를 가름"}]}
 ];
 
 var REF=[
@@ -699,14 +689,11 @@ var REF=[
  w:"08:52 '화염·연기 안 보임' 보고 → 불과 3분 뒤 08:55 폭발. '이상 없음'이 가장 위험한 신호일 수 있습니다.",
  p:[{t:"'조용함 = 위험'의 역설",b:"유증기·가스는 무색·무취 — 가시 징후 없어도 임계 농도 도달 가능"},
     {t:"'이상무' 후 추가 확인 프로토콜",b:"'이상 없음' 보고 직후 ①가스 농도 ②천장 온도 ③탈출 경로 재확인"},
-    {t:"플래시오버 전조 5단계",b:"①연기 색 ②밀도 ③기류 역전 ④복사열 ⑤소음 — 가스 감지기 병행"}],
- tip:"'이상 없음'을 들었을 때 어떤 감각으로 판단하는지 솔직하게 이야기하게 하세요. 정상화 편향이 얼마나 자연스럽게 작동하는지 인식하는 것이 핵심입니다."},
+    {t:"플래시오버 전조 5단계",b:"①연기 색 ②밀도 ③기류 역전 ④복사열 ⑤소음 — 가스 감지기 병행"}]},
 {n:"02",t:"진입 대원과 실시간 소통해야 한다",s:"Real-time Communication",
  w:"대피 명령이 3~4차례 무전으로 전달됐으나 2명이 탈출하지 못함 — 소통이 일방적·사후적이었을 가능성.",
  p:[{t:"5분 단위 정기 무전 확인",b:"응답 없을 시 즉시 대응 — '침묵 = 이상 없음'이 아닌 '침묵 = 즉각 확인 필요'"},
-    {t:"무전 외 이중 신호 체계",b:"무전 + 호각(비상신호 단음 3회 반복) 병행 — 무전 불통 대비 훈련"},
-    {t:"탈출 후 즉시 Roll-call",b:"진입 대원 전원 인원 확인 → 고립 인지 시각(09:02)을 앞당겨 구조 골든타임 확보"}],
- tip:"현장에서 무전 통화가 실제로 얼마나 자주 이루어지는지 교육생 스스로 점검하게 하세요."}
+    {t:"탈출 후 즉시 Roll-call",b:"진입 대원 전원 인원 확인 → 고립 인지 시각(09:02)을 앞당겨 구조 골든타임 확보"}]}
 ];
 
 // ── 렌더링 ──
@@ -769,10 +756,6 @@ function renderLessons(){
         +'<div class="principles">'
           +d.p.map(function(x){return '<div class="principle"><strong>'+x.t+'</strong>'+x.b+'</div>'}).join('')
         +'</div>'
-        +'<div class="tip-mini">'
-          +'<div class="tip-mini-label">★ 강사 팁</div>'
-          +'<div class="tip-mini-text">'+d.tip+'</div>'
-        +'</div>'
       +'</div>';
     il.appendChild(e);
   });
@@ -794,10 +777,6 @@ function renderLessons(){
         +'</div>'
         +'<div class="principles">'
           +d.p.map(function(x){return '<div class="principle"><strong>'+x.t+'</strong>'+x.b+'</div>'}).join('')
-        +'</div>'
-        +'<div class="tip-mini">'
-          +'<div class="tip-mini-label">★ 강사 팁</div>'
-          +'<div class="tip-mini-text">'+d.tip+'</div>'
         +'</div>'
       +'</div>';
     rl.appendChild(e);
