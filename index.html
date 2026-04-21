@@ -3,797 +3,831 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>디브리핑 가이드 — 인천소방학교</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>완도 화재 디브리핑 — 현장지휘관 단기 실무반 V.26.4.1</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --accent:   #c0392b;
-  --navy:     #0d1b3e;
-  --navy2:    #162447;
-  --navy3:    #1f3370;
-  --gold:     #d4a017;
-  --black:    #111;
-  --white:    #fff;
-  --bg-light: #eef2f8;
-  --border:   #d0d9ec;
-  --muted:    #7a8aaa;
-  --green:    #1e8449;
-  --orange:   #e67e22;
-  --blue:     #1a5276;
+:root{
+  --accent:#c0392b;--accent2:#8e2b20;--navy:#0d1b3e;--navy2:#162447;--navy3:#1f3370;
+  --gold:#d4a017;--green:#1a6b3a;--green2:#0f4724;--amber:#e67e22;--blue:#1a5276;
+  --white:#fff;--bg:#eef2f8;--bg2:#f7f9fc;--border:#d0d9ec;--muted:#7a8aaa;
+  --text:#0d1b3e;--text2:#334466;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{font-size:18px}
-body{font-family:'Noto Sans KR',sans-serif;background:var(--bg-light);overflow:hidden;height:100dvh}
+html,body{height:100%}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
 
-/* ── 헤더 ── */
-.site-header{
-  border-bottom:3px solid var(--gold);
-  padding:14px 24px;
-  display:flex;align-items:center;gap:16px;
-  position:sticky;top:0;z-index:200;
+/* ═══ HEADER ═══ */
+.hdr{
   background:
-    radial-gradient(ellipse at 0% 100%,rgba(192,57,43,.3) 0%,transparent 50%),
+    radial-gradient(ellipse at 0% 100%,rgba(192,57,43,.32) 0%,transparent 50%),
     repeating-linear-gradient(0deg,transparent,transparent 32px,rgba(255,255,255,.025) 32px,rgba(255,255,255,.025) 33px),
     repeating-linear-gradient(90deg,transparent,transparent 32px,rgba(255,255,255,.025) 32px,rgba(255,255,255,.025) 33px),
     linear-gradient(135deg,#0d1b3e 0%,#162447 60%,#1a1e3a 100%);
-  box-shadow:0 3px 20px rgba(13,27,62,.6),0 1px 0 rgba(212,160,23,.3);
+  border-bottom:3px solid var(--gold);
+  padding:18px 32px;
+  display:flex;align-items:center;gap:22px;
+  box-shadow:0 3px 20px rgba(13,27,62,.6)
 }
-.site-icon{width:68px;height:68px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.07);border-radius:50%;border:2px solid rgba(212,160,23,.4)}
-.site-icon-text{font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:700;color:var(--gold);letter-spacing:1px;line-height:1}
-.site-title{flex:1}
-.site-title h1{font-size:1.45rem;font-weight:900;color:#fff;letter-spacing:-0.3px;line-height:1.2;text-shadow:0 1px 8px rgba(0,0,0,.4)}
-.site-title p{font-size:0.65rem;color:#9fb4d8;letter-spacing:.8px;margin-top:4px;font-weight:400}
-.site-clock{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;gap:2px}
-.clock-time{font-family:'DM Mono',monospace;font-size:1.05rem;font-weight:700;color:#fff;letter-spacing:1px}
-.clock-date{font-family:'DM Mono',monospace;font-size:0.55rem;color:#7a9acc;letter-spacing:1px}
+.hdr-icon{
+  width:68px;height:68px;flex-shrink:0;border-radius:50%;
+  background:rgba(255,255,255,.07);border:2px solid rgba(212,160,23,.4);
+  display:flex;align-items:center;justify-content:center
+}
+.hdr-icon span{font-family:'DM Mono',monospace;font-size:15px;font-weight:700;color:var(--gold);letter-spacing:1px}
+.hdr-title{flex:1}
+.hdr-title h1{font-size:26px;font-weight:900;color:#fff;letter-spacing:-0.5px;line-height:1.2;text-shadow:0 1px 8px rgba(0,0,0,.4)}
+.hdr-title h1 .ver{font-family:'DM Mono',monospace;font-size:13px;color:var(--gold);margin-left:12px;font-weight:500;letter-spacing:1px;padding:3px 9px;background:rgba(212,160,23,.15);border:1px solid rgba(212,160,23,.35);border-radius:3px;vertical-align:middle}
+.hdr-title p{font-size:12px;color:#9fb4d8;margin-top:5px;letter-spacing:.5px}
+.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.hdr-memo{
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;
+  color:#c99;padding:4px 10px;background:rgba(192,57,43,.18);
+  border:1px solid rgba(192,57,43,.35);border-radius:2px
+}
+.hdr-clock{font-family:'DM Mono',monospace;font-size:15px;font-weight:700;color:#fff;letter-spacing:1px}
+.hdr-date{font-family:'DM Mono',monospace;font-size:9px;color:#7a9acc;letter-spacing:1px}
 
-/* ── 탭 ── */
-.tab-nav{
+/* ═══ TAB NAV ═══ */
+.tabnav{
   background:var(--navy2);
   display:grid;grid-template-columns:repeat(3,1fr);
-  width:100%;border-bottom:3px solid var(--gold);
+  border-bottom:3px solid var(--gold)
 }
-.tab-btn{
+.tab{
   background:var(--navy2);border:none;
   border-right:1px solid rgba(255,255,255,.1);
-  color:rgba(255,255,255,.5);
-  font-family:'Noto Sans KR',sans-serif;font-size:0.95rem;font-weight:800;
-  padding:28px 8px;cursor:pointer;position:relative;
-  transition:background .2s,color .2s;text-align:center;line-height:1.5;word-break:keep-all
+  color:rgba(255,255,255,.55);
+  font-family:'Noto Sans KR',sans-serif;
+  font-weight:700;padding:18px 14px;cursor:pointer;position:relative;
+  transition:background .2s,color .2s;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:4px
 }
-.tab-btn:last-child{border-right:none}
-.tab-btn::after{content:'';position:absolute;bottom:-3px;left:0;right:0;height:3px;background:var(--accent);transform:scaleX(0);transition:transform .3s}
-.tab-btn:hover{background:var(--navy3);color:rgba(255,255,255,.9)}
-.tab-btn.active{background:var(--navy3);color:#fff}
-.tab-btn.active::after{transform:scaleX(1)}
-.tab-num{font-family:'DM Mono',monospace;font-size:0.6rem;color:rgba(255,255,255,.35);display:block;margin-bottom:3px;letter-spacing:2px}
-.tab-btn.active .tab-num{color:var(--gold)}
+.tab:last-child{border-right:none}
+.tab .tn{font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.35);letter-spacing:3px}
+.tab .tt{font-size:14px}
+.tab .ts{font-size:10.5px;color:rgba(255,255,255,.4);font-weight:400;letter-spacing:.3px}
+.tab::after{content:'';position:absolute;bottom:-3px;left:0;right:0;height:3px;background:var(--accent);transform:scaleX(0);transition:transform .3s}
+.tab:hover{background:var(--navy3);color:rgba(255,255,255,.9)}
+.tab:hover .tn{color:rgba(212,160,23,.6)}
+.tab.active{background:var(--navy3);color:#fff}
+.tab.active .tn{color:var(--gold)}
+.tab.active .ts{color:#9fb4d8}
+.tab.active::after{transform:scaleX(1)}
 
-.tab-panel{display:none}
-.tab-panel.active{
-  display:block;
-  animation:fadeIn .3s ease;
-  height:calc(100dvh - var(--header-h,76px) - var(--nav-h,96px));
-  overflow-y:auto;-webkit-overflow-scrolling:touch
+/* ═══ PANELS ═══ */
+.panels{height:calc(100dvh - var(--hdr-h,108px) - var(--nav-h,72px));overflow-y:auto;background:var(--bg)}
+.panel{display:none;padding:28px 32px 60px;max-width:1360px;margin:0 auto}
+.panel.active{display:block;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══ 섹션 공통 ═══ */
+.panel-title{
+  display:flex;align-items:center;gap:14px;margin-bottom:6px
 }
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-
-/* ── 공통 섹션 헤더 ── */
-.stage-bar{display:flex;align-items:center;gap:12px;margin:24px 28px 10px}
-.stage-bar span{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;white-space:nowrap}
-.stage-bar-line{flex:1;height:1px;background:var(--border)}
-
-/* ── 진행률 바 ── */
-.prog-wrap{background:#fff;border-bottom:1px solid var(--border);padding:8px 28px;display:flex;align-items:center;gap:14px;flex-shrink:0}
-.prog-bg{flex:1;height:5px;background:#e0e0e0;border-radius:3px;overflow:hidden}
-.prog-fill{height:100%;background:var(--navy3);width:0%;transition:width .4s ease}
-.prog-label{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--navy3);white-space:nowrap;font-weight:600}
-.prog-label span{color:var(--navy);font-weight:800}
-
-/* ── Q&A 카드 공통 ── */
-.qa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 28px 8px}
-.qa-card{background:#fff;border:1.5px solid var(--border);cursor:pointer;user-select:none;transition:border-color .2s,box-shadow .2s,transform .15s;overflow:hidden}
-.qa-card:hover{border-color:#bbb;box-shadow:0 4px 20px rgba(0,0,0,.08);transform:translateY(-2px)}
-.qa-card.open{border-color:var(--accent);box-shadow:0 4px 24px rgba(192,57,43,.12)}
-.qa-card-q{padding:16px 14px;display:flex;align-items:flex-start;gap:10px}
-.q-num{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--accent);font-weight:700;flex-shrink:0;padding-top:3px;min-width:26px}
-.q-text{font-size:0.84rem;font-weight:700;line-height:1.5;color:var(--black);word-break:keep-all;flex:1}
-.q-arr{font-size:0.7rem;color:var(--muted);flex-shrink:0;padding-top:4px;transition:transform .25s;margin-left:4px}
-.qa-card.open .q-arr{transform:rotate(180deg);color:var(--accent)}
-.qa-card-a{max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1)}
-.qa-card.open .qa-card-a{max-height:800px}
-.qa-card-a-inner{border-top:1px solid #eee;background:#fdf0ef;padding:12px 14px 14px}
-.a-sum{font-size:0.8rem;font-weight:700;color:var(--accent);line-height:1.6;margin-bottom:8px;word-break:keep-all}
-.a-ul{list-style:none;display:flex;flex-direction:column;gap:5px}
-.a-ul li{font-size:0.76rem;color:#444;line-height:1.7;display:flex;align-items:flex-start;gap:6px;word-break:keep-all}
-.a-ul li::before{content:'▸';color:var(--accent);font-size:0.58rem;flex-shrink:0;margin-top:5px}
-
-/* ── TAB1: 10분 타임라인 ── */
-#tab1{background:var(--bg-light);padding-bottom:40px}
-.timeline-strip{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
-  margin:0 0 4px;background:#fff;border-bottom:1px solid var(--border)
+.pt-badge{
+  background:var(--accent);color:#fff;font-size:10px;font-weight:700;
+  letter-spacing:3px;padding:5px 11px;font-family:'DM Mono',monospace
 }
-.tl-seg{
-  padding:14px 16px;border-right:1px solid var(--border);
-  cursor:pointer;transition:background .2s;position:relative
-}
-.tl-seg:last-child{border-right:none}
-.tl-seg:hover{background:#f5f8ff}
-.tl-seg.active{background:var(--navy2)}
-.tl-seg-time{font-family:'DM Mono',monospace;font-size:0.68rem;font-weight:700;margin-bottom:3px}
-.tl-seg.active .tl-seg-time{color:var(--gold)}
-.tl-seg-time:not(.tl-seg.active .tl-seg-time){color:var(--accent)}
-.tl-seg-phase{font-size:0.8rem;font-weight:800;color:var(--navy);line-height:1.3;word-break:keep-all}
-.tl-seg.active .tl-seg-phase{color:#fff}
-.tl-seg-desc{font-size:0.65rem;color:var(--muted);margin-top:3px;line-height:1.4;word-break:keep-all}
-.tl-seg.active .tl-seg-desc{color:#9fb4d8}
-.tl-indicator{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--accent);transform:scaleX(0);transition:transform .3s}
-.tl-seg.active .tl-indicator{transform:scaleX(1)}
-.tl-tip{background:var(--navy);color:#9fb4d8;font-size:0.72rem;padding:8px 28px;border-bottom:1px solid rgba(255,255,255,.08)}
-.tl-tip span{color:var(--gold);font-weight:700}
+.pt-text{font-size:22px;font-weight:900;color:var(--navy)}
+.pt-line{flex:1;height:2px;background:var(--navy);margin-left:4px}
+.panel-sub{font-size:12px;color:var(--muted);margin-bottom:24px;margin-left:80px}
 
-/* ── TAB2: 5대 역량 ── */
-#tab2{background:var(--bg-light);padding-bottom:40px}
-.domain-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:3px 10px;border-radius:2px;
-  font-family:'DM Mono',monospace;font-size:0.62rem;font-weight:700;letter-spacing:1px
+.sec-header{
+  display:flex;align-items:center;gap:12px;
+  margin:28px 0 14px;padding-bottom:8px;
+  border-bottom:1.5px solid var(--navy)
 }
-.domain-header{margin:0 28px 10px;display:flex;align-items:center;gap:12px}
-.domain-label{font-size:0.85rem;font-weight:900;color:var(--navy)}
-.domain-sub{font-size:0.65rem;color:var(--muted);font-family:'DM Mono',monospace}
-
-/* ── TAB3: 완도 사례 ── */
-#tab3{background:var(--bg-light);padding-bottom:40px}
-
-/* 애도 배너 */
-.memorial-banner{
-  background:linear-gradient(135deg,#1a0a0a 0%,#2d1010 100%);
-  border-bottom:2px solid var(--accent);
-  padding:14px 28px;display:flex;align-items:center;gap:16px;flex-shrink:0
+.sec-num{
+  font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+  background:var(--navy);color:#fff;padding:5px 10px;letter-spacing:2px
 }
-.memorial-flag{font-size:1.6rem;flex-shrink:0}
-.memorial-text{flex:1}
-.memorial-title{font-size:0.82rem;font-weight:900;color:#fff;letter-spacing:.5px;margin-bottom:3px}
-.memorial-sub{font-size:0.68rem;color:#c99;line-height:1.5;word-break:keep-all}
-.memorial-date{font-family:'DM Mono',monospace;font-size:0.6rem;color:#a55;letter-spacing:2px;flex-shrink:0}
+.sec-title{font-size:17px;font-weight:900;color:var(--navy)}
+.sec-desc{font-size:11px;color:var(--muted);margin-left:auto}
 
-/* 사고 타임라인 */
-.incident-timeline{
-  background:#fff;border-bottom:1px solid var(--border);
-  padding:14px 28px;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-shrink:0
-}
-.tl-title{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:3px;margin-bottom:10px}
-.tl-row{display:flex;align-items:flex-start;gap:0;min-width:600px}
-.tl-event{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
-.tl-event+.tl-event::before{content:'';position:absolute;left:-50%;top:14px;width:100%;height:2px;background:var(--border);z-index:0}
-.tl-event.critical+.tl-event::before,.tl-event+.tl-event.critical::before{background:#c0392b44}
-.tl-dot{width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.6rem;z-index:1;flex-shrink:0;position:relative}
-.tl-event.critical .tl-dot{background:var(--accent);border-color:var(--accent);color:#fff;font-size:0.65rem;font-weight:700}
-.tl-event.warn .tl-dot{background:var(--orange);border-color:var(--orange);color:#fff}
-.tl-event.safe .tl-dot{background:var(--green);border-color:var(--green);color:#fff}
-.tl-event-time{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);margin-top:5px;text-align:center;font-weight:600}
-.tl-event.critical .tl-event-time{color:var(--accent)}
-.tl-event-label{font-size:0.62rem;color:var(--navy);text-align:center;margin-top:2px;line-height:1.3;word-break:keep-all;max-width:70px}
-
-/* 사례 요약 카드 */
-.case-summary{
-  margin:20px 28px 0;
-  display:grid;grid-template-columns:repeat(4,1fr);gap:10px
-}
-.case-stat{
+/* ═══════════════════ TAB 1 ═══════════════════ */
+/* 핵심 수치 */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:6px}
+.stat{
   background:#fff;border:1.5px solid var(--border);
-  padding:12px 14px;text-align:center
+  padding:18px 20px;position:relative;overflow:hidden;
+  transition:transform .2s
 }
-.case-stat-num{font-family:'DM Mono',monospace;font-size:1.3rem;font-weight:700;line-height:1;margin-bottom:4px}
-.case-stat-label{font-size:0.65rem;color:var(--muted);line-height:1.3;word-break:keep-all}
-.stat-red{color:var(--accent)}
-.stat-navy{color:var(--navy)}
-.stat-orange{color:var(--orange)}
-.stat-green{color:var(--green)}
+.stat:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(13,27,62,.08)}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--navy)}
+.stat.red::before{background:var(--accent)}
+.stat.amber::before{background:var(--amber)}
+.stat.blue::before{background:var(--blue)}
+.stat-l{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--muted);letter-spacing:2px;margin-bottom:8px;text-transform:uppercase}
+.stat-n{font-size:30px;font-weight:900;line-height:1;color:var(--navy);margin-bottom:6px}
+.stat.red .stat-n{color:var(--accent)}
+.stat.amber .stat-n{color:var(--amber)}
+.stat.blue .stat-n{color:var(--blue)}
+.stat-n .unit{font-size:15px;font-weight:500;margin-left:3px}
+.stat-d{font-size:11px;color:var(--text2);line-height:1.55;word-break:keep-all}
 
-/* 역량 섹션 컬러 */
-.qa-card.dom-a.open{border-color:var(--accent);box-shadow:0 4px 24px rgba(192,57,43,.12)}
-.qa-card.dom-b.open{border-color:var(--navy3);box-shadow:0 4px 24px rgba(31,51,112,.12)}
-.qa-card.dom-b .qa-card-a-inner{background:#eef2f8}
-.qa-card.dom-b.open .q-num,.qa-card.dom-b.open .q-arr{color:var(--navy3)}
-.qa-card.dom-b .a-sum,.qa-card.dom-b .a-ul li::before{color:var(--navy3)}
-.qa-card.dom-c.open{border-color:var(--green);box-shadow:0 4px 24px rgba(30,132,73,.12)}
-.qa-card.dom-c .qa-card-a-inner{background:#edfaee}
-.qa-card.dom-c .q-num,.qa-card.dom-c .q-arr{color:var(--green)}
-.qa-card.dom-c.open .q-arr{color:var(--green)}
-.qa-card.dom-c .a-sum,.qa-card.dom-c .a-ul li::before{color:var(--green)}
-.qa-card.dom-d.open{border-color:var(--orange);box-shadow:0 4px 24px rgba(230,126,34,.12)}
-.qa-card.dom-d .qa-card-a-inner{background:#fef5ec}
-.qa-card.dom-d .q-num{color:var(--orange)}
-.qa-card.dom-d.open .q-arr{color:var(--orange)}
-.qa-card.dom-d .a-sum,.qa-card.dom-d .a-ul li::before{color:var(--orange)}
-.qa-card.dom-e.open{border-color:var(--blue);box-shadow:0 4px 24px rgba(26,82,118,.12)}
-.qa-card.dom-e .qa-card-a-inner{background:#eaf4fc}
-.qa-card.dom-e .q-num{color:var(--blue)}
-.qa-card.dom-e.open .q-arr{color:var(--blue)}
-.qa-card.dom-e .a-sum,.qa-card.dom-e .a-ul li::before{color:var(--blue)}
+/* 타임라인 (가로 전체) */
+.timeline-wrap{
+  background:#fff;border:1.5px solid var(--border);
+  padding:28px 20px 22px;overflow-x:auto
+}
+.timeline{
+  display:grid;grid-template-columns:repeat(12,1fr);gap:0;
+  position:relative;min-width:1100px
+}
+.timeline::before{
+  content:'';position:absolute;top:28px;left:0;right:0;
+  height:2px;background:var(--border)
+}
+.tl-ev{
+  display:flex;flex-direction:column;align-items:center;
+  position:relative;padding:0 4px
+}
+.tl-dot{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;z-index:2;
+  background:var(--navy3);border:2.5px solid #fff;
+  box-shadow:0 2px 4px rgba(0,0,0,.12);margin-bottom:14px
+}
+.tl-ev.safe .tl-dot{background:var(--green)}
+.tl-ev.warn .tl-dot{background:var(--amber)}
+.tl-ev.crit .tl-dot{background:var(--accent);width:34px;height:34px;font-size:12px}
+.tl-time{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.tl-ev.crit .tl-time{color:var(--accent)}
+.tl-label{font-size:10.5px;color:var(--text2);text-align:center;line-height:1.4;word-break:keep-all;font-weight:500}
+.tl-ev.crit .tl-label{color:var(--accent);font-weight:700}
 
-.stage-bar.dom-b .stage-bar span,.stage-bar.dom-b-s{color:var(--navy3)!important}
-.stage-bar.dom-c span{color:var(--green)!important}
-.stage-bar.dom-d span{color:var(--orange)!important}
-.stage-bar.dom-e span{color:var(--blue)!important}
+/* 화재 원인 체인 */
+.chain-wrap{
+  background:#fff;border:1.5px solid var(--border);padding:22px 20px
+}
+.chain{display:flex;align-items:stretch;gap:0}
+.chain-step{
+  flex:1;padding:14px 12px;background:var(--bg2);
+  border:1.5px solid var(--border);
+  text-align:center;position:relative;
+  display:flex;flex-direction:column;justify-content:center;gap:4px
+}
+.chain-step.crit{background:#fceaea;border-color:var(--accent)}
+.chain-step.crit .cs-num{color:var(--accent)}
+.chain-step.crit .cs-text{color:var(--accent2)}
+.cs-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--navy3);font-weight:700;letter-spacing:1.5px}
+.cs-text{font-size:12px;color:var(--navy);font-weight:700;line-height:1.4;word-break:keep-all}
+.chain-arr{
+  flex:0 0 30px;display:flex;align-items:center;justify-content:center;
+  font-size:18px;color:var(--muted);font-weight:700
+}
+.chain-arr.crit{color:var(--accent)}
 
-/* 교훈 카드 */
-.lesson-box{
-  margin:20px 28px 8px;
+/* 건물 정보 (2열) */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.info-card{background:#fff;border:1.5px solid var(--border);padding:18px 22px}
+.ic-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.ic-icon{width:32px;height:32px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'DM Mono',monospace;font-size:13px}
+.ic-icon.red{background:var(--accent)}
+.ic-title{font-size:14px;font-weight:700;color:var(--navy)}
+.ic-row{display:flex;gap:14px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed rgba(208,217,236,.6)}
+.ic-row:last-child{border-bottom:none}
+.ic-key{flex:0 0 92px;font-size:11px;color:var(--muted);font-weight:500;padding-top:1px}
+.ic-val{flex:1;font-size:12px;color:var(--text);line-height:1.55;word-break:keep-all}
+.ic-val.alert{color:var(--accent);font-weight:500}
+
+/* 메모리얼 배너 (Tab 1 상단) */
+.memorial{
+  background:linear-gradient(90deg,#1a0a0a 0%,#2d1010 60%,#1a0a0a 100%);
+  border:1px solid var(--accent2);border-left:4px solid var(--accent);
+  padding:14px 22px;margin-bottom:24px;
+  display:flex;align-items:center;gap:18px
+}
+.mem-icon{font-size:22px;flex-shrink:0}
+.mem-text{flex:1}
+.mem-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px}
+.mem-sub{font-size:11px;color:#c99;line-height:1.5}
+.mem-date{font-family:'DM Mono',monospace;font-size:11px;color:#a55;letter-spacing:1.5px}
+
+/* ═══════════════════ TAB 2 ═══════════════════ */
+.t2-intro{
+  background:#fff;border-left:4px solid var(--accent);
+  padding:14px 20px;margin-bottom:22px;
+  font-size:12px;color:var(--text2);line-height:1.7
+}
+.t2-intro strong{color:var(--accent);font-weight:700}
+
+.filter-bar{
+  display:flex;gap:8px;margin-bottom:18px;align-items:center;flex-wrap:wrap
+}
+.filter-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;margin-right:4px}
+.fbtn{
+  padding:6px 14px;font-size:11px;font-weight:500;
+  background:transparent;border:1.5px solid var(--border);
+  color:var(--muted);cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;gap:6px
+}
+.fbtn:hover{border-color:var(--navy);color:var(--navy)}
+.fbtn.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.fbtn .n{font-family:'DM Mono',monospace;font-size:10px;opacity:.7}
+.fbtn.red.on{background:var(--accent);border-color:var(--accent)}
+.fbtn.amber.on{background:var(--amber);border-color:var(--amber)}
+.fbtn.gray.on{background:var(--muted);border-color:var(--muted)}
+
+.prio-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.prio{
+  background:#fff;border:1.5px solid var(--border);
+  cursor:pointer;transition:all .2s;overflow:hidden;
+  display:flex;flex-direction:column
+}
+.prio:hover{border-color:var(--navy);box-shadow:0 4px 16px rgba(13,27,62,.08)}
+.prio.open{border-color:var(--accent)}
+.prio-head{padding:16px 18px;display:flex;align-items:flex-start;gap:14px}
+.prio-rank{
+  width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:900;flex-shrink:0;
+  font-family:'DM Mono',monospace
+}
+.prio-rank.red{background:#fceaea;color:var(--accent)}
+.prio-rank.amber{background:#fdf1e0;color:var(--amber)}
+.prio-rank.gray{background:#eef0f5;color:var(--muted)}
+.prio-main{flex:1;min-width:0}
+.prio-q{font-size:13.5px;font-weight:700;color:var(--text);line-height:1.5;word-break:keep-all;margin-bottom:6px}
+.prio-tags{display:flex;gap:5px;flex-wrap:wrap}
+.ptag{font-size:9.5px;padding:2px 8px;font-weight:500;letter-spacing:.3px}
+.ptag.dom{background:var(--bg);color:var(--navy);border:1px solid var(--border)}
+.ptag.level{color:#fff;font-weight:700;letter-spacing:1.5px}
+.ptag.level.red{background:var(--accent)}
+.ptag.level.amber{background:var(--amber)}
+.ptag.level.gray{background:var(--muted)}
+.prio-arr{font-size:10px;color:var(--muted);transition:transform .2s;flex-shrink:0;padding-top:6px}
+.prio.open .prio-arr{transform:rotate(180deg);color:var(--accent)}
+.prio-body{max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1)}
+.prio.open .prio-body{max-height:600px}
+.prio-inner{padding:0 18px 18px;border-top:1px dashed var(--border);padding-top:14px;margin-top:0}
+.fact-block{background:#fdf1e0;border-left:3px solid var(--amber);padding:9px 13px;margin-bottom:12px}
+.fact-label{font-family:'DM Mono',monospace;font-size:9px;color:#854F0B;letter-spacing:2px;font-weight:700;margin-bottom:3px}
+.fact-text{font-size:11.5px;color:#633806;line-height:1.6;word-break:keep-all}
+.pts{display:flex;flex-direction:column;gap:6px}
+.pt-item{font-size:11.5px;color:var(--text2);line-height:1.6;word-break:keep-all;display:flex;gap:8px;align-items:flex-start}
+.pt-item::before{content:'▸';color:var(--accent);font-size:10px;margin-top:3px;flex-shrink:0}
+
+/* ═══════════════════ TAB 3 ═══════════════════ */
+.t3-intro{
   background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);
+  color:#fff;padding:18px 24px;margin-bottom:24px;
   border-left:4px solid var(--gold);
-  padding:16px 20px
+  display:flex;align-items:center;gap:20px
 }
-.lesson-title{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--gold);letter-spacing:3px;margin-bottom:8px}
-.lesson-text{font-size:0.78rem;color:#c8d8f0;line-height:1.7;word-break:keep-all}
-.lesson-note{font-size:0.68rem;color:#7a9acc;margin-top:8px;line-height:1.5;font-style:italic}
+.t3-intro-icon{font-size:28px;flex-shrink:0}
+.t3-intro-text h3{font-size:14px;font-weight:700;margin-bottom:4px;letter-spacing:.3px}
+.t3-intro-text p{font-size:11.5px;color:#c8d8f0;line-height:1.6}
 
-/* ── 반응형 ── */
-@media(max-width:900px){
-  .qa-grid{grid-template-columns:repeat(2,1fr)}
-  .case-summary{grid-template-columns:repeat(2,1fr)}
+.lesson-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:22px}
+.lesson{
+  background:#fff;border:1.5px solid var(--border);
+  cursor:pointer;overflow:hidden;transition:all .2s;
+  display:flex;flex-direction:column
 }
-@media(max-width:600px){
-  html{font-size:16px}
-  .site-header{padding:10px 14px;gap:10px}
-  .site-icon{width:52px;height:52px}
-  .site-title h1{font-size:1.1rem}
-  .tab-btn{font-size:0.8rem;padding:22px 4px}
-  .tab-num{font-size:0.55rem}
-  .qa-grid{grid-template-columns:1fr;padding:0 14px 8px}
-  .stage-bar{margin:20px 14px 8px}
-  .prog-wrap{padding:7px 14px}
-  .memorial-banner{padding:12px 14px}
-  .incident-timeline{padding:12px 14px}
-  .case-summary{grid-template-columns:repeat(2,1fr);margin:14px 14px 0}
-  .lesson-box{margin:14px 14px 6px}
-  .timeline-strip{grid-template-columns:repeat(2,2fr)}
-  .tl-seg{padding:10px 12px}
-  .tl-tip{padding:7px 14px}
-  .domain-header{margin:0 14px 8px}
+.lesson:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(13,27,62,.1)}
+.lesson.open{border-color:var(--navy3);box-shadow:0 6px 24px rgba(31,51,112,.15)}
+.lesson.ref{border-color:var(--border)}
+.lesson.ref.open{border-color:var(--accent);box-shadow:0 6px 24px rgba(192,57,43,.15)}
+.lesson-top{
+  padding:16px 18px 14px;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px
 }
-@media(max-width:400px){
-  .qa-grid{padding:0 10px 8px}
-  .site-title p{display:none}
+.lesson.ref .lesson-top{background:#fdf1f0;border-bottom-color:#f5c4b3}
+.lesson-num{
+  width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+  font-family:'DM Mono',monospace;font-size:13px;font-weight:700;
+  flex-shrink:0;background:var(--navy3);color:#fff;border-radius:50%
 }
+.lesson.ref .lesson-num{background:var(--accent)}
+.lesson-head{flex:1;min-width:0}
+.lesson-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.45;word-break:keep-all}
+.lesson-sub{font-size:10px;color:var(--muted);margin-top:3px;font-family:'DM Mono',monospace}
+.lesson-body{padding:14px 18px;flex:1;display:flex;flex-direction:column;gap:10px}
+.wando-mini{
+  background:#fdf1f0;border-left:3px solid var(--accent);padding:9px 12px
+}
+.wm-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--accent);letter-spacing:1.5px;font-weight:700;margin-bottom:3px}
+.wm-text{font-size:11px;color:var(--accent2);line-height:1.55;word-break:keep-all}
+.principles{display:flex;flex-direction:column;gap:5px;flex:1}
+.principle{
+  padding:8px 10px;background:var(--bg2);font-size:11px;line-height:1.55;
+  color:var(--text);word-break:keep-all;border-left:2px solid var(--navy3)
+}
+.lesson.ref .principle{border-left-color:var(--accent)}
+.principle strong{font-weight:700;display:block;margin-bottom:2px}
+.tip-mini{
+  background:#fffbee;border-left:3px solid var(--gold);
+  padding:9px 12px;margin-top:auto
+}
+.tip-mini-label{font-family:'DM Mono',monospace;font-size:9px;color:#854F0B;letter-spacing:1.5px;font-weight:700;margin-bottom:3px}
+.tip-mini-text{font-size:10.5px;color:#555;line-height:1.55;word-break:keep-all}
+
+.lesson-grid.ref-grid{grid-template-columns:1fr 1fr}
+
+.bridge{
+  display:flex;align-items:center;gap:14px;
+  padding:12px 22px;margin:28px 0 20px;
+  background:var(--navy);color:#fff
+}
+.bridge-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);letter-spacing:2px;font-weight:700}
+.bridge-line{flex:1;height:1px;background:rgba(255,255,255,.15)}
+.bridge-text{font-size:12px;color:#c8d8f0;text-align:center;word-break:keep-all}
+
+/* 푸터 공통 */
+.panel-footer{
+  margin-top:32px;padding:14px 20px;
+  background:#fff;border:1px solid var(--border);border-left:3px solid var(--gold);
+  font-size:10.5px;color:var(--muted);line-height:1.7;display:flex;align-items:center;gap:14px
+}
+.pf-icon{color:var(--gold);font-weight:700;flex-shrink:0}
 </style>
 </head>
 <body>
 
-<!-- ══ 헤더 ══ -->
-<header class="site-header" id="site-header">
-  <div class="site-icon"><span class="site-icon-text">IFA</span></div>
-  <div class="site-title">
-    <h1>현장지휘관 디브리핑 가이드</h1>
-    <p>INCHEON FIRE ACADEMY · 초급현장지휘관 양성반</p>
+<header class="hdr" id="hdr">
+  <div class="hdr-icon"><span>IFA</span></div>
+  <div class="hdr-title">
+    <h1>완도 화재 디브리핑<span class="ver">V.26.4.1</span></h1>
+    <p>INCHEON FIRE ACADEMY · 현장지휘관 단기 실무반 교육 자료</p>
   </div>
-  <div class="site-clock">
-    <div class="clock-time" id="cl-time">00:00:00</div>
-    <div class="clock-date" id="cl-date">----.--.--</div>
+  <div class="hdr-right">
+    <div class="hdr-memo">🎗 고 박승원 소방위 · 고 노태영 소방사</div>
+    <div class="hdr-clock" id="clk-t">00:00:00</div>
+    <div class="hdr-date" id="clk-d">----.--.--</div>
   </div>
 </header>
 
-<!-- ══ 탭 네비 ══ -->
-<nav class="tab-nav" id="tab-nav">
-  <button class="tab-btn active" onclick="switchTab(1,this)">
-    <span class="tab-num">TAB 01</span>10분 디브리핑<br>타임라인
+<nav class="tabnav" id="tabnav">
+  <button class="tab active" onclick="switchT(1,this)">
+    <span class="tn">TAB 01 · 사고 개요</span>
+    <span class="tt">완도 수산물 냉동창고 화재 사고 개요</span>
+    <span class="ts">핵심 수치 · 타임라인 · 원인 추정 · 현장 정보</span>
   </button>
-  <button class="tab-btn" onclick="switchTab(2,this)">
-    <span class="tab-num">TAB 02</span>5대 역량별<br>동료질문
+  <button class="tab" onclick="switchT(2,this)">
+    <span class="tn">TAB 02 · 디브리핑</span>
+    <span class="tt">현장지휘관 디브리핑 우선순위 10</span>
+    <span class="ts">긴급 핵심 5 · 중요 3 · 보완 2</span>
   </button>
-  <button class="tab-btn" onclick="switchTab(3,this)">
-    <span class="tab-num">TAB 03</span>완도 화재<br>사례 디브리핑
+  <button class="tab" onclick="switchT(3,this)">
+    <span class="tn">TAB 03 · 교훈</span>
+    <span class="tt">완도 화재 현장 교훈</span>
+    <span class="ts">개선 방향 3 · 반성 2</span>
   </button>
 </nav>
 
-<!-- ══════════════ TAB 1 : 10분 타임라인 ══════════════ -->
-<div class="tab-panel active" id="tab1">
-  <!-- 타임라인 세그먼트 선택 -->
-  <div class="timeline-strip" id="tl-strip">
-    <div class="tl-seg active" onclick="selectSeg(0,this)" data-seg="0">
-      <div class="tl-seg-time">0 — 2분</div>
-      <div class="tl-seg-phase">초기 공유</div>
-      <div class="tl-seg-desc">XVR 종료 직후 첫인상 나누기</div>
-      <div class="tl-indicator"></div>
+<div class="panels" id="panels">
+
+<!-- ══════════════════════ TAB 1 ══════════════════════ -->
+<div class="panel active" id="p1">
+
+  <div class="memorial">
+    <div class="mem-icon">🎗</div>
+    <div class="mem-text">
+      <div class="mem-title">故 박승원 소방위 · 故 노태영 소방사 영전에 삼가 조의를 표합니다</div>
+      <div class="mem-sub">두 분의 희생이 헛되지 않도록, 미래의 대원을 지키기 위해 이 교육을 진행합니다</div>
     </div>
-    <div class="tl-seg" onclick="selectSeg(1,this)" data-seg="1">
-      <div class="tl-seg-time">2 — 5분</div>
-      <div class="tl-seg-phase">핵심 사건 분석</div>
-      <div class="tl-seg-desc">전환점 의사결정 집중 분석</div>
-      <div class="tl-indicator"></div>
-    </div>
-    <div class="tl-seg" onclick="selectSeg(2,this)" data-seg="2">
-      <div class="tl-seg-time">5 — 8분</div>
-      <div class="tl-seg-phase">역량 중심 피드백</div>
-      <div class="tl-seg-desc">5대 역량별 강점·개선점 도출</div>
-      <div class="tl-indicator"></div>
-    </div>
-    <div class="tl-seg" onclick="selectSeg(3,this)" data-seg="3">
-      <div class="tl-seg-time">8 — 10분</div>
-      <div class="tl-seg-phase">학습 정리</div>
-      <div class="tl-seg-desc">핵심 교훈 공유 및 목표 설정</div>
-      <div class="tl-indicator"></div>
-    </div>
-  </div>
-  <div class="tl-tip" id="tl-tip">
-    <span>★ 강사 팁:</span> 판단하지 말고 감정·느낌 위주로 자유롭게 발언을 유도하세요.
+    <div class="mem-date">2026.04.12</div>
   </div>
 
-  <div class="prog-wrap">
-    <div class="prog-bg"><div class="prog-fill" id="t1-prog"></div></div>
-    <div class="prog-label">확인 <span id="t1-done">0</span> / <span id="t1-total">0</span></div>
+  <div class="panel-title">
+    <div class="pt-badge">TAB 01</div>
+    <div class="pt-text">완도 수산물 냉동창고 화재 사고 개요</div>
+    <div class="pt-line"></div>
+  </div>
+  <div class="panel-sub">2026년 4월 12일(일) 전남 완도군 군외면 · 언론 보도 기반 정리 (합동조사단 조사 진행 중)</div>
+
+  <!-- 1) 핵심 수치 -->
+  <div class="sec-header">
+    <div class="sec-num">01</div>
+    <div class="sec-title">핵심 수치</div>
+    <div class="sec-desc">사고의 규모를 한눈에 파악할 수 있는 핵심 지표</div>
+  </div>
+  <div class="stats">
+    <div class="stat red">
+      <div class="stat-l">CASUALTIES</div>
+      <div class="stat-n">2<span class="unit">명</span></div>
+      <div class="stat-d">소방관 순직<br>(박 소방위 · 노 소방사)</div>
+    </div>
+    <div class="stat amber">
+      <div class="stat-l">CRITICAL GAP</div>
+      <div class="stat-n">3<span class="unit">분</span></div>
+      <div class="stat-d">"이상 없음" 보고부터<br>폭발까지의 시간</div>
+    </div>
+    <div class="stat blue">
+      <div class="stat-l">RESOURCES</div>
+      <div class="stat-n">138<span class="unit">명</span></div>
+      <div class="stat-d">투입 소방관 · 장비 45대<br>대응 1단계 발령</div>
+    </div>
+    <div class="stat">
+      <div class="stat-l">TOTAL TIME</div>
+      <div class="stat-n">3h 1m</div>
+      <div class="stat-d">신고(08:25)부터<br>완진(11:26)까지</div>
+    </div>
   </div>
 
-  <div id="t1-cards"></div>
-  <div style="text-align:center;margin:20px 0">
-    <button class="qa-reset-btn" onclick="resetTab1()" style="background:none;border:1px solid #ccc;color:#999;font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:2px;padding:9px 28px;cursor:pointer">RESET ALL</button>
+  <!-- 2) 타임라인 -->
+  <div class="sec-header">
+    <div class="sec-num">02</div>
+    <div class="sec-title">사고 발생 경위 타임라인</div>
+    <div class="sec-desc">12단계 분 단위 재구성</div>
   </div>
+  <div class="timeline-wrap">
+    <div class="timeline">
+      <div class="tl-ev safe"><div class="tl-dot">📞</div><div class="tl-time">08:25</div><div class="tl-label">화재<br>신고</div></div>
+      <div class="tl-ev safe"><div class="tl-dot">🚒</div><div class="tl-time">08:31</div><div class="tl-label">선착대<br>도착</div></div>
+      <div class="tl-ev safe"><div class="tl-dot">1차</div><div class="tl-time">08:38</div><div class="tl-label">7명 1차<br>진입</div></div>
+      <div class="tl-ev warn"><div class="tl-dot">⚠</div><div class="tl-time">08:47</div><div class="tl-label">연기<br>재발생</div></div>
+      <div class="tl-ev warn"><div class="tl-dot">2차</div><div class="tl-time">08:48</div><div class="tl-label">2차<br>진입</div></div>
+      <div class="tl-ev warn"><div class="tl-dot">💬</div><div class="tl-time">08:52</div><div class="tl-label">"이상<br>없음" 보고</div></div>
+      <div class="tl-ev crit"><div class="tl-dot">💥</div><div class="tl-time">08:55</div><div class="tl-label">유증기<br>폭발</div></div>
+      <div class="tl-ev crit"><div class="tl-dot">🚨</div><div class="tl-time">09:00</div><div class="tl-label">대응 1단계<br>발령</div></div>
+      <div class="tl-ev crit"><div class="tl-dot">!</div><div class="tl-time">09:02</div><div class="tl-label">2명<br>고립 확인</div></div>
+      <div class="tl-ev crit"><div class="tl-dot">🔍</div><div class="tl-time">10:02</div><div class="tl-label">박 소방위<br>수습(5m)</div></div>
+      <div class="tl-ev crit"><div class="tl-dot">🔍</div><div class="tl-time">11:23</div><div class="tl-label">노 소방사<br>수습(3m)</div></div>
+      <div class="tl-ev safe"><div class="tl-dot">✓</div><div class="tl-time">11:26</div><div class="tl-label">완진<br>선포</div></div>
+    </div>
+  </div>
+
+  <!-- 3) 화재 원인 체인 -->
+  <div class="sec-header">
+    <div class="sec-num">03</div>
+    <div class="sec-title">화재 원인 추정 경로 (잠정)</div>
+    <div class="sec-desc">합동조사단 결과 발표 전 언론 보도 기반 추정</div>
+  </div>
+  <div class="chain-wrap">
+    <div class="chain">
+      <div class="chain-step">
+        <div class="cs-num">STEP 01</div>
+        <div class="cs-text">에폭시 바닥작업<br>토치 사용</div>
+      </div>
+      <div class="chain-arr">→</div>
+      <div class="chain-step">
+        <div class="cs-num">STEP 02</div>
+        <div class="cs-text">에폭시·우레탄<br>유증기 발생</div>
+      </div>
+      <div class="chain-arr">→</div>
+      <div class="chain-step">
+        <div class="cs-num">STEP 03</div>
+        <div class="cs-text">밀폐 천장에<br>유증기 축적</div>
+      </div>
+      <div class="chain-arr crit">→</div>
+      <div class="chain-step crit">
+        <div class="cs-num">STEP 04</div>
+        <div class="cs-text">임계 농도<br>도달 · 점화</div>
+      </div>
+      <div class="chain-arr crit">→</div>
+      <div class="chain-step crit">
+        <div class="cs-num">STEP 05</div>
+        <div class="cs-text">플래시오버<br>화염 분출</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4) 현장·건물 정보 -->
+  <div class="sec-header">
+    <div class="sec-num">04</div>
+    <div class="sec-title">현장 · 건물 정보</div>
+    <div class="sec-desc">대응 현황 및 건물 특성</div>
+  </div>
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="ic-header">
+        <div class="ic-icon">🏭</div>
+        <div class="ic-title">건물 정보</div>
+      </div>
+      <div class="ic-row"><div class="ic-key">위치</div><div class="ic-val">전남 완도군 군외면 원동리</div></div>
+      <div class="ic-row"><div class="ic-key">용도</div><div class="ic-val">수산물 가공 · 제조업체 냉동창고</div></div>
+      <div class="ic-row"><div class="ic-key">구조</div><div class="ic-val">2층 콘크리트, 냉동실 6개 구획</div></div>
+      <div class="ic-row"><div class="ic-key">면적</div><div class="ic-val">3,095㎡ (2동 중 1동 피해)</div></div>
+      <div class="ic-row"><div class="ic-key">내장재</div><div class="ic-val">천장 우레탄 폼 · 벽면 샌드위치 패널 · 바닥 에폭시</div></div>
+      <div class="ic-row"><div class="ic-key">소화설비</div><div class="ic-val alert">스프링클러 미설치 (설치 의무 대상 아님)</div></div>
+    </div>
+    <div class="info-card">
+      <div class="ic-header">
+        <div class="ic-icon red">🚒</div>
+        <div class="ic-title">대응 현황</div>
+      </div>
+      <div class="ic-row"><div class="ic-key">투입 인력</div><div class="ic-val">소방관 138명</div></div>
+      <div class="ic-row"><div class="ic-key">투입 장비</div><div class="ic-val">차량 · 장비 45대</div></div>
+      <div class="ic-row"><div class="ic-key">진입 편성</div><div class="ic-val">구조대원 4명 + 진압대원 3명 = 7명</div></div>
+      <div class="ic-row"><div class="ic-key">인명피해</div><div class="ic-val alert">소방관 2명 순직 · 민간 1명 경상(연기흡입)</div></div>
+      <div class="ic-row"><div class="ic-key">재산피해</div><div class="ic-val">창고 1개 동 대부분 소실</div></div>
+      <div class="ic-row"><div class="ic-key">발화 추정</div><div class="ic-val">2번 냉동실 에폭시 제거 작업 중 토치 사용</div></div>
+    </div>
+  </div>
+
+  <div class="panel-footer">
+    <div class="pf-icon">ⓘ</div>
+    <div>이 자료는 2026.04 언론 보도 기반으로 정리되었으며, 소방청 합동조사단 공식 조사 진행 중(2026.04.20 ~ 05.19)입니다. 공식 조사 결과 발표 후 일부 내용이 업데이트될 수 있습니다.</div>
+  </div>
+
 </div>
 
-<!-- ══════════════ TAB 2 : 5대 역량 동료질문 ══════════════ -->
-<div class="tab-panel" id="tab2">
-  <div class="prog-wrap">
-    <div class="prog-bg"><div class="prog-fill" id="t2-prog"></div></div>
-    <div class="prog-label">확인 <span id="t2-done">0</span> / <span id="t2-total">0</span></div>
+<!-- ══════════════════════ TAB 2 ══════════════════════ -->
+<div class="panel" id="p2">
+
+  <div class="panel-title">
+    <div class="pt-badge">TAB 02</div>
+    <div class="pt-text">완도 냉동창고 화재 — 현장지휘관 디브리핑 우선순위 10</div>
+    <div class="pt-line"></div>
   </div>
-  <div id="t2-cards" style="padding-bottom:40px"></div>
+  <div class="panel-sub">5대 역량 기반 질문 · 사실 근거 + 토론 포인트 제공 · 동료질문(Peer-to-Peer) 방식 권장</div>
+
+  <div class="t2-intro">
+    <strong>디브리핑 진행 원칙:</strong> 비난 없이 사실 중심으로 재구성합니다. "우리라면 어떻게 했을까?"라는 질문 방식으로 접근하며, 강사는 직접 답을 제시하지 말고 교육생끼리 서로 질문·답변하도록 유도하세요. 합동조사단 결과 발표 전이므로 사고 경위에 대한 단정은 피하고 학습 관점에서만 활용합니다.
+  </div>
+
+  <div class="filter-bar">
+    <span class="filter-label">FILTER</span>
+    <button class="fbtn on" onclick="filt('all',this)">전체 <span class="n">10</span></button>
+    <button class="fbtn red" onclick="filt('red',this)">긴급 핵심 <span class="n">5</span></button>
+    <button class="fbtn amber" onclick="filt('amber',this)">중요 <span class="n">3</span></button>
+    <button class="fbtn gray" onclick="filt('gray',this)">보완 <span class="n">2</span></button>
+  </div>
+
+  <div class="prio-grid" id="prio-list"></div>
+
+  <div class="panel-footer">
+    <div class="pf-icon">★</div>
+    <div>카드를 클릭하면 사실 근거(CASE FACT) + 토론 포인트(3가지)가 펼쳐집니다. 상단 필터로 우선순위별 선별 열람이 가능합니다.</div>
+  </div>
+
 </div>
 
-<!-- ══════════════ TAB 3 : 완도 화재 사례 ══════════════ -->
-<div class="tab-panel" id="tab3">
+<!-- ══════════════════════ TAB 3 ══════════════════════ -->
+<div class="panel" id="p3">
 
-  <!-- 애도 배너 -->
-  <div class="memorial-banner">
-    <div class="memorial-flag">🎗</div>
-    <div class="memorial-text">
-      <div class="memorial-title">故 박승원 소방위 · 故 노태영 소방사 영전에 삼가 조의를 표합니다</div>
-      <div class="memorial-sub">이 사례 학습은 두 분의 희생이 헛되지 않도록, 미래의 대원을 지키기 위해 진행합니다</div>
-    </div>
-    <div class="memorial-date">2026.04.12</div>
+  <div class="panel-title">
+    <div class="pt-badge">TAB 03</div>
+    <div class="pt-text">완도 화재 현장 교훈</div>
+    <div class="pt-line"></div>
   </div>
+  <div class="panel-sub">개선 방향 3가지 + 현장지휘관의 자기 성찰 2가지</div>
 
-  <!-- 사고 타임라인 -->
-  <div class="incident-timeline">
-    <div class="tl-title">INCIDENT TIMELINE — 완도 수산물 냉동창고 화재</div>
-    <div class="tl-row">
-      <div class="tl-event safe">
-        <div class="tl-dot">📞</div>
-        <div class="tl-event-time">08:25</div>
-        <div class="tl-event-label">화재 신고 접수</div>
-      </div>
-      <div class="tl-event safe">
-        <div class="tl-dot">🚒</div>
-        <div class="tl-event-time">08:31</div>
-        <div class="tl-event-label">선착대 도착<br>(신고 6분)</div>
-      </div>
-      <div class="tl-event warn">
-        <div class="tl-dot">1차</div>
-        <div class="tl-event-time">08:38</div>
-        <div class="tl-event-label">대원 7명<br>1차 진입</div>
-      </div>
-      <div class="tl-event warn">
-        <div class="tl-dot">2차</div>
-        <div class="tl-event-time">08:48</div>
-        <div class="tl-event-label">연기 재발생<br>2차 진입</div>
-      </div>
-      <div class="tl-event warn">
-        <div class="tl-dot">💬</div>
-        <div class="tl-event-time">08:52</div>
-        <div class="tl-event-label">"화염·연기<br>안 보임" 보고</div>
-      </div>
-      <div class="tl-event critical">
-        <div class="tl-dot">💥</div>
-        <div class="tl-event-time">08:55</div>
-        <div class="tl-event-label">유증기 폭발<br>플래시오버</div>
-      </div>
-      <div class="tl-event critical">
-        <div class="tl-dot">🚨</div>
-        <div class="tl-event-time">09:00</div>
-        <div class="tl-event-label">대응 1단계<br>발령</div>
-      </div>
-      <div class="tl-event critical">
-        <div class="tl-dot">🔍</div>
-        <div class="tl-event-time">10:02</div>
-        <div class="tl-event-label">박승원 소방위<br>시신 수습</div>
-      </div>
-      <div class="tl-event critical">
-        <div class="tl-dot">🔍</div>
-        <div class="tl-event-time">11:23</div>
-        <div class="tl-event-label">노태영 소방사<br>시신 수습</div>
-      </div>
-      <div class="tl-event safe">
-        <div class="tl-dot">✓</div>
-        <div class="tl-event-time">11:26</div>
-        <div class="tl-event-label">완진 선포<br>(3시간)</div>
-      </div>
+  <div class="t3-intro">
+    <div class="t3-intro-icon">🎯</div>
+    <div class="t3-intro-text">
+      <h3>교훈의 체계화 — 체계(System) + 태도(Mindset)</h3>
+      <p>개선 방향은 <strong style="color:var(--gold)">체계</strong>의 문제이고, 반성은 <strong style="color:#f09595">태도</strong>의 문제입니다. 두 가지가 함께 변화할 때 비로소 현장이 바뀝니다.</p>
     </div>
   </div>
 
-  <!-- 사고 핵심 수치 -->
-  <div class="case-summary">
-    <div class="case-stat">
-      <div class="case-stat-num stat-navy">3,095<span style="font-size:0.7rem">㎡</span></div>
-      <div class="case-stat-label">냉동창고 연면적<br>(스프링클러 미설치)</div>
-    </div>
-    <div class="case-stat">
-      <div class="case-stat-num stat-orange">7<span style="font-size:0.7rem">명</span></div>
-      <div class="case-stat-label">2차 진입 대원<br>(5명 탈출·2명 순직)</div>
-    </div>
-    <div class="case-stat">
-      <div class="case-stat-num stat-red">3<span style="font-size:0.7rem">분</span></div>
-      <div class="case-stat-label">"안전" 보고 →<br>폭발까지 간격</div>
-    </div>
-    <div class="case-stat">
-      <div class="case-stat-num stat-navy">5m / 3m</div>
-      <div class="case-stat-label">출입구까지 거리에서<br>두 대원 발견</div>
-    </div>
+  <!-- 개선 방향 3개 -->
+  <div class="sec-header">
+    <div class="sec-num">개선 방향</div>
+    <div class="sec-title">현장지휘 체계 개선</div>
+    <div class="sec-desc">제도 · 편성 · 절차 차원의 변화</div>
+  </div>
+  <div class="lesson-grid" id="imp-list"></div>
+
+  <!-- 연결 브리지 -->
+  <div class="bridge">
+    <div class="bridge-tag">CONNECTION</div>
+    <div class="bridge-line"></div>
+    <div class="bridge-text">개선 방향(체계)을 실행하려면 아래의 반성(태도)을 먼저 내면화해야 합니다</div>
+    <div class="bridge-line"></div>
+    <div class="bridge-tag">▼ 반성</div>
   </div>
 
-  <!-- 원인 요약 -->
-  <div class="lesson-box">
-    <div class="lesson-title">CAUSE · 사고 원인</div>
-    <div class="lesson-text">에폭시 바닥 페인트 제거 작업 중 토치 사용 → 에폭시·우레탄 유증기 발생 → 밀폐된 천장에 유증기 축적 → 2차 진입 중 한계점 도달 후 동시 점화 → 플래시오버 발생 및 화염 외부 분출</div>
-    <div class="lesson-note">※ 합동조사단(26명, 30일간) 정밀 조사 진행 중 (2026.04.20 기준) — 이 디브리핑은 현재까지 공개된 사실에 기반하며, 비난·단정 없이 학습 목적으로 활용합니다.</div>
+  <!-- 반성 2개 -->
+  <div class="sec-header">
+    <div class="sec-num">반성</div>
+    <div class="sec-title">현장지휘관의 자기 성찰</div>
+    <div class="sec-desc">인식 · 태도 · 습관 차원의 전환</div>
+  </div>
+  <div class="lesson-grid ref-grid" id="ref-list"></div>
+
+  <div class="panel-footer">
+    <div class="pf-icon">ⓘ</div>
+    <div>각 카드를 클릭하지 않아도 핵심 내용이 요약되어 표시됩니다. 교육 중 이 화면을 그대로 프로젝션하여 토론 자료로 활용 가능합니다.</div>
   </div>
 
-  <!-- 진행률 -->
-  <div class="prog-wrap" style="margin-top:12px">
-    <div class="prog-bg"><div class="prog-fill" id="t3-prog"></div></div>
-    <div class="prog-label">확인 <span id="t3-done">0</span> / <span id="t3-total">0</span></div>
-  </div>
-
-  <!-- 질문 카드 영역 -->
-  <div id="t3-cards"></div>
-  <div style="text-align:center;margin:20px 0">
-    <button class="qa-reset-btn" onclick="resetTab('t3')" style="background:none;border:1px solid #ccc;color:#999;font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:2px;padding:9px 28px;cursor:pointer">RESET ALL</button>
-  </div>
 </div>
 
-<!-- ══════════════ 데이터 ══════════════ -->
+</div>
+
+<!-- ═══════════ DATA ═══════════ -->
 <script>
-// ── 탭 1 데이터: 10분 타임라인 ──────────────────────────
-var SEG_DATA = [
-  {
-    time:'0~2분', phase:'초기 공유', tip:'판단하지 말고 감정·느낌 위주로 자유롭게 발언을 유도하세요.',
-    qs:[
-      {q:'이번 훈련에서 가장 인상 깊었던 장면은 무엇인가요?',
-       sum:'느낌과 감정 공유를 통해 디브리핑 분위기를 만드는 단계입니다.',
-       pts:['판단 없이 "좋았다/나빴다"보다 "어떤 장면이 기억에 남았나"에 집중','모든 발언을 수용하고 경청하는 분위기 조성','발언이 없을 경우 "가장 긴장했던 순간은?"으로 전환']},
-      {q:'훈련 중 가장 긴장했던 순간은 언제였나요?',
-       sum:'스트레스 요인을 인식하면 압박 하 의사결정 역량 개선에 직결됩니다.',
-       pts:['긴장의 원인(정보 부족·시간 압박·팀원 혼선 등) 구분','긴장이 판단에 어떻게 영향을 미쳤는지 연결','부정적 감정도 학습 자원임을 강조']},
-      {q:'전반적인 팀 수행을 한 문장으로 평가한다면?',
-       sum:'초기 자기평가를 이후 구체적 피드백과 비교하는 기준점이 됩니다.',
-       pts:['점수 매기기보다 서술형 평가 권장','다양한 시각이 나올 수 있음을 허용','이 평가는 이후 역량 피드백 단계에서 다시 검토']},
-    ]
-  },
-  {
-    time:'2~5분', phase:'핵심 사건 분석', tip:'타임라인 재구성을 통해 "무엇이 → 왜 → 어떤 결과로" 이어졌는지 인과관계를 명확히 도출하세요.',
-    qs:[
-      {q:'지휘권 인수부터 첫 임무 부여까지 어떤 순서로 진행했나요?',
-       sum:'SOP 113 초기 절차 준수 여부를 함께 재구성하는 질문입니다.',
-       pts:['도착보고 → 규모파악 → 지휘소 설치 → 임무부여 순서 확인','단계가 생략되었다면 어떤 상황이었는지 탐색','정확한 무선 보고 문구 확인: \'○○안전센터 ○○호 현장 도착, 지휘권 인수\'']},
-      {q:'가장 중요한 의사결정은 몇 분 시점에 이루어졌나요?',
-       sum:'결정 타이밍과 그 결정이 이후 작전에 미친 영향을 분석합니다.',
-       pts:['타임라인상 전환점(Turning Point) 공동 파악','빠른 결정이 옳았는지, 더 기다렸어야 했는지 논의','결정 지연이 발생했다면 그 원인(정보 부족·팀 혼선·사고 경직) 탐색']},
-      {q:'SOP 113 절차대로 진행된 부분과 그렇지 않은 부분은?',
-       sum:'규정 준수 여부를 비난 없이 사실 중심으로 확인합니다.',
-       pts:['잘 지켜진 절차도 반드시 언급 (강점 강화)','절차를 이탈한 상황의 맥락 이해 (왜 그랬는가)','절차 이탈이 결과에 어떤 영향을 주었는지 연결']},
-      {q:'초기 판단을 수정해야 했던 상황이 있었나요? 어떤 계기였나요?',
-       sum:'적응적 의사결정(Adaptive Decision-Making) 역량을 확인합니다.',
-       pts:['초기 정보와 실제 상황의 차이 식별','정보 업데이트 후 신속한 재판단 여부 확인','변화 신호를 인식하지 못한 순간이 있었다면 원인 분석']},
-    ]
-  },
-  {
-    time:'5~8분', phase:'역량 중심 피드백', tip:'동료질문 방식 — 강사가 직접 답을 제시하지 말고 교육생끼리 서로 질문하도록 유도하세요.',
-    qs:[
-      {q:'현장 규모 파악 — 도착 후 어떤 정보를 수집했나요? 빠진 정보는?',
-       sum:'Size-Up의 체계성(화재위치·규모·인명·위험물·구조) 점검',
-       pts:['SOP 113 초기 정보 5항목 체크리스트 활용','야간 조건이 정보 수집을 어떻게 제한했는지','빠진 정보가 이후 판단에 어떤 영향을 미쳤는지']},
-      {q:'인명 안전 — 2-in/2-out 원칙은 지켜졌나요?',
-       sum:'대원 안전 관리의 핵심 원칙 준수 여부를 확인합니다.',
-       pts:['외부 대기 2명의 역할과 준비 상태 확인','PASS 장치 활성화 및 탈출 경로 사전 공유 여부','안전 담당관 지정 및 역할 명확화 여부']},
-      {q:'지휘체계 — 임무 부여가 명확하게 이루어졌나요? 혼선이 있었나요?',
-       sum:'명령의 명확성과 수신 확인(Read-back) 여부를 점검합니다.',
-       pts:['진압조·구조조·안전담당 역할 분리 명확성','무선 혼잡 시 명령 전달 대안 수단','복명복창 또는 Read-back이 이루어졌는지']},
-      {q:'같은 상황을 다시 맞는다면 무엇을 다르게 하겠나요?',
-       sum:'학습 내면화와 행동 변화 의지를 확인하는 핵심 질문입니다.',
-       pts:['가능하면 구체적 행동 수준의 답변 유도','"더 잘할 것"보다 "구체적으로 어떻게"에 집중','다음 훈련 개인 목표와 연결']},
-    ]
-  },
-  {
-    time:'8~10분', phase:'학습 정리', tip:'긍정 종료 — 강점 강화를 먼저, 개선 목표를 나중에. 마지막 발언이 기억에 가장 오래 남습니다.',
-    qs:[
-      {q:'오늘 훈련에서 가장 중요한 교훈 한 가지를 말씀해주세요.',
-       sum:'개인별 핵심 학습 포인트를 명시적으로 언어화합니다.',
-       pts:['한 문장으로 표현하도록 안내','다양한 교훈이 나올 수 있음을 허용','교관은 공통 주제를 요약하여 판서']},
-      {q:'다음 XVR 세션에서 개인적으로 집중할 역량은 무엇인가요?',
-       sum:'자기주도 학습 목표 설정으로 훈련 동기를 강화합니다.',
-       pts:['5대 역량 중 하나를 선택하도록 안내','추상적 목표("더 잘할 것")보다 구체적 행동 목표','짝과 공유하여 상호 피드백 약속 가능']},
-      {q:'팀 전체가 함께 개선해야 할 사항은 무엇인가요?',
-       sum:'개인 학습을 팀 학습으로 연결하는 마무리 질문입니다.',
-       pts:['팀 단위 개선 과제를 1~2개로 압축','다음 훈련 전 짧은 사전 브리핑 주제로 활용','교관이 팀 과제를 기록하여 다음 세션에 반영']},
-    ]
-  }
+var PRIO=[
+{r:1,lv:"red",d:"의사결정",l:"긴급 핵심",
+ q:"'연기 재발생'만으로 2차 진입을 결정하기 전, 지휘관으로서 어떤 확인 절차를 거쳤어야 할까요?",
+ f:"상황 판단 회의 중 다른 벽면에서 연기가 치솟자 08:48 2차 진입 결정. '불길이 크지 않아 막바지 작업'으로 판단.",
+ p:["재진입 전 체크리스트 3항목: ①완진 기준 충족 ②RIT 대기 확인 ③SCBA 잔압 확인",
+    "연기 재발생 원인(잔불 / 새로운 발화 / 유증기 기화) 구분 없이 진입 — 과도한 단순화",
+    "'막바지 작업'이라는 판단이 주의를 낮춘 정상화 편향(Normalization of Deviance) 가능성"]},
+{r:2,lv:"red",d:"인명안전",l:"긴급 핵심",
+ q:"RIT(신속동료구조팀)가 현장에 도착한 시각은 10:00, 폭발은 08:55. 이 65분 격차에 대해 어떻게 생각하나요?",
+ f:"RIT는 오전 10:00 현장 도착 — 폭발(08:55) 후 약 65분 뒤. 2명 고립 인지(09:02) 후에도 58분이 소요됨.",
+ p:["내부 진입 대원이 있는 순간부터 RIT는 외부 대기 필수 — 사후 편성이 아닌 동시 편성 원칙",
+    "2-in/2-out: 외부 대기 2명이 '즉시 투입 가능 상태'여야 하는 이유가 명확해짐",
+    "RIT 도착 전 고립 → 구조 공백 65분 — 도착 시각을 당기는 구조적 개선 필요"]},
+{r:3,lv:"red",d:"현장규모파악",l:"긴급 핵심",
+ q:"'수산물 가공공장 냉동창고'라는 정보를 접했을 때, 어떤 특수 위험을 먼저 떠올렸어야 할까요?",
+ f:"공장 내부는 천장 우레탄 폼·벽면 샌드위치 패널·바닥 에폭시로 시공. 에폭시 작업 중 토치 사용으로 유증기 발생·축적.",
+ p:["산업시설 Size-Up: 냉매(암모니아·프레온), 도료(에폭시·우레탄), 밀폐 구조 → 유증기 축적 체인",
+    "건물 관계자 인터뷰가 핵심 — '작업 중 무엇을 사용했나'가 위험 분류를 바꿈",
+    "스프링클러 미설치 확인 → 자동 진압 없음 → 화재 확산 가속 → 자원 선제 증원 필요"]},
+{r:4,lv:"red",d:"인명안전",l:"긴급 핵심",
+ q:"08:52 '화염·연기가 보이지 않는다'는 보고를 받았습니다. 이 보고가 '안전 신호'가 아닐 수 있는 이유는?",
+ f:"2차 진입 후 08:52 '화염·연기 안 보임' 보고 → 3분 뒤 08:55 외부까지 화염 분출 폭발.",
+ p:["유증기는 무색·무취 — 가시 징후 없어도 한계 농도 도달 가능 (LEL 초과)",
+    "밀폐 공간일수록 유증기 농도가 빠르게 임계점 초과 → '조용함 = 위험' 역설",
+    "대원이 연기를 못 보는 상황 = 시야 제로 → 탈출 방향 판단 불가 위험 동반"]},
+{r:5,lv:"red",d:"지휘체계",l:"긴급 핵심",
+ q:"무전 대피 명령이 3~4차례 전달됐지만 2명이 탈출하지 못했습니다. 무전 외 어떤 비상 신호 체계가 있었어야 할까요?",
+ f:"지휘팀장이 3~4차례 무전 대피 명령 → 7명 중 5명 탈출, 2명 고립. 출입구 5m·3m 앞에서 발견.",
+ p:["폭발·연기 속 무전 수신 불가 가능성 — 호각 비상신호(단음 3회 반복) 병행 필수",
+    "탈출 방향 표시: 형광 유도 줄·표식 사전 설치 여부가 생사를 가를 수 있음",
+    "대피 명령 후 인원 확인(Roll-call) 즉시 실시 → 고립 2명 인지(09:02)를 앞당길 수 있었음"]},
+{r:6,lv:"amber",d:"지휘체계",l:"중요",
+ q:"1차 진입 후 '완진 판단'을 어떻게 내렸나요? 냉동창고 구조에서 완진 확인 기준은?",
+ f:"1차 진입 시 연기 발화원 미확인, 샌드위치 패널 절단 후 일단 철수 → 완진 판단 후 재발생.",
+ p:["완진 기준: 전체 공간 탐색 완료 + 열화상카메라로 잔열 없음 확인 + 벤틸레이션 완료",
+    "냉동창고는 다수 구획 → 각 구획 개별 확인 없이 전체 완진 불가",
+    "'연기 사라짐 = 완진'이 아닌 '잠복 화재(Hidden Fire) 가능성' 인식 필요"]},
+{r:7,lv:"amber",d:"자원관리",l:"중요",
+ q:"대응 1단계 발령은 09:00, 폭발은 08:55입니다. 더 이른 시점에 대응 단계를 상향했어야 한다면 어떤 기준이었을까요?",
+ f:"08:25 신고 → 08:31 선착대 도착 → 대응 1단계 발령은 09:00(폭발 5분 뒤). 인력 115명·장비 39대 동원.",
+ p:["스프링클러 미설치 + 위험 내장재(우레탄·에폭시) = 선제적 대응 단계 상향 기준 해당",
+    "1차 진입에서 발화원 미확인 = '상황 미통제' → 증원 요청 트리거로 삼았어야",
+    "2차 진입 결정 시점이 선제적 1단계 발령 트리거가 될 수 있었음"]},
+{r:8,lv:"amber",d:"인명안전",l:"중요",
+ q:"7명 진입 대원의 실시간 위치를 어떻게 파악하고 있었나요? 고립 인지(09:02)를 앞당길 수 있었을까요?",
+ f:"7명 진입 → 폭발(08:55) → 5명 탈출 확인 → 09:02 2명 위치 파악 불가. 출입구 5m·3m에서 발견.",
+ p:["진입 시 PASS 장치 작동 확인 — 30초 정지 시 자동 경보가 고립 위치 파악 수단",
+    "진입 대원 명단·역할 지정 후 대피 후 Roll-call 즉시 실시 원칙",
+    "진입 대원과의 무전 확인 주기: 5분 단위 또는 상황 변화 시 즉시 보고 체계"]},
+{r:9,lv:"gray",d:"의사결정",l:"보완",
+ q:"'불길이 크지 않아 막바지 작업'이라는 판단에는 어떤 인지 편향이 작동했을 가능성이 있나요?",
+ f:"2차 진입 당시 '막바지 작업'으로 판단 — 이 판단이 안전 확인 절차를 축약했을 가능성.",
+ p:["정상화 편향: 여러 번 비슷한 상황을 무사히 넘긴 경험 → '이 정도면 괜찮다'는 습관화",
+    "터널 시야: '진압 완료'에 집중 → 새로운 위험 신호(유증기 축적) 인식 실패",
+    "시간 압박 편향: 빨리 끝내고 싶은 욕구가 체계적 확인을 단축시킴"]},
+{r:10,lv:"gray",d:"인명안전",l:"보완",
+ q:"두 대원은 출입구 5m·3m 앞에서 발견됐습니다. 이 사실이 탈출 경로 사전 브리핑에 주는 교훈은?",
+ f:"박 소방위 출입구 안쪽 5m, 노 소방사 3m 지점 발견. 노 소방사는 내장재 패널에 덮인 상태.",
+ p:["출구 근처라도 폭발·패널 붕괴 시 탈출 불가 — 출구 방향 인식보다 '탈출 실행 속도'가 관건",
+    "재진입 전 출구 위치·탈출 경로를 7명 전원이 재확인했는지 — 밀폐 공간일수록 중요",
+    "저자세 이동(匍匐前進) + 벽면 촉각 유도 훈련의 실전 필요성"]}
 ];
 
-// ── 탭 2 데이터: 5대 역량 동료질문 ───────────────────────
-var DOMAIN_DATA = [
-  {id:'a', code:'A', name:'현장 규모 파악', nameEn:'Scene Size-Up', color:'var(--accent)',
-   qs:[
-    {q:'도착 즉시 가장 먼저 무엇을 확인하셨나요? 그 판단 근거는?',sum:'Size-Up의 우선순위 체계 확인',pts:['2D 정보(화재 위치·층수) 우선','3D 정보(구조물·위험물) 보완 순서','SOP 113 초기 정보 5항목 체계적 수집 여부']},
-    {q:'화재 층수와 연소 범위를 어떻게 파악하셨나요?',sum:'감각 기반 정보 수집 방법 탐색',pts:['시각·청각·후각 각각 어떤 정보를 제공했나','연기색·냄새로 연료 종류 추정 여부','야간 조건의 정보 수집 제한 인식']},
-    {q:'건물 구조(오피스텔 특성)가 초기 판단에 어떤 영향을 미쳤나요?',sum:'건물 유형별 위험 인식 수준 점검',pts:['수직 연소 확산 위험(덕트·배관) 인지','야간 피난 취약성(수면 중 거주자) 고려','LPG 등 위험물 존재 가능성 점검 여부']},
-    {q:'요구조자 존재 여부를 어떤 방법으로 확인하셨나요?',sum:'인명 검색 우선순위 결정 방법 탐색',pts:['외부 목격자·건물 관리인 정보 활용','각 층 창문 상황 관찰 여부','구조요청 신호(비명·불빛) 인지 여부']},
-    {q:'야간 조건이 현장 규모 파악에 미친 어려움은?',sum:'야간 특수 상황 대응 능력 점검',pts:['조명 장비 활용 계획 수립 여부','야간 피난 경로 추가 확인 필요성','민간인 동원 어려움과 대안']},
-    {q:'인접 건물·시설로의 연소 확산 위험은 어떻게 평가하셨나요?',sum:'확산 위험 평가와 선제 조치 여부',pts:['풍향·풍속 확인 및 반영','인접 건물 유형(연소 취약성) 평가','확산 방지 우선 배치 고려 여부']},
-    {q:'현장 규모 파악 단계에서 가장 아쉬웠던 점은?',sum:'자기평가와 성찰을 통한 학습 강화',pts:['구체적 상황 묘사 유도','"왜 그렇게 됐는가"에 집중','다음 번에는 어떻게 다를 것인지 연결']},
-   ]},
-  {id:'b', code:'B', name:'지휘체계 확립', nameEn:'Command Establishment', color:'var(--navy3)',
-   qs:[
-    {q:'지휘권 인수 선언은 언제, 어떻게 하셨나요?',sum:'도착보고 정확성과 지휘권 인수 절차 점검',pts:['\'○○안전센터 ○○호 현장 도착, 지휘권 인수\' 문구 확인','무선 통보 대상과 채널 확인','지휘권 인수 지연이 발생했다면 원인 탐색']},
-    {q:'지휘소 위치를 어디에 설치하셨나요? 그 이유는?',sum:'지휘소 위치 선정 기준 준수 여부 확인',pts:['풍상측 · 안전지대 · 가시범위 3원칙','지휘소 이전이 필요했던 상황 논의','통신 음영 지역 여부 고려']},
-    {q:'초기 임무 부여(진압조·구조조·안전담당)는 어떻게 이루어졌나요?',sum:'임무 부여의 명확성과 완전성 점검',pts:['3개 조 역할 분리 명확성','임무 부여 후 Read-back 여부','인력 부족 시 역할 통합 판단 기준']},
-    {q:'후속대 도착 시 지휘권 인수·인계 절차는?',sum:'상황 인계의 정확성과 연속성 점검',pts:['현장 상황 브리핑 핵심 5항목','인계 중 공백 최소화 방법','후속 지휘관과의 사전 무선 연락 여부']},
-    {q:'무선 통신 혼잡 시 명령을 어떻게 전달하셨나요?',sum:'통신 장애 대응 능력 탐색',pts:['채널 분리 운영 여부','직접 전달·수신호 등 대안 수단','우선순위 통신 원칙 적용 여부']},
-    {q:'지휘체계에서 가장 어려웠던 순간은 언제였나요?',sum:'실제 지휘 어려움 공유를 통한 공감 형성',pts:['상황의 맥락 이해 없이 판단 자제','다른 교육생의 경험과 비교','공통적 어려움에서 개선 방향 도출']},
-   ]},
-  {id:'c', code:'C', name:'자원 관리', nameEn:'Resource Management', color:'var(--green)',
-   qs:[
-    {q:'선착대 자원 배치 계획을 어떻게 수립하셨나요?',sum:'자원 배치 우선순위 사고 방식 점검',pts:['진압차·굴절차·구조차 배치 순서','수원(소화전·급수차) 확보 계획','지휘관이 전체 자원 현황을 파악하고 있었는지']},
-    {q:'증원 요청은 언제, 어떤 근거로 결정하셨나요?',sum:'선제적 증원 요청 능력 점검',pts:['"상황 악화 후"가 아닌 "악화 징후 시" 선제 요청 원칙','증원 요청 지연이 발생했다면 원인','타 기관(구조·구급·경찰) 협조 요청 포함 여부']},
-    {q:'인력이 부족하다고 느낀 순간이 있었나요?',sum:'자원 한계 인식과 대응 방법 탐색',pts:['부족 인식 시점과 실제 요청 시점 차이','우선순위 재조정 방법','역할 통합·축소의 판단 기준']},
-    {q:'다음번에 자원 관리를 개선한다면 무엇을 바꾸겠나요?',sum:'자원 관리 자기개선 의지 확인',pts:['구체적 행동 수준의 답변 유도','현장 기록 도구(화이트보드·태블릿) 활용 방안','훈련 때 습관 형성의 중요성 강조']},
-   ]},
-  {id:'d', code:'D', name:'인명 안전', nameEn:'Personnel Safety', color:'var(--orange)',
-   qs:[
-    {q:'2-in/2-out 원칙은 어떻게 적용하셨나요?',sum:'대원 안전 핵심 원칙 준수 여부 확인',pts:['외부 대기 2명의 즉시 투입 준비 상태','공기호흡기 잔압 모니터링 주기','예외가 발생했다면 어떤 상황이었나']},
-    {q:'진입 전 문(Door) 온도 확인은 어떻게 하셨나요?',sum:'Flash-over 징후 인식 능력 점검',pts:['등 접촉법(Back of hand) vs 장갑 접촉 방법 구분','문 온도 외 추가 징후(연기색·압력) 확인 여부','온도 이상 시 행동 프로토콜 적용']},
-    {q:'탈출 경로는 몇 개를 확보하셨나요?',sum:'복수 탈출 경로 확보 습관 점검',pts:['주 경로와 대체 경로 사전 공유 방법','탈출 경로 변경 시 무선 공지 여부','어둠·연기 속 경로 식별 방법']},
-    {q:'긴급 탈출 신호는 어떤 기준으로 발령하셨나요?',sum:'긴급 대피 기준과 발령 타이밍 점검',pts:['연료 부족·Flash-over 징후·구조물 붕괴 중 해당 조건','신호 방법(무선·호각·손전등)과 전 대원 인지 여부','탈출 후 인원 확인(Roll-call) 절차']},
-    {q:'대원 안전과 요구조자 구조 사이에서 갈등이 있었나요?',sum:'위험·편익 균형 판단 능력 탐색',pts:['생존 가능성 평가 기준','공격적 구조와 방어적 안전 사이 판단','"No body recovery" 원칙의 의미와 적용']},
-   ]},
-  {id:'e', code:'E', name:'압박 하 의사결정', nameEn:'Decision-Making Under Pressure', color:'var(--blue)',
-   qs:[
-    {q:'가장 어려운 결정은 무엇이었나요? 어떤 과정을 거쳐 결정하셨나요?',sum:'의사결정 과정의 구체적 재구성',pts:['정보 → 판단 → 결심 → 행동의 OODA 적용 여부','직관적 판단 vs 분석적 판단 구분','결정 후 결과 모니터링 여부']},
-    {q:'정보가 불충분한 상황에서 어떻게 판단하셨나요?',sum:'불확실성 하 판단 능력 점검',pts:['"충분한 정보" vs "행동 가능한 정보" 구분','패턴 인식과 경험 활용 여부','잘못된 전제(Mental Model)로 인한 오판 여부']},
-    {q:'시간 압박이 가장 심했던 순간은 언제였나요?',sum:'시간 압박 관리 능력 탐색',pts:['압박 상황에서 의사결정 질 변화 인식','급박할수록 느려지는 의식적 훈련의 중요성','체계적 행동 절차가 자동화된 정도']},
-    {q:'압박 하 의사결정 능력을 향상시키려면 무엇이 필요하다고 생각하나요?',sum:'자기계발 방향 설정 마무리 질문',pts:['XVR 반복 훈련의 가치 재확인','실전 경험과 훈련 경험의 연결','동료 피드백과 자기성찰 병행']},
-   ]},
+var IMP=[
+{n:"01",t:"RIT 운영 체계 정립",s:"Rapid Intervention Team",
+ w:"RIT 도착이 폭발 65분 후(10:00) — 두 대원은 출입구 5m·3m 앞에서 발견됐습니다.",
+ p:[{t:"타서 구조대 선제 요청",b:"인명 구조 상황 추정 순간, 1차 진입 전 인근 소방서 구조대에 즉시 지원 요청"},
+    {t:"자체 구조대 → RIT 고정",b:"관할 구조대 1개는 내부 진입 대원 전담 지원(RIT) 역할로 고정"},
+    {t:"2차 진입 전 RIT 재확인",b:"재진입 결정 시 RIT 편성·준비 상태를 반드시 재확인하고 진입 허가"}],
+ tip:"1개 구조대 체계의 현실적 제약을 인정하되, 그렇기에 타서 요청을 더 빨리·더 자주 해야 함을 강조하세요."},
+{n:"02",t:"1선 펌프차 지정 + 대응단계 선제 상향",s:"First-line Assignment · Proactive Escalation",
+ w:"대응 1단계 발령이 09:00 — 폭발(08:55) 5분 후. 위험 내장재 조합에도 선제 상향이 없었습니다.",
+ p:[{t:"1선 펌프차 역할 고정",b:"도착 즉시 수원 확보·방수 준비 완료 — 진압 라인 확보 전 내부 진입 금지"},
+    {t:"위험 내장재 = 즉시 상향",b:"스프링클러 미설치 + 우레탄·에폭시 = 대응단계 선제 상향 트리거"},
+    {t:"발화원 미특정 = 증원 요청",b:"'상황 미통제' 판단 시 즉시 증원 요청 및 대응단계 상향"}],
+ tip:"대응단계 상향을 주저하게 되는 심리적 요인(보고 부담, 과잉 반응 우려)을 솔직하게 꺼내 토론해보세요."},
+{n:"03",t:"진입 시 탈출 방안 사전 확보",s:"Pre-entry Exit Strategy",
+ w:"두 대원이 출입구 5m·3m 앞 지점에서 발견 — 방향 감각 상실 시 출구 앞에서도 탈출 불가합니다.",
+ p:[{t:"진입 전 탈출 경로 전원 공유",b:"주 경로 + 대체 경로를 전 대원이 숙지·상호 확인 · 2차 재진입 시 동일 반복"},
+    {t:"PASS 장치 작동 확인 필수",b:"30초 이상 정지 시 자동 경보 → 고립 위치 파악 수단 확보"},
+    {t:"저자세 이동 + 벽면 촉각 훈련",b:"시야 제로 상황에서 벽면 따라 저자세 이동 훈련이 생사를 가름"}],
+ tip:"PASS 장치·탈출 경로 브리핑이 실제로 얼마나 지켜지는지 교육생 스스로 돌아보게 하세요."}
 ];
 
-// ── 탭 3 데이터: 완도 사례 ────────────────────────────────
-var WANDO_DATA = [
-  {id:'a', code:'A', name:'현장 규모 파악', color:'var(--accent)', domCls:'dom-a',
-   qs:[
-    {q:'냉동창고 도착 시 "수산물 가공공장" 정보만으로 어떤 위험물을 먼저 확인했어야 할까요?',
-     sum:'산업시설 화재의 특수 위험 인식 능력을 점검합니다.',
-     pts:['냉동창고 → 냉매(암모니아·프레온) 누출 가능성','바닥 도료(에폭시·우레탄)가 연소 시 발생하는 유증기','밀폐 구조 → 유증기 축적 → 플래시오버 위험 체인 인식']},
-    {q:'"연기·화염이 안 보인다"는 보고가 오히려 더 위험한 상황일 수 있는 이유는?',
-     sum:'Hidden Fire(잠복 화재)와 플래시오버 전조 인식의 핵심 질문입니다.',
-     pts:['유증기는 무색·무취 → 가시적 징후 없어도 한계점 도달 가능','밀폐 공간일수록 유증기 농도가 빠르게 임계점 초과','"조용함 = 안전"의 착각 — 과거 경험이 편향을 만들 수 있음']},
-    {q:'1차 진입 시 천장 마감재(우레탄 폼)와 바닥 에폭시를 확인했다면 어떤 판단이 달라질 수 있었을까요?',
-     sum:'건물 내장재 정보가 진압 전략에 미치는 영향을 탐색합니다.',
-     pts:['우레탄 폼은 급속 연소·유독가스 발생 자재 — 사전 확인 필요','에폭시 작업 중이라는 정보 → 유증기 축적 위험 즉시 인지','건물 관계자 인터뷰가 현장 규모 파악의 핵심 도구']},
-   ]},
-  {id:'b', code:'B', name:'지휘체계 확립', color:'var(--navy3)', domCls:'dom-b',
-   qs:[
-    {q:'2차 진입 결정 전 지휘관이 확인했어야 할 정보는 무엇이었을까요?',
-     sum:'2차 진입 결정의 절차적 적절성을 비판적으로 탐색합니다.',
-     pts:['1차 진입 완진 확인 기준(전체 공간 탐색 완료 여부)','잔불 vs 연기 재발생 원인 파악 전 진입 위험','지휘팀 상황 판단 회의 — 어떤 정보를 기반으로 했나']},
-    {q:'지휘소에서 내부 진입 대원과의 무전 확인 주기는 얼마가 적절했을까요?',
-     sum:'진입 대원 안전 모니터링의 체계성을 점검합니다.',
-     pts:['NFPA 기준: 진입 후 매 5분 또는 SCBA 잔압 1/2 시점','음성 응답 없을 경우 즉시 대응 프로토콜','개인위치정보시스템(PASS·무선위치) 활용 현황']},
-    {q:'"대피하라"는 긴급 명령이 무전으로 전달됐으나 2명이 탈출하지 못했습니다. 어떤 대안적 전달 방법이 있었을까요?',
-     sum:'비상 통신 체계의 다중화 필요성을 논의합니다.',
-     pts:['무선 외 호각(비상신호 3회 단음) 사용 여부','RIT 즉시 투입 — 고립 대원 위치 신호(PASS 장치) 추적','내부 무전 혼신 시 채널 변경 절차 훈련 여부']},
-   ]},
-  {id:'c', code:'C', name:'자원 관리', color:'var(--green)', domCls:'dom-c',
-   qs:[
-    {q:'RIT(신속동료구조팀)는 2차 진입 시점에 이미 편성·대기 상태였어야 할까요?',
-     sum:'RIT 편성 타이밍의 적절성을 논의합니다.',
-     pts:['RIT 편성 기준: 진입 대원 있을 때는 항상 대기 원칙','2차 진입 결정 = RIT 재편성·재확인 의무 발생 시점','이번 사고에서 RIT가 진입한 시각(10시 2분)과 폭발 시각(8시 55분) 간 간격']},
-    {q:'스프링클러 미설치 건물 진입 시 자원 배치 계획에서 무엇이 달라야 할까요?',
-     sum:'건물 안전시설 미비 상황에서의 강화된 자원 운용을 탐색합니다.',
-     pts:['스프링클러 없음 = 화재 확산 속도 가속 → 진압 자원 선제 증원 필요','급수 방법(소화전·급수차) 이중 확보','대응 단계 상향 기준 낮추기(선제적 1단계 발령)']},
-   ]},
-  {id:'d', code:'D', name:'인명 안전', color:'var(--orange)', domCls:'dom-d',
-   qs:[
-    {q:'2차 진입 전 탈출 경로 재확인과 PASS 장치 점검은 어떻게 이루어졌어야 할까요?',
-     sum:'재진입 시 안전 재확인 절차의 필요성을 탐색합니다.',
-     pts:['진입 ≠ 재진입 — 재진입마다 새로운 안전 브리핑 원칙','PASS 장치: 정지 30초 후 자동 경보 → 의식 있을 때 수동 작동 훈련','탈출 경로 사전 공유 — 연기·열로 시야 제로 시 촉각으로 이동 훈련']},
-    {q:'두 대원은 출입구 5m, 3m 앞에서 발견됐습니다. 이 사실이 탈출 훈련에 주는 교훈은?',
-     sum:'실제 순직 사례에서 탈출 훈련의 중요성을 도출합니다.',
-     pts:['폭발·플래시오버 시 방향 감각 상실 → 출구 근처에서도 표류 가능','저자세 이동(低姿勢 匍匐) + 벽면 유도 탈출 훈련의 실전성','생존 줄(Survival Rope) 활용 훈련 필요성']},
-    {q:'Flash-over 징후를 감지하지 못한 원인이 무엇이라고 생각하나요? 어떤 훈련으로 보완할 수 있을까요?',
-     sum:'Flash-over 전조 감지 능력 향상 방향을 논의합니다.',
-     pts:['유증기 = 가시 징후 없음 → 가스 감지기 활용 훈련 필요','천장 스모크 롤링·기류 변화 관찰 훈련','Flash-over 전조 5단계(연기 색·밀도·기류·복사열·소음) 암기화']},
-   ]},
-  {id:'e', code:'E', name:'압박 하 의사결정', color:'var(--blue)', domCls:'dom-e',
-   qs:[
-    {q:'"연기 재발생"이라는 단서만으로 2차 진입을 결정한 것은 충분한 근거였을까요?',
-     sum:'의사결정 근거의 적절성을 비판적으로 탐색합니다.',
-     pts:['연기 재발생 원인(잔불·새로운 발화·유증기 기화) 구분 없이 진입 → 과도한 단순화','의사결정 전 체크리스트: ①출구 확보? ②RIT 대기? ③통신 채널 확인?','"이 정도면 괜찮겠지"라는 정상화 편향(Normalization of Deviance)']},
-    {q:'지휘관이 2차 진입을 결정하는 과정에서 어떤 인지 편향이 작동했을 가능성이 있을까요?',
-     sum:'인지 편향이 현장 판단에 미치는 영향을 탐색합니다.',
-     pts:['터널 시야(Tunnel Vision): "화재 진압 완료"에 집중 → 새 위험 신호 무시','확증 편향: "연기=잔불=재진압 필요"라는 기존 패턴 적용','권위에 대한 복종 편향: 지휘관의 진입 결정에 의문 제기 어려운 조직 문화']},
-    {q:'합동조사단 결과 발표 전, 우리가 이 사고에서 지금 당장 현장에 적용할 수 있는 교훈은 무엇인가요?',
-     sum:'즉시 적용 가능한 학습 포인트를 도출하는 마무리 질문입니다.',
-     pts:['재진입 전 반드시 RIT 대기 확인','"조용함 = 위험" 인식 — 가시 징후 없는 상황의 역설적 위험성','탈출 신호 체계(무선+호각) 이중화 즉시 점검'],
-     highlight:true},
-   ]},
+var REF=[
+{n:"01",t:"화염·연기가 보이지 않는다는 정보도 재차 확인해야 한다",s:"Hidden Fire Awareness",
+ w:"08:52 '화염·연기 안 보임' 보고 → 불과 3분 뒤 08:55 폭발. '이상 없음'이 가장 위험한 신호일 수 있습니다.",
+ p:[{t:"'조용함 = 위험'의 역설",b:"유증기·가스는 무색·무취 — 가시 징후 없어도 임계 농도 도달 가능"},
+    {t:"'이상무' 후 추가 확인 프로토콜",b:"'이상 없음' 보고 직후 ①가스 농도 ②천장 온도 ③탈출 경로 재확인"},
+    {t:"플래시오버 전조 5단계",b:"①연기 색 ②밀도 ③기류 역전 ④복사열 ⑤소음 — 가스 감지기 병행"}],
+ tip:"'이상 없음'을 들었을 때 어떤 감각으로 판단하는지 솔직하게 이야기하게 하세요. 정상화 편향이 얼마나 자연스럽게 작동하는지 인식하는 것이 핵심입니다."},
+{n:"02",t:"진입 대원과 실시간 소통해야 한다",s:"Real-time Communication",
+ w:"대피 명령이 3~4차례 무전으로 전달됐으나 2명이 탈출하지 못함 — 소통이 일방적·사후적이었을 가능성.",
+ p:[{t:"5분 단위 정기 무전 확인",b:"응답 없을 시 즉시 대응 — '침묵 = 이상 없음'이 아닌 '침묵 = 즉각 확인 필요'"},
+    {t:"무전 외 이중 신호 체계",b:"무전 + 호각(비상신호 단음 3회 반복) 병행 — 무전 불통 대비 훈련"},
+    {t:"탈출 후 즉시 Roll-call",b:"진입 대원 전원 인원 확인 → 고립 인지 시각(09:02)을 앞당겨 구조 골든타임 확보"}],
+ tip:"현장에서 무전 통화가 실제로 얼마나 자주 이루어지는지 교육생 스스로 점검하게 하세요."}
 ];
 
-// ══════════════ 렌더링 & 로직 ══════════════
-
-// 탭 전환
-function switchTab(n, btn) {
-  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
-  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active')});
-  btn.classList.add('active');
-  document.getElementById('tab'+n).classList.add('active');
-  setHeaderVars();
-}
-
-// 헤더/탭 높이 CSS 변수
-function setHeaderVars() {
-  var h = document.getElementById('site-header').offsetHeight;
-  var n = document.getElementById('tab-nav').offsetHeight;
-  document.documentElement.style.setProperty('--header-h', h+'px');
-  document.documentElement.style.setProperty('--nav-h', n+'px');
-}
-
-// 카드 토글
-function toggleCard(el) {
-  el.classList.toggle('open');
-  updateProg();
-}
-
-// 진행률 업데이트
-function updateProg() {
-  ['t1','t2','t3'].forEach(function(id){
-    var wrap = document.getElementById(id+'-cards');
-    if (!wrap) return;
-    var all = wrap.querySelectorAll('.qa-card').length;
-    var done = wrap.querySelectorAll('.qa-card.open').length;
-    var pf = document.getElementById(id+'-prog');
-    var pd = document.getElementById(id+'-done');
-    var pt = document.getElementById(id+'-total');
-    if (pf) pf.style.width = all ? Math.round(done/all*100)+'%' : '0%';
-    if (pd) pd.textContent = done;
-    if (pt) pt.textContent = all;
-  });
-}
-
-// 탭1 세그먼트 선택
-var curSeg = 0;
-var TIPS = [
-  '판단하지 말고 감정·느낌 위주로 자유롭게 발언을 유도하세요.',
-  '타임라인 재구성을 통해 "무엇이 → 왜 → 어떤 결과로" 이어졌는지 인과관계를 명확히 도출하세요.',
-  '동료질문 방식 — 강사가 직접 답을 제시하지 말고 교육생끼리 서로 질문하도록 유도하세요.',
-  '긍정 종료 — 강점 강화를 먼저, 개선 목표를 나중에. 마지막 발언이 기억에 가장 오래 남습니다.'
-];
-function selectSeg(idx, el) {
-  curSeg = idx;
-  document.querySelectorAll('#tl-strip .tl-seg').forEach(function(s){s.classList.remove('active')});
-  el.classList.add('active');
-  document.getElementById('tl-tip').innerHTML = '<span>★ 강사 팁:</span> '+TIPS[idx];
-  renderTab1Cards();
-}
-
-// 탭1 카드 렌더
-function renderTab1Cards() {
-  var seg = SEG_DATA[curSeg];
-  var html = '<div class="stage-bar"><span>'+seg.time+' · '+seg.phase+'</span><div class="stage-bar-line"></div></div>';
-  html += '<div class="qa-grid">';
-  seg.qs.forEach(function(q, i){
-    html += '<div class="qa-card" onclick="toggleCard(this)">'
-      +'<div class="qa-card-q">'
-      +'<span class="q-num">Q'+(i+1)+'</span>'
-      +'<span class="q-text">'+q.q+'</span>'
-      +'<span class="q-arr">▼</span>'
+// ── 렌더링 ──
+function renderPrio(){
+  var list=document.getElementById('prio-list');
+  list.innerHTML='';
+  PRIO.forEach(function(q){
+    var el=document.createElement('div');
+    el.className='prio';
+    el.setAttribute('data-lv',q.lv);
+    el.innerHTML=
+      '<div class="prio-head" onclick="togP(this.closest(\'.prio\'))">'
+        +'<div class="prio-rank '+q.lv+'">'+q.r+'</div>'
+        +'<div class="prio-main">'
+          +'<div class="prio-q">'+q.q+'</div>'
+          +'<div class="prio-tags">'
+            +'<span class="ptag dom">'+q.d+'</span>'
+            +'<span class="ptag level '+q.lv+'">'+q.l+'</span>'
+          +'</div>'
+        +'</div>'
+        +'<div class="prio-arr">▼</div>'
       +'</div>'
-      +'<div class="qa-card-a"><div class="qa-card-a-inner">'
-      +'<div class="a-sum">'+q.sum+'</div>'
-      +'<ul class="a-ul">'+q.pts.map(function(p){return '<li>'+p+'</li>'}).join('')+'</ul>'
-      +'</div></div>'
+      +'<div class="prio-body"><div class="prio-inner">'
+        +'<div class="fact-block">'
+          +'<div class="fact-label">CASE FACT — 사실 근거</div>'
+          +'<div class="fact-text">'+q.f+'</div>'
+        +'</div>'
+        +'<div class="pts">'+q.p.map(function(x){return '<div class="pt-item">'+x+'</div>'}).join('')+'</div>'
+      +'</div></div>';
+    list.appendChild(el);
+  });
+}
+function togP(c){c.classList.toggle('open')}
+function filt(lv,btn){
+  document.querySelectorAll('.fbtn').forEach(function(b){b.classList.remove('on')});
+  btn.classList.add('on');
+  document.querySelectorAll('.prio').forEach(function(p){
+    p.style.display=(lv==='all'||p.getAttribute('data-lv')===lv)?'':'none';
+  });
+}
+
+function renderLessons(){
+  var il=document.getElementById('imp-list'),rl=document.getElementById('ref-list');
+  IMP.forEach(function(d){
+    var e=document.createElement('div');
+    e.className='lesson';
+    e.innerHTML=
+      '<div class="lesson-top">'
+        +'<div class="lesson-num">'+d.n+'</div>'
+        +'<div class="lesson-head">'
+          +'<div class="lesson-title">'+d.t+'</div>'
+          +'<div class="lesson-sub">'+d.s+'</div>'
+        +'</div>'
+      +'</div>'
+      +'<div class="lesson-body">'
+        +'<div class="wando-mini">'
+          +'<div class="wm-label">CASE LINK</div>'
+          +'<div class="wm-text">'+d.w+'</div>'
+        +'</div>'
+        +'<div class="principles">'
+          +d.p.map(function(x){return '<div class="principle"><strong>'+x.t+'</strong>'+x.b+'</div>'}).join('')
+        +'</div>'
+        +'<div class="tip-mini">'
+          +'<div class="tip-mini-label">★ 강사 팁</div>'
+          +'<div class="tip-mini-text">'+d.tip+'</div>'
+        +'</div>'
       +'</div>';
+    il.appendChild(e);
   });
-  html += '</div>';
-  document.getElementById('t1-cards').innerHTML = html;
-  updateProg();
-}
-
-// 탭2 카드 렌더
-function renderTab2Cards() {
-  var html = '';
-  var qn = 1;
-  DOMAIN_DATA.forEach(function(dom){
-    html += '<div class="stage-bar dom-'+dom.id+'">'
-      +'<span style="color:'+dom.color+'">역량 '+dom.code+' · '+dom.name+' ('+dom.nameEn+')</span>'
-      +'<div class="stage-bar-line"></div></div>';
-    html += '<div class="qa-grid">';
-    dom.qs.forEach(function(q){
-      var dc = 'dom-'+dom.id;
-      html += '<div class="qa-card '+dc+'" onclick="toggleCard(this)">'
-        +'<div class="qa-card-q">'
-        +'<span class="q-num" style="color:'+dom.color+'">'+dom.code+(dom.qs.indexOf(q)+1)+'</span>'
-        +'<span class="q-text">'+q.q+'</span>'
-        +'<span class="q-arr">▼</span>'
+  REF.forEach(function(d){
+    var e=document.createElement('div');
+    e.className='lesson ref';
+    e.innerHTML=
+      '<div class="lesson-top">'
+        +'<div class="lesson-num">'+d.n+'</div>'
+        +'<div class="lesson-head">'
+          +'<div class="lesson-title">'+d.t+'</div>'
+          +'<div class="lesson-sub">'+d.s+'</div>'
         +'</div>'
-        +'<div class="qa-card-a"><div class="qa-card-a-inner">'
-        +'<div class="a-sum" style="color:'+dom.color+'">'+q.sum+'</div>'
-        +'<ul class="a-ul">'+q.pts.map(function(p){return '<li>'+p+'</li>'}).join('')+'</ul>'
-        +'</div></div>'
-        +'</div>';
-      qn++;
-    });
-    html += '</div>';
-  });
-  document.getElementById('t2-cards').innerHTML = html;
-  updateProg();
-}
-
-// 탭3 카드 렌더
-function renderTab3Cards() {
-  var html = '';
-  WANDO_DATA.forEach(function(dom){
-    html += '<div class="stage-bar" style="margin-top:20px">'
-      +'<span style="color:'+dom.color+'">역량 '+dom.code+' · '+dom.name+'</span>'
-      +'<div class="stage-bar-line"></div></div>';
-    html += '<div class="qa-grid">';
-    dom.qs.forEach(function(q, qi){
-      var hl = q.highlight ? ' style="border-color:#d4a017;box-shadow:0 4px 20px rgba(212,160,23,.18)"' : '';
-      html += '<div class="qa-card '+dom.domCls+'"'+hl+' onclick="toggleCard(this)">'
-        +'<div class="qa-card-q">'
-        +'<span class="q-num" style="color:'+dom.color+'">'+dom.code+(qi+1)+'</span>'
-        +'<span class="q-text">'+q.q+'</span>'
-        +'<span class="q-arr">▼</span>'
+      +'</div>'
+      +'<div class="lesson-body">'
+        +'<div class="wando-mini">'
+          +'<div class="wm-label">CASE LINK</div>'
+          +'<div class="wm-text">'+d.w+'</div>'
         +'</div>'
-        +'<div class="qa-card-a"><div class="qa-card-a-inner">'
-        +'<div class="a-sum" style="color:'+dom.color+'">'+q.sum+'</div>'
-        +'<ul class="a-ul">'+q.pts.map(function(p){return '<li>'+p+'</li>'}).join('')+'</ul>'
-        +'</div></div>'
-        +'</div>';
-    });
-    html += '</div>';
+        +'<div class="principles">'
+          +d.p.map(function(x){return '<div class="principle"><strong>'+x.t+'</strong>'+x.b+'</div>'}).join('')
+        +'</div>'
+        +'<div class="tip-mini">'
+          +'<div class="tip-mini-label">★ 강사 팁</div>'
+          +'<div class="tip-mini-text">'+d.tip+'</div>'
+        +'</div>'
+      +'</div>';
+    rl.appendChild(e);
   });
-  document.getElementById('t3-cards').innerHTML = html;
-  updateProg();
 }
 
-function resetTab1() {
-  document.getElementById('t1-cards').querySelectorAll('.qa-card').forEach(function(c){c.classList.remove('open')});
-  updateProg();
-}
-function resetTab(id) {
-  document.getElementById(id+'-cards').querySelectorAll('.qa-card').forEach(function(c){c.classList.remove('open')});
-  updateProg();
-}
-
-// 시계
-function updateClock() {
-  var now = new Date();
-  var h = String(now.getHours()).padStart(2,'0');
-  var m = String(now.getMinutes()).padStart(2,'0');
-  var s = String(now.getSeconds()).padStart(2,'0');
-  document.getElementById('cl-time').textContent = h+':'+m+':'+s;
-  var days = ['일','월','화','수','목','금','토'];
-  var d = now.getFullYear()+'.'+String(now.getMonth()+1).padStart(2,'0')+'.'+String(now.getDate()).padStart(2,'0')+' ('+days[now.getDay()]+')';
-  document.getElementById('cl-date').textContent = d;
+function switchT(n,btn){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});
+  btn.classList.add('active');
+  document.getElementById('p'+n).classList.add('active');
+  document.getElementById('panels').scrollTop=0;
 }
 
-// 초기화
-window.addEventListener('DOMContentLoaded', function(){
-  updateClock(); setInterval(updateClock, 1000);
-  setHeaderVars();
-  renderTab1Cards();
-  renderTab2Cards();
-  renderTab3Cards();
-  window.addEventListener('resize', setHeaderVars);
+function clock(){
+  var n=new Date(),dd=['일','월','화','수','목','금','토'];
+  document.getElementById('clk-t').textContent=
+    String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
+  document.getElementById('clk-d').textContent=
+    n.getFullYear()+'.'+String(n.getMonth()+1).padStart(2,'0')+'.'+String(n.getDate()).padStart(2,'0')+' ('+dd[n.getDay()]+')';
+}
+function setVars(){
+  document.documentElement.style.setProperty('--hdr-h',document.getElementById('hdr').offsetHeight+'px');
+  document.documentElement.style.setProperty('--nav-h',document.getElementById('tabnav').offsetHeight+'px');
+}
+
+window.addEventListener('DOMContentLoaded',function(){
+  renderPrio();renderLessons();
+  clock();setInterval(clock,1000);
+  setVars();window.addEventListener('resize',setVars);
 });
 </script>
 </body>
