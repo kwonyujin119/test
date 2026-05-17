@@ -1,901 +1,1307 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>유비테크 Guide · UBTech Robotics 9880.HK · 2026.04.29</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Pretendard+Variable&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KODEX 반도체타겟위클리커버드콜 종합분석</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --paper:#F5F1E8;--paper-deep:#EDE6D3;
-  --ink:#1A1916;--ink-soft:#3A372F;--ink-mute:#6B6558;
-  --rule:#D9D2BD;--rule-soft:#E5DEC9;
-  --coral:#CC785C;--coral-deep:#A65A40;--coral-soft:#E8B59E;
-  --moss:#6B7B4E;--crimson:#9A3A2C;--gold:#B08A3E;--navy:#2D3D52;
-  --shadow:0 1px 0 rgba(26,25,22,.04),0 8px 24px -8px rgba(26,25,22,.08);
-  --shadow-lg:0 1px 0 rgba(26,25,22,.04),0 24px 48px -16px rgba(26,25,22,.12);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--paper);color:var(--ink);font-family:'DM Sans','Pretendard Variable',-apple-system,sans-serif;font-feature-settings:'ss01','cv11';line-height:1.6;-webkit-font-smoothing:antialiased}
-body{
-  background-image:
-    radial-gradient(1200px 600px at 110% -10%, rgba(204,120,92,.08), transparent 60%),
-    radial-gradient(900px 500px at -10% 30%, rgba(45,61,82,.06), transparent 60%),
-    radial-gradient(800px 400px at 60% 100%, rgba(176,138,62,.06), transparent 60%);
-}
-body::before{
-  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity:.4;mix-blend-mode:multiply
-}
-.wrap{max-width:1240px;margin:0 auto;padding:32px 28px 80px;position:relative;z-index:1}
+  :root {
+    --blue: #00c6ff;
+    --cyan: #0ef;
+    --navy: #020b18;
+    --card: #061428;
+    --border: #0a2540;
+    --gold: #f5c518;
+    --green: #00e676;
+    --red: #ff4444;
+    --orange: #ff9100;
+    --text: #e8f4ff;
+    --muted: #4a7fa5;
+    --card-w: 1080px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #010810;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--text);
+    padding: 40px 20px;
+  }
 
-/* MASTHEAD */
-.masthead{border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:18px 0 14px;margin-bottom:28px}
-.masthead-row{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
-.brandmark{display:flex;align-items:center;gap:14px}
-.brandmark-glyph{width:42px;height:42px;border-radius:50%;
-  background:radial-gradient(circle at 35% 30%, #E89D7E, var(--coral) 55%, var(--coral-deep));
-  position:relative;flex-shrink:0;box-shadow:inset 0 -3px 8px rgba(0,0,0,.15), 0 2px 6px rgba(166,90,64,.25)}
-.brandmark-glyph::after{content:"";position:absolute;inset:0;border-radius:50%;
-  background:radial-gradient(circle at 70% 75%, transparent 40%, rgba(255,255,255,.15) 60%, transparent 75%)}
-.brandmark-text{display:flex;flex-direction:column;line-height:1}
-.brandmark-text .small{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:5px}
-.brandmark-text .name{font-family:'Fraunces',serif;font-weight:600;font-size:22px;letter-spacing:-.01em;color:var(--ink)}
-.dateline{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-mute);text-align:right}
-.dateline strong{color:var(--ink);font-weight:600}
+  /* ── CARD BASE ── */
+  .card {
+    width: var(--card-w);
+    height: var(--card-w);
+    margin: 0 auto 40px;
+    background: var(--navy);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+  }
 
-/* HERO */
-.hero{margin:36px 0 32px;display:grid;grid-template-columns:1.5fr 1fr;gap:36px;align-items:end}
-@media(max-width:900px){.hero{grid-template-columns:1fr;gap:24px}}
-.hero-left .kicker{
-  display:inline-flex;align-items:center;gap:10px;
-  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--coral-deep);margin-bottom:14px
-}
-.hero-left .kicker::before{content:"";width:28px;height:1px;background:var(--coral)}
-h1.headline{
-  font-family:'Fraunces',serif;font-weight:500;font-size:clamp(48px,7vw,82px);line-height:.95;letter-spacing:-.025em;color:var(--ink);
-  font-variation-settings:"opsz" 144, "SOFT" 30
-}
-h1.headline em{font-style:italic;font-weight:400;color:var(--coral-deep);font-variation-settings:"opsz" 144, "SOFT" 100}
-.subhead{margin-top:18px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:21px;color:var(--ink-soft);max-width:600px;line-height:1.5}
+  /* ── GRID LINES BG ── */
+  .card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,198,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,198,255,0.04) 1px, transparent 1px);
+    background-size: 54px 54px;
+    z-index: 0;
+  }
 
-/* HERO STOCK CARD */
-.stock-card{
-  background:linear-gradient(135deg, #1A1916 0%, #2A2620 100%);
-  color:#F5F1E8;
-  border-radius:10px;padding:28px 30px;
-  position:relative;overflow:hidden
-}
-.stock-card::before{
-  content:"";position:absolute;top:-80px;right:-80px;width:240px;height:240px;
-  background:radial-gradient(circle, rgba(204,120,92,.3), transparent 70%);pointer-events:none
-}
-.stock-card .ticker{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:var(--coral-soft);text-transform:uppercase;margin-bottom:8px;font-weight:600}
-.stock-card .price{font-family:'Fraunces',serif;font-weight:500;font-size:54px;line-height:1;color:#F5F1E8;letter-spacing:-.02em;font-variation-settings:"opsz" 144}
-.stock-card .price small{font-size:18px;color:#D5CEB9;margin-left:8px;font-weight:400}
-.stock-card .chg-row{display:flex;align-items:center;gap:10px;margin-top:8px}
-.stock-card .chg{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;padding:3px 8px;border-radius:3px;color:#F5F1E8;background:rgba(154,58,44,.4)}
-.stock-card .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;margin-top:24px;padding-top:20px;border-top:1px solid rgba(245,241,232,.15)}
-.stock-card .stat-lab{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;color:var(--coral-soft);text-transform:uppercase;font-weight:500;margin-bottom:4px}
-.stock-card .stat-val{font-family:'Fraunces',serif;font-weight:500;font-size:18px;color:#F5F1E8;line-height:1.1}
-.stock-card .stat-val small{font-size:11px;color:#D5CEB9;margin-left:4px}
+  /* ── CARD 1: COVER ── */
+  .cover {
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, #003366 0%, #010c1f 70%);
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+    text-align: center;
+  }
+  .cover .scan-line {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    animation: scan 3s linear infinite;
+  }
+  @keyframes scan {
+    0% { top: 0; opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+  .cover-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--cyan);
+    background: rgba(0,238,255,0.08);
+    border: 1px solid rgba(0,238,255,0.25);
+    padding: 6px 18px;
+    margin-bottom: 28px;
+    display: inline-block;
+  }
+  .cover-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 64px;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    background: linear-gradient(135deg, #fff 0%, var(--cyan) 60%, #0099cc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+  }
+  .cover-sub {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 26px;
+    letter-spacing: 0.15em;
+    color: var(--blue);
+    margin-bottom: 36px;
+  }
+  .cover-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    width: 100%;
+    margin-bottom: 36px;
+  }
+  .cover-stat {
+    background: rgba(0,198,255,0.06);
+    border: 1px solid rgba(0,198,255,0.15);
+    padding: 18px 12px;
+  }
+  .cover-stat-val {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 36px;
+    color: var(--cyan);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .cover-stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+  .cover-footer {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    margin-top: auto;
+  }
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 0;
+  }
+  .orb-1 { width: 300px; height: 300px; background: rgba(0,100,255,0.2); top: -80px; right: -60px; }
+  .orb-2 { width: 200px; height: 200px; background: rgba(0,230,255,0.12); bottom: -40px; left: -20px; }
+  .cover > * { position: relative; z-index: 1; }
 
-/* SECTION HEAD */
-.sec{padding:48px 0 16px}
-.sec-head{display:flex;align-items:baseline;gap:18px;margin:0 0 24px;padding-bottom:14px;border-bottom:1px solid var(--rule)}
-.sec-head .idx{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:var(--coral-deep);text-transform:uppercase;font-weight:500}
-.sec-head h2{font-family:'Fraunces',serif;font-weight:500;font-size:32px;letter-spacing:-.015em;color:var(--ink);font-variation-settings:"opsz" 80;line-height:1.1}
-.sec-head .meta{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--ink-mute);text-transform:uppercase}
+  /* ── SECTION HEADER ── */
+  .sec-head {
+    padding: 32px 48px 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    z-index: 1;
+  }
+  .sec-num {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 48px;
+    color: rgba(0,198,255,0.2);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .sec-title {
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--cyan);
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+  .sec-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--cyan), transparent);
+  }
 
-/* GRID */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-@media(max-width:760px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+  /* ── CARD BODY ── */
+  .card-body {
+    padding: 24px 48px 32px;
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* CARDS */
-.card{background:#FBF8F0;border:1px solid var(--rule);border-radius:6px;padding:22px 24px;transition:transform .25s ease, box-shadow .25s ease}
-.card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
-.card-label{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:var(--ink-mute);text-transform:uppercase;font-weight:500;margin-bottom:10px}
-.card-value{font-family:'Fraunces',serif;font-weight:500;font-size:30px;letter-spacing:-.01em;color:var(--ink);line-height:1.05}
-.card-sub{margin-top:8px;font-size:13px;color:var(--ink-mute)}
-.card-foot{margin-top:14px;padding-top:12px;border-top:1px dashed var(--rule);font-size:12.5px;color:var(--ink-soft);line-height:1.5}
+  /* ── HOLDINGS CARD ── */
+  .hold-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0,198,255,0.07);
+  }
+  .hold-rank {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    width: 20px;
+    flex-shrink: 0;
+  }
+  .hold-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .hold-name {
+    font-size: 13px;
+    font-weight: 500;
+    flex: 1;
+  }
+  .hold-type {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    width: 90px;
+    text-align: right;
+  }
+  .hold-pct {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 22px;
+    width: 70px;
+    text-align: right;
+  }
+  .hold-bar-wrap {
+    width: 120px;
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .hold-bar {
+    height: 100%;
+    border-radius: 2px;
+  }
 
-/* OVERVIEW DATA */
-.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:24px}
-@media(max-width:760px){.overview-grid{grid-template-columns:1fr}}
-.ov-block h3{font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:-.01em;margin-bottom:14px;color:var(--ink);display:flex;align-items:center;gap:10px}
-.ov-block h3::before{content:"";width:6px;height:22px;background:var(--coral);border-radius:1px}
-.ov-list{display:flex;flex-direction:column;gap:8px}
-.ov-row{display:grid;grid-template-columns:130px 1fr;gap:16px;padding:8px 0;border-bottom:1px dotted var(--rule)}
-.ov-row:last-child{border-bottom:none}
-.ov-key{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:var(--ink-mute);text-transform:uppercase;font-weight:500;align-self:center}
-.ov-val{font-size:14px;color:var(--ink);line-height:1.45}
-.ov-val strong{font-weight:600;color:var(--ink)}
-.ov-val small{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-mute);margin-left:4px}
+  /* ── RISK/STRENGTH ── */
+  .rs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    flex: 1;
+  }
+  .rs-col-title {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid;
+  }
+  .rs-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    align-items: flex-start;
+  }
+  .rs-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .rs-text { font-size: 13px; line-height: 1.6; color: #b0cce0; }
+  .rs-bold { font-weight: 700; color: var(--text); display: block; margin-bottom: 2px; font-size: 13px; }
 
-/* SEGMENT BARS */
-.seg-block{margin-top:8px}
-.seg-row{display:grid;grid-template-columns:160px 1fr 80px;gap:14px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--rule)}
-.seg-row:last-child{border-bottom:none}
-.seg-name{font-family:'Fraunces',serif;font-weight:500;font-size:14px;color:var(--ink)}
-.seg-name small{display:block;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--ink-mute);font-weight:400;margin-top:2px}
-.seg-bar-bg{height:8px;background:rgba(204,120,92,.1);border-radius:4px;overflow:hidden;position:relative}
-.seg-bar-fill{height:100%;background:linear-gradient(90deg, var(--coral) 0%, var(--coral-deep) 100%);border-radius:4px}
-.seg-bar-fill.alt{background:linear-gradient(90deg, var(--moss) 0%, #4D5A3A 100%)}
-.seg-bar-fill.alt2{background:linear-gradient(90deg, var(--gold) 0%, #8E6E2D 100%)}
-.seg-bar-fill.alt3{background:linear-gradient(90deg, var(--navy) 0%, #1F2C3D 100%)}
-.seg-pct{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:13px;color:var(--ink);text-align:right}
+  /* ── OUTLOOK ── */
+  .timeline {
+    position: relative;
+    flex: 1;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, var(--cyan), transparent);
+  }
+  .tl-item {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding-left: 40px;
+    position: relative;
+  }
+  .tl-dot {
+    position: absolute;
+    left: 10px;
+    top: 6px;
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan);
+    background: var(--navy);
+    z-index: 1;
+  }
+  .tl-year {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 22px;
+    color: var(--cyan);
+    min-width: 80px;
+    line-height: 1.1;
+  }
+  .tl-content {
+    flex: 1;
+  }
+  .tl-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .tl-desc { font-size: 12px; color: #7aabcc; line-height: 1.6; }
 
-/* PRODUCT GRID */
-.product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
-@media(max-width:760px){.product-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.product-grid{grid-template-columns:1fr}}
-.product-card{background:#FBF8F0;border:1px solid var(--rule);border-radius:5px;padding:14px 16px;position:relative;overflow:hidden}
-.product-card.flag::before{content:"★";position:absolute;top:8px;right:10px;color:var(--coral);font-size:13px}
-.product-card .pn{font-family:'Fraunces',serif;font-weight:600;font-size:16px;color:var(--ink);margin-bottom:4px;letter-spacing:-.01em}
-.product-card .pd{font-size:12px;color:var(--ink-soft);line-height:1.45}
-.product-card .pp{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.04em;color:var(--coral-deep);font-weight:600;margin-top:8px;text-transform:uppercase}
+  /* ── SIMULATION ── */
+  .sim-input-box {
+    background: rgba(0,198,255,0.05);
+    border: 1px solid rgba(0,198,255,0.2);
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .sim-input-item .label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 4px; }
+  .sim-input-item .val { font-family: 'Bebas Neue', cursive; font-size: 24px; color: var(--gold); }
 
-/* CUSTOMERS */
-.cust-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-.cust-pill{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.04em;padding:6px 11px;background:rgba(204,120,92,.08);border:1px solid var(--coral-soft);border-radius:4px;color:var(--ink-soft);font-weight:500}
-.cust-pill.global{background:rgba(45,61,82,.08);border-color:#7A8A9A;color:var(--navy)}
+  .sim-chart {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 0;
+    padding-bottom: 28px;
+  }
+  .sim-bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .sim-bar-wrap {
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 4px;
+    height: 260px;
+  }
+  .sim-bar {
+    width: 28%;
+    border-radius: 2px 2px 0 0;
+    position: relative;
+    transition: all 0.3s;
+  }
+  .sim-bar:hover { opacity: 0.8; }
+  .sim-yr {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    text-align: center;
+  }
+  .sim-legend {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  .sim-leg-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .sim-leg-dot { width: 10px; height: 10px; border-radius: 2px; }
 
-/* INDUSTRY OUTLOOK */
-.outlook-block{
-  background:linear-gradient(135deg, #FBF8F0 0%, #F0E8D5 100%);
-  border:1px solid var(--rule);border-radius:8px;padding:32px 36px;margin-bottom:20px
-}
-.outlook-block h3{font-family:'Fraunces',serif;font-weight:500;font-size:24px;letter-spacing:-.01em;margin-bottom:8px;color:var(--ink)}
-.outlook-block .lead{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:var(--ink-soft);margin-bottom:24px;max-width:780px;line-height:1.55}
+  .sim-result-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .sim-result-card {
+    background: rgba(0,198,255,0.05);
+    border: 1px solid;
+    padding: 12px;
+    text-align: center;
+  }
+  .sim-yr-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 6px; }
+  .sim-scenarios { font-size: 10px; color: #5a90b0; line-height: 1.8; }
+  .sim-main { font-family: 'Bebas Neue', cursive; font-size: 20px; margin-bottom: 2px; }
 
-/* MARKET SIZE TIMELINE */
-.timeline-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:24px;border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:#FBF8F0}
-@media(max-width:760px){.timeline-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:480px){.timeline-grid{grid-template-columns:1fr}}
-.tl-cell{padding:18px 20px;border-right:1px solid var(--rule);position:relative}
-.tl-cell:last-child{border-right:none}
-.tl-cell.now{background:linear-gradient(135deg, rgba(204,120,92,.1), transparent)}
-.tl-cell .yr{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:var(--ink-mute);font-weight:600;text-transform:uppercase;margin-bottom:8px}
-.tl-cell .mkt{font-family:'Fraunces',serif;font-weight:600;font-size:28px;color:var(--ink);line-height:1;margin-bottom:6px;font-variation-settings:"opsz" 72}
-.tl-cell .mkt small{font-size:14px;font-weight:400;color:var(--ink-mute);margin-left:2px}
-.tl-cell .desc{font-size:11.5px;color:var(--ink-soft);line-height:1.4}
-.tl-cell .src{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink-mute);margin-top:8px;letter-spacing:.04em}
+  /* ── SEMICONDUCTOR ── */
+  .semi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    flex: 1;
+  }
+  .semi-box {
+    background: rgba(0,198,255,0.04);
+    border: 1px solid rgba(0,198,255,0.12);
+    padding: 16px;
+  }
+  .semi-box-title {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--cyan);
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0,198,255,0.15);
+  }
+  .semi-item {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    align-items: flex-start;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #8ab8d0;
+  }
+  .semi-bullet { color: var(--cyan); flex-shrink: 0; }
 
-/* DRIVERS */
-.driver-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
-@media(max-width:760px){.driver-grid{grid-template-columns:1fr}}
-.driver-card{background:#FBF8F0;border:1px solid var(--rule);border-radius:6px;padding:18px 20px;position:relative}
-.driver-card .dn{font-family:'Fraunces',serif;font-style:italic;font-size:13px;color:var(--coral-deep);margin-bottom:6px}
-.driver-card h4{font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--ink);margin-bottom:8px;letter-spacing:-.01em}
-.driver-card p{font-size:13px;color:var(--ink-soft);line-height:1.55}
+  /* ── MARKET CHART ── */
+  .mkt-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .mkt-name {
+    font-size: 13px;
+    font-weight: 500;
+    width: 200px;
+    flex-shrink: 0;
+  }
+  .mkt-bar-wrap {
+    flex: 1;
+    height: 22px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+  .mkt-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .mkt-val {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 20px;
+    width: 90px;
+    text-align: right;
+    flex-shrink: 0;
+  }
 
-/* NEWS TIMELINE */
-.news-list{display:flex;flex-direction:column;gap:0}
-.news-item{display:grid;grid-template-columns:120px 1fr;gap:24px;padding:22px 0;border-bottom:1px solid var(--rule);transition:padding .25s ease}
-.news-item:hover{padding-left:8px;background:linear-gradient(90deg, rgba(204,120,92,.04), transparent 70%)}
-.news-date{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--coral-deep);font-weight:600;text-transform:uppercase;padding-top:4px}
-.news-date small{display:block;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--ink-mute);margin-top:4px;letter-spacing:0;text-transform:none;font-weight:400}
-.news-body h4{font-family:'Fraunces',serif;font-weight:500;font-size:20px;letter-spacing:-.01em;color:var(--ink);margin-bottom:6px;line-height:1.3}
-.news-body p{font-size:14px;color:var(--ink-soft);line-height:1.6;max-width:780px}
-.news-tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--coral-deep);margin-top:6px;font-weight:600;padding:2px 8px;background:rgba(204,120,92,.08);border-radius:3px}
+  /* ── FOOTER ── */
+  .card-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    background: rgba(0,0,0,0.5);
+    border-top: 1px solid rgba(0,198,255,0.1);
+    padding: 10px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+  }
+  .footer-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+  }
+  .footer-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--cyan);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-/* SCENARIO */
-.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-@media(max-width:900px){.scenario-grid{grid-template-columns:1fr}}
-.scen-card{background:#FBF8F0;border:1.5px solid var(--rule);border-radius:8px;padding:0;overflow:hidden;position:relative;transition:transform .25s ease, box-shadow .25s ease}
-.scen-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
-.scen-card.bull{border-color:#9A3A2C}
-.scen-card.bull .scen-head{background:linear-gradient(135deg, #9A3A2C, #7A2A1F);color:#F5F1E8}
-.scen-card.base{border-color:var(--gold)}
-.scen-card.base .scen-head{background:linear-gradient(135deg, var(--gold), #8E6E2D);color:#F5F1E8}
-.scen-card.bear{border-color:#1F4E45}
-.scen-card.bear .scen-head{background:linear-gradient(135deg, #2D5048, #1F4E45);color:#F5F1E8}
-.scen-head{padding:22px 24px 20px}
-.scen-head .lab{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:6px;font-weight:600}
-.scen-head h3{font-family:'Fraunces',serif;font-weight:500;font-size:24px;line-height:1.1;letter-spacing:-.01em;margin-bottom:10px}
-.scen-head .prob{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;padding:3px 9px;background:rgba(255,255,255,.18);border-radius:3px;letter-spacing:.04em}
-.scen-body{padding:22px 24px}
-.scen-body .target{margin-bottom:18px;padding-bottom:16px;border-bottom:1px dashed var(--rule)}
-.scen-body .target-lab{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:var(--ink-mute);text-transform:uppercase;margin-bottom:6px;font-weight:600}
-.scen-body .target-val{font-family:'Fraunces',serif;font-weight:600;font-size:32px;color:var(--ink);line-height:1;font-variation-settings:"opsz" 72}
-.scen-body .target-val small{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;margin-left:8px}
-.scen-body .target-val small.up{color:#7A2A1F}
-.scen-body .target-val small.dn{color:#1F4E45}
-.scen-body h5{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:var(--coral-deep);text-transform:uppercase;margin-bottom:10px;font-weight:600;margin-top:14px}
-.scen-body h5:first-of-type{margin-top:0}
-.scen-body ul{list-style:none;padding:0}
-.scen-body li{font-size:13px;color:var(--ink-soft);line-height:1.55;padding:6px 0;padding-left:18px;position:relative}
-.scen-body li::before{content:"→";position:absolute;left:0;color:var(--coral);font-weight:700}
+  /* ── BIG HEADLINE ── */
+  .big-h {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 52px;
+    letter-spacing: 0.03em;
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .big-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-family: 'JetBrains Mono', monospace;
+  }
 
-/* COMPETITOR TABLE */
-.comp-table-wrap{background:#FBF8F0;border:1px solid var(--rule);border-radius:6px;overflow:hidden;margin-top:6px}
-.comp-table{width:100%;border-collapse:collapse;font-size:13.5px}
-.comp-table th{text-align:left;padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-mute);font-weight:600;border-bottom:1.5px solid var(--ink);background:#F5F1E8}
-.comp-table td{padding:14px 16px;border-bottom:1px solid var(--rule);color:var(--ink-soft);vertical-align:top;line-height:1.45}
-.comp-table tr:hover td{background:rgba(204,120,92,.04)}
-.comp-table .cname{font-family:'Fraunces',serif;font-weight:600;color:var(--ink);font-size:15px;letter-spacing:-.01em}
-.comp-table .cname small{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-mute);margin-top:2px;font-weight:500;letter-spacing:.04em}
-.comp-table .share{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--coral-deep);font-size:14px;letter-spacing:-.005em}
-.threat-pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:600;padding:3px 8px;border-radius:3px;letter-spacing:.04em;text-transform:uppercase}
-.threat-pill.high{background:rgba(154,58,44,.15);color:#7A2A1F}
-.threat-pill.mid{background:rgba(176,138,62,.15);color:#8E6E2D}
-.threat-pill.low{background:rgba(31,78,69,.12);color:#1F4E45}
+  /* ── KPI ROW ── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .kpi-box {
+    background: rgba(0,198,255,0.05);
+    border: 1px solid rgba(0,198,255,0.15);
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .kpi-val {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 28px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .kpi-label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; }
 
-/* SIMULATION */
-.sim-block{background:linear-gradient(135deg, #FBF8F0 0%, #F0E8D5 100%);border:1px solid var(--ink);border-radius:8px;padding:32px 36px;position:relative}
-.sim-block::after{content:"₩100,000,000";position:absolute;top:24px;right:32px;font-family:'Fraunces',serif;font-style:italic;font-size:13px;color:var(--coral-deep);border:1px solid var(--coral);border-radius:50%;width:100px;height:100px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.1;transform:rotate(-8deg);padding:8px;letter-spacing:-.005em;background:var(--paper)}
-.sim-block h3{font-family:'Fraunces',serif;font-weight:500;font-size:28px;letter-spacing:-.015em;margin-bottom:8px}
-.sim-block .bridge{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:var(--ink-soft);margin-bottom:24px;max-width:680px}
-
-.entry-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:var(--paper);margin-bottom:28px}
-@media(max-width:760px){.entry-grid{grid-template-columns:repeat(2,1fr)}}
-.entry-cell{padding:14px 18px;border-right:1px solid var(--rule)}
-.entry-cell:last-child{border-right:none}
-.entry-cell .lab{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:5px;font-weight:600}
-.entry-cell .val{font-family:'Fraunces',serif;font-weight:600;font-size:20px;color:var(--ink);line-height:1.1}
-.entry-cell .val small{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-mute);font-weight:500;margin-left:3px}
-
-/* SIM TABLE */
-.sim-table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
-.sim-table th{text-align:left;padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-mute);font-weight:600;border-bottom:1.5px solid var(--ink);background:#FBF8F0}
-.sim-table td{padding:16px 18px;border-bottom:1px solid var(--rule);color:var(--ink-soft);vertical-align:middle;line-height:1.5}
-.sim-table tr:last-child td{border-bottom:none}
-.sim-table .scen{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
-.sim-table .scen.bull{color:#7A2A1F}
-.sim-table .scen.base{color:#8E6E2D}
-.sim-table .scen.bear{color:#1F4E45}
-.sim-table .ret{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px}
-.sim-table .ret.up{color:#7A2A1F}
-.sim-table .ret.dn{color:#1F4E45}
-.sim-table .amt{font-family:'Fraunces',serif;font-weight:600;font-size:18px;color:var(--ink);letter-spacing:-.005em}
-
-.note-box{background:rgba(204,120,92,.05);border-left:3px solid var(--coral);padding:16px 22px;font-size:13.5px;color:var(--ink-soft);line-height:1.6;margin-top:18px;border-radius:0 4px 4px 0}
-.note-box strong{color:var(--ink);font-weight:600}
-.note-box.warn{background:rgba(154,58,44,.05);border-left-color:#9A3A2C}
-.note-box.warn strong{color:#7A2A1F}
-
-/* VERDICT */
-.verdict-block{background:#1A1916;color:#F5F1E8;border-radius:8px;padding:32px 36px;margin-top:24px;position:relative;overflow:hidden}
-.verdict-block::before{content:"";position:absolute;top:-100px;right:-100px;width:300px;height:300px;background:radial-gradient(circle, rgba(204,120,92,.25), transparent 70%);pointer-events:none}
-.verdict-block .vlab{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--coral-soft);text-transform:uppercase;margin-bottom:14px;font-weight:600}
-.verdict-block h3{font-family:'Fraunces',serif;font-weight:500;font-size:30px;line-height:1.15;letter-spacing:-.015em;margin-bottom:12px}
-.verdict-block p{font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:#D5CEB9;line-height:1.6;max-width:820px;margin-bottom:8px}
-.verdict-block p strong{color:#F5F1E8;font-style:normal;font-weight:600}
-
-/* FOOTER */
-.foot{margin-top:60px;padding-top:24px;border-top:1px solid var(--ink);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-mute);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.foot em{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;letter-spacing:0;text-transform:none;color:var(--ink-soft)}
+  /* responsive */
+  @media (max-width: 1140px) {
+    :root { --card-w: 100vw; }
+    .card { height: auto; min-height: 100vw; }
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <!-- MASTHEAD -->
-  <header class="masthead">
-    <div class="masthead-row">
-      <div class="brandmark">
-        <div class="brandmark-glyph"></div>
-        <div class="brandmark-text">
-          <span class="small">Single Stock Deep-Dive · Hong Kong Listing</span>
-          <span class="name">The Analyst — Vol. 027</span>
-        </div>
-      </div>
-      <div class="dateline">
-        <div>2026 / 04 / 29 · <strong>WED</strong> · 06:40 KST</div>
-      </div>
+<!-- ════════════════════════════════════════ -->
+<!-- CARD 1: COVER -->
+<!-- ════════════════════════════════════════ -->
+<div class="card cover" id="card1">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="scan-line"></div>
+
+  <div class="cover-badge">삼성자산운용 · 2026.05.12 상장</div>
+  <div class="cover-title">KODEX 반도체</div>
+  <div class="cover-sub">타겟위클리커버드콜 ETF</div>
+
+  <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:0.1em;margin-bottom:28px;">
+    KRX SEMICONDUCTOR TR 100% + KOSPI200 WEEKLY CALL 30%
+  </div>
+
+  <div class="cover-stats">
+    <div class="cover-stat">
+      <div class="cover-stat-val">9%</div>
+      <div class="cover-stat-label">연 목표 분배율</div>
     </div>
-  </header>
-
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-left">
-      <div class="kicker">기업 심층분석 · Humanoid Robotics Pioneer</div>
-      <h1 class="headline">유비테크<br><em>UBTech Guide</em></h1>
-      <p class="subhead">중국 휴머노이드 로봇 산업의 실전 양산 1번 주자. 800만 위안 누적 수주, 5,000대 양산 캐파, 그리고 Tesla·Figure보다 빨리 공장에 배치된 단 하나의 회사.</p>
+    <div class="cover-stat">
+      <div class="cover-stat-val">30%</div>
+      <div class="cover-stat-label">콜옵션 매도 비중</div>
     </div>
-    <div class="stock-card">
-      <div class="ticker">9880.HK · UBTech Robotics</div>
-      <div class="price">107.10<small>HKD</small></div>
-      <div class="chg-row"><span class="chg">+2.00% · +2.10 HKD</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#D5CEB9">04/27 종가</span></div>
-      <div class="stat-grid">
-        <div><div class="stat-lab">시가총액</div><div class="stat-val">HK$54.13B<small>≈ ₩10조</small></div></div>
-        <div><div class="stat-lab">52주 범위</div><div class="stat-val">73.5 — 161.0<small>HKD</small></div></div>
-        <div><div class="stat-lab">12M 평균목표</div><div class="stat-val">157.89<small>+47.4%</small></div></div>
-        <div><div class="stat-lab">애널리스트</div><div class="stat-val">12 Buy / 0 Sell</div></div>
-        <div><div class="stat-lab">베타 (β)</div><div class="stat-val">4.43<small>고변동성</small></div></div>
-        <div><div class="stat-lab">상장일</div><div class="stat-val">2023.12.29<small>HKEX</small></div></div>
-      </div>
+    <div class="cover-stat">
+      <div class="cover-stat-val">~53%</div>
+      <div class="cover-stat-label">SK하이닉스+삼성전자</div>
     </div>
-  </section>
+  </div>
 
-  <!-- ============ 1. 유비테크 개요 ============ -->
-  <section class="sec">
-    <div class="sec-head">
-      <span class="idx">01</span>
-      <h2>유비테크 개요</h2>
-      <span class="meta">Company Overview</span>
+  <div style="display:flex;gap:24px;justify-content:center;margin-bottom:32px;">
+    <div style="text-align:center;">
+      <div style="font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-bottom:6px;">월 분배금 (5억 기준)</div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:38px;color:var(--gold);">3,750만원</div>
     </div>
-
-    <div class="overview-grid">
-      <div class="ov-block">
-        <h3>회사 정보</h3>
-        <div class="ov-list">
-          <div class="ov-row"><span class="ov-key">정식명칭</span><span class="ov-val"><strong>UBTech Robotics Corp Ltd</strong> (优必选科技股份有限公司)</span></div>
-          <div class="ov-row"><span class="ov-key">설립연도</span><span class="ov-val">2012년 (저우젠 / James Zhou 창업)</span></div>
-          <div class="ov-row"><span class="ov-key">본사</span><span class="ov-val">중국 선전(深圳) · R&amp;D센터 다수</span></div>
-          <div class="ov-row"><span class="ov-key">생산 거점</span><span class="ov-val">류저우(柳州) 양산공장 — 휴머노이드 전용</span></div>
-          <div class="ov-row"><span class="ov-key">상장</span><span class="ov-val">홍콩증시 메인보드 <strong>9880.HK</strong> · 2023.12.29 IPO</span></div>
-          <div class="ov-row"><span class="ov-key">발행주식</span><span class="ov-val">471.12백만주 · 주요주주 James Zhou(34%) + 텐센트·스카이워스</span></div>
-          <div class="ov-row"><span class="ov-key">직원</span><span class="ov-val">약 1,800명 (R&amp;D 인력 50%↑)</span></div>
-          <div class="ov-row"><span class="ov-key">주요 IP</span><span class="ov-val">서보 액추에이터 / BrainNet AI / Co-Agent / U-SLAM</span></div>
-        </div>
-      </div>
-
-      <div class="ov-block">
-        <h3>핵심 재무 지표 (FY2024)</h3>
-        <div class="ov-list">
-          <div class="ov-row"><span class="ov-key">매출</span><span class="ov-val"><strong>RMB 1,305M</strong> ≈ $184M / ₩2,700억</span></div>
-          <div class="ov-row"><span class="ov-key">매출 성장률</span><span class="ov-val">+23.6% YoY (Walker S2 기여 본격화)</span></div>
-          <div class="ov-row"><span class="ov-key">매출총이익률</span><span class="ov-val">28.7% (HW 중심 사업 특성)</span></div>
-          <div class="ov-row"><span class="ov-key">영업손실</span><span class="ov-val"><strong>−RMB 970M</strong> · 영업이익률 −74%</span></div>
-          <div class="ov-row"><span class="ov-key">조정 순손실</span><span class="ov-val">−RMB 690M (전년 대비 손실폭 축소)</span></div>
-          <div class="ov-row"><span class="ov-key">현금보유</span><span class="ov-val">RMB 1.29B (PIPE 후 보강)</span></div>
-          <div class="ov-row"><span class="ov-key">부채비율</span><span class="ov-val">D/E 0.57 · 순현금 −RMB 344M (소폭 순부채)</span></div>
-          <div class="ov-row"><span class="ov-key">PSR (주가/매출)</span><span class="ov-val">약 28배 — 성장주 멀티플, 우려 요인</span></div>
-        </div>
-      </div>
+    <div style="width:1px;background:rgba(0,198,255,0.2)"></div>
+    <div style="text-align:center;">
+      <div style="font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-bottom:6px;">세후 실수령 (월)</div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:38px;color:var(--green);">3,554만원</div>
     </div>
+  </div>
 
-    <h3 style="font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:-.01em;margin:24px 0 14px;color:var(--ink);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:6px;height:22px;background:var(--coral);border-radius:1px"></span>매출 구성 4대 사업부 (FY2024)</h3>
-    <div class="card">
-      <div class="seg-block">
-        <div class="seg-row">
-          <div class="seg-name">교육용 스마트 로봇<small>Alpha Mini, uKit, Yanshee</small></div>
-          <div class="seg-bar-bg"><div class="seg-bar-fill" style="width:34%"></div></div>
-          <div class="seg-pct">RMB 444M (34%)</div>
-        </div>
-        <div class="seg-row">
-          <div class="seg-name">물류 로봇 (AGV/AMR)<small>Wali 시리즈, Chitu L4 무인차</small></div>
-          <div class="seg-bar-bg"><div class="seg-bar-fill alt" style="width:24%"></div></div>
-          <div class="seg-pct">RMB 314M (24%)</div>
-        </div>
-        <div class="seg-row">
-          <div class="seg-name">산업 휴머노이드<small>Walker S, Walker S2 — 폭발 성장</small></div>
-          <div class="seg-bar-bg"><div class="seg-bar-fill alt2" style="width:25%"></div></div>
-          <div class="seg-pct">RMB 326M (25%)</div>
-        </div>
-        <div class="seg-row">
-          <div class="seg-name">소비자용 (AiRROBO 등)<small>로봇 청소기·고양이 화장실</small></div>
-          <div class="seg-bar-bg"><div class="seg-bar-fill alt3" style="width:17%"></div></div>
-          <div class="seg-pct">RMB 221M (17%)</div>
-        </div>
-      </div>
-      <div class="note-box" style="margin-top:18px">
-        <strong>전환점 포인트:</strong> Walker S 시리즈(산업 휴머노이드) 매출이 FY2024 +2,203.7% 폭증, 판매 대수는 35,866.7% 증가하여 1,079대를 기록. 2025년 11월부터 Walker S2 양산이 본격 시작되어 <strong>FY2025~2026 매출 비중 50%↑로 사업 구조가 재편되는 중</strong>이다.
-      </div>
-    </div>
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;width:100%;">
+    <div style="height:3px;background:linear-gradient(90deg,var(--cyan),var(--blue));border-radius:2px;grid-column:span 2;"></div>
+    <div style="height:3px;background:var(--gold);border-radius:2px;grid-column:span 1;"></div>
+    <div style="height:3px;background:var(--green);border-radius:2px;grid-column:span 1;"></div>
+    <div style="height:3px;background:rgba(0,198,255,0.2);border-radius:2px;grid-column:span 2;"></div>
+  </div>
 
-    <h3 style="font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:-.01em;margin:32px 0 14px;color:var(--ink);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:6px;height:22px;background:var(--coral);border-radius:1px"></span>핵심 제품 라인업</h3>
-    <div class="product-grid">
-      <div class="product-card flag">
-        <div class="pn">Walker S2</div>
-        <div class="pd">2세대 산업 휴머노이드. 162° 회전, Co-Agent AI, 자동 배터리 스왑. 162cm/63kg.</div>
-        <div class="pp">★ 핵심 신성장 · 양산</div>
-      </div>
-      <div class="product-card flag">
-        <div class="pn">Walker S</div>
-        <div class="pd">1세대 산업 휴머노이드. NIO·BYD 공장 검증 완료. 41 DOF, 15kg 페이로드.</div>
-        <div class="pp">검증 완료 · 양산</div>
-      </div>
-      <div class="product-card">
-        <div class="pn">Chitu L4 무인차</div>
-        <div class="pd">L4 자율주행 물류 차량. 공장 내 물류 자동화 핵심.</div>
-        <div class="pp">물류 사업부</div>
-      </div>
-      <div class="product-card">
-        <div class="pn">Alpha Mini</div>
-        <div class="pd">교육용 휴머노이드. 글로벌 50개국 학교 도입. 누적 200만대.</div>
-        <div class="pp">교육 캐시카우</div>
-      </div>
-      <div class="product-card">
-        <div class="pn">AiRROBO</div>
-        <div class="pd">소비자용 로봇 청소기 · 고양이 화장실 · 잔디깎이. 미국·유럽 직판.</div>
-        <div class="pp">소비자 부문</div>
-      </div>
-      <div class="product-card">
-        <div class="pn">BrainNet · Co-Agent</div>
-        <div class="pd">자체 AI 플랫폼. 작업 계획·이상감지·도구사용. Baidu LLM 통합.</div>
-        <div class="pp">SW 플랫폼</div>
-      </div>
-    </div>
+  <div style="margin-top:24px;font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:0.12em;">
+    종합분석 보고서 · 2026 · INVESTMENT RESEARCH
+  </div>
 
-    <h3 style="font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:-.01em;margin:32px 0 10px;color:var(--ink);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:6px;height:22px;background:var(--coral);border-radius:1px"></span>주요 고객사 (2026.04 기준)</h3>
-    <p style="font-size:13.5px;color:var(--ink-soft);margin-bottom:6px"><strong style="color:var(--ink)">중국 자동차 OEM:</strong></p>
-    <div class="cust-grid">
-      <span class="cust-pill">BYD 비야디</span>
-      <span class="cust-pill">Geely 지리</span>
-      <span class="cust-pill">NIO 니오</span>
-      <span class="cust-pill">Zeekr 지커</span>
-      <span class="cust-pill">FAW-Volkswagen</span>
-      <span class="cust-pill">Audi-FAW</span>
-      <span class="cust-pill">BAIC New Energy</span>
-      <span class="cust-pill">Dongfeng Liuzhou</span>
-    </div>
-    <p style="font-size:13.5px;color:var(--ink-soft);margin:14px 0 6px"><strong style="color:var(--ink)">물류·테크:</strong></p>
-    <div class="cust-grid">
-      <span class="cust-pill">Foxconn 폭스콘</span>
-      <span class="cust-pill">SF Express 순펑</span>
-    </div>
-    <p style="font-size:13.5px;color:var(--ink-soft);margin:14px 0 6px"><strong style="color:var(--ink)">글로벌 신규 (2026):</strong></p>
-    <div class="cust-grid">
-      <span class="cust-pill global">🇪🇺 Airbus 항공기 조립</span>
-      <span class="cust-pill global">🇺🇸 Texas Instruments 반도체 공장</span>
-      <span class="cust-pill global">🇸🇦 Saudi Arabia 산업 자동화</span>
-      <span class="cust-pill global">🇩🇪 독일 자동차 OEM 협력</span>
-    </div>
-  </section>
-
-  <!-- ============ 2. 산업 전망 ============ -->
-  <section class="sec">
-    <div class="sec-head">
-      <span class="idx">02</span>
-      <h2>산업 전망 — 휴머노이드 로봇</h2>
-      <span class="meta">Industry Outlook 2026 — 2035</span>
-    </div>
-
-    <div class="outlook-block">
-      <h3>2026~2027, 산업 변곡점에 진입</h3>
-      <p class="lead">ABI Research·IDTechEx·골드만삭스가 공통적으로 지적하는 명제 — <strong style="font-style:normal;color:var(--ink)">휴머노이드 로봇은 2026~2027년 사이에 'AI 데모'에서 '산업 인프라'로 전환된다.</strong> 자동차 OEM이 첫 채택자, 그 다음 물류, 그 다음 일반 서비스 순으로 확산. 2030년 이후 가정용 시장이 열리면 시장 규모는 연 100억 달러 단위에서 1,000억 달러 단위로 점프한다.</p>
-
-      <div class="timeline-grid">
-        <div class="tl-cell now">
-          <div class="yr">— 2025 (Now)</div>
-          <div class="mkt">$2~3<small>B</small></div>
-          <div class="desc">2025년 글로벌 출하 16,000대. AgiBot/Unitree/UBTech가 시장 주도.</div>
-          <div class="src">Robozaps · BCC</div>
-        </div>
-        <div class="tl-cell">
-          <div class="yr">— 2026 ~ 2027</div>
-          <div class="mkt">$4~10<small>B</small></div>
-          <div class="desc">UBTech 5천대 / Tesla 5천~1.2만대 / Figure 1만대+ 양산 본격화.</div>
-          <div class="src">IDTechEx · BoFA</div>
-        </div>
-        <div class="tl-cell">
-          <div class="yr">— 2030</div>
-          <div class="mkt">$13~38<small>B</small></div>
-          <div class="desc">중국만 $10.26B. 자동차·물류 산업 전반 확산. 가정용 진입 초기.</div>
-          <div class="src">Goldman · Morgan Stanley</div>
-        </div>
-        <div class="tl-cell">
-          <div class="yr">— 2035</div>
-          <div class="mkt">$104<small>B</small></div>
-          <div class="desc">CAGR 47% · 누적 출하 수백만 대. BoFA 2060년 30억 대 전망(차량 추월).</div>
-          <div class="src">Roots Analysis · BoFA</div>
-        </div>
-      </div>
-    </div>
-
-    <h3 style="font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:-.01em;margin:24px 0 14px;color:var(--ink);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:6px;height:22px;background:var(--coral);border-radius:1px"></span>구조적 성장 동력 — 3대 드라이버</h3>
-
-    <div class="driver-grid">
-      <div class="driver-card">
-        <div class="dn">— Driver №1 —</div>
-        <h4>구조적 노동력 부족</h4>
-        <p>일본 노동인구 20년째 감소. 독일 2035년까지 700만 명 부족. 중국·한국 고령화 가속. 미국 제조업 380만 명 부족(2033). 사이클이 아닌 <strong style="color:var(--ink)">구조적 부족</strong>으로, 임금 상승만으로 해결 불가.</p>
-      </div>
-      <div class="driver-card">
-        <div class="dn">— Driver №2 —</div>
-        <h4>AI Foundation Model 진보</h4>
-        <p>NVIDIA Cosmos · Google Gemini Robotics · OpenAI Helix(Figure)가 'World Model' 시대를 연다. 휴머노이드는 <strong style="color:var(--ink)">'행동하는 ChatGPT'</strong>로 진화. 2025→2027년 학습 효율 10배 향상 전망.</p>
-      </div>
-      <div class="driver-card">
-        <div class="dn">— Driver №3 —</div>
-        <h4>가격 학습곡선 붕괴</h4>
-        <p>Unitree G1 $16,000, Tesla Optimus 목표 $20~30K. 중국발 공급망 통합으로 <strong style="color:var(--ink)">연 20~30% 가격 하락</strong> 예상. EV 학습곡선(2015~2020) 재현. 2030년 ROI 1년 미만 가능.</p>
-      </div>
-    </div>
-
-    <div class="note-box" style="margin-top:20px">
-      <strong>주요 적용 분야 (2026 기준):</strong> 자동차·제조 35% / 물류·창고 25% / 연구개발 15% / 기타(서비스·의료·교육) 25%. 2030년 이후 가정용 시장이 본격 열리면 <strong>총 TAM은 수조 달러</strong>로 확장될 가능성. 단, 안전 표준화·법적 책임 프레임워크 미비가 핵심 장애물.
-    </div>
-  </section>
-
-  <!-- ============ 3. 유비테크 뉴스 ============ -->
-  <section class="sec">
-    <div class="sec-head">
-      <span class="idx">03</span>
-      <h2>유비테크 뉴스 타임라인</h2>
-      <span class="meta">Key Events 2025—2026</span>
-    </div>
-
-    <div class="news-list">
-      <div class="news-item">
-        <div class="news-date">2026.04 <small>Latest</small></div>
-        <div class="news-body">
-          <h4>Texas Instruments, 반도체 팹용 Walker S2 도입 — 미·중 디커플링 시대의 역설</h4>
-          <p>미국 칩 제조사 TI가 자사 반도체 공장에 UBTech Walker S2 채택. UBTech는 TI 부품을 자사 로봇에 통합 — 양사 간 <strong style="color:var(--ink)">상호 공급망 (Reciprocal Supply Chain)</strong> 형성. 미·중 무역 갈등 와중에 휴머노이드 로봇이 새로운 협력 채널이 되는 흥미로운 사례.</p>
-          <span class="news-tag">Global Expansion</span>
-        </div>
-      </div>
-
-      <div class="news-item">
-        <div class="news-date">2026.03 <small>Q1 어닝</small></div>
-        <div class="news-body">
-          <h4>Airbus, 항공기 조립용 Walker S2 PoC 계약 체결</h4>
-          <p>유럽 항공 거인 Airbus가 'early concept testing phase'로 Walker S2를 도입. 항공기 조립의 정밀 작업에 휴머노이드 적용 가능성 검증. UBTech의 자동차 외 신규 수직시장 확장의 첫 신호탄. 1Q 매출 RMB 621M(전년동기 +86.6%), 손실폭 18.5% 축소.</p>
-          <span class="news-tag">New Vertical</span>
-        </div>
-      </div>
-
-      <div class="news-item">
-        <div class="news-date">2026.01 <small>현실 점검</small></div>
-        <div class="news-body">
-          <h4>"Walker S2 효율, 인간 작업자 대비 절반 수준" — 회사 공식 인정</h4>
-          <p>UBTech 측이 직접 인정: <strong style="color:var(--ink)">"휴머노이드는 여전히 프로토타입 후기 단계"</strong>. 일부 작업은 인간의 50% 효율. 시장의 과도한 기대를 경계하는 발언이지만, 동시에 <strong style="color:var(--ink)">2배 효율로 가는 학습곡선의 시작점</strong>이라는 의미. 단기 변동성 확대.</p>
-          <span class="news-tag">Reality Check</span>
-        </div>
-      </div>
-
-      <div class="news-item">
-        <div class="news-date">2025.12 <small>마일스톤</small></div>
-        <div class="news-body">
-          <h4>1,000번째 Walker S2 출고 — 류저우 공장에서 세계 최초 휴머노이드 양산 1,000대 달성</h4>
-          <p>류저우 공장에서 1,000번째 Walker S2 출고 기념식. 이미 500대 이상 산업 현장 가동 중. <strong style="color:var(--ink)">"수백 대의 Walker S2가 일렬 정렬로 컨테이너 진입하는 영상"</strong>이 글로벌 화제. Figure CEO Brett Adcock이 "CGI 의심" 제기 → UBTech가 1인칭 드론 영상으로 진위 입증.</p>
-          <span class="news-tag">Mass Production</span>
-        </div>
-      </div>
-
-      <div class="news-item">
-        <div class="news-date">2025.11 <small>핵심 이벤트</small></div>
-        <div class="news-body">
-          <h4>Walker S2 양산 정식 개시 + 누적 수주 8억 위안($112M) 돌파</h4>
-          <p>Walker S2 첫 양산 배치 수백 대 출고. 연내 500대 인도 목표. 9월 250M 위안 계약 + 츠궁(Zigong) 데이터센터 159M 위안 등 대형 수주. <strong style="color:var(--ink)">2026년 5,000대, 2027년 10,000대 양산 캐파 로드맵</strong> 공식 발표. 주가 11/14 HKD 124.40으로 단기 조정.</p>
-          <span class="news-tag">Production Ramp</span>
-        </div>
-      </div>
-
-      <div class="news-item">
-        <div class="news-date">2025.07 <small>자본 보강</small></div>
-        <div class="news-body">
-          <h4>$307M PIPE 투자 유치 — 양산 캐파 확대 자금 확보</h4>
-          <p>2023년 12월 IPO 이후 최대 규모의 후속 자금 조달. 류저우 공장 캐파 5,000대 → 10,000대 확장에 활용. <strong style="color:var(--ink)">현금 보유 RMB 1.29B로 강화</strong>되어 향후 2~3년 영업적자에도 자금 압박 제한적. 다만 신주 발행으로 4.64% 희석.</p>
-          <span class="news-tag">Capital Raise</span>
-        </div>
-      </div>
-
-      <div class="news-item">
-        <div class="news-date">2025년 통산</div>
-        <div class="news-body">
-          <h4>FY2025 통산 휴머노이드 매출 +2,203% — 사업 구조 대전환의 해</h4>
-          <p>풀사이즈 산업 휴머노이드 매출 RMB 820.6M (전년 대비 +2,203.7%), 출하 1,079대(+35,867%). <strong style="color:var(--ink)">교육 로봇 의존 회사 → 산업 휴머노이드 회사로의 정체성 전환</strong>. 조정 순손실 RMB 690.5M로 적자 폭은 축소되며 BEP까지 2~3년 가시권.</p>
-          <span class="news-tag">Pivot Year</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ 4. 시나리오 ============ -->
-  <section class="sec">
-    <div class="sec-head">
-      <span class="idx">04</span>
-      <h2>3-시나리오 분석</h2>
-      <span class="meta">12-Month Forward View</span>
-    </div>
-
-    <div class="scenario-grid">
-      <div class="scen-card bull">
-        <div class="scen-head">
-          <div class="lab">Bullish · 낙관 시나리오</div>
-          <h3>휴머노이드 패권 확립</h3>
-          <span class="prob">발생 확률 25%</span>
-        </div>
-        <div class="scen-body">
-          <div class="target">
-            <div class="target-lab">12개월 목표주가</div>
-            <div class="target-val">HKD 190 <small class="up">+77.4%</small></div>
-          </div>
-          <h5>핵심 트리거</h5>
-          <ul>
-            <li>Walker S2 2026년 인도 5,000대 초과 달성</li>
-            <li>Tesla Optimus 양산 지연(공급망 이슈) → UBTech 시장점유율 +5%p</li>
-            <li>Airbus·TI 외 미국 빅테크 OEM 신규 수주 (Apple/Amazon/Boeing)</li>
-            <li>미·중 휴머노이드 협력 프레임워크 출현 (TI 사례 확산)</li>
-            <li>FY2026 매출 RMB 4,500M (+245% YoY), 영업이익 BEP 근접</li>
-          </ul>
-          <h5>밸류에이션 근거</h5>
-          <ul>
-            <li>PSR 35배 (성장 가속 시 정당화)</li>
-            <li>골드만삭스 $38B 시장 시나리오에서 5% 점유 가정</li>
-            <li>차이나 휴머노이드 ETF 자금 유입 가속</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="scen-card base">
-        <div class="scen-head">
-          <div class="lab">Base · 중립 시나리오</div>
-          <h3>점진적 양산 확대</h3>
-          <span class="prob">발생 확률 50%</span>
-        </div>
-        <div class="scen-body">
-          <div class="target">
-            <div class="target-lab">12개월 목표주가</div>
-            <div class="target-val">HKD 158 <small class="up">+47.4%</small></div>
-          </div>
-          <h5>핵심 가정</h5>
-          <ul>
-            <li>Walker S2 2026년 인도 3,000~4,000대 (캐파 60~80% 가동)</li>
-            <li>Tesla Optimus·Figure·Unitree와 5각 경쟁 체제 정착</li>
-            <li>중국 자동차 OEM 비중 70% 유지, 글로벌 30%로 확장</li>
-            <li>FY2026 매출 RMB 3,000M (+130% YoY), 손실 RMB −400M</li>
-            <li>Walker S3 차세대 모델 2026년 하반기 공개</li>
-          </ul>
-          <h5>리스크 균형 요인</h5>
-          <ul>
-            <li>HSI 박스권(25,000~28,000)에서 차익실현 압력</li>
-            <li>경쟁사 가격 인하로 ASP −15% 압박</li>
-            <li>회사 가이던스 컨센서스 부합 정도</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="scen-card bear">
-        <div class="scen-head">
-          <div class="lab">Bearish · 비관 시나리오</div>
-          <h3>경쟁 격화 + 손실 지속</h3>
-          <span class="prob">발생 확률 25%</span>
-        </div>
-        <div class="scen-body">
-          <div class="target">
-            <div class="target-lab">12개월 목표주가</div>
-            <div class="target-val">HKD 70 <small class="dn">−34.6%</small></div>
-          </div>
-          <h5>위험 트리거</h5>
-          <ul>
-            <li>Tesla Optimus·Figure 03 가격 $25K 안착 → ASP 50% 인하 압박</li>
-            <li>Walker S2 인도 2,000대 미만(고객사 검수 지연)</li>
-            <li>FY2026 영업손실 RMB −1,200M로 확대, 추가 자본확충 필요</li>
-            <li>중국 정부 보조금 축소·대만해협 지정학 리스크 확대</li>
-            <li>휴머노이드 'AI 버블' 인식 → 섹터 멀티플 50% 압축</li>
-          </ul>
-          <h5>차트 지지선</h5>
-          <ul>
-            <li>1차 지지: HKD 90 (200일 이동평균)</li>
-            <li>2차 지지: HKD 73 (52주 최저)</li>
-            <li>최악의 경우: HKD 60 (PSR 15배 평균회귀)</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <div class="note-box warn" style="margin-top:24px">
-      <strong>견제 시각 (Devil's Advocate):</strong> UBTech는 <strong>여전히 영업적자 회사</strong>다. 멀티플(PSR 28배)이 매출 성장 지속을 전제로 하므로, 분기 한 번이라도 컨센 미달 시 −20% 갭다운 가능. 베타 4.43은 시장 평균 4배 변동성 — 단순 보유 자체가 시장 리스크의 4배 노출이다. 또한 미·중 갈등이 격화되면 중국 휴머노이드 기업의 미국 시장 접근이 차단될 수 있다.
-    </div>
-  </section>
-
-  <!-- ============ 5. 주요 경쟁사 ============ -->
-  <section class="sec">
-    <div class="sec-head">
-      <span class="idx">05</span>
-      <h2>주요 경쟁사 이슈</h2>
-      <span class="meta">Competitive Landscape</span>
-    </div>
-
-    <div class="comp-table-wrap">
-      <table class="comp-table">
-        <thead>
-          <tr><th style="width:22%">기업</th><th style="width:11%">시장점유율</th><th>2026 핵심 이슈</th><th style="width:14%">UBTech 위협도</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><div class="cname">AgiBot 智元 <small>비상장 · 상하이</small></div></td>
-            <td><span class="share">31%</span></td>
-            <td>전 화웨이 천재소년 펑즈후이 창업. X2/G2 모델로 출하 1위. 화웨이·바이두 자금 + 중국 정부 지원. <strong style="color:var(--ink)">중국 시장 직접 경쟁자</strong>. 2026년 IPO 임박설.</td>
-            <td><span class="threat-pill high">High · 직접경쟁</span></td>
-          </tr>
-          <tr>
-            <td><div class="cname">Unitree 宇树科技 <small>비상장 · 항저우</small></div></td>
-            <td><span class="share">27%</span></td>
-            <td>2025년 5,500+ 대 출하로 글로벌 양산 1위. G1 $16K 가격 파괴자. H2는 모터 자체 제조로 비용 우위. <strong style="color:var(--ink)">교육·연구 시장에서는 압도적</strong>. 산업용은 약점.</td>
-            <td><span class="threat-pill high">High · 가격경쟁</span></td>
-          </tr>
-          <tr>
-            <td><div class="cname">Tesla Optimus <small>TSLA · 美</small></div></td>
-            <td><span class="share">~5%</span></td>
-            <td>Gen 3 하드웨어 최종 단계. 2026 여름 저볼륨 양산, 2027 고볼륨 목표. <strong style="color:var(--ink)">목표 1M units/year by 2030</strong>. 자체 공장에서 검증 후 외부 판매. $20~30K 목표가가 압박.</td>
-            <td><span class="threat-pill high">High · 가격&amp;브랜드</span></td>
-          </tr>
-          <tr>
-            <td><div class="cname">Figure AI <small>비상장 · 美 BotQ</small></div></td>
-            <td><span class="share">~3%</span></td>
-            <td>OpenAI·NVIDIA·MS·Bezos 투자. Helix 02 풀바디 AI. BMW 협업. <strong style="color:var(--ink)">"100,000 units in 4 years"</strong> 가이던스. BotQ 공장 12,000+ units/year. 가정용 베타 2026년말.</td>
-            <td><span class="threat-pill mid">Mid · 미국 시장</span></td>
-          </tr>
-          <tr>
-            <td><div class="cname">Boston Dynamics Atlas <small>현대차 그룹</small></div></td>
-            <td><span class="share">~2%</span></td>
-            <td>전기 Atlas로 백플립·점프 등 운동 능력 압도. 현대차·기아 공장 파일럿. <strong style="color:var(--ink)">기술적 벤치마크</strong>이지만 가격 부담으로 양산 한계. 2026 상용화 목표.</td>
-            <td><span class="threat-pill mid">Mid · 한국 시장</span></td>
-          </tr>
-          <tr>
-            <td><div class="cname">Agility Robotics Digit <small>비상장 · 美</small></div></td>
-            <td><span class="share">~3%</span></td>
-            <td>Amazon 풀필먼트 센터 정식 도입. <strong style="color:var(--ink)">물류 특화 휴머노이드 1위</strong>. UBTech의 물류 부문과 직접 경쟁. CEO Peggy Johnson "휴머노이드 과대 마케팅 비판" 발언으로 차별화.</td>
-            <td><span class="threat-pill mid">Mid · 물류 부문</span></td>
-          </tr>
-          <tr>
-            <td><div class="cname">Apptronik Apollo <small>비상장 · 美 Texas</small></div></td>
-            <td><span class="share">~2%</span></td>
-            <td>NASA 출신 팀. <strong style="color:var(--ink)">Mercedes-Benz 인트라로지스틱스 파일럿</strong>. 2026 본격 양산 진입. NASA·Google·Microsoft 파트너십. 미국 본토 우위.</td>
-            <td><span class="threat-pill low">Low · 지역 차별</span></td>
-          </tr>
-          <tr>
-            <td><div class="cname">XPeng IRON <small>9868.HK · 中</small></div></td>
-            <td><span class="share">~1%</span></td>
-            <td>중국 EV OEM XPeng의 Q1 2026 출시. 극도로 자연스러운 보행 동작 시연. <strong style="color:var(--ink)">XPeng 자동차 공장 자체 활용</strong> 중심으로 BYD 모델 추격. 직접 외판은 제한적.</td>
-            <td><span class="threat-pill low">Low · 자체사용</span></td>
-          </tr>
-          <tr>
-            <td><div class="cname">1X Technologies NEO <small>비상장 · 美/노르웨이</small></div></td>
-            <td><span class="share">~1%</span></td>
-            <td>OpenAI 투자. <strong style="color:var(--ink)">가정용 휴머노이드 NEO $20K 또는 $499/월 RaaS</strong>. 선주문 받는 중. 산업용보다 가정용에 베팅. UBTech와 시장 거의 겹치지 않음.</td>
-            <td><span class="threat-pill low">Low · 다른 시장</span></td>
-          </tr>
-          <tr>
-            <td><div class="cname">Leju 乐聚 <small>비상장 · 中</small></div></td>
-            <td><span class="share">~5%</span></td>
-            <td>하얼빈공대 출신. Kuavo 4 Pro 모델로 중국 내수 시장 추격. <strong style="color:var(--ink)">화웨이 Atlas LLM 통합</strong>으로 AI 능력 차별화. 2026 글로벌 진출 본격화.</td>
-            <td><span class="threat-pill mid">Mid · 중국 내수</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="note-box" style="margin-top:20px">
-      <strong>경쟁 구도 종합:</strong> UBTech는 시장점유율 5%로 AgiBot/Unitree 대비 후순위지만, <strong>실제 산업현장 양산·인도 검증된 사실상 유일한 회사</strong>(Tesla·Figure는 아직 자체 공장 시범 단계). 2026년이 양산 경쟁의 결정적 한 해 — Tesla·Figure 양산 본격화 전 시장 선점이 관건. <strong style="color:#7A2A1F">UBTech의 진짜 경쟁자는 Tesla·Figure가 아니라 같은 중국 기업 AgiBot·Unitree</strong>이다.
-    </div>
-  </section>
-
-  <!-- ============ 6. 1억 시뮬레이션 ============ -->
-  <section class="sec">
-    <div class="sec-head">
-      <span class="idx">06</span>
-      <h2>기초자산 1억원 시뮬레이션</h2>
-      <span class="meta">₩100,000,000 → UBTech 9880.HK</span>
-    </div>
-
-    <div class="sim-block">
-      <h3>1억원으로 유비테크에 투자한다면</h3>
-      <p class="bridge">홍콩 주식 직접투자 기준. 환율(USD/KRW 1,472, USD/HKD 7.85)을 적용하면 1 HKD ≈ ₩187.5. 수수료·세금·환전 스프레드 약 0.7% 차감 후 진입 가능 주식 수 산출. 시나리오별 12개월 후 결과 + 5년 누적 시나리오로 자산 증식 경로를 검증한다.</p>
-
-      <div class="entry-grid">
-        <div class="entry-cell">
-          <div class="lab">진입가 (HKD)</div>
-          <div class="val">107.10<small>HKD</small></div>
-        </div>
-        <div class="entry-cell">
-          <div class="lab">환산 (KRW)</div>
-          <div class="val">20,081<small>원/주</small></div>
-        </div>
-        <div class="entry-cell">
-          <div class="lab">매수 가능</div>
-          <div class="val">4,945<small>주 (수수료 0.7% 反映)</small></div>
-        </div>
-        <div class="entry-cell">
-          <div class="lab">실투입금</div>
-          <div class="val">99.3M<small>원 (예수금 700천원)</small></div>
-        </div>
-      </div>
-
-      <h3 style="font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:-.01em;margin:8px 0 14px;color:var(--ink);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:6px;height:22px;background:var(--coral);border-radius:1px"></span>12개월 후 시나리오 (1년 단기)</h3>
-
-      <table class="sim-table">
-        <thead>
-          <tr><th style="width:18%">시나리오</th><th style="width:13%">목표 (HKD)</th><th style="width:13%">예상 수익률</th><th style="width:18%">평가금액</th><th>핵심 가정</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="scen bull">★ Bullish</span><div style="font-size:11px;color:var(--ink-mute);margin-top:2px">확률 25%</div></td>
-            <td><strong style="font-family:'JetBrains Mono',monospace;font-size:14px">190.94</strong></td>
-            <td><span class="ret up">+77.4%</span></td>
-            <td><span class="amt">₩176.2M</span><div style="font-size:11px;color:var(--ink-mute);margin-top:2px">+₩76.2M</div></td>
-            <td>5,000대 양산 초과 + 미국 빅테크 신규 수주 + Tesla 양산 지연</td>
-          </tr>
-          <tr>
-            <td><span class="scen base">● Base</span><div style="font-size:11px;color:var(--ink-mute);margin-top:2px">확률 50%</div></td>
-            <td><strong style="font-family:'JetBrains Mono',monospace;font-size:14px">157.89</strong></td>
-            <td><span class="ret up">+47.4%</span></td>
-            <td><span class="amt">₩146.4M</span><div style="font-size:11px;color:var(--ink-mute);margin-top:2px">+₩46.4M</div></td>
-            <td>3~4천대 양산, 컨센 부합. 자동차 OEM 70%/글로벌 30%</td>
-          </tr>
-          <tr>
-            <td><span class="scen bear">▼ Bearish</span><div style="font-size:11px;color:var(--ink-mute);margin-top:2px">확률 25%</div></td>
-            <td><strong style="font-family:'JetBrains Mono',monospace;font-size:14px">70.00</strong></td>
-            <td><span class="ret dn">−34.6%</span></td>
-            <td><span class="amt">₩65.4M</span><div style="font-size:11px;color:var(--ink-mute);margin-top:2px">−₩34.6M</div></td>
-            <td>Tesla·Figure 양산 본격화로 가격 압박, ASP −50% 충격</td>
-          </tr>
-          <tr style="background:rgba(204,120,92,.05)">
-            <td><strong style="color:var(--ink)">기댓값 (확률가중)</strong></td>
-            <td>—</td>
-            <td><span class="ret up">+34.4%</span></td>
-            <td><span class="amt">₩134.1M</span><div style="font-size:11px;color:var(--ink-mute);margin-top:2px">+₩34.1M</div></td>
-            <td><strong style="color:var(--ink)">위험조정 후에도 양(+)의 기댓값. 다만 변동성 베타 4.43 감안 시 표준편차 ±35%</strong></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3 style="font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:-.01em;margin:32px 0 14px;color:var(--ink);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:6px;height:22px;background:var(--coral);border-radius:1px"></span>5년 누적 시나리오 (장기 보유)</h3>
-
-      <table class="sim-table">
-        <thead>
-          <tr><th style="width:18%">시나리오</th><th style="width:15%">5년 CAGR</th><th style="width:15%">5년 누적수익</th><th style="width:18%">5년 후 평가금액</th><th>전제 조건</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="scen bull">★ Bullish</span><div style="font-size:11px;color:var(--ink-mute);margin-top:2px">시장 점유율 8%</div></td>
-            <td><strong style="font-family:'JetBrains Mono',monospace;font-size:14px">+45%</strong></td>
-            <td><span class="ret up">+540%</span></td>
-            <td><span class="amt">₩640M</span><div style="font-size:11px;color:var(--ink-mute);margin-top:2px">≈ 6.4억원</div></td>
-            <td>2030년 글로벌 휴머노이드 $38B 시장에서 5~8% 점유 + 흑자 전환</td>
-          </tr>
-          <tr>
-            <td><span class="scen base">● Base</span><div style="font-size:11px;color:var(--ink-mute);margin-top:2px">시장 점유율 4%</div></td>
-            <td><strong style="font-family:'JetBrains Mono',monospace;font-size:14px">+22%</strong></td>
-            <td><span class="ret up">+170%</span></td>
-            <td><span class="amt">₩270M</span><div style="font-size:11px;color:var(--ink-mute);margin-top:2px">≈ 2.7억원</div></td>
-            <td>점유율 유지, 2028년 BEP 도달, FY2030 매출 RMB 8B</td>
-          </tr>
-          <tr>
-            <td><span class="scen bear">▼ Bearish</span><div style="font-size:11px;color:var(--ink-mute);margin-top:2px">경쟁사에 시장 잠식</div></td>
-            <td><strong style="font-family:'JetBrains Mono',monospace;font-size:14px">−10%</strong></td>
-            <td><span class="ret dn">−40%</span></td>
-            <td><span class="amt">₩60M</span><div style="font-size:11px;color:var(--ink-mute);margin-top:2px">≈ 6천만원</div></td>
-            <td>Tesla/Figure에 양산 추월당함, 추가 자본확충에 따른 희석 누적</td>
-          </tr>
-          <tr style="background:rgba(204,120,92,.05)">
-            <td><strong style="color:var(--ink)">기댓값 (5년)</strong></td>
-            <td><span class="ret up">+22%</span></td>
-            <td><span class="ret up">+170%</span></td>
-            <td><span class="amt">₩265M</span><div style="font-size:11px;color:var(--ink-mute);margin-top:2px">≈ 2.65억원</div></td>
-            <td><strong style="color:var(--ink)">5년 보유 시 기대수익 +165%, 사이즈를 5%로 제한 시 포트폴리오 성과에 +8.3%p 기여</strong></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="note-box warn" style="margin-top:24px">
-        <strong>리스크 관리 — 절대 원칙:</strong><br>
-        ① <strong>포지션 사이즈 5% 한도</strong> — 1억 자산 기준 UBTech에 최대 500만원. 10억 자산이면 5,000만원. 베타 4.43의 고변동성 종목은 단일 종목 리스크가 포트폴리오 전체를 흔들 수 있다.<br>
-        ② <strong>−25% 손절 룰</strong> — HKD 80 도달 시 50% 매도, HKD 70 도달 시 전량 매도. 적자 회사는 모멘텀이 꺾이면 회복까지 2~3년 걸린다.<br>
-        ③ <strong>이익 실현 단계</strong> — HKD 158 도달 시 1/3 매도, HKD 190 도달 시 추가 1/3 매도, 잔여 1/3은 5년 보유.<br>
-        ④ <strong>분할 매수</strong> — 한 번에 모든 자금 투입 금지. 3회 분할(HKD 107, 95, 85)로 평단가 분산. 또는 매월 1/12씩 1년에 걸쳐 분할.
-      </div>
-    </div>
-
-    <div class="verdict-block">
-      <div class="vlab">⚡ Final Verdict · 종합 의견</div>
-      <h3>"휴머노이드 시대의 첫 번째 검증된 양산 기업, 그러나 적자 + 고변동성"</h3>
-      <p>UBTech는 <strong>2026~2027년 휴머노이드 산업 변곡점에서 가장 실전 검증된 중국 기업</strong>이다. Tesla Optimus가 아직 시연 단계, Figure가 BotQ 공장 짓는 중일 때, UBTech는 이미 BYD·Foxconn·Airbus 라인에서 1,000대를 가동하고 있다. 5년 기대수익 +170%는 매력적이지만, <strong>베타 4.43 + 적자기업이라는 두 가지 리스크</strong>가 단순 보유의 리스크를 시장의 4배로 키운다.</p>
-      <p style="margin-top:14px">전문가의 권고는 명확하다 — <strong>10억 자산가 기준 최대 5,000만원(5%) 한도, 12개월 평균 분할 매수, −25%/+50% 자동 손절·익절 룰 엄수</strong>. 이 종목은 '몰빵'할 자산이 아니라, '미래 메가테마의 옵션'으로 포트폴리오에 심는 것이 정공법이다. 1억 기댓값 +34% 가능성에 베팅하되, 잃어도 자산 전체에 영향이 없도록 사이즈를 통제하는 것 — 이것이 100억 만들기 프로젝트에서 메가테마 종목을 다루는 자세다.</p>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="foot">
-    <div>
-      <strong>The Analyst — UBTech Deep-Dive</strong> · Vol. 27 · Single Stock<br>
-      <em>"In the long run, the market is a weighing machine — but you must survive the short-run voting machine first."</em>
-    </div>
-    <div style="text-align:right">
-      Generated 2026.04.29 06:40 KST<br>
-      Data: HKEX / Yahoo Finance / Investing.com / SimplyWallSt / Company Filings
-    </div>
-  </footer>
+  <div class="card-footer">
+    <span class="footer-tag">CARD 01 / 08 · COVER</span>
+    <div class="footer-dot"></div>
+    <span class="footer-tag">본 자료는 투자 권유가 아닙니다</span>
+  </div>
 </div>
+
+
+<!-- ════════════════════════════════════════ -->
+<!-- CARD 2: 구성종목 -->
+<!-- ════════════════════════════════════════ -->
+<div class="card" id="card2">
+  <div class="sec-head">
+    <div class="sec-num">02</div>
+    <div>
+      <div class="sec-title">PORTFOLIO HOLDINGS</div>
+      <div style="font-size:22px;font-weight:900;margin-top:2px;">구성 종목 분석</div>
+    </div>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="card-body">
+    <div class="big-sub" style="margin-bottom:16px;">KRX 반도체 TR 지수 전체 편입 · 2026.05 기준</div>
+
+    <div class="kpi-row">
+      <div class="kpi-box">
+        <div class="kpi-val" style="color:var(--cyan);">31.4%</div>
+        <div class="kpi-label">SK하이닉스 비중</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-val" style="color:var(--blue);">21.4%</div>
+        <div class="kpi-label">삼성전자 비중</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-val" style="color:var(--gold);">52.8%</div>
+        <div class="kpi-label">TOP2 합산</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-val" style="color:var(--green);">30%</div>
+        <div class="kpi-label">옵션 매도 비중</div>
+      </div>
+    </div>
+
+    <!-- Holdings -->
+    <div style="flex:1;">
+      <div class="hold-row">
+        <span class="hold-rank">01</span>
+        <div class="hold-dot" style="background:#00c6ff;"></div>
+        <span class="hold-name">SK하이닉스</span>
+        <span class="hold-type">HBM·DRAM</span>
+        <span class="hold-pct" style="color:#00c6ff;">31.4%</span>
+        <div class="hold-bar-wrap"><div class="hold-bar" style="width:100%;background:linear-gradient(90deg,#00c6ff,#0099cc);"></div></div>
+      </div>
+      <div class="hold-row">
+        <span class="hold-rank">02</span>
+        <div class="hold-dot" style="background:#4488ff;"></div>
+        <span class="hold-name">삼성전자</span>
+        <span class="hold-type">메모리·파운드리</span>
+        <span class="hold-pct" style="color:#4488ff;">21.4%</span>
+        <div class="hold-bar-wrap"><div class="hold-bar" style="width:68%;background:#4488ff;"></div></div>
+      </div>
+      <div class="hold-row">
+        <span class="hold-rank">03</span>
+        <div class="hold-dot" style="background:#f5c518;"></div>
+        <span class="hold-name">한미반도체</span>
+        <span class="hold-type">반도체 장비</span>
+        <span class="hold-pct" style="color:#f5c518;">6.8%</span>
+        <div class="hold-bar-wrap"><div class="hold-bar" style="width:22%;background:#f5c518;"></div></div>
+      </div>
+      <div class="hold-row">
+        <span class="hold-rank">04</span>
+        <div class="hold-dot" style="background:#ff9100;"></div>
+        <span class="hold-name">리노공업</span>
+        <span class="hold-type">반도체 부품</span>
+        <span class="hold-pct" style="color:#ff9100;">4.2%</span>
+        <div class="hold-bar-wrap"><div class="hold-bar" style="width:13%;background:#ff9100;"></div></div>
+      </div>
+      <div class="hold-row">
+        <span class="hold-rank">05</span>
+        <div class="hold-dot" style="background:#a78bfa;"></div>
+        <span class="hold-name">원익IPS</span>
+        <span class="hold-type">CVD·ALD 장비</span>
+        <span class="hold-pct" style="color:#a78bfa;">3.1%</span>
+        <div class="hold-bar-wrap"><div class="hold-bar" style="width:10%;background:#a78bfa;"></div></div>
+      </div>
+      <div class="hold-row">
+        <span class="hold-rank">06</span>
+        <div class="hold-dot" style="background:#22d3ee;"></div>
+        <span class="hold-name">이오테크닉스</span>
+        <span class="hold-type">레이저 장비</span>
+        <span class="hold-pct" style="color:#22d3ee;">2.8%</span>
+        <div class="hold-bar-wrap"><div class="hold-bar" style="width:9%;background:#22d3ee;"></div></div>
+      </div>
+      <div class="hold-row">
+        <span class="hold-rank">07</span>
+        <div class="hold-dot" style="background:#34d399;"></div>
+        <span class="hold-name">솔브레인</span>
+        <span class="hold-type">반도체 소재</span>
+        <span class="hold-pct" style="color:#34d399;">2.4%</span>
+        <div class="hold-bar-wrap"><div class="hold-bar" style="width:8%;background:#34d399;"></div></div>
+      </div>
+      <div class="hold-row">
+        <span class="hold-rank">08</span>
+        <div class="hold-dot" style="background:#fb7185;"></div>
+        <span class="hold-name">피에스케이</span>
+        <span class="hold-type">식각 장비</span>
+        <span class="hold-pct" style="color:#fb7185;">2.1%</span>
+        <div class="hold-bar-wrap"><div class="hold-bar" style="width:7%;background:#fb7185;"></div></div>
+      </div>
+      <div class="hold-row" style="border:none;">
+        <span class="hold-rank">+</span>
+        <div class="hold-dot" style="background:#334155;"></div>
+        <span class="hold-name" style="color:var(--muted);">기타 KRX반도체 밸류체인</span>
+        <span class="hold-type" style="color:var(--muted);">소부장 전반</span>
+        <span class="hold-pct" style="color:var(--muted);">25.8%</span>
+        <div class="hold-bar-wrap"><div class="hold-bar" style="width:82%;background:#1e3a5f;"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <span class="footer-tag">CARD 02 / 08 · HOLDINGS</span>
+    <div class="footer-dot"></div>
+    <span class="footer-tag">기준: 2026.05 | 변동 가능</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════ -->
+<!-- CARD 3: 강점 & 리스크 -->
+<!-- ════════════════════════════════════════ -->
+<div class="card" id="card3">
+  <div class="sec-head">
+    <div class="sec-num">03</div>
+    <div>
+      <div class="sec-title">STRENGTH & RISK ANALYSIS</div>
+      <div style="font-size:22px;font-weight:900;margin-top:2px;">강점 & 리스크</div>
+    </div>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="card-body">
+    <div class="rs-grid">
+      <!-- 강점 -->
+      <div>
+        <div class="rs-col-title" style="color:var(--green);border-color:rgba(0,230,118,0.3);">
+          ✅ &nbsp;STRENGTHS · 강점
+        </div>
+        <div class="rs-item">
+          <span class="rs-icon">💰</span>
+          <div class="rs-text">
+            <span class="rs-bold">연 9% 안정적 현금흐름</span>
+            5억 투자 시 월 3,554만원 세후 수령. 은퇴 생활비·현금흐름 포트폴리오에 최적.
+          </div>
+        </div>
+        <div class="rs-item">
+          <span class="rs-icon">🏆</span>
+          <div class="rs-text">
+            <span class="rs-bold">패시브 구조 — 대장주 집중</span>
+            SK하이닉스·삼성전자 합산 53%+ 고집중. 액티브 대비 규제 없이 대장주 최대 담기 가능.
+          </div>
+        </div>
+        <div class="rs-item">
+          <span class="rs-icon">🛡️</span>
+          <div class="rs-text">
+            <span class="rs-bold">비과세 옵션 프리미엄</span>
+            분배금 중 65% 이상이 옵션 프리미엄 → 비과세. 실효 세율 대폭 낮음.
+          </div>
+        </div>
+        <div class="rs-item">
+          <span class="rs-icon">📈</span>
+          <div class="rs-text">
+            <span class="rs-bold">상승 70% 참여 가능</span>
+            옵션 30%만 매도 → 반도체 상승장에서 70% 참여. 풀커버드콜 대비 유리.
+          </div>
+        </div>
+        <div class="rs-item">
+          <span class="rs-icon">⚡</span>
+          <div class="rs-text">
+            <span class="rs-bold">초과 프리미엄 재투자</span>
+            9% 초과 분배금은 반도체 종목에 자동 재투자 → 복리 효과 보조.
+          </div>
+        </div>
+      </div>
+
+      <!-- 리스크 -->
+      <div>
+        <div class="rs-col-title" style="color:var(--red);border-color:rgba(255,68,68,0.3);">
+          ⚠️ &nbsp;RISKS · 리스크
+        </div>
+        <div class="rs-item">
+          <span class="rs-icon">🔀</span>
+          <div class="rs-text">
+            <span class="rs-bold">기초자산-옵션 불일치</span>
+            주식은 KRX반도체, 옵션은 코스피200 → 헤지 효율 제한. 반도체 급등 시 프리미엄 미흡 가능.
+          </div>
+        </div>
+        <div class="rs-item">
+          <span class="rs-icon">🆕</span>
+          <div class="rs-text">
+            <span class="rs-bold">신규 상장 — 트랙레코드 無</span>
+            2026.05.12 상장. 실제 9% 분배 지급 검증 안됨. 초기 6개월 실적 확인 필수.
+          </div>
+        </div>
+        <div class="rs-item">
+          <span class="rs-icon">📉</span>
+          <div class="rs-text">
+            <span class="rs-bold">급등장 기회비용</span>
+            반도체가 단기 30%+ 급등 시 상승 제한. 레버리지 ETF 대비 수익 대폭 저하 가능.
+          </div>
+        </div>
+        <div class="rs-item">
+          <span class="rs-icon">🔄</span>
+          <div class="rs-text">
+            <span class="rs-bold">반도체 다운사이클 리스크</span>
+            2028년 공급 증가 시 반도체 하락 → 주가 하락 손실은 옵션 프리미엄으로 완충 불가.
+          </div>
+        </div>
+        <div class="rs-item">
+          <span class="rs-icon">💸</span>
+          <div class="rs-text">
+            <span class="rs-bold">종합과세 리스크</span>
+            5억 × 9% = 4,500만 → 과세분이 금융소득 2,000만 초과 시 종합과세 대상.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <span class="footer-tag">CARD 03 / 08 · RISK & STRENGTH</span>
+    <div class="footer-dot"></div>
+    <span class="footer-tag">종합위험등급: 중위험</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════ -->
+<!-- CARD 4: 단기·장기 전망 -->
+<!-- ════════════════════════════════════════ -->
+<div class="card" id="card4">
+  <div class="sec-head">
+    <div class="sec-num">04</div>
+    <div>
+      <div class="sec-title">SHORT & LONG TERM OUTLOOK</div>
+      <div style="font-size:22px;font-weight:900;margin-top:2px;">단기·장기 전망</div>
+    </div>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="card-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+      <!-- 단기 -->
+      <div style="background:rgba(0,198,255,0.04);border:1px solid rgba(0,198,255,0.15);padding:18px;">
+        <div style="font-size:10px;letter-spacing:0.2em;color:var(--cyan);font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(0,198,255,0.15);">
+          📅 단기 전망 (2026~2027)
+        </div>
+        <div class="semi-item"><span class="semi-bullet">▸</span>AI 데이터센터 투자 폭발 → HBM 수요 급증 → 구성종목 실적 서프라이즈</div>
+        <div class="semi-item"><span class="semi-bullet">▸</span>코스피200 옵션 유동성 8.5조원 → 분배 재원 안정적 확보</div>
+        <div class="semi-item"><span class="semi-bullet">▸</span>2026년 코스피 전체 순이익의 93%를 반도체가 견인 중</div>
+        <div class="semi-item"><span class="semi-bullet">▸</span>2026년 8월 이후 이익 성장 속도 점검 필요 (정점 가능성)</div>
+        <div style="margin-top:12px;padding:10px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.2);">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">단기 분배금 안정성</div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--green);">★★★★☆</div>
+          <div style="font-size:11px;color:#5a9070;">9% 달성 가능성 높음</div>
+        </div>
+      </div>
+      <!-- 장기 -->
+      <div style="background:rgba(245,197,24,0.04);border:1px solid rgba(245,197,24,0.15);padding:18px;">
+        <div style="font-size:10px;letter-spacing:0.2em;color:var(--gold);font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(245,197,24,0.15);">
+          🔭 장기 전망 (2028~2031+)
+        </div>
+        <div class="semi-item"><span style="color:var(--gold);">▸</span>피지컬AI 로봇 2028년 대량 양산 → 온디바이스 메모리 신수요</div>
+        <div class="semi-item"><span style="color:var(--gold);">▸</span>HBM 시장 2028년 전체 D램 시장 규모 초과 전망</div>
+        <div class="semi-item"><span style="color:var(--gold);">▸</span>2028년 공급 증가 가시화 시 업황 조정 리스크 잠재</div>
+        <div class="semi-item"><span style="color:var(--gold);">▸</span>5년 기초자산 현재 대비 상승 가능성 우세 (역사적 근거)</div>
+        <div style="margin-top:12px;padding:10px;background:rgba(245,197,24,0.06);border:1px solid rgba(245,197,24,0.2);">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">장기 원금 보존 가능성</div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--gold);">★★★★☆</div>
+          <div style="font-size:11px;color:#9a8030;">반도체 사이클 감안 우세</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2026</div>
+        <div class="tl-content">
+          <div class="tl-title">반도체 슈퍼사이클 정점 구간</div>
+          <div class="tl-desc">HBM·DDR5 수요 폭발. 분배금 9%+ 안정 지급 기대. 옵션 프리미엄 풍부. 코스피 1만pt 도전.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="border-color:var(--gold);"></div>
+        <div class="tl-year" style="color:var(--gold);">2027</div>
+        <div class="tl-content">
+          <div class="tl-title">피지컬AI 로봇 초기 수요 가세</div>
+          <div class="tl-desc">HBM4 양산 본격화. GPU당 탑재 HBM 3.7배 증가. 이익 성장 속도 확인 필요 구간.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="border-color:var(--orange);"></div>
+        <div class="tl-year" style="color:var(--orange);">2028</div>
+        <div class="tl-content">
+          <div class="tl-title">공급 증가·수급 변곡점</div>
+          <div class="tl-desc">마이크론 CHIPS Act 증설 가시화. 삼성 HBM4 본격 참전. 리밸런싱 전략 검토 시점.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <span class="footer-tag">CARD 04 / 08 · OUTLOOK</span>
+    <div class="footer-dot"></div>
+    <span class="footer-tag">전망은 추정치이며 확정이 아닙니다</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════ -->
+<!-- CARD 5: 30년 시뮬레이션 -->
+<!-- ════════════════════════════════════════ -->
+<div class="card" id="card5">
+  <div class="sec-head">
+    <div class="sec-num">05</div>
+    <div>
+      <div class="sec-title">30-YEAR INVESTMENT SIMULATION</div>
+      <div style="font-size:22px;font-weight:900;margin-top:2px;">30년 투자 시뮬레이션</div>
+    </div>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="card-body">
+    <div class="sim-input-box">
+      <div class="sim-input-item">
+        <div class="label">기초 투자금</div>
+        <div class="val">5억원</div>
+      </div>
+      <div class="sim-input-item">
+        <div class="label">목표 분배율</div>
+        <div class="val">연 9%</div>
+      </div>
+      <div class="sim-input-item">
+        <div class="label">시나리오</div>
+        <div class="val" style="font-size:16px;line-height:1.4;">강세·기본·약세</div>
+      </div>
+    </div>
+
+    <!-- Bar Chart using CSS -->
+    <div style="flex:1;display:flex;flex-direction:column;">
+      <div style="display:flex;align-items:flex-end;gap:8px;flex:1;padding-bottom:24px;position:relative;">
+        <!-- Y axis labels -->
+        <div style="display:flex;flex-direction:column;justify-content:space-between;height:220px;padding-bottom:0;margin-right:4px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);">1000억</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);">750억</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);">500억</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);">250억</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);">0</div>
+        </div>
+        <!-- Grid lines -->
+        <div style="position:absolute;left:52px;right:0;top:0;bottom:24px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;">
+          <div style="height:1px;background:rgba(0,198,255,0.07);"></div>
+          <div style="height:1px;background:rgba(0,198,255,0.07);"></div>
+          <div style="height:1px;background:rgba(0,198,255,0.07);"></div>
+          <div style="height:1px;background:rgba(0,198,255,0.07);"></div>
+          <div style="height:1px;background:rgba(0,198,255,0.12);"></div>
+        </div>
+
+        <!-- Bars -->
+        <div style="flex:1;display:flex;align-items:flex-end;gap:16px;height:220px;padding-left:4px;">
+          <!-- 5년 -->
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:220px;justify-content:flex-end;">
+            <div style="display:flex;align-items:flex-end;gap:3px;width:100%;">
+              <div style="flex:1;height:62px;background:linear-gradient(180deg,#22c55e,#16a34a);border-radius:2px 2px 0 0;" title="강세 11.8억"></div>
+              <div style="flex:1;height:43px;background:linear-gradient(180deg,#00c6ff,#0099cc);border-radius:2px 2px 0 0;" title="기본 7.7억"></div>
+              <div style="flex:1;height:27px;background:linear-gradient(180deg,#ff6b6b,#cc4444);border-radius:2px 2px 0 0;" title="약세 6.2억"></div>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-align:center;">5년</div>
+          </div>
+          <!-- 10년 -->
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:220px;justify-content:flex-end;">
+            <div style="display:flex;align-items:flex-end;gap:3px;width:100%;">
+              <div style="flex:1;height:108px;background:linear-gradient(180deg,#22c55e,#16a34a);border-radius:2px 2px 0 0;"></div>
+              <div style="flex:1;height:67px;background:linear-gradient(180deg,#00c6ff,#0099cc);border-radius:2px 2px 0 0;"></div>
+              <div style="flex:1;height:42px;background:linear-gradient(180deg,#ff6b6b,#cc4444);border-radius:2px 2px 0 0;"></div>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-align:center;">10년</div>
+          </div>
+          <!-- 20년 -->
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:220px;justify-content:flex-end;">
+            <div style="display:flex;align-items:flex-end;gap:3px;width:100%;">
+              <div style="flex:1;height:186px;background:linear-gradient(180deg,#22c55e,#16a34a);border-radius:2px 2px 0 0;"></div>
+              <div style="flex:1;height:130px;background:linear-gradient(180deg,#00c6ff,#0099cc);border-radius:2px 2px 0 0;"></div>
+              <div style="flex:1;height:72px;background:linear-gradient(180deg,#ff6b6b,#cc4444);border-radius:2px 2px 0 0;"></div>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-align:center;">20년</div>
+          </div>
+          <!-- 30년 -->
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:220px;justify-content:flex-end;">
+            <div style="display:flex;align-items:flex-end;gap:3px;width:100%;">
+              <div style="flex:1;height:220px;background:linear-gradient(180deg,#22c55e,#16a34a);border-radius:2px 2px 0 0;position:relative;">
+                <div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-family:'Bebas Neue',cursive;font-size:13px;color:#22c55e;white-space:nowrap;">1,029억</div>
+              </div>
+              <div style="flex:1;height:185px;background:linear-gradient(180deg,#00c6ff,#0099cc);border-radius:2px 2px 0 0;position:relative;">
+                <div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-family:'Bebas Neue',cursive;font-size:13px;color:#00c6ff;white-space:nowrap;">239억</div>
+              </div>
+              <div style="flex:1;height:104px;background:linear-gradient(180deg,#ff6b6b,#cc4444);border-radius:2px 2px 0 0;position:relative;">
+                <div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-family:'Bebas Neue',cursive;font-size:13px;color:#ff6b6b;white-space:nowrap;">116억</div>
+              </div>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-align:center;">30년</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:16px;justify-content:center;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);">
+          <div style="width:12px;height:12px;background:#22c55e;border-radius:2px;"></div>강세 (연25%)
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);">
+          <div style="width:12px;height:12px;background:#00c6ff;border-radius:2px;"></div>기본 (연13%)
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);">
+          <div style="width:12px;height:12px;background:#ff6b6b;border-radius:2px;"></div>약세 (연5%)
+        </div>
+      </div>
+
+      <!-- 30년 분배금 누적 -->
+      <div style="background:rgba(245,197,24,0.05);border:1px solid rgba(245,197,24,0.2);padding:14px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <div style="text-align:center;">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">30년 누적 분배금 수령</div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:26px;color:var(--gold);">약 135억원</div>
+          <div style="font-size:10px;color:#6a7a50;">(기본 시나리오 기준)</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">30년 월 평균 수령액</div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:26px;color:var(--gold);">3,750만원</div>
+          <div style="font-size:10px;color:#6a7a50;">(분배금 재원 유지 시)</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">총 수령 (원금+분배)</div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:26px;color:var(--gold);">약 374억원</div>
+          <div style="font-size:10px;color:#6a7a50;">(기본 시나리오)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <span class="footer-tag">CARD 05 / 08 · 30Y SIMULATION</span>
+    <div class="footer-dot"></div>
+    <span class="footer-tag">수학적 추정치 · 투자권유 아님</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════ -->
+<!-- CARD 6: 구성종목별 장기 전망 -->
+<!-- ════════════════════════════════════════ -->
+<div class="card" id="card6">
+  <div class="sec-head">
+    <div class="sec-num">06</div>
+    <div>
+      <div class="sec-title">LONG-TERM STOCK OUTLOOK</div>
+      <div style="font-size:22px;font-weight:900;margin-top:2px;">구성종목별 장기 전망</div>
+    </div>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="card-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;">
+
+      <div style="border:1px solid rgba(0,198,255,0.15);background:rgba(0,198,255,0.03);padding:18px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:#00c6ff;"></div>
+          <span style="font-weight:700;font-size:15px;">SK하이닉스</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-left:auto;">31.4%</span>
+        </div>
+        <div class="semi-item"><span class="semi-bullet">▸</span>HBM3E → HBM4E 독보적 점유율 유지</div>
+        <div class="semi-item"><span class="semi-bullet">▸</span>노무라 2026 영업이익 279조원 예상 (+492%)</div>
+        <div class="semi-item"><span class="semi-bullet">▸</span>엔비디아·AMD 독점 공급 → 가격 협상력 최강</div>
+        <div style="margin-top:10px;padding:8px;background:rgba(0,198,255,0.06);border-left:3px solid var(--cyan);">
+          <div style="font-size:10px;color:var(--muted);">5년 전망</div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:22px;color:var(--cyan);">매우 긍정적 ↑</div>
+        </div>
+      </div>
+
+      <div style="border:1px solid rgba(68,136,255,0.15);background:rgba(68,136,255,0.03);padding:18px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:#4488ff;"></div>
+          <span style="font-weight:700;font-size:15px;">삼성전자</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-left:auto;">21.4%</span>
+        </div>
+        <div class="semi-item"><span style="color:#4488ff;">▸</span>HBM4 복귀 성공 시 점유율 급반전</div>
+        <div class="semi-item"><span style="color:#4488ff;">▸</span>파운드리 2나노 수율 개선이 핵심 변수</div>
+        <div class="semi-item"><span style="color:#4488ff;">▸</span>현재 선행 PER 6배 → 역사적 저평가 구간</div>
+        <div style="margin-top:10px;padding:8px;background:rgba(68,136,255,0.06);border-left:3px solid #4488ff;">
+          <div style="font-size:10px;color:var(--muted);">5년 전망</div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:22px;color:#4488ff;">긍정적 ↑ (HBM 변수)</div>
+        </div>
+      </div>
+
+      <div style="border:1px solid rgba(245,197,24,0.15);background:rgba(245,197,24,0.03);padding:18px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--gold);"></div>
+          <span style="font-weight:700;font-size:15px;">한미반도체</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-left:auto;">6.8%</span>
+        </div>
+        <div class="semi-item"><span style="color:var(--gold);">▸</span>TC본더 세계 1위 — HBM 패키징 핵심 장비</div>
+        <div class="semi-item"><span style="color:var(--gold);">▸</span>HBM 생산량 증가할수록 장비 수요 비례 증가</div>
+        <div class="semi-item"><span style="color:var(--gold);">▸</span>삼성·SK 양쪽 모두 납품 → 구조적 수혜</div>
+        <div style="margin-top:10px;padding:8px;background:rgba(245,197,24,0.06);border-left:3px solid var(--gold);">
+          <div style="font-size:10px;color:var(--muted);">5년 전망</div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:22px;color:var(--gold);">매우 긍정적 ↑</div>
+        </div>
+      </div>
+
+      <div style="border:1px solid rgba(52,211,153,0.15);background:rgba(52,211,153,0.03);padding:18px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:#34d399;"></div>
+          <span style="font-weight:700;font-size:15px;">소부장 (솔브레인·피에스케이 등)</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-left:auto;">~15%</span>
+        </div>
+        <div class="semi-item"><span style="color:#34d399;">▸</span>반도체 공정 고도화 → 소재·부품 단가 상승</div>
+        <div class="semi-item"><span style="color:#34d399;">▸</span>탈중국 공급망 재편으로 국내 소부장 수혜</div>
+        <div class="semi-item"><span style="color:#34d399;">▸</span>변동성 작고 꾸준한 성장 — 안정적 포지션</div>
+        <div style="margin-top:10px;padding:8px;background:rgba(52,211,153,0.06);border-left:3px solid #34d399;">
+          <div style="font-size:10px;color:var(--muted);">5년 전망</div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:22px;color:#34d399;">안정적 긍정 ↗</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <span class="footer-tag">CARD 06 / 08 · STOCK OUTLOOK</span>
+    <div class="footer-dot"></div>
+    <span class="footer-tag">개별 종목 투자 권유 아님</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════ -->
+<!-- CARD 7: 한국 반도체 전망 -->
+<!-- ════════════════════════════════════════ -->
+<div class="card" id="card7">
+  <div class="sec-head">
+    <div class="sec-num">07</div>
+    <div>
+      <div class="sec-title">KOREA SEMICONDUCTOR OUTLOOK</div>
+      <div style="font-size:22px;font-weight:900;margin-top:2px;">한국 반도체 전망</div>
+    </div>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="card-body">
+    <!-- 핵심 지표 -->
+    <div class="kpi-row">
+      <div class="kpi-box">
+        <div class="kpi-val" style="color:var(--cyan);">93%</div>
+        <div class="kpi-label">코스피 이익증가 중 반도체 기여</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-val" style="color:var(--gold);">279조</div>
+        <div class="kpi-label">SK하이닉스 2026 예상 영익</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-val" style="color:var(--green);">4,021억$</div>
+        <div class="kpi-label">2026년 메모리 시장 규모</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-val" style="color:var(--orange);">1조$</div>
+        <div class="kpi-label">2026년 글로벌 반도체 목표</div>
+      </div>
+    </div>
+
+    <!-- 시장 점유율 바 -->
+    <div style="margin-bottom:20px;">
+      <div style="font-size:10px;letter-spacing:0.15em;color:var(--cyan);font-weight:700;margin-bottom:12px;">HBM 시장 점유율 (2026 추정)</div>
+      <div class="mkt-row">
+        <span class="mkt-name">SK하이닉스</span>
+        <div class="mkt-bar-wrap">
+          <div class="mkt-bar-fill" style="width:56%;background:linear-gradient(90deg,#00c6ff,#0099cc);">SK하이닉스</div>
+        </div>
+        <span class="mkt-val" style="color:#00c6ff;">~56%</span>
+      </div>
+      <div class="mkt-row">
+        <span class="mkt-name">마이크론</span>
+        <div class="mkt-bar-wrap">
+          <div class="mkt-bar-fill" style="width:25%;background:linear-gradient(90deg,#f5c518,#cc9900);">마이크론</div>
+        </div>
+        <span class="mkt-val" style="color:#f5c518;">~25%</span>
+      </div>
+      <div class="mkt-row">
+        <span class="mkt-name">삼성전자 (복귀 중)</span>
+        <div class="mkt-bar-wrap">
+          <div class="mkt-bar-fill" style="width:19%;background:linear-gradient(90deg,#4488ff,#2255cc);">삼성</div>
+        </div>
+        <span class="mkt-val" style="color:#4488ff;">~19%</span>
+      </div>
+    </div>
+
+    <!-- 기회와 위협 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;">
+      <div>
+        <div style="font-size:10px;letter-spacing:0.15em;color:var(--green);font-weight:700;margin-bottom:10px;">🇰🇷 한국 반도체 기회</div>
+        <div class="semi-item"><span class="semi-bullet">▸</span>AI → HBM 구조적 수요 → SK·삼성 직접 수혜</div>
+        <div class="semi-item"><span class="semi-bullet">▸</span>중국 CXMT·SMIC 규제 강화 → 반사이익</div>
+        <div class="semi-item"><span class="semi-bullet">▸</span>탈중국 공급망 재편 → 한국산 소부장 수요</div>
+        <div class="semi-item"><span class="semi-bullet">▸</span>LTA(장기공급계약) 가격·물량 유리하게 체결 중</div>
+      </div>
+      <div>
+        <div style="font-size:10px;letter-spacing:0.15em;color:var(--red);font-weight:700;margin-bottom:10px;">⚠️ 한국 반도체 위협</div>
+        <div class="semi-item"><span style="color:var(--red);">▸</span>마이크론 CHIPS Act 보조금으로 생산능력 급확대</div>
+        <div class="semi-item"><span style="color:var(--red);">▸</span>2028년 공급 과잉 전환 가능성 내재</div>
+        <div class="semi-item"><span style="color:var(--red);">▸</span>삼성전자 파운드리 경쟁력 회복 지연 리스크</div>
+        <div class="semi-item"><span style="color:var(--red);">▸</span>미·중 무역 갈등 심화 시 공급망 변수</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <span class="footer-tag">CARD 07 / 08 · KOREA SEMICON</span>
+    <div class="footer-dot"></div>
+    <span class="footer-tag">데이터 기준: 2026년 상반기</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════ -->
+<!-- CARD 8: 글로벌 반도체 산업 전망 -->
+<!-- ════════════════════════════════════════ -->
+<div class="card" id="card8">
+  <div class="sec-head">
+    <div class="sec-num">08</div>
+    <div>
+      <div class="sec-title">GLOBAL SEMICONDUCTOR INDUSTRY</div>
+      <div style="font-size:22px;font-weight:900;margin-top:2px;">글로벌 반도체 산업 전망</div>
+    </div>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="card-body">
+
+    <!-- 시장 규모 성장 -->
+    <div style="margin-bottom:18px;">
+      <div style="font-size:10px;letter-spacing:0.15em;color:var(--cyan);font-weight:700;margin-bottom:10px;">글로벌 반도체 시장 규모 전망 (억 달러)</div>
+      <div style="display:flex;align-items:flex-end;gap:16px;height:80px;margin-bottom:6px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);">6,270</span>
+          <div style="width:100%;height:40px;background:linear-gradient(180deg,#1e4a7a,#0a2a4a);border-radius:2px 2px 0 0;"></div>
+          <span style="font-size:10px;color:var(--muted);">2024</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--cyan);">10,000+</span>
+          <div style="width:100%;height:64px;background:linear-gradient(180deg,#00c6ff,#0066aa);border-radius:2px 2px 0 0;"></div>
+          <span style="font-size:10px;color:var(--cyan);">2026</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--gold);">16,000</span>
+          <div style="width:100%;height:80px;background:linear-gradient(180deg,#f5c518,#aa8800);border-radius:2px 2px 0 0;"></div>
+          <span style="font-size:10px;color:var(--gold);">2030</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--green);">30,000+</span>
+          <div style="width:100%;height:76px;background:linear-gradient(180deg,#22c55e,#166634);border-radius:2px 2px 0 0;opacity:0.7;border:1px dashed #22c55e;"></div>
+          <span style="font-size:10px;color:var(--green);">2035(추정)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 수요 드라이버 타임라인 -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:10px;letter-spacing:0.15em;color:var(--cyan);font-weight:700;margin-bottom:10px;">수요 드라이버 전환 로드맵</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+        <div style="background:rgba(0,198,255,0.05);border:1px solid rgba(0,198,255,0.2);padding:12px;">
+          <div style="font-family:'Bebas Neue',cursive;font-size:18px;color:var(--cyan);margin-bottom:6px;">NOW~2027</div>
+          <div style="font-weight:700;font-size:12px;margin-bottom:4px;">데이터센터 AI</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.6;">GPU+HBM<br>AI 서버 증설<br>LLM 학습 수요</div>
+        </div>
+        <div style="background:rgba(245,197,24,0.05);border:1px solid rgba(245,197,24,0.2);padding:12px;">
+          <div style="font-family:'Bebas Neue',cursive;font-size:18px;color:var(--gold);margin-bottom:6px;">2027~2030</div>
+          <div style="font-weight:700;font-size:12px;margin-bottom:4px;">피지컬AI 로봇</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.6;">온디바이스 AI칩<br>엣지 메모리<br>휴머노이드</div>
+        </div>
+        <div style="background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.2);padding:12px;">
+          <div style="font-family:'Bebas Neue',cursive;font-size:18px;color:var(--green);margin-bottom:6px;">2030~</div>
+          <div style="font-weight:700;font-size:12px;margin-bottom:4px;">양자+자율주행</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.6;">양자 메모리<br>자율주행 SoC<br>스마트 인프라</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 투자 결론 -->
+    <div style="background:linear-gradient(135deg,rgba(0,198,255,0.08),rgba(0,100,200,0.05));border:1px solid rgba(0,198,255,0.25);padding:16px 20px;">
+      <div style="font-size:10px;letter-spacing:0.2em;color:var(--cyan);font-weight:700;margin-bottom:10px;">📋 종합 투자 결론</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <div class="semi-item"><span class="semi-bullet">✓</span><span style="color:var(--green);">수요 절벽 없는 연속 성장 구조</span> — 데이터센터→피지컬AI 바통 잇기</div>
+          <div class="semi-item"><span class="semi-bullet">✓</span><span style="color:var(--green);">월 현금흐름 + 반도체 성장 동시 참여</span>로 은퇴 자산 운용에 적합</div>
+        </div>
+        <div>
+          <div class="semi-item"><span class="semi-bullet">!</span><span style="color:var(--orange);">코어 자산은 S&P500 병행 권장</span> — 반도체 단일 섹터 집중 위험</div>
+          <div class="semi-item"><span class="semi-bullet">!</span><span style="color:var(--orange);">2028년 공급 증가 시점</span> 비중 조정 전략 사전 수립 필요</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <span class="footer-tag">CARD 08 / 08 · GLOBAL OUTLOOK</span>
+    <div class="footer-dot"></div>
+    <span class="footer-tag">본 보고서는 투자 권유가 아닙니다 · 2026</span>
+  </div>
+</div>
+
+<div style="text-align:center;padding:20px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#1a3a5a;letter-spacing:0.15em;">
+  KODEX 반도체타겟위클리커버드콜 종합분석 © 2026 · 투자 권유 아님 · 원금 손실 가능
+</div>
+
 </body>
 </html>
