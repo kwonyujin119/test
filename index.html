@@ -3,658 +3,898 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>이미지 송수신 포털</title>
+<title>기록 채팅 포털</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Gowun+Dodum&display=swap');
 
-  :root {
-    --bg:       #0b0c0e;
-    --surface:  #111318;
-    --panel:    #161a22;
-    --border:   #252b38;
-    --amber:    #f5a623;
-    --amber2:   #ffcc66;
-    --green:    #3dffa0;
-    --red:      #ff5252;
-    --text:     #c8d0e0;
-    --muted:    #4a5568;
-    --mono:     'Share Tech Mono', monospace;
-    --sans:     'Noto Sans KR', sans-serif;
-  }
+:root {
+  --bg:        #EEF2F7;
+  --chat-bg:   #FFFFFF;
+  --header-bg: #FFFFFF;
+  --my-bubble: #4A86CF;
+  --my-text:   #FFFFFF;
+  --other-bubble: #FFFFFF;
+  --other-text: #2D3748;
+  --input-bg:  #FFFFFF;
+  --border:    #E2E8F0;
+  --accent:    #4A86CF;
+  --accent2:   #3A6FBB;
+  --muted:     #9AABB8;
+  --time-color:#A0AEC0;
+  --date-bg:   rgba(0,0,0,0.06);
+  --sans:      'Noto Sans KR', sans-serif;
+  --title:     'Gowun Dodum', 'Noto Sans KR', sans-serif;
+  --shadow:    0 2px 12px rgba(74,134,207,0.10);
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.08);
+}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+html, body {
+  height: 100%;
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--other-text);
+  -webkit-font-smoothing: antialiased;
+}
 
-  /* Grid background */
-  body::before {
-    content: '';
-    position: fixed; inset: 0; z-index: 0;
-    background-image:
-      linear-gradient(rgba(245,166,35,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(245,166,35,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-  }
+/* ── Layout ── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 680px;
+  margin: 0 auto;
+  background: var(--chat-bg);
+  box-shadow: 0 0 40px rgba(0,0,0,0.08);
+  position: relative;
+}
 
-  /* Scanline */
-  body::after {
-    content: '';
-    position: fixed; inset: 0; z-index: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.08) 2px,
-      rgba(0,0,0,0.08) 4px
-    );
-    pointer-events: none;
-  }
+/* ── Header ── */
+.header {
+  position: sticky; top: 0; z-index: 20;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+}
 
-  .wrapper {
-    position: relative; z-index: 1;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 32px 24px 60px;
-  }
+.header-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4A86CF, #7BB3F0);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(74,134,207,0.3);
+}
 
-  /* ─── Header ─── */
-  header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 40px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border);
-  }
+.header-info { flex: 1; }
 
-  .logo-dot {
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--amber);
-    box-shadow: 0 0 12px var(--amber);
-    animation: pulse 2s ease-in-out infinite;
-  }
+.header-name {
+  font-family: var(--title);
+  font-size: 15px;
+  font-weight: 600;
+  color: #2D3748;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
-  @keyframes pulse {
-    0%,100% { box-shadow: 0 0 6px var(--amber); opacity: 1; }
-    50%      { box-shadow: 0 0 20px var(--amber); opacity: 0.7; }
-  }
+.online-dot {
+  width: 7px; height: 7px;
+  background: #48BB78;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-green 2s infinite;
+}
 
-  .header-text h1 {
-    font-family: var(--mono);
-    font-size: 18px;
-    color: var(--amber);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
+@keyframes pulse-green {
+  0%,100% { box-shadow: 0 0 0 0 rgba(72,187,120,0.4); }
+  50%      { box-shadow: 0 0 0 4px rgba(72,187,120,0); }
+}
 
-  .header-text p {
-    font-size: 11px;
-    color: var(--muted);
-    font-family: var(--mono);
-    letter-spacing: 1px;
-    margin-top: 3px;
-  }
+.header-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 1px;
+}
 
-  .status-badge {
-    margin-left: auto;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--green);
-    border: 1px solid rgba(61,255,160,0.3);
-    padding: 4px 12px;
-    letter-spacing: 2px;
-    animation: blink 3s step-end infinite;
-  }
+.header-actions { display: flex; gap: 8px; }
 
-  @keyframes blink {
-    0%,100% { opacity: 1; }
-    50%      { opacity: 0.4; }
-  }
+.icon-btn {
+  width: 36px; height: 36px;
+  border: none;
+  background: var(--bg);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  color: #556080;
+}
+.icon-btn:hover { background: #dde8f5; transform: scale(1.05); }
+.icon-btn:active { transform: scale(0.95); }
 
-  /* ─── Upload Zone ─── */
-  .drop-zone {
-    position: relative;
-    border: 2px dashed var(--border);
-    border-radius: 2px;
-    background: var(--surface);
-    min-height: 260px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-    overflow: hidden;
-  }
+/* ── Chat Area ── */
+.chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--bg);
+  scroll-behavior: smooth;
+}
 
-  .drop-zone:hover,
-  .drop-zone.drag-over {
-    border-color: var(--amber);
-    background: rgba(245,166,35,0.04);
-  }
+.chat-area::-webkit-scrollbar { width: 5px; }
+.chat-area::-webkit-scrollbar-track { background: transparent; }
+.chat-area::-webkit-scrollbar-thumb { background: #CBD5E0; border-radius: 4px; }
 
-  .drop-zone.has-image {
-    border-color: var(--green);
-    border-style: solid;
-  }
+/* ── Date Divider ── */
+.date-divider {
+  display: flex; align-items: center; justify-content: center;
+  margin: 16px 0 10px;
+}
 
-  .drop-zone .corner {
-    position: absolute;
-    width: 16px; height: 16px;
-    border-color: var(--amber);
-    border-style: solid;
-    opacity: 0.5;
-  }
-  .drop-zone .corner.tl { top: 8px; left: 8px;  border-width: 2px 0 0 2px; }
-  .drop-zone .corner.tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
-  .drop-zone .corner.bl { bottom: 8px; left: 8px;  border-width: 0 0 2px 2px; }
-  .drop-zone .corner.br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+.date-divider span {
+  background: var(--date-bg);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
 
-  .drop-icon {
-    font-size: 40px;
-    opacity: 0.3;
-    transition: opacity 0.2s, transform 0.2s;
-  }
-  .drop-zone:hover .drop-icon { opacity: 0.6; transform: scale(1.1); }
+/* ── Message Row ── */
+.msg-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  margin-bottom: 4px;
+  animation: fadeUp 0.25s ease both;
+}
 
-  .drop-label {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--muted);
-    text-align: center;
-    line-height: 1.8;
-    letter-spacing: 0.5px;
-  }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-  .drop-label span {
-    display: block;
-    font-size: 11px;
-    margin-top: 4px;
-    opacity: 0.6;
-  }
+.msg-row.me { flex-direction: row-reverse; }
 
-  .preview-img {
-    max-width: 100%;
-    max-height: 500px;
-    object-fit: contain;
-    border-radius: 1px;
-    display: none;
-  }
+/* Avatar */
+.avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #B794F4, #9F7AEA);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  align-self: flex-start;
+  box-shadow: var(--shadow-sm);
+}
 
-  /* ─── Action Bar ─── */
-  .action-bar {
-    display: flex;
-    gap: 12px;
-    margin-top: 16px;
-    flex-wrap: wrap;
-  }
+.msg-row.me .avatar { display: none; }
 
-  .btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 11px 20px;
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    border: 1px solid var(--border);
-    background: var(--panel);
-    color: var(--text);
-    cursor: pointer;
-    border-radius: 2px;
-    transition: all 0.15s;
-    flex: 1;
-    justify-content: center;
-    min-width: 140px;
-    user-select: none;
-  }
+/* Bubble group */
+.bubble-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 72%;
+}
 
-  .btn:hover {
-    border-color: var(--amber);
-    color: var(--amber);
-    background: rgba(245,166,35,0.06);
-  }
+.msg-row.me .bubble-group { align-items: flex-end; }
 
-  .btn:active { transform: scale(0.98); }
+.sender-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748B;
+  margin-bottom: 2px;
+  margin-left: 2px;
+}
+.msg-row.me .sender-name { display: none; }
 
-  .btn.primary {
-    border-color: var(--amber);
-    color: var(--amber);
-  }
+/* Bubble */
+.bubble {
+  position: relative;
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.55;
+  word-break: break-word;
+  white-space: pre-wrap;
+  box-shadow: var(--shadow-sm);
+  max-width: 100%;
+}
 
-  .btn.success {
-    border-color: var(--green);
-    color: var(--green);
-  }
+.msg-row.me .bubble {
+  background: var(--my-bubble);
+  color: var(--my-text);
+  border-bottom-right-radius: 5px;
+}
 
-  .btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-    pointer-events: none;
-  }
+.msg-row.other .bubble {
+  background: var(--other-bubble);
+  color: var(--other-text);
+  border-bottom-left-radius: 5px;
+}
 
-  .btn-icon { font-size: 16px; }
+/* Image bubble */
+.bubble.image-bubble {
+  padding: 5px;
+  background: transparent;
+  box-shadow: none;
+}
 
-  /* ─── Info Panel ─── */
-  .info-panel {
-    margin-top: 20px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    padding: 16px 20px;
-    display: none;
-  }
+.bubble-img {
+  width: 100%;
+  max-width: 260px;
+  border-radius: 14px;
+  display: block;
+  cursor: zoom-in;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+  transition: transform 0.15s, box-shadow 0.15s;
+  object-fit: cover;
+}
 
-  .info-panel.visible { display: block; }
+.bubble-img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+}
 
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
-  }
+/* Time + unread */
+.meta-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+}
+.msg-row.me .meta-row { flex-direction: row-reverse; }
 
-  .info-item label {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 4px;
-  }
+.msg-time {
+  font-size: 10px;
+  color: var(--time-color);
+  white-space: nowrap;
+  padding-bottom: 2px;
+}
 
-  .info-item span {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--amber2);
-  }
+/* ── Paste Hint ── */
+.paste-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  padding: 40px;
+  text-align: center;
+  color: var(--muted);
+  user-select: none;
+}
 
-  /* ─── Log ─── */
-  .log-section {
-    margin-top: 24px;
-  }
+.paste-hint .hint-icon { font-size: 52px; opacity: 0.4; }
+.paste-hint .hint-title { font-size: 16px; font-weight: 600; color: #94A3B8; }
+.paste-hint .hint-sub { font-size: 13px; color: var(--muted); line-height: 1.7; }
+.paste-hint .hint-key {
+  display: inline-block;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #556080;
+  box-shadow: 0 2px 0 var(--border);
+}
 
-  .log-header {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+/* ── Input Bar ── */
+.input-bar {
+  background: var(--input-bg);
+  border-top: 1px solid var(--border);
+  padding: 10px 14px 12px;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.04);
+}
 
-  .log-header::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
+.input-extras {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  padding-bottom: 4px;
+}
 
-  .log-box {
-    background: #080a0d;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    padding: 14px 16px;
-    font-family: var(--mono);
-    font-size: 12px;
-    line-height: 1.8;
-    min-height: 80px;
-    max-height: 160px;
-    overflow-y: auto;
-  }
+.input-extra-btn {
+  width: 32px; height: 32px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+  color: #718096;
+}
+.input-extra-btn:hover { background: var(--bg); }
 
-  .log-line { display: block; }
-  .log-line.ok   { color: var(--green); }
-  .log-line.info { color: var(--amber); }
-  .log-line.err  { color: var(--red); }
-  .log-line .ts  { color: var(--muted); margin-right: 10px; }
+.input-wrap {
+  flex: 1;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 22px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  transition: border-color 0.15s;
+}
+.input-wrap:focus-within { border-color: var(--accent); }
 
-  /* Scrollbar */
-  .log-box::-webkit-scrollbar { width: 4px; }
-  .log-box::-webkit-scrollbar-track { background: transparent; }
-  .log-box::-webkit-scrollbar-thumb { background: var(--border); }
+.text-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--sans);
+  font-size: 14px;
+  color: #2D3748;
+  resize: none;
+  max-height: 120px;
+  min-height: 20px;
+  line-height: 1.5;
+}
+.text-input::placeholder { color: var(--muted); }
 
-  /* ─── Hotkey hints ─── */
-  .hints {
-    margin-top: 12px;
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-  .hint {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .key {
-    display: inline-block;
-    border: 1px solid var(--border);
-    padding: 2px 8px;
-    border-radius: 3px;
-    color: var(--text);
-    font-size: 11px;
-    background: var(--panel);
-  }
+.send-btn {
+  width: 38px; height: 38px;
+  border: none;
+  background: var(--accent);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, transform 0.1s;
+  box-shadow: 0 2px 8px rgba(74,134,207,0.35);
+}
+.send-btn:hover { background: var(--accent2); transform: scale(1.05); }
+.send-btn:active { transform: scale(0.95); }
+.send-btn svg { width: 18px; height: 18px; fill: white; margin-left: 2px; }
 
-  #file-input { display: none; }
+/* ── Image Preview Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
 
-  /* Toast */
-  .toast {
-    position: fixed;
-    bottom: 32px; right: 32px;
-    background: var(--panel);
-    border: 1px solid var(--amber);
-    color: var(--amber);
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 1px;
-    padding: 12px 20px;
-    border-radius: 2px;
-    z-index: 100;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.25s;
-    pointer-events: none;
-  }
-  .toast.show { opacity: 1; transform: translateY(0); }
+.modal-box {
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  max-width: min(90vw, 720px);
+  max-height: 90vh;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+  transform: scale(0.92);
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+.modal-overlay.open .modal-box { transform: scale(1); }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: #FAFAFA;
+}
+
+.modal-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2D3748;
+}
+
+.modal-actions { display: flex; gap: 8px; }
+
+.modal-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: none;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.modal-btn.download {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 2px 8px rgba(74,134,207,0.3);
+}
+.modal-btn.download:hover { background: var(--accent2); }
+.modal-btn.close {
+  background: var(--bg);
+  color: #556080;
+}
+.modal-btn.close:hover { background: #dde8f5; }
+
+.modal-img-wrap {
+  overflow: auto;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: #F7F9FC;
+}
+
+.modal-img {
+  max-width: 100%;
+  max-height: calc(90vh - 100px);
+  border-radius: 10px;
+  object-fit: contain;
+  display: block;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+}
+
+/* ── File input hidden ── */
+#file-input { display: none; }
+
+/* ── Paste-over zone ── */
+.paste-zone-overlay {
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(74,134,207,0.12);
+  border: 4px dashed var(--accent);
+  border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.paste-zone-overlay.show { opacity: 1; }
+.paste-zone-overlay span {
+  background: white;
+  padding: 16px 32px;
+  border-radius: 40px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+  box-shadow: var(--shadow);
+}
+
+/* ── Tooltip ── */
+.tooltip {
+  position: fixed;
+  bottom: 80px; left: 50%; transform: translateX(-50%);
+  background: rgba(45,55,72,0.9);
+  color: white;
+  font-size: 12px;
+  padding: 7px 16px;
+  border-radius: 20px;
+  pointer-events: none;
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+.tooltip.show { opacity: 1; }
 
 </style>
 </head>
 <body>
 
-<div class="wrapper">
+<div class="app">
 
   <!-- Header -->
-  <header>
-    <div class="logo-dot"></div>
-    <div class="header-text">
-      <h1>IMG.PORTAL</h1>
-      <p>IMAGE TRANSFER SYSTEM v1.0</p>
+  <div class="header">
+    <div class="header-avatar">📝</div>
+    <div class="header-info">
+      <div class="header-name">
+        나의 기록장
+        <span class="online-dot"></span>
+      </div>
+      <div class="header-sub">텍스트와 이미지를 자유롭게 기록하세요</div>
     </div>
-    <div class="status-badge">● ONLINE</div>
-  </header>
-
-  <!-- Drop / Paste Zone -->
-  <div class="drop-zone" id="dropZone" title="클릭하여 파일 선택">
-    <div class="corner tl"></div>
-    <div class="corner tr"></div>
-    <div class="corner bl"></div>
-    <div class="corner br"></div>
-
-    <div class="drop-icon" id="dropIcon">⬡</div>
-    <div class="drop-label" id="dropLabel">
-      이미지를 드래그하거나 클릭하여 업로드<br>
-      또는 <strong style="color:var(--amber)">Ctrl+V</strong>로 클립보드에서 붙여넣기
-      <span>JPG · PNG · GIF · WEBP · BMP 지원</span>
+    <div class="header-actions">
+      <button class="icon-btn" id="btnSave" title="대화 내보내기 (HTML)">💾</button>
+      <button class="icon-btn" id="btnClear" title="전체 지우기">🗑️</button>
     </div>
-    <img class="preview-img" id="previewImg" alt="미리보기">
   </div>
 
-  <!-- Action Buttons -->
-  <div class="action-bar">
-    <button class="btn primary" id="btnUpload">
-      <span class="btn-icon">📁</span> 파일 업로드
-    </button>
-    <button class="btn" id="btnPaste">
-      <span class="btn-icon">📋</span> 클립보드 붙여넣기
-    </button>
-    <button class="btn success" id="btnDownload" disabled>
-      <span class="btn-icon">⬇</span> 이미지 다운로드
-    </button>
-    <button class="btn" id="btnClear" disabled>
-      <span class="btn-icon">✕</span> 초기화
-    </button>
-  </div>
-
-  <input type="file" id="file-input" accept="image/*">
-
-  <!-- Image Info -->
-  <div class="info-panel" id="infoPanel">
-    <div class="info-grid">
-      <div class="info-item">
-        <label>파일명</label>
-        <span id="infoName">—</span>
-      </div>
-      <div class="info-item">
-        <label>해상도</label>
-        <span id="infoDim">—</span>
-      </div>
-      <div class="info-item">
-        <label>파일 크기</label>
-        <span id="infoSize">—</span>
-      </div>
-      <div class="info-item">
-        <label>형식</label>
-        <span id="infoType">—</span>
+  <!-- Chat Area -->
+  <div class="chat-area" id="chatArea">
+    <div class="paste-hint" id="emptyHint">
+      <div class="hint-icon">💬</div>
+      <div class="hint-title">기록을 시작하세요</div>
+      <div class="hint-sub">
+        텍스트를 입력하거나<br>
+        <span class="hint-key">Ctrl</span> + <span class="hint-key">V</span> 로 이미지를 붙여넣어 기록하세요
       </div>
     </div>
   </div>
 
-  <!-- Hotkeys -->
-  <div class="hints">
-    <div class="hint"><span class="key">Ctrl</span>+<span class="key">V</span> 붙여넣기</div>
-    <div class="hint"><span class="key">Ctrl</span>+<span class="key">S</span> 다운로드</div>
-    <div class="hint"><span class="key">ESC</span> 초기화</div>
-  </div>
-
-  <!-- Log -->
-  <div class="log-section" style="margin-top:28px">
-    <div class="log-header">System Log</div>
-    <div class="log-box" id="logBox"></div>
+  <!-- Input Bar -->
+  <div class="input-bar">
+    <div class="input-extras">
+      <button class="input-extra-btn" id="btnImg" title="이미지 첨부">🖼️</button>
+    </div>
+    <div class="input-wrap">
+      <textarea class="text-input" id="textInput" placeholder="기록할 내용을 입력하세요…" rows="1"></textarea>
+    </div>
+    <button class="send-btn" id="sendBtn" title="전송 (Enter)">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
   </div>
 
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- Image Preview Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">이미지 미리보기</div>
+      <div class="modal-actions">
+        <button class="modal-btn download" id="btnModalDownload">⬇ 다운로드</button>
+        <button class="modal-btn close" id="btnModalClose">✕ 닫기</button>
+      </div>
+    </div>
+    <div class="modal-img-wrap">
+      <img class="modal-img" id="modalImg" src="" alt="미리보기">
+    </div>
+  </div>
+</div>
+
+<!-- Drag overlay -->
+<div class="paste-zone-overlay" id="pasteOverlay">
+  <span>📎 이미지를 놓으세요</span>
+</div>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip"></div>
+
+<!-- File input -->
+<input type="file" id="file-input" accept="image/*" multiple>
 
 <script>
-  const dropZone   = document.getElementById('dropZone');
-  const previewImg = document.getElementById('previewImg');
-  const dropIcon   = document.getElementById('dropIcon');
-  const dropLabel  = document.getElementById('dropLabel');
-  const fileInput  = document.getElementById('file-input');
-  const btnUpload  = document.getElementById('btnUpload');
-  const btnPaste   = document.getElementById('btnPaste');
-  const btnDownload= document.getElementById('btnDownload');
-  const btnClear   = document.getElementById('btnClear');
-  const infoPanel  = document.getElementById('infoPanel');
-  const logBox     = document.getElementById('logBox');
-  const toast      = document.getElementById('toast');
+const chatArea     = document.getElementById('chatArea');
+const textInput    = document.getElementById('textInput');
+const sendBtn      = document.getElementById('sendBtn');
+const emptyHint    = document.getElementById('emptyHint');
+const modalOverlay = document.getElementById('modalOverlay');
+const modalImg     = document.getElementById('modalImg');
+const modalTitle   = document.getElementById('modalTitle');
+const btnModalDown = document.getElementById('btnModalDownload');
+const btnModalClose= document.getElementById('btnModalClose');
+const btnImg       = document.getElementById('btnImg');
+const fileInput    = document.getElementById('file-input');
+const btnSave      = document.getElementById('btnSave');
+const btnClear     = document.getElementById('btnClear');
+const pasteOverlay = document.getElementById('pasteOverlay');
+const tooltip      = document.getElementById('tooltip');
 
-  let currentFile = null;
-  let currentBlob = null;
-  let currentName = 'image.png';
+let msgCount = 0;
+let currentImgSrc = null;
+let currentImgName = 'image.png';
+let lastDate = null;
 
-  /* ── Logger ── */
-  function log(msg, type='info') {
-    const now = new Date();
-    const ts = now.toTimeString().slice(0,8);
-    const line = document.createElement('span');
-    line.className = `log-line ${type}`;
-    line.innerHTML = `<span class="ts">[${ts}]</span>${msg}`;
-    logBox.appendChild(line);
-    logBox.scrollTop = logBox.scrollHeight;
-  }
+/* ── Helpers ── */
+function now() {
+  const d = new Date();
+  return d.toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit', hour12:true });
+}
 
-  function showToast(msg) {
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2200);
-  }
+function today() {
+  const d = new Date();
+  return d.toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+}
 
-  /* ── Show Image ── */
-  function loadImage(src, name, size, type) {
-    previewImg.src = src;
-    previewImg.style.display = 'block';
-    dropIcon.style.display = 'none';
-    dropLabel.style.display = 'none';
-    dropZone.classList.add('has-image');
+function showTooltip(msg, duration=2000) {
+  tooltip.textContent = msg;
+  tooltip.classList.add('show');
+  setTimeout(() => tooltip.classList.remove('show'), duration);
+}
 
-    btnDownload.disabled = false;
-    btnClear.disabled    = false;
+function removeHint() {
+  if (emptyHint && emptyHint.parentNode) emptyHint.remove();
+}
 
-    currentName = name || 'image.png';
+function insertDateDivider() {
+  const todayStr = today();
+  if (lastDate === todayStr) return;
+  lastDate = todayStr;
+  const div = document.createElement('div');
+  div.className = 'date-divider';
+  div.innerHTML = `<span>${todayStr}</span>`;
+  chatArea.appendChild(div);
+}
 
-    previewImg.onload = () => {
-      document.getElementById('infoName').textContent = currentName;
-      document.getElementById('infoDim').textContent  = `${previewImg.naturalWidth} × ${previewImg.naturalHeight} px`;
-      document.getElementById('infoSize').textContent = size ? formatSize(size) : '—';
-      document.getElementById('infoType').textContent = type || '—';
-      infoPanel.classList.add('visible');
-    };
-  }
+function scrollBottom() {
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
 
-  function formatSize(bytes) {
-    if (bytes < 1024)       return bytes + ' B';
-    if (bytes < 1048576)    return (bytes/1024).toFixed(1) + ' KB';
-    return (bytes/1048576).toFixed(2) + ' MB';
-  }
+/* ── Append Text Message ── */
+function appendText(text) {
+  if (!text.trim()) return;
+  removeHint();
+  insertDateDivider();
+  msgCount++;
 
-  /* ── Clear ── */
-  function clearAll() {
-    previewImg.src = '';
-    previewImg.style.display = 'none';
-    dropIcon.style.display   = 'block';
-    dropLabel.style.display  = 'block';
-    dropZone.classList.remove('has-image');
-    infoPanel.classList.remove('visible');
-    btnDownload.disabled = true;
-    btnClear.disabled    = true;
-    currentBlob = null;
-    currentFile = null;
-    fileInput.value = '';
-    log('시스템 초기화 완료.', 'info');
-  }
+  const row = document.createElement('div');
+  row.className = 'msg-row me';
 
-  /* ── File Reader Helper ── */
-  function readFile(file) {
-    if (!file || !file.type.startsWith('image/')) {
-      log('이미지 파일만 지원됩니다.', 'err');
-      showToast('⚠ 이미지 파일이 아닙니다');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      currentBlob = e.target.result;
-      loadImage(e.target.result, file.name, file.size, file.type.toUpperCase().replace('IMAGE/',''));
-      log(`파일 로드 성공 → ${file.name} (${formatSize(file.size)})`, 'ok');
-      showToast('✓ 이미지 로드 완료');
-    };
-    reader.readAsDataURL(file);
-  }
+  row.innerHTML = `
+    <div class="bubble-group">
+      <div class="meta-row">
+        <div class="msg-time">${now()}</div>
+        <div class="bubble">${escapeHtml(text)}</div>
+      </div>
+    </div>
+  `;
 
-  /* ── 1. Upload ── */
-  btnUpload.addEventListener('click', () => fileInput.click());
-  dropZone.addEventListener('click', () => {
-    if (!previewImg.style.display || previewImg.style.display === 'none') fileInput.click();
+  chatArea.appendChild(row);
+  scrollBottom();
+}
+
+/* ── Append Image Message ── */
+function appendImage(src, name) {
+  removeHint();
+  insertDateDivider();
+  msgCount++;
+
+  const row = document.createElement('div');
+  row.className = 'msg-row me';
+
+  const img = document.createElement('img');
+  img.className = 'bubble-img';
+  img.src = src;
+  img.alt = name || '이미지';
+  img.title = '클릭하여 미리보기';
+  img.dataset.src  = src;
+  img.dataset.name = name || 'image.png';
+
+  img.addEventListener('click', () => openModal(src, name));
+
+  const metaRow = document.createElement('div');
+  metaRow.className = 'meta-row';
+
+  const timeEl = document.createElement('div');
+  timeEl.className = 'msg-time';
+  timeEl.textContent = now();
+
+  const imgBubble = document.createElement('div');
+  imgBubble.className = 'bubble image-bubble';
+  imgBubble.appendChild(img);
+
+  metaRow.appendChild(timeEl);
+  metaRow.appendChild(imgBubble);
+
+  const group = document.createElement('div');
+  group.className = 'bubble-group';
+  group.appendChild(metaRow);
+
+  row.appendChild(group);
+  chatArea.appendChild(row);
+  scrollBottom();
+}
+
+/* ── Escape HTML ── */
+function escapeHtml(str) {
+  return str
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+/* ── Read File → base64 ── */
+function readFileAsDataURL(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
   });
+}
 
-  fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) { log(`파일 선택됨: ${file.name}`, 'info'); readFile(file); }
-  });
-
-  /* ── 2. Paste (Ctrl+V) ── */
-  async function pasteFromClipboard() {
-    try {
-      const items = await navigator.clipboard.read();
-      for (const item of items) {
-        const imgType = item.types.find(t => t.startsWith('image/'));
-        if (imgType) {
-          const blob = await item.getType(imgType);
-          const file = new File([blob], 'clipboard.png', { type: imgType });
-          log('클립보드에서 이미지 감지됨.', 'info');
-          readFile(file);
-          return;
-        }
-      }
-      log('클립보드에 이미지가 없습니다.', 'err');
-      showToast('⚠ 클립보드에 이미지 없음');
-    } catch {
-      log('클립보드 접근 실패 — Ctrl+V 키를 직접 사용하세요.', 'err');
-      showToast('⚠ 클립보드 접근 권한이 필요합니다');
-    }
+/* ── Handle image file ── */
+async function handleImageFile(file) {
+  if (!file || !file.type.startsWith('image/')) {
+    showTooltip('⚠ 이미지 파일만 지원됩니다'); return;
   }
+  const src = await readFileAsDataURL(file);
+  appendImage(src, file.name || 'image.png');
+}
 
-  btnPaste.addEventListener('click', pasteFromClipboard);
+/* ── Send text ── */
+function sendText() {
+  const t = textInput.value;
+  if (!t.trim()) return;
+  appendText(t);
+  textInput.value = '';
+  textInput.style.height = 'auto';
+}
 
-  document.addEventListener('paste', (e) => {
-    const items = e.clipboardData?.items;
-    if (!items) return;
-    for (const item of items) {
-      if (item.type.startsWith('image/')) {
-        const file = item.getAsFile();
-        log('Ctrl+V 붙여넣기 감지됨.', 'info');
-        readFile(file);
-        e.preventDefault();
-        return;
-      }
-    }
-    log('붙여넣은 데이터에 이미지가 없습니다.', 'err');
-  });
+sendBtn.addEventListener('click', sendText);
 
-  /* ── 3. Download ── */
-  function downloadImage() {
-    if (!currentBlob) return;
-    const ext  = currentName.includes('.') ? '' : '.png';
-    const name = currentName + ext;
-    const a    = document.createElement('a');
-    a.href     = currentBlob;
-    a.download = name;
-    a.click();
-    log(`다운로드 시작 → ${name}`, 'ok');
-    showToast('⬇ 다운로드 시작');
-  }
-
-  btnDownload.addEventListener('click', downloadImage);
-  btnClear.addEventListener('click', clearAll);
-
-  /* ── Drag & Drop ── */
-  dropZone.addEventListener('dragover', (e) => {
+textInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
-    dropZone.classList.add('drag-over');
-  });
+    sendText();
+  }
+});
 
-  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+/* Auto resize textarea */
+textInput.addEventListener('input', () => {
+  textInput.style.height = 'auto';
+  textInput.style.height = Math.min(textInput.scrollHeight, 120) + 'px';
+});
 
-  dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.classList.remove('drag-over');
-    const file = e.dataTransfer.files[0];
-    if (file) { log(`드래그 드롭: ${file.name}`, 'info'); readFile(file); }
-  });
+/* ── Paste (Ctrl+V) ── */
+document.addEventListener('paste', async (e) => {
+  const items = e.clipboardData?.items;
+  if (!items) return;
 
-  /* ── Keyboard Shortcuts ── */
-  document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-      e.preventDefault();
-      if (!btnDownload.disabled) downloadImage();
+  let hasImage = false;
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      hasImage = true;
+      const file = item.getAsFile();
+      await handleImageFile(file);
     }
-    if (e.key === 'Escape') clearAll();
-  });
+  }
 
-  /* ── Boot log ── */
-  log('IMG.PORTAL 시스템 초기화...', 'info');
-  setTimeout(() => log('파일 업로드 모듈 준비 완료.', 'ok'), 400);
-  setTimeout(() => log('클립보드 수신 모듈 준비 완료.', 'ok'), 700);
-  setTimeout(() => log('다운로드 모듈 준비 완료.', 'ok'), 1000);
-  setTimeout(() => log('모든 모듈 온라인. 이미지를 로드하세요.', 'ok'), 1300);
+  // if text is pasted and input not focused, put into input
+  if (!hasImage && document.activeElement !== textInput) {
+    const text = e.clipboardData.getData('text');
+    if (text) { textInput.value += text; textInput.focus(); }
+  }
+});
+
+/* ── File Upload Button ── */
+btnImg.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', async e => {
+  for (const f of e.target.files) await handleImageFile(f);
+  fileInput.value = '';
+});
+
+/* ── Drag & Drop ── */
+let dragCounter = 0;
+
+document.addEventListener('dragenter', e => {
+  if ([...e.dataTransfer.types].includes('Files')) {
+    dragCounter++;
+    pasteOverlay.classList.add('show');
+  }
+});
+
+document.addEventListener('dragleave', () => {
+  dragCounter--;
+  if (dragCounter <= 0) { dragCounter = 0; pasteOverlay.classList.remove('show'); }
+});
+
+document.addEventListener('dragover', e => e.preventDefault());
+
+document.addEventListener('drop', async e => {
+  e.preventDefault();
+  dragCounter = 0;
+  pasteOverlay.classList.remove('show');
+  for (const f of e.dataTransfer.files) await handleImageFile(f);
+});
+
+/* ── Modal ── */
+function openModal(src, name) {
+  currentImgSrc  = src;
+  currentImgName = name || 'image.png';
+  modalImg.src   = src;
+  modalTitle.textContent = currentImgName;
+  modalOverlay.classList.add('open');
+}
+
+function closeModal() {
+  modalOverlay.classList.remove('open');
+  setTimeout(() => { modalImg.src = ''; }, 200);
+}
+
+btnModalClose.addEventListener('click', closeModal);
+modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+/* ── Download from Modal ── */
+btnModalDown.addEventListener('click', () => {
+  if (!currentImgSrc) return;
+  const a = document.createElement('a');
+  a.href = currentImgSrc;
+  a.download = currentImgName;
+  a.click();
+  showTooltip('⬇ 다운로드 시작');
+});
+
+/* ── Save Chat as HTML ── */
+btnSave.addEventListener('click', () => {
+  const rows = chatArea.innerHTML;
+  const html = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>기록 내보내기 — ${today()}</title>
+<style>
+body { font-family: 'Noto Sans KR', sans-serif; background:#EEF2F7; padding: 24px; max-width: 680px; margin: 0 auto; }
+.date-divider { text-align:center; margin: 20px 0 10px; }
+.date-divider span { background:rgba(0,0,0,0.06); color:#9AABB8; font-size:11px; padding:4px 14px; border-radius:20px; }
+.msg-row { display:flex; align-items:flex-end; gap:6px; margin-bottom:6px; }
+.msg-row.me { flex-direction:row-reverse; }
+.bubble-group { display:flex; flex-direction:column; gap:3px; max-width:72%; }
+.msg-row.me .bubble-group { align-items:flex-end; }
+.meta-row { display:flex; align-items:flex-end; gap:5px; }
+.msg-row.me .meta-row { flex-direction:row-reverse; }
+.bubble { padding:10px 14px; border-radius:18px; font-size:14px; line-height:1.55; word-break:break-word; white-space:pre-wrap; }
+.msg-row.me .bubble { background:#4A86CF; color:#fff; border-bottom-right-radius:5px; }
+.bubble.image-bubble { padding:5px; background:transparent; }
+.bubble-img { max-width:260px; border-radius:14px; display:block; box-shadow:0 2px 16px rgba(0,0,0,.12); }
+.msg-time { font-size:10px; color:#A0AEC0; white-space:nowrap; padding-bottom:2px; }
+.paste-hint { display:none; }
+</style>
+</head>
+<body>
+${rows}
+<p style="text-align:center;font-size:11px;color:#9AABB8;margin-top:32px;">내보내기: ${new Date().toLocaleString('ko-KR')}</p>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `기록_${new Date().toISOString().slice(0,10)}.html`;
+  a.click();
+  showTooltip('💾 HTML 파일로 저장됐습니다');
+});
+
+/* ── Clear ── */
+btnClear.addEventListener('click', () => {
+  if (msgCount === 0) return;
+  if (!confirm('모든 기록을 지우시겠습니까?')) return;
+  chatArea.innerHTML = '';
+  msgCount = 0;
+  lastDate = null;
+
+  const hint = document.createElement('div');
+  hint.className = 'paste-hint';
+  hint.id = 'emptyHint';
+  hint.innerHTML = `
+    <div class="hint-icon">💬</div>
+    <div class="hint-title">기록을 시작하세요</div>
+    <div class="hint-sub">
+      텍스트를 입력하거나<br>
+      <span class="hint-key">Ctrl</span> + <span class="hint-key">V</span> 로 이미지를 붙여넣어 기록하세요
+    </div>
+  `;
+  chatArea.appendChild(hint);
+  showTooltip('🗑 전체 기록이 삭제됐습니다');
+});
+
 </script>
 </body>
 </html>
