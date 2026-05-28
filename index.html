@@ -579,7 +579,6 @@ html, body {
 const chatArea     = document.getElementById('chatArea');
 const textInput    = document.getElementById('textInput');
 const sendBtn      = document.getElementById('sendBtn');
-const emptyHint    = document.getElementById('emptyHint');
 const modalOverlay = document.getElementById('modalOverlay');
 const modalImg     = document.getElementById('modalImg');
 const modalTitle   = document.getElementById('modalTitle');
@@ -592,39 +591,71 @@ const btnClear     = document.getElementById('btnClear');
 const pasteOverlay = document.getElementById('pasteOverlay');
 const tooltip      = document.getElementById('tooltip');
 
-let msgCount = 0;
-let currentImgSrc = null;
+/* ══════════════════════════════════════
+   💾  영구 저장 (localStorage)
+   ══════════════════════════════════════ */
+const STORAGE_KEY = 'chat_portal_v1';
+let messages  = [];   // { id, type, content, name, time, dateLabel }
+let msgCount  = 0;
+let lastDate  = null;
+let currentImgSrc  = null;
 let currentImgName = 'image.png';
-let lastDate = null;
+
+/* 저장 */
+function saveToStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+  } catch (e) {
+    // 용량 초과 (보통 5~10MB) — 이미지가 많을 때 발생
+    showTooltip('⚠ 저장 공간 부족 — 오래된 이미지를 삭제하거나 HTML로 내보내세요', 4000);
+  }
+}
+
+/* 불러오기 — 페이지 로드 시 실행 */
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (!Array.isArray(saved) || saved.length === 0) return;
+
+    removeHint();
+    saved.forEach(msg => renderMessage(msg, false)); // false = 저장 skip
+    msgCount = saved.length;
+    messages = saved;
+    scrollBottom();
+    updateSubtitle();
+  } catch (e) {
+    console.warn('저장 데이터 불러오기 실패:', e);
+  }
+}
 
 /* ── Helpers ── */
-function now() {
-  const d = new Date();
-  return d.toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit', hour12:true });
+function getTimeStr() {
+  return new Date().toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit', hour12:true });
 }
 
-function today() {
-  const d = new Date();
-  return d.toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+function getDateLabel() {
+  return new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
 }
 
-function showTooltip(msg, duration=2000) {
+function showTooltip(msg, duration=2200) {
   tooltip.textContent = msg;
   tooltip.classList.add('show');
   setTimeout(() => tooltip.classList.remove('show'), duration);
 }
 
 function removeHint() {
-  if (emptyHint && emptyHint.parentNode) emptyHint.remove();
+  const hint = document.getElementById('emptyHint');
+  if (hint) hint.remove();
 }
 
-function insertDateDivider() {
-  const todayStr = today();
-  if (lastDate === todayStr) return;
-  lastDate = todayStr;
+function insertDateDividerIfNeeded(dateLabel) {
+  if (lastDate === dateLabel) return;
+  lastDate = dateLabel;
   const div = document.createElement('div');
   div.className = 'date-divider';
-  div.innerHTML = `<span>${todayStr}</span>`;
+  div.innerHTML = `<span>${dateLabel}</span>`;
   chatArea.appendChild(div);
 }
 
@@ -632,176 +663,173 @@ function scrollBottom() {
   chatArea.scrollTop = chatArea.scrollHeight;
 }
 
-/* ── Append Text Message ── */
-function appendText(text) {
-  if (!text.trim()) return;
-  removeHint();
-  insertDateDivider();
-  msgCount++;
-
-  const row = document.createElement('div');
-  row.className = 'msg-row me';
-
-  row.innerHTML = `
-    <div class="bubble-group">
-      <div class="meta-row">
-        <div class="msg-time">${now()}</div>
-        <div class="bubble">${escapeHtml(text)}</div>
-      </div>
-    </div>
-  `;
-
-  chatArea.appendChild(row);
-  scrollBottom();
+function updateSubtitle() {
+  const sub = document.querySelector('.header-sub');
+  if (!sub) return;
+  sub.textContent = msgCount > 0
+    ? `총 ${msgCount}개의 기록 · 새로고침 후에도 보존됩니다`
+    : '텍스트와 이미지를 자유롭게 기록하세요';
 }
 
-/* ── Append Image Message ── */
-function appendImage(src, name) {
-  removeHint();
-  insertDateDivider();
-  msgCount++;
-
-  const row = document.createElement('div');
-  row.className = 'msg-row me';
-
-  const img = document.createElement('img');
-  img.className = 'bubble-img';
-  img.src = src;
-  img.alt = name || '이미지';
-  img.title = '클릭하여 미리보기';
-  img.dataset.src  = src;
-  img.dataset.name = name || 'image.png';
-
-  img.addEventListener('click', () => openModal(src, name));
-
-  const metaRow = document.createElement('div');
-  metaRow.className = 'meta-row';
-
-  const timeEl = document.createElement('div');
-  timeEl.className = 'msg-time';
-  timeEl.textContent = now();
-
-  const imgBubble = document.createElement('div');
-  imgBubble.className = 'bubble image-bubble';
-  imgBubble.appendChild(img);
-
-  metaRow.appendChild(timeEl);
-  metaRow.appendChild(imgBubble);
-
-  const group = document.createElement('div');
-  group.className = 'bubble-group';
-  group.appendChild(metaRow);
-
-  row.appendChild(group);
-  chatArea.appendChild(row);
-  scrollBottom();
-}
-
-/* ── Escape HTML ── */
 function escapeHtml(str) {
   return str
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/* ── Read File → base64 ── */
-function readFileAsDataURL(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = e => res(e.target.result);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
-}
+/* ══════════════════════════════════════
+   🖼  메시지 렌더 (통합)
+   ══════════════════════════════════════ */
+function renderMessage(msg, save = true) {
+  /* 날짜 구분선 */
+  insertDateDividerIfNeeded(msg.dateLabel);
 
-/* ── Handle image file ── */
-async function handleImageFile(file) {
-  if (!file || !file.type.startsWith('image/')) {
-    showTooltip('⚠ 이미지 파일만 지원됩니다'); return;
+  const row = document.createElement('div');
+  row.className = 'msg-row me';
+
+  if (msg.type === 'text') {
+    row.innerHTML = `
+      <div class="bubble-group">
+        <div class="meta-row">
+          <div class="msg-time">${msg.time}</div>
+          <div class="bubble">${escapeHtml(msg.content)}</div>
+        </div>
+      </div>`;
+  } else {
+    // image
+    const img = document.createElement('img');
+    img.className = 'bubble-img';
+    img.src   = msg.content;
+    img.alt   = msg.name || '이미지';
+    img.title = '클릭하여 미리보기';
+    img.addEventListener('click', () => openModal(msg.content, msg.name));
+
+    const timeEl = document.createElement('div');
+    timeEl.className = 'msg-time';
+    timeEl.textContent = msg.time;
+
+    const imgBubble = document.createElement('div');
+    imgBubble.className = 'bubble image-bubble';
+    imgBubble.appendChild(img);
+
+    const metaRow = document.createElement('div');
+    metaRow.className = 'meta-row';
+    metaRow.appendChild(timeEl);
+    metaRow.appendChild(imgBubble);
+
+    const group = document.createElement('div');
+    group.className = 'bubble-group';
+    group.appendChild(metaRow);
+    row.appendChild(group);
   }
-  const src = await readFileAsDataURL(file);
-  appendImage(src, file.name || 'image.png');
+
+  chatArea.appendChild(row);
+
+  /* 신규 메시지일 때만 저장 */
+  if (save) {
+    messages.push(msg);
+    saveToStorage();
+    msgCount++;
+    updateSubtitle();
+    scrollBottom();
+  }
 }
 
-/* ── Send text ── */
+/* ── 텍스트 전송 ── */
 function sendText() {
   const t = textInput.value;
   if (!t.trim()) return;
-  appendText(t);
+  removeHint();
+
+  const msg = {
+    id:        Date.now(),
+    type:      'text',
+    content:   t,
+    name:      null,
+    time:      getTimeStr(),
+    dateLabel: getDateLabel(),
+  };
+
+  renderMessage(msg, true);
   textInput.value = '';
   textInput.style.height = 'auto';
 }
 
 sendBtn.addEventListener('click', sendText);
-
 textInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendText();
-  }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendText(); }
 });
-
-/* Auto resize textarea */
 textInput.addEventListener('input', () => {
   textInput.style.height = 'auto';
   textInput.style.height = Math.min(textInput.scrollHeight, 120) + 'px';
 });
 
-/* ── Paste (Ctrl+V) ── */
+/* ── 이미지 처리 ── */
+function readFileAsDataURL(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = e => res(e.target.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+async function handleImageFile(file) {
+  if (!file || !file.type.startsWith('image/')) {
+    showTooltip('⚠ 이미지 파일만 지원됩니다'); return;
+  }
+  removeHint();
+  const src = await readFileAsDataURL(file);
+  const msg = {
+    id:        Date.now(),
+    type:      'image',
+    content:   src,
+    name:      file.name || 'image.png',
+    time:      getTimeStr(),
+    dateLabel: getDateLabel(),
+  };
+  renderMessage(msg, true);
+}
+
+/* ── Ctrl+V 붙여넣기 ── */
 document.addEventListener('paste', async (e) => {
   const items = e.clipboardData?.items;
   if (!items) return;
-
   let hasImage = false;
   for (const item of items) {
     if (item.type.startsWith('image/')) {
       hasImage = true;
-      const file = item.getAsFile();
-      await handleImageFile(file);
+      await handleImageFile(item.getAsFile());
     }
   }
-
-  // if text is pasted and input not focused, put into input
   if (!hasImage && document.activeElement !== textInput) {
     const text = e.clipboardData.getData('text');
     if (text) { textInput.value += text; textInput.focus(); }
   }
 });
 
-/* ── File Upload Button ── */
+/* ── 파일 업로드 ── */
 btnImg.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', async e => {
   for (const f of e.target.files) await handleImageFile(f);
   fileInput.value = '';
 });
 
-/* ── Drag & Drop ── */
+/* ── 드래그 앤 드롭 ── */
 let dragCounter = 0;
-
 document.addEventListener('dragenter', e => {
-  if ([...e.dataTransfer.types].includes('Files')) {
-    dragCounter++;
-    pasteOverlay.classList.add('show');
-  }
+  if ([...e.dataTransfer.types].includes('Files')) { dragCounter++; pasteOverlay.classList.add('show'); }
 });
-
 document.addEventListener('dragleave', () => {
-  dragCounter--;
-  if (dragCounter <= 0) { dragCounter = 0; pasteOverlay.classList.remove('show'); }
+  if (--dragCounter <= 0) { dragCounter = 0; pasteOverlay.classList.remove('show'); }
 });
-
 document.addEventListener('dragover', e => e.preventDefault());
-
 document.addEventListener('drop', async e => {
-  e.preventDefault();
-  dragCounter = 0;
-  pasteOverlay.classList.remove('show');
+  e.preventDefault(); dragCounter = 0; pasteOverlay.classList.remove('show');
   for (const f of e.dataTransfer.files) await handleImageFile(f);
 });
 
-/* ── Modal ── */
+/* ── 이미지 미리보기 Modal ── */
 function openModal(src, name) {
   currentImgSrc  = src;
   currentImgName = name || 'image.png';
@@ -809,91 +837,89 @@ function openModal(src, name) {
   modalTitle.textContent = currentImgName;
   modalOverlay.classList.add('open');
 }
-
 function closeModal() {
   modalOverlay.classList.remove('open');
   setTimeout(() => { modalImg.src = ''; }, 200);
 }
-
 btnModalClose.addEventListener('click', closeModal);
 modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-});
-
-/* ── Download from Modal ── */
+/* ── 다운로드 ── */
 btnModalDown.addEventListener('click', () => {
   if (!currentImgSrc) return;
   const a = document.createElement('a');
-  a.href = currentImgSrc;
-  a.download = currentImgName;
-  a.click();
+  a.href = currentImgSrc; a.download = currentImgName; a.click();
   showTooltip('⬇ 다운로드 시작');
 });
 
-/* ── Save Chat as HTML ── */
+/* ── HTML 내보내기 ── */
 btnSave.addEventListener('click', () => {
-  const rows = chatArea.innerHTML;
-  const html = `<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<title>기록 내보내기 — ${today()}</title>
+  const dateNow = getDateLabel();
+  const rows    = chatArea.innerHTML;
+  const html    = `<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<title>기록 내보내기 — ${dateNow}</title>
 <style>
-body { font-family: 'Noto Sans KR', sans-serif; background:#EEF2F7; padding: 24px; max-width: 680px; margin: 0 auto; }
-.date-divider { text-align:center; margin: 20px 0 10px; }
-.date-divider span { background:rgba(0,0,0,0.06); color:#9AABB8; font-size:11px; padding:4px 14px; border-radius:20px; }
-.msg-row { display:flex; align-items:flex-end; gap:6px; margin-bottom:6px; }
-.msg-row.me { flex-direction:row-reverse; }
-.bubble-group { display:flex; flex-direction:column; gap:3px; max-width:72%; }
-.msg-row.me .bubble-group { align-items:flex-end; }
-.meta-row { display:flex; align-items:flex-end; gap:5px; }
-.msg-row.me .meta-row { flex-direction:row-reverse; }
-.bubble { padding:10px 14px; border-radius:18px; font-size:14px; line-height:1.55; word-break:break-word; white-space:pre-wrap; }
-.msg-row.me .bubble { background:#4A86CF; color:#fff; border-bottom-right-radius:5px; }
-.bubble.image-bubble { padding:5px; background:transparent; }
-.bubble-img { max-width:260px; border-radius:14px; display:block; box-shadow:0 2px 16px rgba(0,0,0,.12); }
-.msg-time { font-size:10px; color:#A0AEC0; white-space:nowrap; padding-bottom:2px; }
-.paste-hint { display:none; }
-</style>
-</head>
-<body>
+body{font-family:'Noto Sans KR',sans-serif;background:#EEF2F7;padding:24px;max-width:680px;margin:0 auto}
+.date-divider{text-align:center;margin:20px 0 10px}
+.date-divider span{background:rgba(0,0,0,.06);color:#9AABB8;font-size:11px;padding:4px 14px;border-radius:20px}
+.msg-row{display:flex;align-items:flex-end;gap:6px;margin-bottom:6px}
+.msg-row.me{flex-direction:row-reverse}
+.bubble-group{display:flex;flex-direction:column;gap:3px;max-width:72%}
+.msg-row.me .bubble-group{align-items:flex-end}
+.meta-row{display:flex;align-items:flex-end;gap:5px}
+.msg-row.me .meta-row{flex-direction:row-reverse}
+.bubble{padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.55;word-break:break-word;white-space:pre-wrap}
+.msg-row.me .bubble{background:#4A86CF;color:#fff;border-bottom-right-radius:5px}
+.bubble.image-bubble{padding:5px;background:transparent}
+.bubble-img{max-width:260px;border-radius:14px;display:block;box-shadow:0 2px 16px rgba(0,0,0,.12)}
+.msg-time{font-size:10px;color:#A0AEC0;white-space:nowrap;padding-bottom:2px}
+.paste-hint{display:none}
+</style></head><body>
 ${rows}
-<p style="text-align:center;font-size:11px;color:#9AABB8;margin-top:32px;">내보내기: ${new Date().toLocaleString('ko-KR')}</p>
-</body>
-</html>`;
+<p style="text-align:center;font-size:11px;color:#9AABB8;margin-top:32px">
+  내보내기: ${new Date().toLocaleString('ko-KR')} · 총 ${msgCount}개 기록
+</p>
+</body></html>`;
 
-  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-  const a = document.createElement('a');
+  const blob = new Blob([html], { type:'text/html;charset=utf-8' });
+  const a    = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `기록_${new Date().toISOString().slice(0,10)}.html`;
   a.click();
   showTooltip('💾 HTML 파일로 저장됐습니다');
 });
 
-/* ── Clear ── */
+/* ── 전체 삭제 ── */
 btnClear.addEventListener('click', () => {
   if (msgCount === 0) return;
-  if (!confirm('모든 기록을 지우시겠습니까?')) return;
+  if (!confirm(`총 ${msgCount}개의 기록을 모두 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+
   chatArea.innerHTML = '';
-  msgCount = 0;
-  lastDate = null;
+  messages  = [];
+  msgCount  = 0;
+  lastDate  = null;
+  localStorage.removeItem(STORAGE_KEY);
 
   const hint = document.createElement('div');
-  hint.className = 'paste-hint';
-  hint.id = 'emptyHint';
+  hint.className = 'paste-hint'; hint.id = 'emptyHint';
   hint.innerHTML = `
     <div class="hint-icon">💬</div>
     <div class="hint-title">기록을 시작하세요</div>
     <div class="hint-sub">
       텍스트를 입력하거나<br>
       <span class="hint-key">Ctrl</span> + <span class="hint-key">V</span> 로 이미지를 붙여넣어 기록하세요
-    </div>
-  `;
+    </div>`;
   chatArea.appendChild(hint);
+  updateSubtitle();
   showTooltip('🗑 전체 기록이 삭제됐습니다');
 });
+
+/* ══════════════════════════════════════
+   🚀  페이지 로드 → 저장 데이터 복원
+   ══════════════════════════════════════ */
+loadFromStorage();
 
 </script>
 </body>
