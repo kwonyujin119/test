@@ -553,7 +553,8 @@ footer b{color:var(--muted);font-weight:600}
   .panel-head #roomNew{order:9;width:100%}
   .rep-foot .note{display:none}
   .result .meta{display:none}
-  .tabbar{display:block}
+  .tabbar{display:block;transform:translateZ(0);-webkit-transform:translateZ(0);will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  main{min-height:100vh;min-height:100dvh}   /* 탭 이동 때 본문이 잠깐 짧아져 주소창·하단 탭이 들썩이지 않게 */
   .panel{padding-bottom:24px}
   .timer{gap:8px;padding:8px 10px}
   .timer .t{font-size:22px}
@@ -1508,7 +1509,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   window.addEventListener('resize',()=>{ if(pv.hidden) return; pvPlace(); if(PV.doc){ PV.live.forEach(pvUnrender); PV.live=[]; pvLayout(); pvObserve(); } });
   window.addEventListener('popstate',()=>{ if(!pv.hidden) closePdf(true); });
   document.addEventListener('click',e=>{
-    const a=e.target.closest&&e.target.closest('a[data-pdfv]'); if(!a||!SRV.on) return;
+    const a=e.target.closest&&e.target.closest('a[data-pdfv]'); if(!a||!(SRV.on||SRV.libStatic)) return;
     if(e.ctrlKey||e.metaKey||e.shiftKey||e.button!==0) return;   // 새 탭으로 열고 싶으면 Ctrl+클릭
     e.preventDefault(); openPdf(a.getAttribute('href'), a.dataset.pdfv, Number(a.dataset.page)||1);
   });
