@@ -113,7 +113,7 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .menu-chips{display:flex;flex-wrap:wrap;gap:8px}
 .menu-chips a{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--navy);font-size:13.5px;font-weight:600}
 .menu-chips a img{width:20px;height:20px}
-.ask-ai{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ask-ai{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px}
 .ask-ai p{margin:0;flex:1 1 220px;font-size:14px;color:var(--fg)}
 .bub ol.src{list-style:none;margin:10px 0 0;padding:8px 0 0;border-top:1px dashed var(--line);display:grid;gap:4px}
 .bub ol.src a{display:flex;gap:6px;align-items:baseline;font-size:12.5px;color:var(--navy);padding:4px 0;line-height:1.4}
@@ -590,6 +590,14 @@ footer b{color:var(--muted);font-weight:600}
   .top-nav a{padding:0 7px}
   .top-nav a b{margin-right:0}
   .top-nav a .lbl{display:none}
+}
+/* 860px 이상(폴드 펼침 가로·탭 가로에 가까운 폭)은 글자 이름도 보이게 */
+@media (min-width:860px) and (max-width:1023px){
+  .top-nav a{padding:0 9px}
+  .top-nav a b{margin-right:6px}
+  .top-nav a .lbl{display:inline;font-size:13px}
+}
+@media (min-width:600px) and (max-width:1023px){
   .top-right .pill{display:none}
   .top .wrap{gap:8px}
 }
@@ -2542,6 +2550,7 @@ body.chatview .chat-foot{font-size:11.5px;padding:0 6px;min-height:0;line-height
 body.chatview .chat-foot button{min-height:28px}
 body.chatview .panel{padding-bottom:6px}
 @media (max-width:380px){ .roomhead .btn{padding:0 8px;font-size:12px} }
+@media (pointer:coarse){ .roomhead .btn{height:auto;min-height:40px} }
 /* 체크리스트 상단 바로가기 */
 .timer .tclock{display:flex;flex-direction:column;gap:2px;min-width:0}
 .timer .tmeta{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);white-space:nowrap}
@@ -2568,7 +2577,7 @@ body.chatview .panel{padding-bottom:6px}
 }
 .timer .jrow{flex-basis:100%;width:100%;display:flex;align-items:flex-start;gap:6px;min-width:0}
 .timer .jall{flex:none;min-height:34px;padding:0 12px;border-radius:999px;border:0;background:var(--navy);color:#fff;font-size:12.5px;font-weight:700;white-space:nowrap;cursor:pointer}
-.timer .jgrid{flex-basis:100%;width:100%;max-height:min(60vh,520px);overflow:auto;overscroll-behavior:contain;border-top:1px solid var(--line);padding-top:8px}
+.timer .jgrid{flex-basis:100%;width:100%;max-height:min(60vh,520px,calc(100vh - 340px));max-height:min(60vh,520px,calc(100dvh - 340px));overflow:auto;overscroll-behavior:contain;border-top:1px solid var(--line);padding-top:8px}
 .timer .jgrid[hidden]{display:none}
 .timer .jg-h{margin:2px 0 6px;font-size:12px;font-weight:700;color:var(--muted)}
 .timer .jg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-bottom:10px}
@@ -2710,6 +2719,8 @@ body.chatview .panel{padding-bottom:6px}
 .inst .tx b{display:block;font-size:14.5px;margin-bottom:1px}
 .inst .go{flex:none;min-height:40px;padding:0 14px;border:0;border-radius:999px;background:#FFC400;color:#191919;font-weight:700;font-size:14px;cursor:pointer}
 .inst .x{flex:none;width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:#bdbdbd;font-size:22px;line-height:1;cursor:pointer}
+.inst{flex-wrap:wrap}
+@media (max-width:599px){ .inst .tx{flex:1 1 calc(100% - 100px)} .inst .go{margin-left:54px} }   /* 좁은 폰: 버튼을 글 아래로(글이 세로로 길게 접히지 않게) */
 .sheet .foot .inst-menu{border:0;background:#FFC400;color:#191919;font-weight:700;font-size:13px;border-radius:999px;min-height:32px;padding:0 12px;cursor:pointer}
 </style>
 <script>
@@ -2747,6 +2758,7 @@ body.chatview .panel{padding-bottom:6px}
       hide();
     });
     document.body.appendChild(el);
+    const tb=document.querySelector('.tabbar'); if(tb&&getComputedStyle(tb).display!=='none'){ const top=tb.getBoundingClientRect().top; if(top>0&&top<innerHeight) el.style.bottom=Math.round(innerHeight-top+12)+'px'; }   // 실제 탭바 높이 위로
   }
   window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferred=e; syncMenu(); if(!seen()) show('install'); });
   window.addEventListener('appinstalled',()=>{ mark('installed'); deferred=null; hide(); syncMenu(); });
@@ -2760,6 +2772,8 @@ body.chatview .panel{padding-bottom:6px}
 /* 사용법(?) — 로고 바로 오른쪽. 누르면 화면 요소를 차례로 비추며 말풍선으로 설명(스포트라이트 투어) */
 .top-left{display:flex;align-items:center;gap:8px;flex:none}
 .help-btn{width:30px;height:30px;border-radius:50%;border:2px solid var(--navy);background:var(--surface);color:var(--navy);font-family:var(--mono);font-size:15px;font-weight:800;line-height:1;display:grid;place-items:center;cursor:pointer;padding:0}
+.help-btn{position:relative}
+.help-btn::after{content:"";position:absolute;inset:-8px}   /* 누르는 범위는 46px로 */
 .help-btn:hover{background:var(--ember)}
 .help-btn:focus-visible{outline:3px solid var(--navy-soft);outline-offset:2px}
 .tour{position:fixed;inset:0;z-index:80;cursor:pointer}
