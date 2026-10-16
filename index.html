@@ -1797,13 +1797,18 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const c=$('#convo'); if(!c) return null;
     if(window.innerWidth>=600){ c.style.maxHeight=''; c.style.overflowY=''; return null; }
     const atEnd=c.scrollHeight-c.scrollTop-c.clientHeight<24;
-    c.style.overflowY='auto'; c.style.overscrollBehavior='contain'; c.style.maxHeight='';
-    const over=document.documentElement.scrollHeight-window.innerHeight;
-    if(over>0) c.style.maxHeight=Math.max(160,Math.round(c.getBoundingClientRect().height-over))+'px';
+    c.style.overflowY='auto'; c.style.overscrollBehavior='contain'; c.style.maxHeight=''; c.style.minHeight='';
+    const mainEl=document.querySelector('main'), bar=document.querySelector('.tabbar');
+    const avail=window.innerHeight-(bar&&getComputedStyle(bar).display!=='none'?bar.getBoundingClientRect().height:0);
+    const box=c.closest('.chat')||mainEl, padB=parseFloat(getComputedStyle(document.getElementById('panel')||mainEl).paddingBottom)||0;
+    const over=Math.round(box.getBoundingClientRect().bottom+padB-avail), h=c.getBoundingClientRect().height;
+    if(over>0){ c.style.minHeight='160px'; c.style.maxHeight=Math.max(160,Math.round(h-over))+'px'; }
+    else if(over<0){ c.style.minHeight=Math.round(h-over)+'px'; c.style.maxHeight=c.style.minHeight; }   // 남는 공간까지 대화 배경으로 채움(메신저처럼)
     if(atEnd) c.scrollTop=c.scrollHeight;
     return c;
   }
   window.addEventListener('resize',()=>{ if(document.body.classList.contains('chatview')) fitConvo(); });
+  window.__fitConvo=fitConvo;
   function scrollEndOf(panel){ const box=fitConvo(); if(box){ box.scrollTop=box.scrollHeight; return; } const c=$('#convo'); if(!c) return; const last=c.lastElementChild; if(!last||!last.classList.contains('msg')) return; const comp=$('#composer'); const cover=(comp?comp.getBoundingClientRect().height+16:0)+(window.innerWidth<600?68:0); const r=last.getBoundingClientRect(); const target=window.scrollY + r.bottom - (window.innerHeight - cover); if(target>window.scrollY) window.scrollTo({top:target,behavior:'auto'}); }
 
   function renderBotRoom(panel, room){
@@ -2094,4 +2099,75 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 })();
 </script>
 
+<style id="chat-kakao">
+/* 채팅 — 카카오톡형 배치 (색은 SACHIL 노랑·먹색 유지) */
+:root{--chat-bg:#DFE5EB;--chat-meta:#56606A}
+.chat > .card{background:var(--chat-bg);border-color:transparent;overflow:hidden}
+.convo{gap:4px;padding:14px 12px 12px}
+.msg{gap:6px;align-items:flex-end;flex-wrap:nowrap}
+.msg:not(.cont){margin-top:8px}
+.msg:first-child{margin-top:0}
+.msg.bot,.msg.other{align-items:flex-start}
+.msg .av{width:40px;height:40px;border-radius:15px;border:0;background:var(--surface);align-self:flex-start}
+.msg.other .av.ini{background:var(--navy);color:var(--ember);font-size:13px}
+.msg.cont .av{visibility:hidden;height:1px}
+.msg .col{display:flex;flex-direction:column;gap:3px;min-width:0;max-width:min(72%,520px)}
+.msg .col .bub{max-width:100%}
+.msg .who{font-size:12.5px;font-weight:500;color:var(--chat-meta);padding:0 0 1px 2px}
+.msg.cont .who{display:none}
+.bub{background:var(--surface);border:0;border-radius:14px;padding:8px 11px;font-size:14.5px;line-height:1.45}
+.msg.bot .bub,.msg.other .bub,.msg.other .col .bub{border-bottom-left-radius:14px;border-top-left-radius:4px}
+.msg.cont.bot .bub,.msg.cont.other .bub{border-top-left-radius:14px}
+.msg.me .bub{max-width:min(72%,520px);background:var(--ember);border:0;border-radius:14px;border-top-right-radius:4px}
+.msg.me.cont .bub{border-top-right-radius:14px}
+.msg .t{order:0;width:auto;padding:0 1px 1px;font-family:var(--sans);font-size:10.5px;color:var(--chat-meta);line-height:1.2;white-space:nowrap}
+.msg.me .t{order:0;text-align:right}
+.msg.bot .t,.msg.other .t{align-self:flex-end}
+.msg.hide-t .t{display:none}
+.bub.typing{background:var(--surface)}
+.bub .mini a{background:var(--surface-2)}
+.bub.only-att,.msg.me .bub.only-att{background:transparent;padding:0}
+.convo-note{align-self:center;max-width:92%;margin:6px auto;padding:7px 12px;border-radius:12px;background:rgba(0,0,0,.07);color:#3D454D;font-size:12.5px;line-height:1.5}
+.convo-note .convo-empty{background:transparent}
+.convo-empty{align-self:center}
+.chat > .card .quick{padding:2px 12px 12px}
+.chat > .card .quick button{background:var(--surface);border-color:transparent}
+@media (max-width:599px){
+  .msg{flex-wrap:nowrap}
+  .msg .t{width:auto;padding-left:1px;order:0}
+  .msg.me .t{order:0}
+  .bub,.msg.me .bub{max-width:76%}
+  .msg .col{max-width:calc(100% - 46px - 44px)}
+  .msg .col .bub{max-width:100%}
+  .chat > .card .quick{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .chat > .card .quick::-webkit-scrollbar{display:none}
+  .chat > .card .quick button{flex:none}
+}
+</style>
+<script>
+/* 카카오톡처럼: 같은 사람이 같은 분에 연달아 보낸 말은 프로필·이름을 한 번만, 시간은 마지막 말에만 */
+(function(){
+  function regroup(c){
+    let prev=null, prevKey='', prevT=null;
+    for(const m of c.children){
+      if(!m.classList.contains('msg')){ prev=null; prevKey=''; continue; }
+      if(m.classList.contains('bot') && !m.querySelector(':scope > .col')){
+        const b=m.querySelector(':scope > .bub'); if(b){ const col=document.createElement('div'); col.className='col'; col.innerHTML='<span class="who">SACHIL AI</span>'; m.insertBefore(col,b); col.appendChild(b); }
+      }
+      const who=m.classList.contains('me')?'me':m.classList.contains('bot')?'bot':'o:'+((m.querySelector('.who')||{}).textContent||'');
+      const tEl=m.querySelector(':scope > .t'), t=tEl?tEl.textContent.trim():'';
+      const same=prev && who===prevKey && (t===prevT || !t);
+      m.classList.toggle('cont',!!same);
+      m.classList.remove('hide-t');
+      if(same && prev && t) prev.classList.add('hide-t');
+      prev=m; prevKey=who; prevT=t;
+    }
+  }
+  let q=false;
+  const run=()=>{ q=false; const c=document.getElementById('convo'); if(!c) return; const end=c.scrollHeight-c.scrollTop-c.clientHeight<60; regroup(c); if(window.__fitConvo && document.body.classList.contains('chatview')) window.__fitConvo(); if(end && c.scrollHeight>c.clientHeight) c.scrollTop=c.scrollHeight; };
+  const go=()=>{ if(q) return; q=true; requestAnimationFrame(run); };
+  const start=()=>{ const root=document.getElementById('panel')||document.body; new MutationObserver(go).observe(root,{childList:true,subtree:true}); go(); };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+})();
+</script>
 </body></html>
