@@ -2112,7 +2112,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(r.ok && r.j && r.j.server==='sachil'){
       const wasLocal = state.route==='chat' && !!chat.room;   // 파일 모드 방에 이미 들어가 있었음
       SRV.probing=false; SRV.on=true; SRV.me=r.j.user||null;
-      if(r.j.ai && !CAP.sample){ CAP.sample=serverSample; CAP.ready=true; syncRepUI(); }   // 보고서 AI: Claude 화면 밖에서는 SACHIL 서버(AI 키)로 작성 SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.idx=r.j.index||null;
+      if(r.j.ai && !CAP.sample){ CAP.sample=serverSample; CAP.ready=true; syncRepUI(); }   // 보고서 AI: Claude 화면 밖에서는 SACHIL 서버(AI 키)로 작성
+      SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.idx=r.j.index||null;
       await loadLib();
       if(state.route==='chat'){ if(DB.agreed){ SRV.notice='서버에 연결되어 공유 디브리핑룸으로 바뀌었습니다.'+(wasLocal?' 방금 쓴 내용은 이 기기에만 남습니다.':''); DB.enter=true; } render(); }
       else if(SECTIONS.some(x=>x.slug===state.route) || (state.route==='search'&&state.query.trim())) render();
