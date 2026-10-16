@@ -652,7 +652,7 @@ footer b{color:var(--muted);font-weight:600}
   <div class="grip" aria-hidden="true"></div>
   <header><h2 id="sheetTitle">메뉴</h2><button type="button" class="close" id="sheetClose" aria-label="닫기">×</button></header>
   <div class="sheet-grid" id="sheetGrid"></div>
-  <div class="foot"><span id="sheetFoot">12개 섹션 · 모두 준비중</span><a href="#login">교관 로그인</a></div>
+  <div class="foot"><span id="sheetFoot">12개 섹션 · 모두 준비중</span><button type="button" class="inst-menu" id="instMenu" hidden>앱 설치</button><a href="#login">교관 로그인</a></div>
 </section>
 
 <div class="report" id="report" role="dialog" aria-modal="true" aria-labelledby="repTitle" hidden>
@@ -2301,6 +2301,63 @@ body.chatview .panel{padding-bottom:6px}
   const run=()=>{ q=false; const c=document.getElementById('convo'); if(!c) return; const end=c.scrollHeight-c.scrollTop-c.clientHeight<60; regroup(c); if(window.__fitConvo && document.body.classList.contains('chatview')) window.__fitConvo(); if(end && c.scrollHeight>c.clientHeight) c.scrollTop=c.scrollHeight; };
   const go=()=>{ if(q) return; q=true; requestAnimationFrame(run); };
   const start=()=>{ const root=document.getElementById('panel')||document.body; new MutationObserver(go).observe(root,{childList:true,subtree:true}); go(); };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+})();
+</script>
+<style id="install-css">
+/* 홈 화면 앱 설치 안내(처음 한 번만) */
+.inst{position:fixed;left:12px;right:12px;bottom:calc(var(--bar-h) + var(--sab) + 12px);z-index:45;max-width:520px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:12px 10px 12px 12px;border-radius:16px;background:#191919;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.28);animation:instIn .25s ease-out}
+@keyframes instIn{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.inst{animation:none}}
+@media (min-width:600px){.inst{bottom:20px}}
+.inst img{width:44px;height:44px;border-radius:11px;flex:none}
+.inst .tx{flex:1;min-width:0;font-size:13.5px;line-height:1.45}
+.inst .tx b{display:block;font-size:14.5px;margin-bottom:1px}
+.inst .go{flex:none;min-height:40px;padding:0 14px;border:0;border-radius:999px;background:#FFC400;color:#191919;font-weight:700;font-size:14px;cursor:pointer}
+.inst .x{flex:none;width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:#bdbdbd;font-size:22px;line-height:1;cursor:pointer}
+.sheet .foot .inst-menu{border:0;background:#FFC400;color:#191919;font-weight:700;font-size:13px;border-radius:999px;min-height:32px;padding:0 12px;cursor:pointer}
+</style>
+<script>
+/* 홈 화면에 앱 설치: 처음 접속했을 때 한 번만 안내하고, 다시 띄우지 않는다(메뉴의 '앱 설치'로는 언제든 가능) */
+(function(){
+  const KEY='sachil_install_v1';
+  const seen=()=>{ try{ return localStorage.getItem(KEY); }catch(_){ return '1'; } };
+  const mark=v=>{ try{ localStorage.setItem(KEY,v); }catch(_){ } };
+  const standalone=()=>matchMedia('(display-mode: standalone)').matches || navigator.standalone===true;
+  const ua=navigator.userAgent||'';
+  const ios=/iphone|ipad|ipod/i.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  const kakao=/KAKAOTALK/i.test(ua);
+  const inapp=kakao || /NAVER\(inapp|Instagram|FBAN|FBAV|Line\/|DaumApps|everytimeApp/i.test(ua);
+  const iosSafari=ios && /Safari/i.test(ua) && !/CriOS|FxiOS|EdgiOS/i.test(ua) && !inapp;
+  let deferred=null;
+  if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('sw.js').catch(()=>{});
+  const kind=()=> deferred ? 'install' : inapp ? 'inapp' : iosSafari ? 'ios' : '';
+  function syncMenu(){ const b=document.getElementById('instMenu'); if(b) b.hidden = standalone() || !kind(); }
+  function hide(){ const el=document.getElementById('instBar'); if(el) el.remove(); }
+  function show(k){
+    if(!k || standalone() || document.getElementById('instBar')) return;
+    mark('shown');
+    const icon=document.querySelector('link[rel=apple-touch-icon]'); const src=icon?icon.href:'';
+    const T={
+      install:['SACHIL:47을 홈 화면에 설치','앱처럼 한 번에 열리고 전체 화면으로 볼 수 있어요.','설치'],
+      ios:['홈 화면에 추가하기','사파리 아래쪽 공유 버튼(□↑) → "홈 화면에 추가"를 누르세요.','확인'],
+      inapp:[kakao?'카카오톡 안에서는 설치가 안 돼요':'이 앱 안에서는 설치가 안 돼요', kakao?'기본 브라우저로 열면 홈 화면에 설치할 수 있어요.':'오른쪽 위 메뉴 → "다른 브라우저로 열기"를 누르세요.', kakao?'브라우저로 열기':'확인']
+    }[k];
+    const el=document.createElement('div'); el.className='inst'; el.id='instBar'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','앱 설치 안내');
+    el.innerHTML=`${src?`<img src="${src}" alt="">`:''}<div class="tx"><b>${T[0]}</b>${T[1]}</div><button type="button" class="go">${T[2]}</button><button type="button" class="x" aria-label="닫기">×</button>`;
+    el.querySelector('.x').addEventListener('click',hide);
+    el.querySelector('.go').addEventListener('click',async()=>{
+      if(k==='install' && deferred){ const d=deferred; deferred=null; hide(); try{ d.prompt(); const r=await d.userChoice; if(r&&r.outcome==='accepted') mark('installed'); }catch(_){ } syncMenu(); return; }
+      if(k==='inapp' && kakao){ location.href='kakaotalk://web/openExternal?url='+encodeURIComponent(location.href); return; }
+      hide();
+    });
+    document.body.appendChild(el);
+  }
+  window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferred=e; syncMenu(); if(!seen()) show('install'); });
+  window.addEventListener('appinstalled',()=>{ mark('installed'); deferred=null; hide(); syncMenu(); });
+  // 아이폰 사파리·카톡 등은 설치 이벤트가 없으므로 첫 접속 2.5초 뒤 한 번 안내
+  setTimeout(()=>{ if(!seen() && !standalone() && (inapp || iosSafari)) show(kind()); syncMenu(); },2500);
+  const start=()=>{ const b=document.getElementById('instMenu'); if(b) b.addEventListener('click',()=>{ const sh=document.getElementById('sheetClose'); if(sh) sh.click(); show(kind()); }); syncMenu(); };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
 </script>
