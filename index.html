@@ -554,7 +554,7 @@ footer b{color:var(--muted);font-weight:600}
   .rep-foot .note{display:none}
   .result .meta{display:none}
   .tabbar{display:block;transform:translateZ(0);-webkit-transform:translateZ(0);will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-  main{min-height:100vh;min-height:100dvh}   /* 탭 이동 때 본문이 잠깐 짧아져 주소창·하단 탭이 들썩이지 않게 */
+  body.chatview footer{display:none}   /* A·47망: 바닥글 때문에 화면보다 길어져 주소창이 접히며 하단 탭이 움직이던 것 방지 */
   .panel{padding-bottom:24px}
   .timer{gap:8px;padding:8px 10px}
   .timer .t{font-size:22px}
@@ -979,6 +979,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     document.body.classList.toggle('compact', !(r==='search' && !state.query.trim()));
     document.body.classList.toggle('nosearch', r!=='search');
     document.body.classList.toggle('home', r==='search' && !state.query.trim());
+    document.body.classList.toggle('chatview', r==='ai' || r==='chat');
     if(r==='search' && focusSearchAfter){ focusSearchAfter=false; const qi=$('#q'); if(qi){ qi.focus(); qi.select(); } }
     document.querySelectorAll('#sheetGrid a').forEach(a=>{ if(a.dataset.slug===r) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
     syncTabbar();
@@ -1791,7 +1792,19 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     $('#dbRename').addEventListener('click',()=>{ setNick(''); toChat(); });
   }
 
-  function scrollEndOf(panel){ const c=$('#convo'); if(!c) return; const last=c.lastElementChild; if(!last||!last.classList.contains('msg')) return; const comp=$('#composer'); const cover=(comp?comp.getBoundingClientRect().height+16:0)+(window.innerWidth<600?68:0); const r=last.getBoundingClientRect(); const target=window.scrollY + r.bottom - (window.innerHeight - cover); if(target>window.scrollY) window.scrollTo({top:target,behavior:'auto'}); }
+  // 폰: 대화 목록을 화면 안의 스크롤 상자로 맞춘다 → 문서 전체가 스크롤되지 않아 주소창·하단 탭이 움직이지 않음
+  function fitConvo(){
+    const c=$('#convo'); if(!c) return null;
+    if(window.innerWidth>=600){ c.style.maxHeight=''; c.style.overflowY=''; return null; }
+    const atEnd=c.scrollHeight-c.scrollTop-c.clientHeight<24;
+    c.style.overflowY='auto'; c.style.overscrollBehavior='contain'; c.style.maxHeight='';
+    const over=document.documentElement.scrollHeight-window.innerHeight;
+    if(over>0) c.style.maxHeight=Math.max(160,Math.round(c.getBoundingClientRect().height-over))+'px';
+    if(atEnd) c.scrollTop=c.scrollHeight;
+    return c;
+  }
+  window.addEventListener('resize',()=>{ if(document.body.classList.contains('chatview')) fitConvo(); });
+  function scrollEndOf(panel){ const box=fitConvo(); if(box){ box.scrollTop=box.scrollHeight; return; } const c=$('#convo'); if(!c) return; const last=c.lastElementChild; if(!last||!last.classList.contains('msg')) return; const comp=$('#composer'); const cover=(comp?comp.getBoundingClientRect().height+16:0)+(window.innerWidth<600?68:0); const r=last.getBoundingClientRect(); const target=window.scrollY + r.bottom - (window.innerHeight - cover); if(target>window.scrollY) window.scrollTo({top:target,behavior:'auto'}); }
 
   function renderBotRoom(panel, room){
     const msgsHtml = chat.msgs.length ? chat.msgs.map(m=> m.who==='me' ? msgMeHtml(m) : `
