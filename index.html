@@ -1119,6 +1119,42 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   },500); }
   function stopTick(){ clearInterval(tick); tick=null; }
 
+  // ---------- 체크리스트 상단 바로가기(발생개요·화재원인·…·12단계·시각기록) ----------
+  let jumpLeft=0, jumpActive='', jumpLock=0;
+  // 타이머 바가 상단에 '붙었을 때'의 아래쪽 위치(아직 붙기 전이어도 같은 기준으로 계산)
+  function jumpOffset(){ const bar=$('#timerBar'); if(!bar) return 72; const r=scrollRoot(); const top=(parseFloat(getComputedStyle(bar).top)||0)+(r?r.getBoundingClientRect().top:0); return top+bar.offsetHeight+8; }
+  function setJumpActive(id){
+    const nav=$('#jump'); if(!nav) return; jumpActive=id;
+    nav.querySelectorAll('button').forEach(b=>{ const on=b.dataset.j===id; b.classList.toggle('on',on); if(on) b.setAttribute('aria-current','true'); else b.removeAttribute('aria-current'); });
+    const b=nav.querySelector(`[data-j="${id}"]`); if(!b) return;
+    const l=b.offsetLeft-nav.offsetLeft, r=l+b.offsetWidth;
+    if(l<nav.scrollLeft+8) nav.scrollLeft=Math.max(0,l-24); else if(r>nav.scrollLeft+nav.clientWidth-8) nav.scrollLeft=r-nav.clientWidth+24;
+  }
+  function jumpTo(id){
+    const t=document.getElementById(id); if(!t) return;
+    const dy=t.getBoundingClientRect().top-jumpOffset(), r=scrollRoot();
+    jumpLock=Date.now()+700;   // 부드럽게 이동하는 동안 스크롤 감지가 다른 칩을 켜지 않게
+    setJumpActive(id);
+    (r||window).scrollBy({top:dy,behavior:'smooth'});
+  }
+  function syncJump(){
+    if(state.route!=='board' || Date.now()<jumpLock) return;
+    const nav=$('#jump'); if(!nav) return;
+    const off=jumpOffset()+12; let cur='';
+    nav.querySelectorAll('button').forEach(b=>{ const t=document.getElementById(b.dataset.j); if(t && t.getBoundingClientRect().top<=off) cur=b.dataset.j; });
+    if(cur && cur!==jumpActive) setJumpActive(cur);
+    if(!cur && jumpActive) setJumpActive('');
+  }
+  function bindJump(panel){
+    const nav=$('#jump'); if(!nav) return;
+    nav.scrollLeft=jumpLeft;   // 체크할 때마다 다시 그려도 칩 줄 위치 유지
+    nav.addEventListener('scroll',()=>{ jumpLeft=nav.scrollLeft; },{passive:true});
+    nav.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>jumpTo(b.dataset.j)));
+    if(jumpActive) setJumpActive(jumpActive); else syncJump();
+  }
+  { let q=false; const on=()=>{ if(q) return; q=true; requestAnimationFrame(()=>{ q=false; syncJump(); }); };
+    window.addEventListener('scroll',on,{passive:true}); document.addEventListener('scroll',on,{passive:true,capture:true}); }
+
   function renderBoard(panel){
     const phases=CHECKLIST, checks=state.checks;
     const total=TOTAL_ITEMS, done=Object.keys(checks).length;
@@ -1137,9 +1173,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
             <button type="button" class="btn ghost" id="tmReset">초기화</button>
             <button type="button" class="btn primary" id="mkReport">보고서 만들기</button>
           </div>
+          <nav class="jump" id="jump" aria-label="항목 바로가기">
+            ${SITU.map(b=>{const st=situStatus(b); return `<button type="button" data-j="sec-${b.id}"><i class="d ${st.cls}" aria-hidden="true"></i>${esc(b.name.replace(/\s+/g,''))}</button>`;}).join('')}
+            ${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}">${pi+1} ${esc(p.name)} <span class="c">${d}/${p.items.length}</span></button>`;}).join('')}
+            <button type="button" data-j="sec-log">시각 기록</button>
+          </nav>
         </div>
         <div class="situ" aria-label="화재 원인 · 인명 피해 · 재산 피해">
-          ${SITU.map(b=>{const ic=situIcon(b), st=situStatus(b), inv=state.situ.inv[b.id]; return `<section class="card phase">
+          ${SITU.map(b=>{const ic=situIcon(b), st=situStatus(b), inv=state.situ.inv[b.id]; return `<section class="card phase" id="sec-${b.id}">
               <header><h3>${ic?`<img src="${ic}" alt="">`:''}${esc(b.name)}</h3><span class="st ${st.cls}">${st.t}</span></header>
               ${b.noInv?'':`<ul class="items">
                 <li class="item"><label><input type="checkbox" data-inv="${b.id}" ${inv?'checked':''}><span class="tx">조사 중</span></label><span class="at">${inv?esc(inv):''}</span></li>
@@ -1153,12 +1194,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
             </section>`;}).join('')}
         </div>
         <div class="phases">
-          ${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length;return `<section class="card phase ${d===p.items.length?'done':''}">
+          ${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length;return `<section class="card phase ${d===p.items.length?'done':''}" id="ph-${pi}">
               <header><h3><span class="no">${pi+1}</span>${phaseIcon(pi)?`<img src="${phaseIcon(pi)}" alt="">`:''}${esc(p.name)}</h3><span class="cnt">${d}/${p.items.length}</span></header>
               <ul class="items">${p.items.map((it,ii)=>{const k=pi+'-'+ii, at=checks[k];return `<li class="item"><label><input type="checkbox" data-k="${k}" ${at?'checked':''}><span class="tx">${esc(it)}</span></label><span class="at">${at?esc(at):''}</span></li>`;}).join('')}</ul>
             </section>`;}).join('')}
         </div>
-        <section class="card logbox">
+        <section class="card logbox" id="sec-log">
           <header><h3>시각 기록</h3><div style="display:flex;gap:6px;align-items:center"><span class="saved">이 기기에 자동 저장</span><button type="button" class="btn ghost" id="copyLog">기록 복사</button></div></header>
           <form class="logform" id="logForm"><input id="logText" placeholder="예: 2층 진입 지시, 대응 1단계 건의" aria-label="기록 내용"><button class="btn primary" type="submit">기록</button></form>
           <ul class="log" id="logList"></ul>
@@ -1166,6 +1207,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       </div>`;
     renderLog();
     if(state.timer.running) startTick();
+    bindJump(panel);
 
     panel.querySelectorAll('.item input[data-k]').forEach(cb=>cb.addEventListener('change',()=>{
       const k=cb.dataset.k;
@@ -1265,10 +1307,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   function situLines(b){
     const L=[];
-    if(b.text) L.push('- 직접 입력: '+b.text);
-    if(b.investigating) L.push('- 조사 중 ('+b.investigating+' 체크)');
     const fv=b.fields.filter(x=>x.value).map(x=>`${x.label} ${x.value}${x.unit}`);
     if(fv.length) L.push('- '+fv.join(' · '));
+    if(b.text) L.push('- '+b.text);
+    if(b.investigating) L.push('- 조사 중 ('+b.investigating+' 체크)');
     if(!L.length) L.push('- 미기재');
     return L;
   }
@@ -1282,14 +1324,19 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     L.push(`- 지휘 활동 항목 이행 ${f.done}/${f.total}`);
     f.situ.slice(1).forEach((b,i)=>{ sec(`${i+2}. ${b.name}`); situLines(b).forEach(x=>L.push(x)); });
     sec('5. 지휘 활동 (12단계)');
-    f.phases.forEach(p=>L.push(`- ${p.name} ${p.done.length}/${p.done.length+p.undone.length}: `+(p.done.length?p.done.map(x=>`${x.it}(${x.at})`).join(', '):'이행 없음')));
-    const und=f.phases.flatMap(p=>p.undone.map(u=>`${p.name} · ${u}`));
-    sec('6. 미이행 항목'); if(und.length) und.forEach(u=>L.push('- '+u)); else L.push('- 없음');
+    const act=f.phases.filter(p=>p.done.length), none=f.phases.filter(p=>!p.done.length && p.undone.length), part=act.filter(p=>p.undone.length);
+    if(act.length) act.forEach(p=>L.push(`- ${p.name} ${p.done.length}/${p.done.length+p.undone.length}: `+p.done.map(x=>`${x.it}(${x.at})`).join(', ')));
+    else L.push('- 이행 기록 없음');
+    if(act.length && none.length) L.push(`- 기록 없는 단계: ${none.map(p=>p.name).join(', ')}`);
+    sec('6. 미이행 항목');   // 단계별 한 줄로 묶는다(항목을 한 줄씩 나열하면 보고서가 지나치게 길어짐)
+    part.forEach(p=>L.push(`- ${p.name}: ${p.undone.join(', ')}`));
+    if(none.length) L.push(`- 전 항목 미이행 ${none.length}개 단계: ${none.map(p=>p.name).join(', ')}`);
+    if(!part.length && !none.length) L.push('- 없음');
     sec('7. 시간대별 기록'); if(f.log.length) f.log.forEach(l=>L.push('- '+l)); else L.push('- 기록 없음');
     sec('8. 교관 확인 요청 (자동)');
     const ask=[];
     f.situ.forEach((b,i)=>{ if(!b.text && !b.investigating && !b.fields.some(x=>x.value)) ask.push(i===0 ? '발생개요 미기재 — 사고일시·장소·대상 확인' : `${b.name} 미기재 — 조사 중인지, 확인된 사실이 있는지`); });
-    f.phases.filter(p=>p.undone.length && !p.done.length).forEach(p=>ask.push(`${p.name} 단계 전부 미이행 — 생략 사유 또는 기록 누락 여부`));
+    { const nn=f.phases.filter(p=>p.undone.length && !p.done.length); if(nn.length) ask.push(`${nn.slice(0,4).map(p=>p.name).join('·')}${nn.length>4?` 등 ${nn.length}개`:''} 단계 기록 없음 — 실제 미이행인지 기록 누락인지`); }
     if(!ask.length) ask.push('없음');
     ask.slice(0,5).forEach(a=>L.push('- '+a));
     sec('9. 특이사항'); L.push('- (직접 기재)');
@@ -1322,13 +1369,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(cur.draftEdited) return '초안 편집됨 · 이 기기에 저장'+(storageFull?' · 저장 공간 부족':'');
     if(!cur.facts) return '이전 버전에서 가져온 보고서 — 사실 스냅샷이 없어 AI·재생성은 꺼져 있습니다';
     if(!CAP.ready || CAP.sample) return '';
-    return SRV.on ? '서버에 AI 키(config.json의 ai_api_key)가 없어 규칙 초안만 작성합니다' : 'AI 작성은 AI 키를 설정한 SACHIL 서버에 연결해야 쓸 수 있습니다 — 지금은 규칙 초안';
+    return SRV.on ? '규칙 초안 · 서버에 AI 키가 없어 AI 작성은 꺼져 있음' : '규칙 초안 · AI 작성은 SACHIL 서버(AI 키) 연결 시 가능';
   }
   function setRepView(v){
     if(!cur) return;
     repView=v; const body=$('#repBody');
     $('#repTabDraft').setAttribute('aria-selected', v==='draft'); $('#repTabAi').setAttribute('aria-selected', v==='ai');
     $('#repTabAi').disabled = !(cur.ai || repCtl);
+    $('#repTabAi').closest('.seg').hidden = !(CAP.sample || cur.ai || repCtl);   // AI를 못 쓰면 탭 자체를 숨김(고장처럼 보이지 않게)
     body.value = v==='draft' ? cur.draft : (cur.ai || (repCtl ? 'AI가 사실을 읽고 보고서를 작성하는 중입니다…' : ''));
     body.readOnly = !!repCtl && v==='ai';
     $('#repRegen').hidden = !(v==='draft' && cur.draftEdited && cur.facts);
@@ -1336,7 +1384,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   function syncRepUI(keepStatus){
     const b=$('#repAi'); if(!b) return;
-    b.hidden=!(CAP.sample && cur && cur.facts); if(b.dataset.arm!=='1') b.textContent = repCtl ? '중지' : (cur&&cur.ai ? '다시 작성' : 'AI로 작성');
+    b.hidden=!(CAP.sample && cur && cur.facts); if(cur) $('#repTabAi').closest('.seg').hidden=!(CAP.sample || cur.ai || repCtl); if(b.dataset.arm!=='1') b.textContent = repCtl ? '중지' : (cur&&cur.ai ? '다시 작성' : 'AI로 작성');
     $('#repShare').hidden = !(navigator.share);
     if(!keepStatus && !$('#report').hidden && !repCtl) $('#repStatus').textContent=repStatusText();
   }
@@ -1634,10 +1682,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function botSrcHtml(m){
     if(!m.src||!m.src.length) return '';
     const cited=new Set([...String(m.text).matchAll(/\[(\d{1,2})\]/g)].map(x=>Number(x[1])-1));   // 본문에서 인용한 근거만 보인다
-    return `<ol class="src" aria-label="근거 자료">${m.src.map((sc,i)=>(cited.size&&!cited.has(i))?'':`<li><a href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}"><b>[${i+1}]</b><em>${esc(pdfName(sc.name))}</em><span>${sc.page}쪽</span></a></li>`).join('')}</ol>`;
+    return `<div class="src-h">근거 자료</div><ol class="src" aria-label="근거 자료">${m.src.map((sc,i)=>(cited.size&&!cited.has(i))?'':`<li><a href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}"><b>[${i+1}]</b><em>${esc(pdfName(sc.name))}</em><span>${sc.page}쪽</span></a>${sc.snip?`<q class="snip">${esc(sc.snip)}</q>`:''}</li>`).join('')}</ol>`;
   }
-  const botModeHtml=m=> m.mode==='ai' ? '<span class="mode">메뉴 자료 근거 · Claude 답변 — 중요한 내용은 원문으로 확인하세요</span>'
-    : m.mode==='extract' ? `<span class="mode">메뉴 자료에서 발췌${m.note?` · ${esc(m.note)}`:' · AI 요약 미연결'}</span>` : '';
+  const botModeHtml=m=> m.mode==='ai' ? '<span class="mode">교수 에이전트 · 메뉴 자료 근거 답변 — 중요한 내용은 원문으로 확인하세요</span>'
+    : m.mode==='extract' ? `<span class="mode">교수 에이전트 · 원문 발췌 정리${m.note?` · ${esc(m.note)}`:' · AI 키 연결 시 해설형 답변'}</span>` : '';
 
   function answer(qRaw){
     const q=qRaw.trim(), lq=q.toLowerCase();
@@ -1845,7 +1893,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         const hist=[]; for(let i=chat.msgs.length-2;i>0&&hist.length<2;i--){ const b=chat.msgs[i], u=chat.msgs[i-1]; if(b.who==='bot'&&b.mode==='ai'&&u.who==='me'&&u.text) hist.unshift({q:u.text,a:b.text}); }
         api('/api/ask',{json:{q:v,history:hist}}).then(r=>{
           chat.typing=false;
-          if(r.ok&&r.j.ok){ push('bot',String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page})); csave(); }
+          if(r.ok&&r.j.ok){ push('bot',String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,snip:String(x.snippet||'').slice(0,180)})); csave(); }
           else push('bot', r.status===0?'서버에 연결할 수 없습니다. 잠시 뒤 다시 물어보세요.':(r.j.error||'답변을 만들지 못했습니다.'),[]);
           if(chat.room==='bot'&&state.route==='ai'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp&&window.innerWidth>=600) inp.focus(); }
         });
@@ -2209,6 +2257,21 @@ body.chatview .chat-foot{font-size:11.5px;padding:0 6px;min-height:0;line-height
 body.chatview .chat-foot button{min-height:28px}
 body.chatview .panel{padding-bottom:6px}
 @media (max-width:380px){ .roomhead .btn{padding:0 8px;font-size:12px} }
+/* 체크리스트 상단 바로가기 */
+.timer .jump{flex-basis:100%;width:100%;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:2px -2px 0;padding:2px}
+.timer .jump::-webkit-scrollbar{display:none}
+.timer .jump button{flex:none;display:inline-flex;align-items:center;gap:5px;min-height:34px;padding:0 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-size:12.5px;font-weight:600;white-space:nowrap;cursor:pointer}
+.timer .jump button .d{width:7px;height:7px;border-radius:50%;background:var(--line-2);font-style:normal}
+.timer .jump button .d.has{background:#2E9E5B}
+.timer .jump button .d.inv{background:var(--ember)}
+.timer .jump button .c{font-family:var(--mono);font-size:11px;color:var(--muted-2);font-weight:500}
+.timer .jump button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.timer .jump button.on .c{color:#d6d6d6}
+/* AI 도우미 근거 발췌 */
+.bub .src-h{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);font-size:12px;font-weight:700;color:var(--muted)}
+.bub .src-h + ol.src{border-top:0;margin-top:2px;padding-top:0}
+.bub ol.src li{display:grid;gap:2px}
+.bub ol.src q.snip{display:block;quotes:none;font-size:12px;line-height:1.5;color:var(--muted);padding:2px 0 6px 10px;border-left:2px solid var(--ember);margin-left:2px;overflow-wrap:anywhere}
 </style>
 <script>
 /* 카카오톡처럼: 같은 사람이 같은 분에 연달아 보낸 말은 프로필·이름을 한 번만, 시간은 마지막 말에만 */
