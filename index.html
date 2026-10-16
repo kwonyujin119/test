@@ -1653,7 +1653,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   $('#repTabDraft').addEventListener('click',()=>setRepView('draft'));
   $('#repTabAi').addEventListener('click',()=>{ if(cur&&(cur.ai||repCtl)) setRepView('ai'); });
   $('#repAi').addEventListener('click',()=>{ const b=$('#repAi');
-    if(!CAP.sample){ const st=$('#repStatus'); st.textContent = SRV.on ? 'AI 작성 꺼짐 — 서버 PC의 data\\config.json에 ai_api_key(Claude API 키)를 넣고 서버를 다시 켜면 켜집니다' : 'AI 작성 꺼짐 — SACHIL 서버에 연결되지 않았습니다(서버 PC가 꺼져 있는지 확인)'; st.classList.add('warn'); setTimeout(()=>st.classList.remove('warn'),2500); return; }
+    if(!CAP.sample){ const st=$('#repStatus'); st.textContent = SRV.on ? 'AI 작성 꺼짐 — 서버 PC에서 ai-key-setup.bat으로 Claude API 키를 넣고 서버를 다시 켜면 켜집니다' : 'AI 작성 꺼짐 — SACHIL 서버에 연결되지 않았습니다(서버 PC가 꺼져 있는지 확인)'; st.classList.add('warn'); setTimeout(()=>st.classList.remove('warn'),2500); return; }
     if(repCtl){ runAi(true); return; } if(cur&&cur.aiEdited) arm(b,'편집 내용 버리고 다시 작성',()=>runAi(true)); else runAi(true); });
   $('#repCopy').addEventListener('click',()=>copyText(repText(), $('#repCopy'), '복사'));
   $('#repShare').addEventListener('click',async()=>{ try{ await navigator.share({title:'지휘활동 보고서', text:repText()}); }catch(_){ } });
@@ -1715,7 +1715,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const cited=new Set([...String(m.text).matchAll(/\[(\d{1,2})\]/g)].map(x=>Number(x[1])-1));   // 본문에서 인용한 근거만 보인다
     return `<div class="src-h">근거 자료</div><ol class="src" aria-label="근거 자료">${m.src.map((sc,i)=>(cited.size&&!cited.has(i))?'':`<li><a href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}"><b>[${i+1}]</b><em>${esc(pdfName(sc.name))}</em><span>${sc.page}쪽</span></a>${sc.snip?`<q class="snip">${esc(sc.snip)}</q>`:''}</li>`).join('')}</ol>`;
   }
-  const botModeHtml=m=> m.mode==='ai' ? '<span class="mode">교수 에이전트 · 메뉴 자료 근거 답변 — 중요한 내용은 원문으로 확인하세요</span>'
+  const botModeHtml=m=> m.mode==='ai' ? '<span class="mode">AI 도우미 · 메뉴 자료 근거 답변 — 중요한 내용은 원문으로 확인하세요</span>'
     : m.mode==='extract' ? `<span class="mode">교수 에이전트 · 원문 발췌 정리${m.note?` · ${esc(m.note)}`:' · AI 키 연결 시 해설형 답변'}</span>` : '';
 
   function answer(qRaw){
@@ -1735,7 +1735,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const secs=SECTIONS.map(s=>({s,score:score((s.title+' '+s.desc+' '+s.kw).toLowerCase(),s.title)})).filter(h=>h.score>0).sort((a,b)=>b.score-a.score).slice(0,2);
     if(docs.length||secs.length){
       const cards=[...docs.map(({d,sec})=>({title:d.title,slug:sec.slug,type:d.type})),...secs.filter(({s})=>!docs.some(h=>h.sec.slug===s.slug)).map(({s})=>({title:s.title,slug:s.slug,type:'섹션'}))];
-      return {text:`“${q}”와 관련된 메뉴입니다. 서버(sachil_server.py)로 열면 메뉴에 첨부된 자료 본문을 근거로 답합니다.`, cards};
+      return {text:`“${q}”는 아래 메뉴에서 보실 수 있어요. 지금은 서버에 연결되지 않아서 자료 본문까지는 못 읽고 제목으로만 찾아 드렸어요.`, cards};
     }
     return {text:'아직 답을 가진 질문이 아닙니다. 다른 표현으로 묻거나, 검색 탭에서 섹션을 둘러보세요. 서버가 연결되면 이 질문을 교관에게 바로 보낼 수 있습니다.', cards:[{title:'검색으로 이동',slug:'search',type:'이동'}]};
   }
