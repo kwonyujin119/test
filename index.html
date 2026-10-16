@@ -554,7 +554,6 @@ footer b{color:var(--muted);font-weight:600}
   .rep-foot .note{display:none}
   .result .meta{display:none}
   .tabbar{display:block;transform:translateZ(0);-webkit-transform:translateZ(0);will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-  body.chatview footer{display:none}   /* A·47망: 바닥글 때문에 화면보다 길어져 주소창이 접히며 하단 탭이 움직이던 것 방지 */
   .panel{padding-bottom:24px}
   .timer{gap:8px;padding:8px 10px}
   .timer .t{font-size:22px}
@@ -1792,10 +1791,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     $('#dbRename').addEventListener('click',()=>{ setNick(''); toChat(); });
   }
 
-  // 폰: 대화 목록을 화면 안의 스크롤 상자로 맞춘다 → 문서 전체가 스크롤되지 않아 주소창·하단 탭이 움직이지 않음
+  // 대화 목록을 화면 안의 스크롤 상자로 맞춘다(폰·PC 공통) → 문서 전체가 스크롤되지 않아 주소창·하단 탭이 움직이지 않음
   function fitConvo(){
     const c=$('#convo'); if(!c) return null;
-    if(window.innerWidth>=600){ c.style.maxHeight=''; c.style.overflowY=''; return null; }
     const atEnd=c.scrollHeight-c.scrollTop-c.clientHeight<24;
     c.style.overflowY='auto'; c.style.overscrollBehavior='contain'; c.style.maxHeight=''; c.style.minHeight='';
     const mainEl=document.querySelector('main'), bar=document.querySelector('.tabbar');
@@ -2156,6 +2154,23 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   .chat > .card .quick::-webkit-scrollbar{display:none}
   .chat > .card .quick button{flex:none}
 }
+/* 대화방 머리: 한 줄 헤더로 압축(카카오톡처럼) — 공간 낭비 줄임 */
+body.chatview footer{display:none}   /* A·47망: 바닥글이 화면을 늘려 주소창·하단 탭이 움직이던 것 방지, 남는 공간은 대화에 */
+.roomhead{display:grid;grid-template-columns:minmax(0,1fr) auto auto;grid-auto-flow:column;align-items:center;column-gap:6px;row-gap:0;margin:0 0 8px}
+.roomhead .r{display:contents}
+.roomhead .l{grid-column:1;grid-row:1;display:flex;align-items:center;gap:2px;min-width:0}
+.roomhead .l > div{min-width:0}
+.roomhead .eyebrow{display:none}
+.roomhead h2{font-size:17px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roomhead .back{width:32px;height:32px;font-size:24px;margin-left:-8px;flex:none}
+.roomhead .sub{grid-column:1;grid-row:2;font-size:12px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.roomhead:has(.back) .sub{padding-left:26px}
+.roomhead .btn{grid-row:1 / span 2;min-height:32px;height:32px;padding:0 11px;font-size:12.5px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--fg);white-space:nowrap}
+body.chatview .chat{gap:6px}
+body.chatview .chat-foot{font-size:11.5px;padding:0 6px;min-height:0;line-height:1.3}
+body.chatview .chat-foot button{min-height:28px}
+body.chatview .panel{padding-bottom:6px}
+@media (max-width:380px){ .roomhead .btn{padding:0 8px;font-size:12px} }
 </style>
 <script>
 /* 카카오톡처럼: 같은 사람이 같은 분에 연달아 보낸 말은 프로필·이름을 한 번만, 시간은 마지막 말에만 */
