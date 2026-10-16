@@ -1632,7 +1632,8 @@ def net_check(host, port=443, timeout=5):
         return False, f'{host}({ip}):{port} 연결 실패 (방화벽·보안장비 차단 가능): {e}'
     # 실제 HTTPS 응답을 한 번 받아 본다 (cloudflared가 받는 것과 같은 종류)
     import urllib.request, urllib.error, ssl
-    url = f'https://{host}/tunnel' if 'trycloudflare' in host else f'https://{host}/'
+    # api.cloudflare.com 첫 화면은 원래 API 안내 웹페이지(HTML)라 차단으로 오인하므로, JSON을 주는 주소로 점검한다
+    url = f'https://{host}/tunnel' if 'trycloudflare' in host else (f'https://{host}/client/v4/ips' if host == 'api.cloudflare.com' else f'https://{host}/')
     body, note = b'', ''
     try:
         req = urllib.request.Request(url, headers={'User-Agent': 'SACHIL-check'})
@@ -1703,6 +1704,10 @@ def run_tunnel(port, named):
         return
     ok, why = net_check('api.trycloudflare.com' if not named else 'api.cloudflare.com')
     print(('[터널] 망 점검: ' + why), flush=True)
+    if not ok and named:
+        # 고정 도메인은 이미 설정된 터널로 붙는 것이라, 점검이 애매하면 멈추지 말고 일단 연결을 시도한다
+        print('[터널] 망 점검 결과가 불확실하지만 고정 도메인 터널 연결을 시도합니다.', flush=True)
+        ok = True
     if not ok:
         print('[터널] 외부 공개(터널)를 시작할 수 없습니다. 서버는 내부망 주소로는 계속 동작합니다.', flush=True)
         print('[터널] ' + tunnel_diagnosis(0, ['failed to request quick tunnel ' + why]), flush=True)
