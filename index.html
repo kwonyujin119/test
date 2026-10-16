@@ -1063,7 +1063,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!SRV.on){ try{ const x=await fetch('lib/index.json',{cache:'no-cache'}); if(x.ok){ const j=await x.json(); if(j&&j.lib){ SRV.lib=j.lib; SRV.libStatic=true; SRV.libErr=false; syncSheetFoot(); return true; } } }catch(_){ } }
     SRV.libErr=true; return false; }
   function renderPrep(panel, s){
-    if(s.slug!=='login' && (SRV.on || /^https?:$/.test(location.protocol))){ renderLibSection(panel,s); return; }
+    if(s.slug!=='login' && (SRV.on || SRV.libStatic)){ renderLibSection(panel,s); return; }   // 정적 목록(lib/index.json)이 없으면 기존 안내 화면 유지
     const docs=DOCS.filter(d=>d.sec===s.slug);
     const focus=state.focusDoc; state.focusDoc=null;
     const art = s.icon ? `<img class="big" src="${s.icon}" alt="">` : (s.slug==='login' && AS.ic ? `<img class="illo" src="${AS.ic}" alt="">` : '');
