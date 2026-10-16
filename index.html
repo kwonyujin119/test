@@ -1120,7 +1120,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function stopTick(){ clearInterval(tick); tick=null; }
 
   // ---------- 체크리스트 상단 바로가기(발생개요·화재원인·…·12단계·시각기록) ----------
-  let jumpLeft=0, jumpActive='', jumpLock=0;
+  let jumpLeft=0, jumpActive='', jumpLock=0, jumpOpen=false;
   // 타이머 바가 상단에 '붙었을 때'의 아래쪽 위치(아직 붙기 전이어도 같은 기준으로 계산)
   function jumpOffset(){ const bar=$('#timerBar'); if(!bar) return 72; const r=scrollRoot(); const top=(parseFloat(getComputedStyle(bar).top)||0)+(r?r.getBoundingClientRect().top:0); return top+bar.offsetHeight+8; }
   function setJumpActive(id){
@@ -1150,6 +1150,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     nav.scrollLeft=jumpLeft;   // 체크할 때마다 다시 그려도 칩 줄 위치 유지
     nav.addEventListener('scroll',()=>{ jumpLeft=nav.scrollLeft; },{passive:true});
     nav.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>jumpTo(b.dataset.j)));
+    // '전체' 버튼: 모든 항목을 한 화면에 펼쳐 보고, 고르면 접고 그 위치로 이동
+    const all=$('#jumpAll'), grid=$('#jgrid');
+    const setOpen=v=>{ jumpOpen=v; if(grid) grid.hidden=!v; if(all){ all.setAttribute('aria-expanded',v); all.textContent=v?'닫기 ▴':'전체 ▾'; } };
+    if(all) all.addEventListener('click',()=>setOpen(!jumpOpen));
+    if(grid) grid.querySelectorAll('button').forEach(b=>{ if(b.dataset.j===jumpActive) b.classList.add('on'); b.addEventListener('click',()=>{ setOpen(false); jumpTo(b.dataset.j); }); });
     if(jumpActive) setJumpActive(jumpActive); else syncJump();
   }
   { let q=false; const on=()=>{ if(q) return; q=true; requestAnimationFrame(()=>{ q=false; syncJump(); }); };
@@ -1173,11 +1178,18 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
             <button type="button" class="btn ghost" id="tmReset">초기화</button>
             <button type="button" class="btn primary" id="mkReport">보고서 만들기</button>
           </div>
+          <div class="jrow"><button type="button" class="jall" id="jumpAll" aria-expanded="${jumpOpen}" aria-controls="jgrid">${jumpOpen?'닫기 ▴':'전체 ▾'}</button>
           <nav class="jump" id="jump" aria-label="항목 바로가기">
             ${SITU.map(b=>{const st=situStatus(b); return `<button type="button" data-j="sec-${b.id}"><i class="d ${st.cls}" aria-hidden="true"></i>${esc(b.name.replace(/\s+/g,''))}</button>`;}).join('')}
             ${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}">${pi+1} ${esc(p.name)} <span class="c">${d}/${p.items.length}</span></button>`;}).join('')}
             <button type="button" data-j="sec-log">시각 기록</button>
-          </nav>
+          </nav></div>
+          <div class="jgrid" id="jgrid" ${jumpOpen?'':'hidden'} aria-label="전체 항목">
+            <p class="jg-h">현장 기록</p>
+            <div class="jg">${SITU.map(b=>{const st=situStatus(b); return `<button type="button" data-j="sec-${b.id}"><i class="d ${st.cls}" aria-hidden="true"></i><span class="n">${esc(b.name)}</span><span class="c">${esc(st.t)}</span></button>`;}).join('')}<button type="button" data-j="sec-log"><span class="n">시각 기록</span></button></div>
+            <p class="jg-h">12단계 · ${done}/${total}</p>
+            <div class="jg">${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}"><b>${pi+1}</b><span class="n">${esc(p.name)}</span><span class="c">${d}/${p.items.length}</span><i class="bar" style="--p:${Math.round(d/p.items.length*100)}%" aria-hidden="true"></i></button>`;}).join('')}</div>
+          </div>
         </div>
         <div class="situ" aria-label="화재 원인 · 인명 피해 · 재산 피해">
           ${SITU.map(b=>{const ic=situIcon(b), st=situStatus(b), inv=state.situ.inv[b.id]; return `<section class="card phase" id="sec-${b.id}">
@@ -2260,7 +2272,24 @@ body.chatview .chat-foot button{min-height:28px}
 body.chatview .panel{padding-bottom:6px}
 @media (max-width:380px){ .roomhead .btn{padding:0 8px;font-size:12px} }
 /* 체크리스트 상단 바로가기 */
-.timer .jump{flex-basis:100%;width:100%;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:2px -2px 0;padding:2px}
+.timer .jrow{flex-basis:100%;width:100%;display:flex;align-items:center;gap:6px;min-width:0}
+.timer .jall{flex:none;min-height:34px;padding:0 12px;border-radius:999px;border:0;background:var(--navy);color:#fff;font-size:12.5px;font-weight:700;white-space:nowrap;cursor:pointer}
+.timer .jgrid{flex-basis:100%;width:100%;max-height:min(60vh,520px);overflow:auto;overscroll-behavior:contain;border-top:1px solid var(--line);padding-top:8px}
+.timer .jgrid[hidden]{display:none}
+.timer .jg-h{margin:2px 0 6px;font-size:12px;font-weight:700;color:var(--muted)}
+.timer .jg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-bottom:10px}
+.timer .jg button{position:relative;overflow:hidden;display:flex;align-items:center;gap:6px;min-height:42px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-size:13px;font-weight:600;text-align:left;cursor:pointer}
+.timer .jg button b{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.timer .jg button .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.timer .jg button .c{flex:none;font-family:var(--mono);font-size:11px;color:var(--muted-2);font-weight:500}
+.timer .jg button .d{flex:none;width:8px;height:8px;border-radius:50%;background:var(--line-2)}
+.timer .jg button .d.has{background:#2E9E5B}
+.timer .jg button .d.inv{background:var(--ember)}
+.timer .jg button .bar{position:absolute;left:0;bottom:0;height:3px;width:var(--p);background:#2E9E5B}
+.timer .jg button.full{border-color:#2E9E5B}
+.timer .jg button.on{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy)}
+@media (max-width:599px){ .timer .jg{grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px} .timer .jg button{min-height:38px;font-size:12.5px} }
+.timer .jump{flex:1;min-width:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:2px -2px 0;padding:2px}
 .timer .jump::-webkit-scrollbar{display:none}
 .timer .jump button{flex:none;display:inline-flex;align-items:center;gap:5px;min-height:34px;padding:0 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-size:12.5px;font-weight:600;white-space:nowrap;cursor:pointer}
 .timer .jump button .d{width:7px;height:7px;border-radius:50%;background:var(--line-2);font-style:normal}
