@@ -665,7 +665,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v57</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v58</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -702,8 +702,21 @@ footer b{color:var(--muted);font-weight:600}
       <div class="right"><span class="rep-status" id="repStatus" aria-live="polite"></span><button type="button" class="btn ghost sm" id="repRegen" hidden>초안 새로 생성</button></div>
     </div>
     <textarea class="rep-body" id="repBody" spellcheck="false" aria-label="보고서 본문 (편집 가능)"></textarea>
+    <div class="rep-web" id="repWebPanel" hidden>
+      <p class="rw-h"><b>API 키 없이 AI 사이트로 보고서 쓰기</b> — 무료 계정도 됩니다</p>
+      <ol class="rw-steps">
+        <li>아래 사이트를 누르면 <b>보고서 요청문이 복사</b>되고 그 사이트가 열립니다.</li>
+        <li>입력창에 <b>붙여넣기</b> 해서 보내세요.</li>
+        <li>AI가 쓴 보고서를 복사해 와서 아래 칸에 붙여넣고 <b>AI 작성본으로 저장</b>을 누르세요.</li>
+      </ol>
+      <div class="rw-sites"><button type="button" class="btn" data-web="ChatGPT">ChatGPT</button><button type="button" class="btn" data-web="Claude">Claude</button><button type="button" class="btn" data-web="Gemini">Gemini</button><button type="button" class="btn ghost" data-web="">요청문만 복사</button></div>
+      <textarea id="repWebIn" rows="4" placeholder="AI가 쓴 보고서를 여기에 붙여넣기" aria-label="AI가 쓴 보고서 붙여넣기"></textarea>
+      <div class="rw-acts"><button type="button" class="btn ghost" id="repWebPaste">클립보드에서 가져오기</button><button type="button" class="btn primary" id="repWebSave">AI 작성본으로 저장</button></div>
+      <p class="rw-note">요청문에는 체크리스트 기록(장소·피해 등)이 들어갑니다. 실명·연락처 같은 개인정보는 넣지 마세요. 결과는 교관 확인 전 자료입니다.</p>
+    </div>
     <div class="rep-foot">
       <button type="button" class="btn accent" id="repAi" hidden>AI로 작성</button>
+      <button type="button" class="btn" id="repWeb" hidden aria-expanded="false" aria-controls="repWebPanel">AI 사이트로 작성</button>
       <span class="sp"></span>
       <button type="button" class="btn" id="repCopy">복사</button>
       <button type="button" class="btn" id="repShare" hidden>공유</button>
@@ -768,8 +781,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V57', SRV_VER='2.1';
+  const APP_VER='V58', SRV_VER='2.1';
   const UPDATES=[
+    {v:'V58', d:'2026-10-17', t:['보고서: ‘AI 사이트로 작성’ — API 키 없이 ChatGPT·Claude·Gemini 웹(무료 계정 포함)에 요청문을 붙여넣고, 받은 보고서를 붙여넣어 AI 작성본으로 저장']},
     {v:'V57', d:'2026-10-17', t:['첫 화면을 6개 박스로: 47망·디브리핑룸 / S 검색·A AI 도우미 / CH 체크리스트·IL 사고보고서','47망과 디브리핑룸을 두 개의 대화방으로 분리(기존 대화는 47망에 그대로)','로고를 누르면 첫 화면으로']},
     {v:'V56', d:'2026-10-17', t:['기기별 점검(PC·스마트폰·갤럭시탭·폴드7·아이폰) — 에이전트 3팀이 화면 크기·브라우저·기능을 나눠 검사','아이폰·안드로이드: 키보드가 뜨면 대화창이 줄어 입력창이 가리지 않게, 홈 화면 앱 아래 빈 띠 제거, 가로 화면 노치','공유·저장(아이폰은 공유 시트로), 대화 속 PDF는 앱 안 뷰어로, 복사 실패를 정확히 표시','47망: 지운 글이 다른 사람 화면에서도 바로 지워짐(답장 인용 포함), 빠르게 보내도 순서대로·글 안 잃음, 백그라운드 뒤 바로 재연결','AI 도우미: 대화 비우기 뒤 이전 답이 끼어들던 문제 수정','교실 와이파이(같은 주소)에서 30명 넘게 입장·AI 질문이 막히던 제한 완화','갤럭시탭·폴드 상단 메뉴 이름 표시, 작은 버튼 누르는 범위 확대, 카톡 설치 안내가 입장 버튼을 가리던 문제 등','메뉴 마지막에 ‘업데이트 내역’ 섹션 추가 — 이후 반영은 여기에 기록']},
     {v:'V55', d:'2026-10-17', t:['버전 표기 정리(‘초안’ 삭제), 버전 기록 문서(CHANGELOG) 추가']},
@@ -1401,7 +1415,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const str=(v,n)=>typeof v==='string'?v.slice(0,n):'';
     return {id:str(r.id,40)||('r'+Date.now().toString(36)), ts:TSISO.test(String(r.ts))?String(r.ts).slice(0,40):new Date().toISOString(), place:str(r.place,120),
       done:fin(r.done,0), total:fin(r.total,0), elapsed:/^\d{2,}:\d{2}:\d{2}$/.test(String(r.elapsed))?r.elapsed:'', facts:(r.facts&&typeof r.facts==='object'&&Array.isArray(r.facts.situ)&&Array.isArray(r.facts.phases)&&Array.isArray(r.facts.log))?r.facts:null,
-      draftAuto:str(r.draftAuto,8000), draft:str(r.draft,8000), draftEdited:!!r.draftEdited, ai:str(r.ai,8000), aiAuto:str(r.aiAuto,8000), aiEdited:!!r.aiEdited, at:/^\d{2}:\d{2}$/.test(String(r.at))?r.at:''};
+      draftAuto:str(r.draftAuto,8000), draft:str(r.draft,8000), draftEdited:!!r.draftEdited, ai:str(r.ai,8000), aiAuto:str(r.aiAuto,8000), aiEdited:!!r.aiEdited, aiSrc:str(r.aiSrc,20), at:/^\d{2}:\d{2}$/.test(String(r.at))?r.at:''};
   }
   function rpload(){
     try{ const a=JSON.parse(localStorage.getItem(RLKEY)||'[]'); if(Array.isArray(a)) reports=a.filter(r=>r&&typeof r==='object').map(cleanRep).slice(0,MAX_REPORTS); }catch(_){ reports=[]; }
@@ -1487,7 +1501,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function repStatusText(){
     if(repCtl) return '작성 중';
     if(!cur) return '';
-    if(repView==='ai') return cur.ai ? `47 · AI 작성본 ${cur.at}${cur.aiEdited?' · 편집됨':''} · 교관 확인 전` : '';
+    if(repView==='ai') return cur.ai ? `47 · AI 작성본${cur.aiSrc?'('+cur.aiSrc+')':''} ${cur.at}${cur.aiEdited?' · 편집됨':''} · 교관 확인 전` : '';
     if(cur.draftEdited) return '초안 편집됨 · 이 기기에 저장'+(storageFull?' · 저장 공간 부족':'');
     if(!cur.facts) return '이전 버전에서 가져온 보고서 — 사실 스냅샷이 없어 AI·재생성은 꺼져 있습니다';
     if(!CAP.ready || CAP.sample) return '';
@@ -1508,6 +1522,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const b=$('#repAi'); if(!b) return;
     b.hidden=!(cur && cur.facts); b.classList.toggle('off', !CAP.sample); if(cur) $('#repTabAi').closest('.seg').hidden=!(CAP.sample || cur.ai || repCtl); if(b.dataset.arm!=='1') b.textContent = repCtl ? '중지' : (cur&&cur.ai ? '다시 작성' : 'AI로 작성');
     $('#repShare').hidden = !(navigator.share);
+    { const w=$('#repWeb'); if(w) w.hidden=!(cur&&cur.facts)||!!repCtl; }
     if(!keepStatus && !$('#report').hidden && !repCtl) $('#repStatus').textContent=repStatusText();
   }
   function newReport(){
@@ -1706,7 +1721,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(repCtl){ repCtl.abort(); return; }
     const e=cur, ctl=new AbortController(); repCtl=ctl;
     const body=$('#repBody'), st=$('#repStatus');
-    e.ai=''; e.aiAuto=''; e.aiEdited=false; setRepView('ai'); body.readOnly=true; body.value='AI가 사실을 읽고 보고서를 작성하는 중입니다…'; st.textContent='작성 중'; st.classList.add('busy'); syncRepUI();
+    e.ai=''; e.aiAuto=''; e.aiEdited=false; e.aiSrc=''; setRepView('ai'); body.readOnly=true; body.value='AI가 사실을 읽고 보고서를 작성하는 중입니다…'; st.textContent='작성 중'; st.classList.add('busy'); syncRepUI();
     try{
       const r=await CAP.sample(reportPrompt(e),{signal:ctl.signal, modelTier:'quick', cache:!force, onText:({text})=>{ if(repCtl!==ctl) return; e.ai=text; if(repView==='ai') body.value=text; }});
       if(repCtl!==ctl) return;
@@ -1749,6 +1764,27 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   $('#report').addEventListener('click',e=>{ if(e.target===e.currentTarget && repDownOnBack) closeReport(); repDownOnBack=false; });
   $('#repTabDraft').addEventListener('click',()=>setRepView('draft'));
   $('#repTabAi').addEventListener('click',()=>{ if(cur&&(cur.ai||repCtl)) setRepView('ai'); });
+
+  // AI 사이트로 작성: API 키가 없어도 ChatGPT·Claude·Gemini 웹(무료 계정 포함)으로 보고서를 쓰고 결과를 붙여넣어 'AI 작성본'으로 저장
+  const WEB_AI={ChatGPT:'https://chatgpt.com/', Claude:'https://claude.ai/new', Gemini:'https://gemini.google.com/app'};
+  function webPrompt(){ return cur&&cur.facts ? reportPrompt(cur)+'\n\n(보고서 본문만 출력하세요. 머리말·맺음말·마크다운 기호 없이.)' : ''; }
+  $('#repWeb').addEventListener('click',()=>{ const pn=$('#repWebPanel'), b=$('#repWeb'); pn.hidden=!pn.hidden; b.setAttribute('aria-expanded',String(!pn.hidden)); if(!pn.hidden) pn.scrollIntoView({block:'nearest'}); });
+  $('#repWebPanel').querySelectorAll('[data-web]').forEach(btn=>btn.addEventListener('click',()=>{
+    const txt=webPrompt(); if(!txt) return; const site=btn.dataset.web, st=$('#repStatus');
+    let copied=false;
+    try{ navigator.clipboard.writeText(txt).then(()=>{},()=>{ if(!legacyCopy(txt)) st.textContent='복사하지 못했습니다 — 길게 눌러 직접 복사하세요'; }); copied=true; }catch(_){ copied=legacyCopy(txt); }   // 누른 순간 바로 복사(아이폰은 기다리면 막음)
+    if(site&&WEB_AI[site]){ let w=null; try{ w=window.open(WEB_AI[site],'_blank'); if(w) w.opener=null; }catch(_){ } if(!w) location.href=WEB_AI[site]; }
+    st.textContent = (copied?'요청문 복사됨':'요청문 복사 실패')+(site?` · ${site}에 붙여넣어 보내세요`:'');
+    $('#repWebPanel').dataset.site=site||'';
+  }));
+  $('#repWebPaste').addEventListener('click',async()=>{ try{ const t=await navigator.clipboard.readText(); if(t) $('#repWebIn').value=t; else $('#repStatus').textContent='클립보드가 비어 있습니다'; }catch(_){ $('#repStatus').textContent='이 브라우저는 자동 붙여넣기를 막습니다 — 칸을 길게 눌러 붙여넣기 하세요'; } });
+  $('#repWebSave').addEventListener('click',()=>{
+    const t=$('#repWebIn').value.trim(), st=$('#repStatus'); if(!cur) return;
+    if(t.length<20){ st.textContent='붙여넣은 보고서가 너무 짧습니다'; return; }
+    cur.ai=t.slice(0,8000); cur.aiAuto=cur.ai; cur.aiEdited=false; cur.aiSrc=$('#repWebPanel').dataset.site||'AI 사이트'; cur.at=now(); rpsave();
+    $('#repWebIn').value=''; $('#repWebPanel').hidden=true; $('#repWeb').setAttribute('aria-expanded','false');
+    $('#repTabAi').disabled=false; $('#repTabAi').closest('.seg').hidden=false; setRepView('ai'); syncRepUI();
+  });
   $('#repAi').addEventListener('click',()=>{ const b=$('#repAi');
     if(!CAP.sample){ const st=$('#repStatus'); st.textContent = SRV.on ? 'AI 작성 꺼짐 — 서버 PC에서 ai-key-setup.bat으로 Claude API 키를 넣고 서버를 다시 켜면 켜집니다' : 'AI 작성 꺼짐 — SACHIL 서버에 연결되지 않았습니다(서버 PC가 꺼져 있는지 확인)'; st.classList.add('warn'); setTimeout(()=>st.classList.remove('warn'),2500); return; }
     if(repCtl){ runAi(true); return; } if(cur&&cur.aiEdited) arm(b,'편집 내용 버리고 다시 작성',()=>runAi(true)); else runAi(true); });
@@ -2720,6 +2756,15 @@ body.hubview footer{display:none}
 .hub-box.chatbox .hd{color:#3a3000}
 @media (min-width:600px){ .hub{gap:16px} .hub-box{padding:20px} .hub-box .ht{font-size:21px} .hub-box .hd{font-size:13.5px} }
 @media (max-height:680px){ .hub{gap:10px} .hub-box{padding:12px} .hub-box .hk{top:10px;left:10px;min-width:40px;height:40px;font-size:16px} .hub-box .hk.ic{width:40px} .hub-box .ht{margin-top:40px;font-size:17px} .hub-box .hd{font-size:12px} }
+.rep-web{margin:0 20px 6px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2);display:grid;gap:8px}
+.rep-web[hidden]{display:none}
+.rep-web .rw-h{margin:0;font-size:13.5px}
+.rep-web .rw-steps{margin:0;padding-left:18px;font-size:12.5px;line-height:1.55;color:var(--fg)}
+.rep-web .rw-sites{display:flex;flex-wrap:wrap;gap:6px}
+.rep-web textarea{width:100%;min-height:84px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-size:16px;background:var(--surface);resize:vertical;box-sizing:border-box}
+.rep-web .rw-acts{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.rep-web .rw-note{margin:0;font-size:11.5px;color:var(--muted-2)}
+@media (max-width:599px){ .rep-web{margin:0 14px 6px} }
 /* 업데이트 내역 */
 .card.upd{padding:18px 16px}
 .upd-h{display:flex;align-items:center;gap:12px;margin-bottom:10px}
