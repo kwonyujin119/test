@@ -1384,7 +1384,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   function syncRepUI(keepStatus){
     const b=$('#repAi'); if(!b) return;
-    b.hidden=!(CAP.sample && cur && cur.facts); if(cur) $('#repTabAi').closest('.seg').hidden=!(CAP.sample || cur.ai || repCtl); if(b.dataset.arm!=='1') b.textContent = repCtl ? '중지' : (cur&&cur.ai ? '다시 작성' : 'AI로 작성');
+    b.hidden=!(cur && cur.facts); b.classList.toggle('off', !CAP.sample); if(cur) $('#repTabAi').closest('.seg').hidden=!(CAP.sample || cur.ai || repCtl); if(b.dataset.arm!=='1') b.textContent = repCtl ? '중지' : (cur&&cur.ai ? '다시 작성' : 'AI로 작성');
     $('#repShare').hidden = !(navigator.share);
     if(!keepStatus && !$('#report').hidden && !repCtl) $('#repStatus').textContent=repStatusText();
   }
@@ -1623,7 +1623,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   $('#report').addEventListener('click',e=>{ if(e.target===e.currentTarget && repDownOnBack) closeReport(); repDownOnBack=false; });
   $('#repTabDraft').addEventListener('click',()=>setRepView('draft'));
   $('#repTabAi').addEventListener('click',()=>{ if(cur&&(cur.ai||repCtl)) setRepView('ai'); });
-  $('#repAi').addEventListener('click',()=>{ const b=$('#repAi'); if(repCtl){ runAi(true); return; } if(cur&&cur.aiEdited) arm(b,'편집 내용 버리고 다시 작성',()=>runAi(true)); else runAi(true); });
+  $('#repAi').addEventListener('click',()=>{ const b=$('#repAi');
+    if(!CAP.sample){ const st=$('#repStatus'); st.textContent = SRV.on ? 'AI 작성 꺼짐 — 서버 PC의 data\\config.json에 ai_api_key(Claude API 키)를 넣고 서버를 다시 켜면 켜집니다' : 'AI 작성 꺼짐 — SACHIL 서버에 연결되지 않았습니다(서버 PC가 꺼져 있는지 확인)'; st.classList.add('warn'); setTimeout(()=>st.classList.remove('warn'),2500); return; }
+    if(repCtl){ runAi(true); return; } if(cur&&cur.aiEdited) arm(b,'편집 내용 버리고 다시 작성',()=>runAi(true)); else runAi(true); });
   $('#repCopy').addEventListener('click',()=>copyText(repText(), $('#repCopy'), '복사'));
   $('#repShare').addEventListener('click',async()=>{ try{ await navigator.share({title:'지휘활동 보고서', text:repText()}); }catch(_){ } });
   $('#repSave').addEventListener('click',async()=>{
@@ -2272,6 +2274,9 @@ body.chatview .panel{padding-bottom:6px}
 .bub .src-h + ol.src{border-top:0;margin-top:2px;padding-top:0}
 .bub ol.src li{display:grid;gap:2px}
 .bub ol.src q.snip{display:block;quotes:none;font-size:12px;line-height:1.5;color:var(--muted);padding:2px 0 6px 10px;border-left:2px solid var(--ember);margin-left:2px;overflow-wrap:anywhere}
+/* 보고서: AI를 못 쓸 때도 'AI로 작성' 버튼은 보이되 흐리게(누르면 켜는 방법 안내) */
+#repAi.off{opacity:.55}
+#repStatus.warn{color:var(--fg);font-weight:700}
 </style>
 <script>
 /* 카카오톡처럼: 같은 사람이 같은 분에 연달아 보낸 말은 프로필·이름을 한 번만, 시간은 마지막 말에만 */
