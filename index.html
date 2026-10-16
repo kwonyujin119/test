@@ -889,8 +889,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(ae && /^(INPUT|TEXTAREA)$/.test(ae.tagName) && ae.type!=='checkbox' && String(ae.value||'').trim()) return true;
     return false;
   }
-  const NOSWIPE='input,textarea,select,[contenteditable],.pdfv,.lightbox,.report,.atts,video,canvas,.jump,.jgrid,#timerBar';
-  const NOSWIPE_TOUCH='select,[contenteditable],.pdfv,.lightbox,.report,.atts,video,canvas,.jump,.jgrid,#timerBar';   // 체크리스트 상단 고정 카드에서는 넘기지 않음(아래 항목에서는 넘김)
+  const NOSWIPE='input,textarea,select,[contenteditable],.pdfv,.lightbox,.report,.atts,video,canvas,.jump,.jgrid,#timerBar,.quick';
+  const NOSWIPE_TOUCH='select,[contenteditable],.pdfv,.lightbox,.report,.atts,video,canvas,.jump,.jgrid,#timerBar,.quick';   // 체크리스트 상단 고정 카드에서는 넘기지 않음(아래 항목에서는 넘김)
   // 마우스는 링크·버튼에서 시작하면 클릭/끌기와 겹치므로 제외. 글자 위에서 시작하면 글자 선택으로 본다.
   const NOSWIPE_MOUSE=NOSWIPE+',a,button,label,summary,img,.tabbar,.top';
   function onText(el,x,y){
