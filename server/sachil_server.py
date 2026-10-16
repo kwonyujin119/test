@@ -611,7 +611,7 @@ class H(BaseHTTPRequestHandler):
                 return self.send(200, {'server': 'sachil', 'version': VERSION, 'user': self.user, 'room': ROOM47,
                                        'trim_ratio': CONF.get('weekly_trim_ratio'),
                                        'require_code': bool(CONF.get('require_code')),
-                                       'retention_days': CONF.get('retention_days'),
+                                       'retention_days': CONF.get('retention_days'), 'max_files': 10,
                                        'ai': bool(CONF.get('ai_api_key')), 'index': DOCS_IDX.status()})
             if not self.user:
                 return self.err(401, '로그인이 필요합니다')
@@ -1085,7 +1085,7 @@ class H(BaseHTTPRequestHandler):
         b = self.body_json()
         text = re.sub(r'[\x00-\x08\x0b-\x1f\x7f]', '', str(b.get('text') or '')).strip()[:1000]
         fl = b.get('files')
-        ids = [i for i in (fl if isinstance(fl, list) else []) if isinstance(i, str) and re.fullmatch(r'[a-f0-9]{24}', i)][:5]
+        ids = [i for i in (fl if isinstance(fl, list) else []) if isinstance(i, str) and re.fullmatch(r'[a-f0-9]{24}', i)][:10]
         files = []
         for i in ids:
             f = q('SELECT * FROM files WHERE id=? AND owner=? AND room=? AND used=0', (i, self.user['id'], rid), one=True)
