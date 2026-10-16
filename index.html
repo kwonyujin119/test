@@ -1321,7 +1321,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(repView==='ai') return cur.ai ? `47 · AI 작성본 ${cur.at}${cur.aiEdited?' · 편집됨':''} · 교관 확인 전` : '';
     if(cur.draftEdited) return '초안 편집됨 · 이 기기에 저장'+(storageFull?' · 저장 공간 부족':'');
     if(!cur.facts) return '이전 버전에서 가져온 보고서 — 사실 스냅샷이 없어 AI·재생성은 꺼져 있습니다';
-    return CAP.ready && !CAP.sample ? 'AI 작성은 서버·AI 연결 후 열립니다 — 지금은 규칙 초안' : '';
+    if(!CAP.ready || CAP.sample) return '';
+    return SRV.on ? '서버에 AI 키(config.json의 ai_api_key)가 없어 규칙 초안만 작성합니다' : 'AI 작성은 AI 키를 설정한 SACHIL 서버에 연결해야 쓸 수 있습니다 — 지금은 규칙 초안';
   }
   function setRepView(v){
     if(!cur) return;
@@ -1546,7 +1547,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const code=(err&&err.code)||'upstream_error';
       if(err&&err.text){ const t=(code==='cancelled'?'※ 중지로 일부만 작성됨\n':'')+err.text; e.ai=t; e.aiAuto=t; if(repView==='ai') body.value=t; e.at=now(); rpsave(); } else { e.ai=''; }
       if(HIDE_AI.includes(code)) CAP.sample=null;
-      st.textContent = code==='cancelled' ? (e.ai?'중지됨 — 일부만 작성 (편집 가능)':'중지됨') : (AI_MSG[code]||AI_MSG.upstream_error);
+      st.textContent = code==='cancelled' ? (e.ai?'중지됨 — 일부만 작성 (편집 가능)':'중지됨') : ((err&&err.message)||AI_MSG[code]||AI_MSG.upstream_error);
     }finally{
       if(repCtl===ctl){ repCtl=null; st.classList.remove('busy'); body.readOnly=false; $('#repTabAi').disabled=!e.ai; if(!e.ai){ const msg=st.textContent; setRepView('draft'); st.textContent=msg; } syncRepUI(true); }
     }
@@ -1882,6 +1883,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const setTok=t=>{ SRVTOK=t||''; try{ if(SRVTOK) localStorage.setItem('sachil_tok:'+SRVBASE,SRVTOK); else localStorage.removeItem('sachil_tok:'+SRVBASE); }catch(_){ } };
   const SURL=p=>SRVBASE?SRVBASE+p:p;
   const FURL=id=>SURL('/f/'+id)+(SRVBASE&&SRVTOK?'?t='+encodeURIComponent(SRVTOK):'');
+  // 보고서 AI를 SACHIL 서버의 /api/report로 보낸다(window.claude가 없는 github.io·서버 화면용). CAP.sample과 같은 모양으로 돌려준다.
+  async function serverSample(prompt,opt){
+    opt=opt||{};
+    const r=await api('/api/report',{json:{prompt, force:opt.cache===false}, signal:opt.signal});
+    if(r.aborted) throw {code:'cancelled'};
+    if(r.ok&&r.j.ok&&r.j.text) return {text:String(r.j.text)};
+    throw {code:r.j.code||'upstream_error', message:r.status===0?'서버에 연결할 수 없습니다. 서버(검은 창)가 켜져 있는지 확인하세요.':(r.j.error||'')};
+  }
   const SRV={on:false, probing:false, notice:'', draft:null, me:null, room:0, epoch:'', lib:null, libErr:false, trim:0, requireCode:false, gen:0, last:0, seen:new Set(), retention:0, ctl:null};
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   async function api(path, opt){
@@ -2102,7 +2111,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const r=await api('/api/me',{signal:ctl.signal}); clearTimeout(t);
     if(r.ok && r.j && r.j.server==='sachil'){
       const wasLocal = state.route==='chat' && !!chat.room;   // 파일 모드 방에 이미 들어가 있었음
-      SRV.probing=false; SRV.on=true; SRV.me=r.j.user||null; SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.idx=r.j.index||null;
+      SRV.probing=false; SRV.on=true; SRV.me=r.j.user||null;
+      if(r.j.ai && !CAP.sample){ CAP.sample=serverSample; CAP.ready=true; syncRepUI(); }   // 보고서 AI: Claude 화면 밖에서는 SACHIL 서버(AI 키)로 작성 SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.idx=r.j.index||null;
       await loadLib();
       if(state.route==='chat'){ if(DB.agreed){ SRV.notice='서버에 연결되어 공유 디브리핑룸으로 바뀌었습니다.'+(wasLocal?' 방금 쓴 내용은 이 기기에만 남습니다.':''); DB.enter=true; } render(); }
       else if(SECTIONS.some(x=>x.slug===state.route) || (state.route==='search'&&state.query.trim())) render();
