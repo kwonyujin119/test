@@ -1872,13 +1872,18 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const getNick=()=>{ if(DB.nick) return DB.nick; try{ return cleanNick(localStorage.getItem('sachil_nick')); }catch(_){ return ''; } };
   const setNick=n=>{ DB.nick=n||''; try{ if(n) localStorage.setItem('sachil_nick',n); else localStorage.removeItem('sachil_nick'); return true; }catch(_){ return false; } };
   // 외부 서버 연결: github.io 주소 뒤에 ?srv=https://서버주소 를 붙여 열면 그 SACHIL 서버(채팅·메뉴·AI)에 붙는다. 한 번 열면 이 기기에 기억.
+  // 고정 서버 주소(Cloudflare 도메인). 이 주소로 열거나, 주소 뒤 ?srv= 없이 github.io를 열면 여기에 붙는다.
+  const DEFAULT_SRV='https://app.sachil47.com';
   const SRVBASE=(()=>{ try{
     const u=new URL(location.href), p=u.searchParams.get('srv');
     if(p!==null){ let v=p.trim().replace(/\/+$/,''); if(!/^https:\/\/[a-z0-9.\-]+(:\d+)?$/i.test(v)||v===location.origin) v='';
       if(v) localStorage.setItem('sachil_srv',v); else localStorage.removeItem('sachil_srv');
       u.searchParams.delete('srv'); history.replaceState(null,'',u.pathname+u.search+u.hash); return v; }
-    const v=localStorage.getItem('sachil_srv')||''; return v===location.origin?'':v;
-  }catch(_){ return ''; } })();
+    const v=localStorage.getItem('sachil_srv')||'';
+    // 예전 임시 터널 주소(재시작마다 바뀜)는 버리고 고정 주소로 붙는다
+    if(v && !/\.trycloudflare\.com$/i.test(v)) return v===location.origin?'':v;
+    return DEFAULT_SRV===location.origin?'':DEFAULT_SRV;
+  }catch(_){ return DEFAULT_SRV; } })();
   let SRVTOK=''; try{ SRVTOK=SRVBASE?(localStorage.getItem('sachil_tok:'+SRVBASE)||''):''; }catch(_){ }
   const setTok=t=>{ SRVTOK=t||''; try{ if(SRVTOK) localStorage.setItem('sachil_tok:'+SRVBASE,SRVTOK); else localStorage.removeItem('sachil_tok:'+SRVBASE); }catch(_){ } };
   const SURL=p=>SRVBASE?SRVBASE+p:p;
