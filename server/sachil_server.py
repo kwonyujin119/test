@@ -44,7 +44,7 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.zip': ('application/zip', False),
 }
 VERSION = '2.0'
-APP_VERSION = 'V55'
+APP_VERSION = 'V56'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -165,7 +165,7 @@ epoch = lambda rid: EPOCH.get(rid, START_EPOCH)
 POSTS = {}
 POSTS_LOCK = threading.Lock()
 POST_MAX, POST_WINDOW = 12, 30          # 한 사람이 30초에 12번 넘게 보내면 잠시 막음
-JOIN_MAX = 30                           # 한 접속 주소에서 10분에 대화명 입장 30번까지
+JOIN_MAX = 300                          # 한 접속 주소에서 10분에 대화명 입장 300번까지(교실 와이파이는 모두 같은 주소라 넉넉히)
 JOINS = {}
 
 def th(token):
@@ -1622,7 +1622,7 @@ AI_SYS = ('너는 인천소방학교 지휘역량강화센터 학습 플랫폼 S
 
 
 def ai_allowed(ip):
-    lim_ip, lim_day = 12, int(CONF.get('ai_daily_limit') or 0)
+    lim_ip, lim_day = 90, int(CONF.get('ai_daily_limit') or 0)   # 5분에 90번(교실 30명이 같은 주소), 비용은 하루 한도로 막음
     now = time.time()
     with AI_LOCK:
         lst = [t for t in AI_HITS.get(ip, []) if now - t < 300]
@@ -1630,7 +1630,7 @@ def ai_allowed(ip):
         if AI_DAY['d'] != today:
             AI_DAY.update(d=today, n=0)
         if len(lst) >= lim_ip:
-            return False, '질문이 너무 잦습니다(5분에 12번). 잠시 뒤 다시 물어보세요.'
+            return False, '같은 곳에서 질문이 너무 잦습니다(5분에 90번). 잠시 뒤 다시 물어보세요.'
         if lim_day and AI_DAY['n'] >= lim_day:
             return False, f'오늘 AI 답변 한도({lim_day}회)를 다 썼습니다. 자료 발췌로 답합니다.'
         lst.append(now)

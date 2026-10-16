@@ -657,7 +657,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v55</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v56</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -677,7 +677,7 @@ footer b{color:var(--muted);font-weight:600}
   <div class="grip" aria-hidden="true"></div>
   <header><h2 id="sheetTitle">메뉴</h2><button type="button" class="close" id="sheetClose" aria-label="닫기">×</button></header>
   <div class="sheet-grid" id="sheetGrid"></div>
-  <div class="foot"><span id="sheetFoot">12개 섹션 · 모두 준비중</span><button type="button" class="inst-menu" id="instMenu" hidden>앱 설치</button><a href="#login">교관 로그인</a></div>
+  <div class="foot"><span id="sheetFoot">자료 12개 섹션</span><button type="button" class="inst-menu" id="instMenu" hidden>앱 설치</button><a href="#login">교관 로그인</a></div>
 </section>
 
 <div class="report" id="report" role="dialog" aria-modal="true" aria-labelledby="repTitle" hidden>
@@ -726,7 +726,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {slug:'safety',        ab:'안전', title:'안전관리', desc:'현장 안전관리 절차, 안전담당 지정, 철수 기준', kw:'안전 안전관리 안전담당 철수 붕괴 위험 인원 점검 PAR 인원확인'},
     {slug:'mci',           ab:'다수', title:'다수사상자', desc:'다수사상자 사고 분류·이송 체계와 현장 응급의료소', kw:'다수사상자 MCI 중증도 분류 트리아지 이송 응급의료소 구급 START'},
     {slug:'drone',         ab:'드론', title:'드론전술', desc:'현장 드론 운용 절차와 영상의 지휘 활용', kw:'드론 무인기 영상 열화상 운용 조종 전술 정찰 비행'},
-    {slug:'cases',         ab:'사례', title:'대형화재사례', desc:'대형화재 사례 분석과 지휘 판단의 교훈', kw:'사례 대형화재 분석 교훈 복기 공장 창고 샌드위치패널 물류'}
+    {slug:'cases',         ab:'사례', title:'대형화재사례', desc:'대형화재 사례 분석과 지휘 판단의 교훈', kw:'사례 대형화재 분석 교훈 복기 공장 창고 샌드위치패널 물류'},
+    {slug:'updates',       ab:'내역', title:'업데이트 내역', desc:'버전별 개선·업데이트 기록', kw:'업데이트 버전 내역 변경 개선 보강 패치 기록 새 기능', local:true}
   ];
   // 예시 인덱스: 본문 연결 전, 문서 '제목' 수준. 조문 제목은 원문 확인 전 예시로 표시한다.
   const DOCS = [
@@ -757,6 +758,68 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   ];
   const AS = (typeof ICTC_ASSETS==='object' && ICTC_ASSETS) || {sections:[],phases:[]};
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
+  // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
+  // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
+  const APP_VER='V56', SRV_VER='2.0';
+  const UPDATES=[
+    {v:'V56', d:'2026-10-17', t:['기기별 점검(PC·스마트폰·갤럭시탭·폴드7·아이폰)과 오류 개선','메뉴 마지막에 ‘업데이트 내역’ 섹션 추가 — 이후 반영은 여기에 기록']},
+    {v:'V55', d:'2026-10-17', t:['버전 표기 정리(‘초안’ 삭제), 버전 기록 문서(CHANGELOG) 추가']},
+    {v:'V54', d:'2026-10-17', t:['바닥글 세 번째 줄 삭제·여백 축소']},
+    {v:'V53', d:'2026-10-17', t:['AI 도우미 추천 질문 줄에서는 좌우로 밀어도 탭이 넘어가지 않게']},
+    {v:'V52', d:'2026-10-17', t:['사용법을 스포트라이트 투어(6단계)로: 비추기 + 말풍선 설명']},
+    {v:'V51', d:'2026-10-17', t:['상단 로고 오른쪽에 사용법(?) 버튼']},
+    {v:'V50', d:'2026-10-17', t:['47망 사진 크기 1/4, 여러 장 묶어 보내기, 한 번에 10개']},
+    {v:'V49', d:'2026-10-17', t:['47망: 지금 접속 수, 날짜 줄, 오전/오후 시간, 안 읽은 수','길게 누르기(답장·복사·공유·저장·삭제), ＋ 메뉴(최근 사진·앨범·카메라·파일)','안 읽은 곳에서 멈춤, 최근 메시지 띄우기']},
+    {v:'V48', d:'2026-10-17', t:['체크리스트: 시계 옆에 시작·초기화·보고서 만들기 한 줄','아래 항목에서 밀면 옆 탭으로 이동(위 고정 카드는 제외)']},
+    {v:'V47', d:'2026-10-17', t:['AI 도우미가 사람이 말하듯 답변','AI 보고서 작성 안정화, AI 키 설정 도구(ai-key-setup.bat)']},
+    {v:'V46', d:'2026-10-16', t:['새 그림 7장 적용(보고서·AI·완료·연결 끊김·PC 첫 화면, 메뉴 아이콘 2개)']},
+    {v:'V45', d:'2026-10-16', t:['체크리스트: 현재 시각 시계, 바로가기 두 줄']},
+    {v:'V44', d:'2026-10-16', t:['업데이트가 바로 보이게(접속마다 새 버전 확인)']},
+    {v:'V43', d:'2026-10-16', t:['47망 버튼을 눌렀는데 AI 도우미가 보이던 문제 수정']},
+    {v:'V42', d:'2026-10-16', t:['체크리스트에서 옆으로 끌어도 탭 유지']},
+    {v:'V41', d:'2026-10-16', t:['체크리스트 ‘전체 ▾’로 모든 항목 한눈에']},
+    {v:'V40', d:'2026-10-16', t:['첫 접속 때 홈 화면 설치 안내(한 번만)']},
+    {v:'V39', d:'2026-10-16', t:['보고서 ‘AI로 작성’ 버튼 항상 표시 + 꺼짐 안내']},
+    {v:'V38', d:'2026-10-16', t:['앱 아이콘(노란 배경·흰 말풍선·검정 47)']},
+    {v:'V37', d:'2026-10-16', t:['AI 도우미 교수형 답변·근거 발췌, 체크리스트 바로가기, 보고서 정리']},
+    {v:'V36', d:'2026-10-16', t:['고정 도메인 app.sachil47.com 연결']},
+    {v:'V35', d:'2026-10-16', t:['‘디브리핑룸을 찾지 못했습니다’ 오류 수정']},
+    {v:'V34', d:'2026-10-16', t:['AI 보고서가 github.io·서버에서 작동하지 않던 문제 수정']},
+    {v:'V33', d:'2026-10-16', t:['폰 하단 탭 고정 근본 해결']},
+    {v:'V32', d:'2026-10-16', t:['탭 이동 때 하단 탭 깜빡임 줄임']},
+    {v:'V31', d:'2026-10-16', t:['옆으로 넘길 때 하단 탭이 사라지던 현상 수정']},
+    {v:'V30', d:'2026-10-16', t:['대화방 위·아래 여백 줄임']},
+    {v:'V29', d:'2026-10-16', t:['github.io 앱과 PC 서버 연결 — 47망 상호 대화']},
+    {v:'V28', d:'2026-10-16', t:['폰 하단 탭 고정, 카카오톡형 채팅창, 메뉴 자료 목록 준비']},
+    {v:'V27', d:'', t:['47망 탭을 말풍선 심벌로, 폰·PC별 탭 배치, 끌어서 넘기기']},
+    {v:'V26', d:'', t:['AI가 메뉴 PDF를 근거로 답변, ‘47망(디브리핑룸)’, 첫 화면을 47망으로 (서버 1.8)']},
+    {v:'V25', d:'', t:['느린 망 흰 화면 해결, 재방문 다운로드 생략, 다크 모드 차단, 폴드 커버 버튼 잘림 수정 (서버 1.7)']},
+    {v:'V24', d:'', t:['이미지 5장 적용, ‘준비중’ 표시 오류 수정 (서버 1.6) · V24.1 터널 프로그램 동봉·재시도']},
+    {v:'V23', d:'', t:['PDF 첫 쪽 미리보기·쪽수, PDF를 열어도 탭 유지']},
+    {v:'V22', d:'', t:['앱 안 PDF 뷰어, 앱 아이콘, 화면에 버전 표시']},
+    {v:'V21', d:'', t:['홈 배경 정리, 서버 켜는 방법 안내, 터널 오류 진단']},
+    {v:'V20', d:'', t:['보안·디자인·앱 동작 결함 일괄 수정']},
+    {v:'V19', d:'', t:['대화 매주 자동 정리, 메뉴가 서버 PC 폴더 파일 표시, 파일 이름 검색']},
+    {v:'V18', d:'', t:['방 개설 삭제 — 동의 → 익명 대화명 → 47번 디브리핑룸 하나로']},
+    {v:'V17', d:'', t:['‘채팅방’을 ‘디브리핑룸’으로']},
+    {v:'V16', d:'', t:['서버 모드: 여러 사람이 함께 채팅']},
+    {v:'V15', d:'', t:['첫 화면 Search 버튼, 체크리스트 12단계 한 줄기, 발생개요 박스']},
+    {v:'V14', d:'', t:['이름을 SACHIL로, S·A·CH·IL 탭, AI 도우미 분리, IL 보고서 목록']},
+    {v:'V13', d:'', t:['화재 원인·인명·재산 피해 박스, 보고서 직접 편집']},
+    {v:'V12', d:'', t:['상황 박스, 보고서 자동 작성']},
+    {v:'V11', d:'', t:['헤더 메뉴, ‘전술상황판’을 ‘체크리스트’로']},
+    {v:'V2~V10', d:'', t:['ICTC 플랫폼 초기 버전: 검색·상황판·채팅·메뉴·첨부 등 (당시 화면으로 추정)']}
+  ];
+  const UPD_ICON='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="12" y="6" width="40" height="52" rx="6" fill="#fff" stroke="#111" stroke-width="4"/><path d="M20 20h24M20 30h24M20 40h12" stroke="#111" stroke-width="4" stroke-linecap="round"/><circle cx="46" cy="46" r="12" fill="#FFC400" stroke="#111" stroke-width="4"/><path d="M41 46l4 4 7-8" fill="none" stroke="#111" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+  function renderUpdates(panel,s){
+    panel.innerHTML=`
+      <div class="card upd">
+        <div class="upd-h"><img src="${UPD_ICON}" alt=""><div><h2>${esc(s.title)}</h2><p>현재 <b>앱 ${APP_VER}</b> · 서버 ${SRV_VER}</p></div></div>
+        <ol class="upd-list">${UPDATES.map((u,k)=>`<li class="${k===0?'new':''}"><div class="vh"><b>${esc(u.v)}</b>${u.d?`<span>${esc(u.d)}</span>`:''}${k===0?'<em>최신</em>':''}</div><ul>${u.t.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></li>`).join('')}</ol>
+        <p class="upd-note">V28~V55의 날짜는 이 앱(github.io) 반영 기준입니다. V27 이전은 작업 기록·당시 화면을 바탕으로 정리했습니다.</p>
+      </div>`;
+  }
+  { const u=SECTIONS.find(x=>x.slug==='updates'); if(u) u.icon=UPD_ICON; }
   const phaseIcon = pi => AS.phases[pi] || '';
   // 체크리스트 — 역할 구분 없이 출동부터 지휘소 운영까지 12단계 한 줄기. 항목은 초안 예시(교관 승인 전).
   const CHECKLIST = [
@@ -1089,11 +1152,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const fmtDate=ts=>{ const d=new Date(ts*1000); return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`; };
   const libHref=(slug,f)=>SRV.on?SURL(`/lib/${slug}/${encodeURIComponent(f.name)}`):`lib/${slug}/${encodeURIComponent(f.name)}`;
   const libRow=(slug,f)=>`<a class="libfile" href="${libHref(slug,f)}" ${f.inline?'target="_blank" rel="noopener"':'download'}${f.ext==='pdf'?` data-pdfv="${esc(f.name)}"`:''}>${f.ext==='pdf'?`<span class="thumb wait" data-thumb="${esc(libHref(slug,f))}" aria-hidden="true"><span class="ext">PDF</span></span>`:`<span class="ext">${esc(f.ext)}</span>`}<span class="nm"><b>${esc(f.name.replace(/\.[^.]+$/,'')).replace(/([_\-.])/g,'$1<wbr>')}</b><small>${fmtSize(f.size)} · ${fmtDate(f.mtime)}${f.ext==='pdf'?`<span data-pg="${esc(libHref(slug,f))}"></span>`:''}</small></span><span class="go">${f.inline?'열기':'받기'}</span></a>`;
-  function syncSheetFoot(){ const el=$('#sheetFoot'); if(!el) return; if(!SRV.lib){ el.textContent='12개 섹션'; return; } const n=SECTIONS.filter(x=>(SRV.lib[x.slug]||[]).length).length; el.textContent=n?`12개 섹션 · 자료 있는 섹션 ${n}`:'12개 섹션 · 아직 올라온 자료 없음'; }
+  function syncSheetFoot(){ const el=$('#sheetFoot'); if(!el) return; if(!SRV.lib){ el.textContent=`자료 12개 섹션 · ${APP_VER}`; return; } const n=SECTIONS.filter(x=>!x.local&&(SRV.lib[x.slug]||[]).length).length; el.textContent=(n?`자료 있는 섹션 ${n}/12`:'아직 올라온 자료 없음')+` · ${APP_VER}`; }
   async function loadLib(){ const r=await api('/api/lib'); if(r.ok&&r.j.lib){ SRV.lib=r.j.lib; SRV.libErr=false; syncSheetFoot(); return true; }
     if(!SRV.on){ try{ const x=await fetch('lib/index.json',{cache:'no-cache'}); if(x.ok){ const j=await x.json(); if(j&&j.lib){ SRV.lib=j.lib; SRV.libStatic=true; SRV.libErr=false; syncSheetFoot(); return true; } } }catch(_){ } }
     SRV.libErr=true; return false; }
   function renderPrep(panel, s){
+    if(s.slug==='updates'){ renderUpdates(panel,s); return; }   // 앱 안에 든 기록(서버 자료 폴더와 무관)
     if(s.slug!=='login' && (SRV.on || SRV.libStatic)){ renderLibSection(panel,s); return; }   // 정적 목록(lib/index.json)이 없으면 기존 안내 화면 유지
     const docs=DOCS.filter(d=>d.sec===s.slug);
     const focus=state.focusDoc; state.focusDoc=null;
@@ -2561,6 +2625,21 @@ body.chatview .panel{padding-bottom:6px}
 .act-sheet button:hover,.act-sheet button:focus-visible{background:var(--surface-2)}
 .act-sheet button.danger{color:#C62828}
 .act-sheet button.cancel{text-align:center;color:var(--muted);border-top:1px solid var(--line);border-radius:0 0 10px 10px}
+/* 업데이트 내역 */
+.card.upd{padding:18px 16px}
+.upd-h{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.upd-h img{width:48px;height:48px;flex:none}
+.upd-h h2{margin:0;font-size:20px}
+.upd-h p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.upd-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.upd-list > li{border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.upd-list > li.new{border-color:var(--ember);box-shadow:inset 3px 0 0 var(--ember)}
+.upd-list .vh{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.upd-list .vh b{font-family:var(--mono);font-size:14px}
+.upd-list .vh span{font-size:12px;color:var(--muted-2)}
+.upd-list .vh em{font-style:normal;font-size:11px;font-weight:700;background:var(--ember);color:var(--navy);border-radius:999px;padding:1px 8px}
+.upd-list ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.55}
+.upd-note{margin:12px 0 0;font-size:12px;color:var(--muted-2)}
 /* AI 도우미 근거 발췌 */
 .bub .src-h{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);font-size:12px;font-weight:700;color:var(--muted)}
 .bub .src-h + ol.src{border-top:0;margin-top:2px;padding-top:0}
@@ -2699,7 +2778,7 @@ body.chatview .panel{padding-bottom:6px}
      d:['<b>SACHIL:47</b> 로고를 누르면 언제든 처음 화면으로 돌아옵니다.','<b>47 말풍선</b>은 47망(디브리핑룸)입니다. 대화명만 보이는 익명 채팅으로 사진·PDF를 나누고, 지금 접속 수와 안 읽은 수가 보입니다. 메시지를 길게 누르면 답장·복사·공유·저장.'],
      n:'실명·소속·계급과 개인정보는 쓰지 마세요.'},
     {k:'메뉴', t:'메뉴', get:()=>[pick('#menuBtn')],
-     d:['교육일정·SOP·긴급구조대응계획·RIT 등 <b>12개 섹션 자료</b>를 엽니다. PDF는 앱 안에서 바로 볼 수 있어요.','<b>앱 설치</b>(홈 화면 바로가기)와 교관 로그인도 여기 있습니다.']},
+     d:['교육일정·SOP·긴급구조대응계획·RIT 등 <b>12개 섹션 자료</b>를 엽니다. PDF는 앱 안에서 바로 볼 수 있어요. 맨 끝 <b>업데이트 내역</b>에서 버전별 바뀐 점을 봅니다.','<b>앱 설치</b>(홈 화면 바로가기)와 교관 로그인도 여기 있습니다.']},
     {k:'S', t:'검색', get:()=>[pick('.tabbar [data-go="search"]','#navSearch')],
      d:['SOP·법령·교재·사례를 <b>낱말로 찾습니다</b>.','결과를 누르면 PDF의 해당 쪽이 바로 열립니다.']},
     {k:'A', t:'AI 도우미', get:()=>[pick('.tabbar [data-go="ai"]','.top-nav [data-route="ai"]')],
