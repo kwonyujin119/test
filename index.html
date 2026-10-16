@@ -2154,6 +2154,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   .chat > .card .quick::-webkit-scrollbar{display:none}
   .chat > .card .quick button{flex:none}
 }
+/* 크롬(안드로이드)의 '가로로 밀면 이전/다음 페이지' 기능 끄기: 앱의 S·A·CH·IL 넘기기와 겹쳐
+   크롬이 화면 캡처 카드를 밀어 넣는 동안 하단 탭이 사라졌다 나타났다. 넘기기는 앱이 직접 처리한다. */
+html,body{overscroll-behavior-x:none}
+
 /* 대화방 머리: 한 줄 헤더로 압축(카카오톡처럼) — 공간 낭비 줄임 */
 body.chatview footer{display:none}   /* A·47망: 바닥글이 화면을 늘려 주소창·하단 탭이 움직이던 것 방지, 남는 공간은 대화에 */
 .roomhead{display:grid;grid-template-columns:minmax(0,1fr) auto auto;grid-auto-flow:column;align-items:center;column-gap:6px;row-gap:0;margin:0 0 8px}
