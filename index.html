@@ -451,8 +451,8 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .bub.only-att .atts{margin-top:0}
 .msg.me .bub.only-att{background:transparent;border-color:transparent}
 .att-img{display:block;border:0;padding:0;background:transparent;cursor:zoom-in;border-radius:12px;overflow:hidden;max-width:100%}
-.att-img.srv{min-height:96px;min-width:96px;background:var(--navy-soft)}
-.att-img img{display:block;width:auto;max-width:min(100%,320px);max-height:320px;height:auto;border-radius:12px;background:var(--navy-soft)}
+.att-img.srv{min-height:64px;min-width:64px;background:var(--navy-soft)}
+.att-img img{display:block;width:auto;max-width:min(100%,160px);max-height:160px;height:auto;border-radius:12px;background:var(--navy-soft)}   /* 채팅 속 사진은 작게(누르면 크게) */
 .att-pdf{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--line);color:var(--fg);max-width:100%}
 .msg.me .att-pdf{background:var(--surface)}
 .att-pdf .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;font-size:13px;flex:1}
@@ -496,7 +496,20 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .lightbox iframe{width:100%;height:100%;border:0;border-radius:8px;background:#fff}
 .lightbox .close{position:absolute;top:calc(10px + var(--sat));right:12px;width:var(--tap);height:var(--tap);border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:26px;line-height:1}
 .lightbox .cap{position:absolute;left:16px;right:70px;top:calc(18px + var(--sat));color:#fff;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.85}
-@media (min-width:600px){ .att-img img{max-width:min(100%,420px);max-height:420px} }
+@media (min-width:600px){ .att-img img{max-width:min(100%,210px);max-height:210px} }
+.atts{justify-items:start}
+.msg.me .atts{justify-items:end}
+.atts > .att-img{width:fit-content;min-width:0;min-height:0}
+.atts > .att-img img{max-width:160px}
+@media (min-width:600px){ .atts > .att-img img{max-width:210px} }
+.att-grid{display:grid;gap:3px;width:min(100%,220px);border-radius:12px;overflow:hidden}
+.att-grid.c2{grid-template-columns:repeat(2,1fr)}
+.att-grid.c3{grid-template-columns:repeat(3,1fr)}
+.att-grid .att-img{border-radius:0;min-width:0;min-height:0;aspect-ratio:1}
+.att-grid .att-img img{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;border-radius:0}
+@media (min-width:600px){ .att-grid{width:min(100%,264px)} }
+.pending .bundle{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;padding:0 6px;white-space:nowrap}
+.pending .bundle input{width:16px;height:16px;accent-color:var(--navy)}
 /* 검색 결과의 AI 도우미 */
 .card.ai{display:flex;gap:12px;padding:16px;align-items:flex-start;background:var(--surface)}
 .card.ai .av{width:40px;height:40px;border-radius:50%;background:var(--ember-soft);border:1px solid var(--line);display:grid;place-items:center;flex:none;overflow:hidden}
@@ -1744,7 +1757,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // ---------- 채팅방 + 첨부 (이 기기에만 저장 · 서버는 마지막 단계) ----------
   const RMKEY='ictc_rooms_v9', RMSG='ictc_roommsgs_v10';
   const CATS=['기수','과정','주제','교관'];
-  const MAX_FILES=5, PDF_KEEP=1.5*1024*1024, IMG_MAX=1280;
+  let MAX_FILES=5; const PDF_KEEP=1.5*1024*1024, IMG_MAX=1280;   // 서버가 더 받으면(새 서버 10장) 늘린다
   let rooms=[], roomMsgs={}, chatPrefill='', storageFull=false;
   const volatile={}; // 큰 PDF의 blob URL (세션 동안만)
   const validAtt=a=>a&&typeof a==='object'&&(a.kind==='image'||a.kind==='pdf')&&typeof a.name==='string';
@@ -1819,6 +1832,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         </form>`;
   let pendMsg='', pendMsgT=null;
   function pendNote(m){ pendMsg=m; clearTimeout(pendMsgT); pendMsgT=setTimeout(()=>{ pendMsg=''; renderPending(); },4000); renderPending(); }
+  let bundlePref=(()=>{ try{ return localStorage.getItem('sachil_bundle')!=='0'; }catch(_){ return true; } })();
   function renderPending(){
     const el=$('#pending'); if(!el) return;
     if(!pending.length&&!pendMsg){ el.hidden=true; el.innerHTML=''; return; }
@@ -1827,8 +1841,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(pending.some(a=>a.shrunk)) notes.push('사진은 1280px로 줄여 보냅니다');
     if(!SRV.on&&pending.some(a=>a.kind==='pdf'&&!a.data)) notes.push('큰 PDF는 이 세션에서만 열립니다');
     if(pendMsg) notes.unshift(pendMsg);
-    el.innerHTML=pending.map(a=>`<span class="pchip">${a.kind==='image'?`<img src="${a.data}" alt="">`:`<span class="ico">PDF</span>`}<span class="nm">${esc(trunc(a.name,18))}</span>${!SRV.on&&a.kind==='pdf'&&!a.data?'<span class="tag">세션만</span>':''}<button type="button" class="x" data-rm="${esc(a.id)}" aria-label="첨부 제거">×</button></span>`).join('')+(pending.length?`<span class="pcount">${pending.length}/${MAX_FILES}</span>`:'')+(notes.length?`<span class="pnote" aria-live="polite">${esc(notes.join(' · '))}</span>`:'');
+    el.innerHTML=pending.map(a=>`<span class="pchip">${a.kind==='image'?`<img src="${a.data}" alt="">`:`<span class="ico">PDF</span>`}<span class="nm">${esc(trunc(a.name,18))}</span>${!SRV.on&&a.kind==='pdf'&&!a.data?'<span class="tag">세션만</span>':''}<button type="button" class="x" data-rm="${esc(a.id)}" aria-label="첨부 제거">×</button></span>`).join('')+(pending.length?`<span class="pcount">${pending.length}/${MAX_FILES}</span>`:'')+(SRV.on&&state.route==='chat'&&pending.filter(a=>a.kind==='image').length>1?`<label class="bundle"><input type="checkbox" id="bundleChk" ${bundlePref?'checked':''}> 묶어 보내기</label>`:'')+(notes.length?`<span class="pnote" aria-live="polite">${esc(notes.join(' · '))}</span>`:'');
     el.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click',()=>{ pending=pending.filter(a=>a.id!==b.dataset.rm); renderPending(); }));
+    const bc=el.querySelector('#bundleChk'); if(bc) bc.addEventListener('change',()=>{ bundlePref=bc.checked; try{ localStorage.setItem('sachil_bundle',bundlePref?'1':'0'); }catch(_){ } });
   }
   let addPendingFiles=null;   // 47망 ＋ 메뉴(앨범·카메라·파일·최근 사진)가 같은 첨부 처리로 넣는다
   function bindComposer(onSend){
@@ -2063,9 +2078,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 
   function srvAtt(files){
     if(!files||!files.length) return '';
-    return `<div class="atts">${files.map(f=>f.kind==='image'
-      ? `<button type="button" class="att-img srv" data-sview="${esc(FURL(f.id))}" data-name="${esc(f.name)}" aria-label="${esc(f.name)} 크게 보기"><img src="${esc(FURL(f.id))}" alt="${esc(f.name)}"></button>`
-      : `<div class="att-pdf"><span class="ico">PDF</span><span class="nm">${esc(f.name)}</span><span class="sz">${fmtSize(f.size)}</span><a class="btn" href="${esc(FURL(f.id))}" target="_blank" rel="noopener" data-pdfv="${esc(f.name)}">열기</a></div>`).join('')}</div>`;
+    const img=f=>`<button type="button" class="att-img srv" data-sview="${esc(FURL(f.id))}" data-name="${esc(f.name)}" aria-label="${esc(f.name)} 크게 보기"><img src="${esc(FURL(f.id))}" alt="${esc(f.name)}" loading="lazy"></button>`;
+    const pdf=f=>`<div class="att-pdf"><span class="ico">PDF</span><span class="nm">${esc(f.name)}</span><span class="sz">${fmtSize(f.size)}</span><a class="btn" href="${esc(FURL(f.id))}" target="_blank" rel="noopener" data-pdfv="${esc(f.name)}">열기</a></div>`;
+    const imgs=files.filter(f=>f.kind==='image'), docs=files.filter(f=>f.kind!=='image');
+    // 사진 여러 장을 묶어 보낸 글: 카카오톡처럼 한 말풍선 안에 바둑판으로
+    const grid=imgs.length>1?`<div class="att-grid c${imgs.length===2||imgs.length===4?2:3}" aria-label="사진 ${imgs.length}장">${imgs.map(img).join('')}</div>`:imgs.map(img).join('');
+    return `<div class="atts">${grid}${docs.map(pdf).join('')}</div>`;
   }
   // 카카오톡처럼: 날짜가 바뀌면 가운데 날짜 줄, 시간은 '오후 3:05'
   const dayKey=ts=>{ const d=new Date(ts*1000); return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); };
@@ -2192,10 +2210,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       }
       if(!v&&!ids.length){ if(SRV.gen===gen) stat(''); return; }
       const reply=SRV.replyTo?SRV.replyTo.id:0;
-      const r=await api(`/api/rooms/${rid}/messages`,{json:reply?{text:v,files:ids,reply}:{text:v,files:ids}});
-      if(!r.ok){ fail('전송 실패: '+(r.j.error||'연결 오류'), v, att, 0, r.status); return; }
-      if(SRV.gen!==gen) return;
-      stat(''); setReply(null); append([r.j.message],{force:true}); applyState(r.j);
+      // 묶어 보내기(기본): 사진 여러 장을 한 말풍선으로. 끄면 한 장씩 따로 보내고 글은 마지막에
+      const parts=(!bundlePref && ids.length>1) ? ids.map(id=>({text:'',files:[id]})).concat(v?[{text:v,files:[]}]:[]) : [{text:v,files:ids}];
+      for(let k=0;k<parts.length;k++){
+        const body=Object.assign({},parts[k]); if(reply&&k===0) body.reply=reply;
+        if(parts.length>1) stat(`보내는 중 ${k+1}/${parts.length}…`);
+        const r=await api(`/api/rooms/${rid}/messages`,{json:body});
+        if(!r.ok){ fail('전송 실패: '+(r.j.error||'연결 오류'), v, att.slice(Math.min(k,att.length)), 0, r.status); return; }
+        if(SRV.gen!==gen) return;
+        append([r.j.message],{force:true}); applyState(r.j);
+      }
+      stat(''); setReply(null);
       if(window.innerWidth>=600){ const i=$('#chatText'); if(i) i.focus(); }
     });
     // ＋ 버튼: 최근 사진 3장 · 앨범 · 카메라 · 파일
@@ -2341,7 +2366,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const wasLocal = state.route==='chat' && !!chat.room;   // 파일 모드 방에 이미 들어가 있었음
       SRV.probing=false; SRV.on=true; SRV.me=r.j.user||null;
       if(r.j.ai && !CAP.sample){ CAP.sample=serverSample; CAP.ready=true; syncRepUI(); }   // 보고서 AI: Claude 화면 밖에서는 SACHIL 서버(AI 키)로 작성
-      SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.idx=r.j.index||null;
+      SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
       await loadLib();
       if(state.route==='chat'){ if(DB.agreed){ SRV.notice='서버에 연결되어 공유 디브리핑룸으로 바뀌었습니다.'+(wasLocal?' 방금 쓴 내용은 이 기기에만 남습니다.':''); DB.enter=true; } render(); }
       else if(SECTIONS.some(x=>x.slug===state.route) || (state.route==='search'&&state.query.trim())) render();
