@@ -43,8 +43,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '2.0'
-APP_VERSION = 'V55'
+VERSION = '2.1'
+APP_VERSION = 'V57'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -145,27 +145,32 @@ def q(sql, args=(), one=False, commit=False):
 NEW_MSG = threading.Condition()
 
 
-def ensure_room47():
-    r = q("SELECT id FROM rooms WHERE cat='47' ORDER BY id LIMIT 1", one=True)
+def ensure_room(cat, title):
+    r = q("SELECT id FROM rooms WHERE cat=? ORDER BY id LIMIT 1", (cat,), one=True)
     if r:
+        q('UPDATE rooms SET title=? WHERE id=?', (title, r['id']), commit=True)
         return r['id']
     return q('INSERT INTO rooms(title,cat,descr,owner,owner_name,created,last) VALUES(?,?,?,?,?,?,?)',
-             ('47망(디브리핑룸)', '47', '', 0, '', time.time(), None), commit=True)
+             (title, cat, '', 0, '', time.time(), None), commit=True)
 
 
-ROOM47 = ensure_room47()
+ROOM47 = ensure_room('47', '47망')            # 기존 대화는 47망에 그대로
+ROOM_DB = ensure_room('DB', '디브리핑룸')      # V57: 47망과 디브리핑룸을 두 방으로 분리
 EPOCH = {}                               # 대화 비우기 표시(비우면 바뀜 → 모든 화면이 새로 그림)
 PRESENCE = {}                            # (방, 사용자) → 마지막으로 대화를 받아 간 시각 — '지금 접속' 수
 PRESENCE_LOCK = threading.Lock()
 READ_VER = {}                            # 방 → 읽음 표시가 바뀐 횟수(바뀌면 기다리던 화면이 깨어나 '안 읽은 수'를 고침)
 ONLINE_SEC = 40                          # 롱폴링(25초)보다 조금 길게
 MEMBER_DAYS = 7                          # 최근 7일 안에 들어온 사람만 '안 읽은 수'에 셈
+DEL_VER = {}                             # 방 → 지운 글 순번(바뀌면 다른 사람 화면에서도 지움)
+DELETED = {}                             # 방 → [(순번, 글 id)] 최근 300개
+DELETED_TXT = '(삭제된 메시지)'
 START_EPOCH = secrets.token_hex(4)
 epoch = lambda rid: EPOCH.get(rid, START_EPOCH)
 POSTS = {}
 POSTS_LOCK = threading.Lock()
-POST_MAX, POST_WINDOW = 12, 30          # 한 사람이 30초에 12번 넘게 보내면 잠시 막음
-JOIN_MAX = 30                           # 한 접속 주소에서 10분에 대화명 입장 30번까지
+POST_MAX, POST_WINDOW = 24, 30          # 한 사람이 30초에 24번 넘게 보내면 잠시 막음(사진 10장 따로 보내기 + 글 여유)
+JOIN_MAX = 300                          # 한 접속 주소에서 10분에 대화명 입장 300번까지(교실 와이파이는 모두 같은 주소라 넉넉히)
 JOINS = {}
 
 def th(token):
@@ -615,7 +620,7 @@ class H(BaseHTTPRequestHandler):
                 return self.lib_get(m.group(1), urllib.parse.unquote(m.group(2)))
             self.user = self.get_user()
             if path == '/api/me':
-                return self.send(200, {'server': 'sachil', 'version': VERSION, 'user': self.user, 'room': ROOM47,
+                return self.send(200, {'server': 'sachil', 'version': VERSION, 'user': self.user, 'room': ROOM47, 'room_debrief': ROOM_DB,
                                        'trim_ratio': CONF.get('weekly_trim_ratio'),
                                        'require_code': bool(CONF.get('require_code')),
                                        'retention_days': CONF.get('retention_days'), 'max_files': 10,
@@ -659,6 +664,9 @@ class H(BaseHTTPRequestHandler):
             if path == '/api/logout':
                 q('DELETE FROM sessions WHERE id=?', (self.user['id'],), commit=True)
                 q('DELETE FROM reads WHERE user=?', (self.user['id'],), commit=True)
+                with PRESENCE_LOCK:   # 접속 수에서 바로 빠지게
+                    for k in [k for k in PRESENCE if k[1] == self.user['id']]:
+                        PRESENCE.pop(k, None)
                 return self.send(200, {'ok': True}, extra={'Set-Cookie': 'sachil=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict'})
             if path == '/api/rooms':
                 return self.room_create()
@@ -960,8 +968,8 @@ class H(BaseHTTPRequestHandler):
         r = q('SELECT * FROM rooms WHERE id=?', (rid,), one=True)
         if not r:
             return self.err(404, '없는 디브리핑룸입니다')
-        if rid == ROOM47:
-            return self.err(403, '47망(디브리핑룸)은 지울 수 없습니다. 대화 비우기를 쓰세요')
+        if rid in (ROOM47, ROOM_DB):
+            return self.err(403, '47망·디브리핑룸은 지울 수 없습니다. 대화 비우기를 쓰세요')
         if r['owner'] != self.user['id'] and self.user['role'] != 'admin':
             return self.err(403, '디브리핑룸을 만든 사람이나 관리자만 지울 수 있습니다')
         for f in q('SELECT id FROM files WHERE room=?', (rid,)):
@@ -1052,6 +1060,7 @@ class H(BaseHTTPRequestHandler):
         after = to_int((args.get('after') or ['0'])[0], 0)
         wait = (args.get('wait') or ['0'])[0] == '1'
         rv0 = to_int((args.get('rv') or ['-1'])[0], -1)
+        dv0 = to_int((args.get('dv') or ['-1'])[0], -1)
         deadline = time.time() + 25
         ep0 = (args.get('epoch') or [''])[0]
         self.touch(rid)
@@ -1067,7 +1076,7 @@ class H(BaseHTTPRequestHandler):
             alive = q('SELECT id FROM rooms WHERE id=?', (rid,), one=True)
             if not alive:   # 기다리는 동안 방이 삭제됨 — 오류가 아니라 정상 응답으로 알린다
                 return self.send(200, {'ok': True, 'gone': True, 'messages': []}, log=False)
-            if rows or not wait or time.time() >= deadline or (ep0 and ep0 != epoch(rid)) or (rv0 >= 0 and rv0 != READ_VER.get(rid, 0)):
+            if rows or not wait or time.time() >= deadline or (ep0 and ep0 != epoch(rid)) or (rv0 >= 0 and rv0 != READ_VER.get(rid, 0)) or (dv0 >= 0 and dv0 != DEL_VER.get(rid, 0)):
                 break
             with NEW_MSG:
                 NEW_MSG.wait(timeout=max(0.5, min(10, deadline - time.time())))
@@ -1076,6 +1085,9 @@ class H(BaseHTTPRequestHandler):
         out = dict({'ok': True, 'epoch': epoch(rid), 'messages': [self.msg_out(r, al) for r in rows]}, **self.room_state(rid))
         if my_read is not None:
             out['my_read'] = my_read
+        out['dv'] = DEL_VER.get(rid, 0)
+        if dv0 >= 0:   # 그사이 지워진 글(다른 사람 화면에서도 '(삭제된 메시지)'로)
+            out['deleted'] = [m for v, m in DELETED.get(rid, []) if v > dv0]
         return self.send(200, out, log=False)
 
     def message_post(self, rid):
@@ -1090,7 +1102,10 @@ class H(BaseHTTPRequestHandler):
             ps.append(now)
             POSTS[self.user['id']] = ps
         b = self.body_json()
-        text = re.sub(r'[\x00-\x08\x0b-\x1f\x7f]', '', str(b.get('text') or '')).strip()[:1000]
+        raw = b.get('text')
+        text = re.sub(r'[\x00-\x08\x0b-\x1f\x7f]', '', raw if isinstance(raw, str) else '').strip()[:1000]   # 글이 아닌 값은 받지 않음
+        if text == DELETED_TXT:   # 지운 글 표시와 헷갈리지 않게
+            text += ' '
         fl = b.get('files')
         ids = [i for i in (fl if isinstance(fl, list) else []) if isinstance(i, str) and re.fullmatch(r'[a-f0-9]{24}', i)][:10]
         files = []
@@ -1133,7 +1148,20 @@ class H(BaseHTTPRequestHandler):
             except OSError:
                 pass
             q('DELETE FROM files WHERE id=?', (f['id'],), commit=True)
-        q('UPDATE messages SET text=?, files=? WHERE id=?', ('(삭제된 메시지)', '[]', mid), commit=True)
+        q('UPDATE messages SET text=?, files=? WHERE id=?', (DELETED_TXT, '[]', mid), commit=True)
+        # 이 글을 인용한 답장에서도 원문을 지운다
+        for x in q("SELECT id, reply FROM messages WHERE room=? AND reply IS NOT NULL AND reply LIKE ?", (r['room'], '%"id": ' + str(mid) + ',%')):
+            try:
+                rj = json.loads(x['reply'])
+                if rj.get('id') == mid:
+                    rj['text'] = DELETED_TXT
+                    q('UPDATE messages SET reply=? WHERE id=?', (json.dumps(rj, ensure_ascii=False), x['id']), commit=True)
+            except (ValueError, TypeError):
+                pass
+        rid = r['room']
+        DEL_VER[rid] = DEL_VER.get(rid, 0) + 1
+        DELETED.setdefault(rid, []).append((DEL_VER[rid], mid))
+        del DELETED[rid][:-300]
         with NEW_MSG:
             NEW_MSG.notify_all()
         return self.send(200, {'ok': True})
@@ -1622,7 +1650,7 @@ AI_SYS = ('너는 인천소방학교 지휘역량강화센터 학습 플랫폼 S
 
 
 def ai_allowed(ip):
-    lim_ip, lim_day = 12, int(CONF.get('ai_daily_limit') or 0)
+    lim_ip, lim_day = 90, int(CONF.get('ai_daily_limit') or 0)   # 5분에 90번(교실 30명이 같은 주소), 비용은 하루 한도로 막음
     now = time.time()
     with AI_LOCK:
         lst = [t for t in AI_HITS.get(ip, []) if now - t < 300]
@@ -1630,7 +1658,7 @@ def ai_allowed(ip):
         if AI_DAY['d'] != today:
             AI_DAY.update(d=today, n=0)
         if len(lst) >= lim_ip:
-            return False, '질문이 너무 잦습니다(5분에 12번). 잠시 뒤 다시 물어보세요.'
+            return False, '같은 곳에서 질문이 너무 잦습니다(5분에 90번). 잠시 뒤 다시 물어보세요.'
         if lim_day and AI_DAY['n'] >= lim_day:
             return False, f'오늘 AI 답변 한도({lim_day}회)를 다 썼습니다. 자료 발췌로 답합니다.'
         lst.append(now)

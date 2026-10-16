@@ -1,7 +1,7 @@
 {
   "name": "SACHIL:47 지휘역량강화 플랫폼",
   "short_name": "SACHIL:47",
-  "start_url": "./#chat",
+  "start_url": "./#hub",
   "scope": "./",
   "display": "standalone",
   "background_color": "#FFC400",

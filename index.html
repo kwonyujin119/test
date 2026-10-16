@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/favicon-48.png" type="image/png" sizes="48x48"><link rel="icon" href="icons/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="theme-color" content="#FFC400"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SACHIL:47"></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><style>:root{color-scheme:light;box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/favicon-48.png" type="image/png" sizes="48x48"><link rel="icon" href="icons/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="theme-color" content="#FFC400"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SACHIL:47"></head><body>
 <title>SACHIL 지휘역량강화 플랫폼</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
@@ -17,7 +17,7 @@
   --r:14px; --r-s:9px;
   --shadow:0 1px 2px rgba(0,0,0,.05),0 8px 24px rgba(0,0,0,.06);
   --tap:44px; --bar-h:60px;
-  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px); --sal:env(safe-area-inset-left,0px); --sar:env(safe-area-inset-right,0px);
   color-scheme:only light;
 }
 *{box-sizing:border-box}
@@ -113,7 +113,7 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .menu-chips{display:flex;flex-wrap:wrap;gap:8px}
 .menu-chips a{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--navy);font-size:13.5px;font-weight:600}
 .menu-chips a img{width:20px;height:20px}
-.ask-ai{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ask-ai{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px}
 .ask-ai p{margin:0;flex:1 1 220px;font-size:14px;color:var(--fg)}
 .bub ol.src{list-style:none;margin:10px 0 0;padding:8px 0 0;border-top:1px dashed var(--line);display:grid;gap:4px}
 .bub ol.src a{display:flex;gap:6px;align-items:baseline;font-size:12.5px;color:var(--navy);padding:4px 0;line-height:1.4}
@@ -590,6 +590,14 @@ footer b{color:var(--muted);font-weight:600}
   .top-nav a{padding:0 7px}
   .top-nav a b{margin-right:0}
   .top-nav a .lbl{display:none}
+}
+/* 860px 이상(폴드 펼침 가로·탭 가로에 가까운 폭)은 글자 이름도 보이게 */
+@media (min-width:860px) and (max-width:1023px){
+  .top-nav a{padding:0 9px}
+  .top-nav a b{margin-right:6px}
+  .top-nav a .lbl{display:inline;font-size:13px}
+}
+@media (min-width:600px) and (max-width:1023px){
   .top-right .pill{display:none}
   .top .wrap{gap:8px}
 }
@@ -617,13 +625,13 @@ footer b{color:var(--muted);font-weight:600}
 <header class="top">
   <div class="wrap">
     <div class="top-left">
-    <a class="brand" href="#chat" aria-label="SACHIL 지휘역량강화 플랫폼 처음으로(47망)">
+    <a class="brand" href="#hub" aria-label="SACHIL 지휘역량강화 플랫폼 첫 화면으로">
       <span class="mark">SACHIL:47</span>
     </a>
     <button type="button" class="help-btn" id="helpBtn" aria-label="사용법 안내 시작" aria-haspopup="dialog" title="사용법">?</button>
     </div>
     <div class="top-right">
-      <a class="ico" href="#chat" id="chatBtn" aria-label="47망(디브리핑룸)" title="47망(디브리핑룸)"><svg viewBox="0 0 28 28" aria-hidden="true"><path class="bb" d="M14 4.2c6 0 10.8 3.7 10.8 8.3S20 20.8 14 20.8c-1 0-2-.1-2.9-.3C9.6 22.7 7.4 24 4.8 24.3c1.2-1.2 2-2.7 2.2-4.3C4.6 18.5 3.2 15.7 3.2 12.5 3.2 7.9 8 4.2 14 4.2Z"/><text x="14" y="15.6" text-anchor="middle">47</text></svg></a>
+      <a class="ico" href="#chat" id="chatBtn" aria-label="47망" title="47망"><svg viewBox="0 0 28 28" aria-hidden="true"><path class="bb" d="M14 4.2c6 0 10.8 3.7 10.8 8.3S20 20.8 14 20.8c-1 0-2-.1-2.9-.3C9.6 22.7 7.4 24 4.8 24.3c1.2-1.2 2-2.7 2.2-4.3C4.6 18.5 3.2 15.7 3.2 12.5 3.2 7.9 8 4.2 14 4.2Z"/><text x="14" y="15.6" text-anchor="middle">47</text></svg></a>
       <nav class="top-nav" aria-label="주요 기능">
         <a href="#search" data-route="search" id="navSearch"><b>S</b><span class="lbl">검색</span></a>
         <a href="#ai" data-route="ai"><b>A</b><span class="lbl">AI 도우미</span></a>
@@ -657,7 +665,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v55</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v57</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -677,7 +685,7 @@ footer b{color:var(--muted);font-weight:600}
   <div class="grip" aria-hidden="true"></div>
   <header><h2 id="sheetTitle">메뉴</h2><button type="button" class="close" id="sheetClose" aria-label="닫기">×</button></header>
   <div class="sheet-grid" id="sheetGrid"></div>
-  <div class="foot"><span id="sheetFoot">12개 섹션 · 모두 준비중</span><button type="button" class="inst-menu" id="instMenu" hidden>앱 설치</button><a href="#login">교관 로그인</a></div>
+  <div class="foot"><span id="sheetFoot">자료 12개 섹션</span><button type="button" class="inst-menu" id="instMenu" hidden>앱 설치</button><a href="#login">교관 로그인</a></div>
 </section>
 
 <div class="report" id="report" role="dialog" aria-modal="true" aria-labelledby="repTitle" hidden>
@@ -726,7 +734,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {slug:'safety',        ab:'안전', title:'안전관리', desc:'현장 안전관리 절차, 안전담당 지정, 철수 기준', kw:'안전 안전관리 안전담당 철수 붕괴 위험 인원 점검 PAR 인원확인'},
     {slug:'mci',           ab:'다수', title:'다수사상자', desc:'다수사상자 사고 분류·이송 체계와 현장 응급의료소', kw:'다수사상자 MCI 중증도 분류 트리아지 이송 응급의료소 구급 START'},
     {slug:'drone',         ab:'드론', title:'드론전술', desc:'현장 드론 운용 절차와 영상의 지휘 활용', kw:'드론 무인기 영상 열화상 운용 조종 전술 정찰 비행'},
-    {slug:'cases',         ab:'사례', title:'대형화재사례', desc:'대형화재 사례 분석과 지휘 판단의 교훈', kw:'사례 대형화재 분석 교훈 복기 공장 창고 샌드위치패널 물류'}
+    {slug:'cases',         ab:'사례', title:'대형화재사례', desc:'대형화재 사례 분석과 지휘 판단의 교훈', kw:'사례 대형화재 분석 교훈 복기 공장 창고 샌드위치패널 물류'},
+    {slug:'updates',       ab:'내역', title:'업데이트 내역', desc:'버전별 개선·업데이트 기록', kw:'업데이트 버전 내역 변경 개선 보강 패치 기록 새 기능', local:true}
   ];
   // 예시 인덱스: 본문 연결 전, 문서 '제목' 수준. 조문 제목은 원문 확인 전 예시로 표시한다.
   const DOCS = [
@@ -757,6 +766,69 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   ];
   const AS = (typeof ICTC_ASSETS==='object' && ICTC_ASSETS) || {sections:[],phases:[]};
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
+  // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
+  // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
+  const APP_VER='V57', SRV_VER='2.1';
+  const UPDATES=[
+    {v:'V57', d:'2026-10-17', t:['첫 화면을 6개 박스로: 47망·디브리핑룸 / S 검색·A AI 도우미 / CH 체크리스트·IL 사고보고서','47망과 디브리핑룸을 두 개의 대화방으로 분리(기존 대화는 47망에 그대로)','로고를 누르면 첫 화면으로']},
+    {v:'V56', d:'2026-10-17', t:['기기별 점검(PC·스마트폰·갤럭시탭·폴드7·아이폰) — 에이전트 3팀이 화면 크기·브라우저·기능을 나눠 검사','아이폰·안드로이드: 키보드가 뜨면 대화창이 줄어 입력창이 가리지 않게, 홈 화면 앱 아래 빈 띠 제거, 가로 화면 노치','공유·저장(아이폰은 공유 시트로), 대화 속 PDF는 앱 안 뷰어로, 복사 실패를 정확히 표시','47망: 지운 글이 다른 사람 화면에서도 바로 지워짐(답장 인용 포함), 빠르게 보내도 순서대로·글 안 잃음, 백그라운드 뒤 바로 재연결','AI 도우미: 대화 비우기 뒤 이전 답이 끼어들던 문제 수정','교실 와이파이(같은 주소)에서 30명 넘게 입장·AI 질문이 막히던 제한 완화','갤럭시탭·폴드 상단 메뉴 이름 표시, 작은 버튼 누르는 범위 확대, 카톡 설치 안내가 입장 버튼을 가리던 문제 등','메뉴 마지막에 ‘업데이트 내역’ 섹션 추가 — 이후 반영은 여기에 기록']},
+    {v:'V55', d:'2026-10-17', t:['버전 표기 정리(‘초안’ 삭제), 버전 기록 문서(CHANGELOG) 추가']},
+    {v:'V54', d:'2026-10-17', t:['바닥글 세 번째 줄 삭제·여백 축소']},
+    {v:'V53', d:'2026-10-17', t:['AI 도우미 추천 질문 줄에서는 좌우로 밀어도 탭이 넘어가지 않게']},
+    {v:'V52', d:'2026-10-17', t:['사용법을 스포트라이트 투어(6단계)로: 비추기 + 말풍선 설명']},
+    {v:'V51', d:'2026-10-17', t:['상단 로고 오른쪽에 사용법(?) 버튼']},
+    {v:'V50', d:'2026-10-17', t:['47망 사진 크기 1/4, 여러 장 묶어 보내기, 한 번에 10개']},
+    {v:'V49', d:'2026-10-17', t:['47망: 지금 접속 수, 날짜 줄, 오전/오후 시간, 안 읽은 수','길게 누르기(답장·복사·공유·저장·삭제), ＋ 메뉴(최근 사진·앨범·카메라·파일)','안 읽은 곳에서 멈춤, 최근 메시지 띄우기']},
+    {v:'V48', d:'2026-10-17', t:['체크리스트: 시계 옆에 시작·초기화·보고서 만들기 한 줄','아래 항목에서 밀면 옆 탭으로 이동(위 고정 카드는 제외)']},
+    {v:'V47', d:'2026-10-17', t:['AI 도우미가 사람이 말하듯 답변','AI 보고서 작성 안정화, AI 키 설정 도구(ai-key-setup.bat)']},
+    {v:'V46', d:'2026-10-16', t:['새 그림 7장 적용(보고서·AI·완료·연결 끊김·PC 첫 화면, 메뉴 아이콘 2개)']},
+    {v:'V45', d:'2026-10-16', t:['체크리스트: 현재 시각 시계, 바로가기 두 줄']},
+    {v:'V44', d:'2026-10-16', t:['업데이트가 바로 보이게(접속마다 새 버전 확인)']},
+    {v:'V43', d:'2026-10-16', t:['47망 버튼을 눌렀는데 AI 도우미가 보이던 문제 수정']},
+    {v:'V42', d:'2026-10-16', t:['체크리스트에서 옆으로 끌어도 탭 유지']},
+    {v:'V41', d:'2026-10-16', t:['체크리스트 ‘전체 ▾’로 모든 항목 한눈에']},
+    {v:'V40', d:'2026-10-16', t:['첫 접속 때 홈 화면 설치 안내(한 번만)']},
+    {v:'V39', d:'2026-10-16', t:['보고서 ‘AI로 작성’ 버튼 항상 표시 + 꺼짐 안내']},
+    {v:'V38', d:'2026-10-16', t:['앱 아이콘(노란 배경·흰 말풍선·검정 47)']},
+    {v:'V37', d:'2026-10-16', t:['AI 도우미 교수형 답변·근거 발췌, 체크리스트 바로가기, 보고서 정리']},
+    {v:'V36', d:'2026-10-16', t:['고정 도메인 app.sachil47.com 연결']},
+    {v:'V35', d:'2026-10-16', t:['‘디브리핑룸을 찾지 못했습니다’ 오류 수정']},
+    {v:'V34', d:'2026-10-16', t:['AI 보고서가 github.io·서버에서 작동하지 않던 문제 수정']},
+    {v:'V33', d:'2026-10-16', t:['폰 하단 탭 고정 근본 해결']},
+    {v:'V32', d:'2026-10-16', t:['탭 이동 때 하단 탭 깜빡임 줄임']},
+    {v:'V31', d:'2026-10-16', t:['옆으로 넘길 때 하단 탭이 사라지던 현상 수정']},
+    {v:'V30', d:'2026-10-16', t:['대화방 위·아래 여백 줄임']},
+    {v:'V29', d:'2026-10-16', t:['github.io 앱과 PC 서버 연결 — 47망 상호 대화']},
+    {v:'V28', d:'2026-10-16', t:['폰 하단 탭 고정, 카카오톡형 채팅창, 메뉴 자료 목록 준비']},
+    {v:'V27', d:'', t:['47망 탭을 말풍선 심벌로, 폰·PC별 탭 배치, 끌어서 넘기기']},
+    {v:'V26', d:'', t:['AI가 메뉴 PDF를 근거로 답변, ‘47망(디브리핑룸)’, 첫 화면을 47망으로 (서버 1.8)']},
+    {v:'V25', d:'', t:['느린 망 흰 화면 해결, 재방문 다운로드 생략, 다크 모드 차단, 폴드 커버 버튼 잘림 수정 (서버 1.7)']},
+    {v:'V24', d:'', t:['이미지 5장 적용, ‘준비중’ 표시 오류 수정 (서버 1.6) · V24.1 터널 프로그램 동봉·재시도']},
+    {v:'V23', d:'', t:['PDF 첫 쪽 미리보기·쪽수, PDF를 열어도 탭 유지']},
+    {v:'V22', d:'', t:['앱 안 PDF 뷰어, 앱 아이콘, 화면에 버전 표시']},
+    {v:'V21', d:'', t:['홈 배경 정리, 서버 켜는 방법 안내, 터널 오류 진단']},
+    {v:'V20', d:'', t:['보안·디자인·앱 동작 결함 일괄 수정']},
+    {v:'V19', d:'', t:['대화 매주 자동 정리, 메뉴가 서버 PC 폴더 파일 표시, 파일 이름 검색']},
+    {v:'V18', d:'', t:['방 개설 삭제 — 동의 → 익명 대화명 → 47번 디브리핑룸 하나로']},
+    {v:'V17', d:'', t:['‘채팅방’을 ‘디브리핑룸’으로']},
+    {v:'V16', d:'', t:['서버 모드: 여러 사람이 함께 채팅']},
+    {v:'V15', d:'', t:['첫 화면 Search 버튼, 체크리스트 12단계 한 줄기, 발생개요 박스']},
+    {v:'V14', d:'', t:['이름을 SACHIL로, S·A·CH·IL 탭, AI 도우미 분리, IL 보고서 목록']},
+    {v:'V13', d:'', t:['화재 원인·인명·재산 피해 박스, 보고서 직접 편집']},
+    {v:'V12', d:'', t:['상황 박스, 보고서 자동 작성']},
+    {v:'V11', d:'', t:['헤더 메뉴, ‘전술상황판’을 ‘체크리스트’로']},
+    {v:'V2~V10', d:'', t:['ICTC 플랫폼 초기 버전: 검색·상황판·채팅·메뉴·첨부 등 (당시 화면으로 추정)']}
+  ];
+  const UPD_ICON='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="12" y="6" width="40" height="52" rx="6" fill="#fff" stroke="#111" stroke-width="4"/><path d="M20 20h24M20 30h24M20 40h12" stroke="#111" stroke-width="4" stroke-linecap="round"/><circle cx="46" cy="46" r="12" fill="#FFC400" stroke="#111" stroke-width="4"/><path d="M41 46l4 4 7-8" fill="none" stroke="#111" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+  function renderUpdates(panel,s){
+    panel.innerHTML=`
+      <div class="card upd">
+        <div class="upd-h"><img src="${UPD_ICON}" alt=""><div><h2>${esc(s.title)}</h2><p>현재 <b>앱 ${APP_VER}</b> · 서버 ${SRV_VER}</p></div></div>
+        <ol class="upd-list">${UPDATES.map((u,k)=>`<li class="${k===0?'new':''}"><div class="vh"><b>${esc(u.v)}</b>${u.d?`<span>${esc(u.d)}</span>`:''}${k===0?'<em>최신</em>':''}</div><ul>${u.t.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></li>`).join('')}</ol>
+        <p class="upd-note">V28~V55의 날짜는 이 앱(github.io) 반영 기준입니다. V27 이전은 작업 기록·당시 화면을 바탕으로 정리했습니다.</p>
+      </div>`;
+  }
+  { const u=SECTIONS.find(x=>x.slug==='updates'); if(u) u.icon=UPD_ICON; }
   const phaseIcon = pi => AS.phases[pi] || '';
   // 체크리스트 — 역할 구분 없이 출동부터 지휘소 운영까지 12단계 한 줄기. 항목은 초안 예시(교관 승인 전).
   const CHECKLIST = [
@@ -795,7 +867,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // ---------- 상태 (상황판은 이 기기에만 저장) ----------
   const KEY='ictc_board_v3', KEY_V2='ictc_board_v2';
   let focusSearchAfter=false;
-  const state = {route:'chat', query:'',
+  const state = {route:'hub', query:'',
     checks:{}, timer:{running:false, start:0, acc:0}, log:[],
     situ:{inv:{}, text:{}, fields:{}}};
   let tick=null, saveT=null;
@@ -858,12 +930,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   sheet.addEventListener('keydown',e=>{ if(e.key!=='Tab') return; const f=[...sheet.querySelectorAll('a,button,[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null); if(!f.length) return; const first=f[0], last=f[f.length-1]; if(e.shiftKey&&document.activeElement===first){ e.preventDefault(); last.focus(); } else if(!e.shiftKey&&document.activeElement===last){ e.preventDefault(); first.focus(); } });
   sheetBack.addEventListener('click',closeSheet); $('#sheetClose').addEventListener('click',closeSheet);
 
+  const ROOMS_R=['chat','debrief'];   // 채팅방 화면: chat=47망, debrief=디브리핑룸
   // ---------- 끌어서 넘기기 (손가락·마우스) ----------
   // 순서: 47망 → S → A → CH → IL → 메뉴. 오른쪽→왼쪽으로 끌면 다음, 왼쪽→오른쪽으로 끌면 이전.
   // 메뉴 안의 항목 화면(SOP 등)·교관 로그인은 '메뉴' 자리로 본다.
-  const SEQ=['chat','search','ai','board','log','menu'];
-  const SEQ_NAME={chat:'47망',search:'S 검색',ai:'A AI 도우미',board:'CH 체크리스트',log:'IL 사고보고서',menu:'메뉴'};
-  const seqPos=()=>sheet.classList.contains('open') ? 5 : (SEQ.indexOf(state.route)>=0 ? SEQ.indexOf(state.route) : 5);
+  const SEQ=['hub','search','ai','board','log','menu'];   // 첫 화면(6개 박스) → S → A → CH → IL → 메뉴. 47망·디브리핑룸은 첫 화면 자리
+  const SEQ_NAME={hub:'첫 화면',search:'S 검색',ai:'A AI 도우미',board:'CH 체크리스트',log:'IL 사고보고서',menu:'메뉴'};
+  const seqPos=()=>sheet.classList.contains('open') ? 5 : (ROOMS_R.includes(state.route) ? 0 : SEQ.indexOf(state.route)>=0 ? SEQ.indexOf(state.route) : 5);
   function swipeStep(dir){        // dir: +1 다음(오른쪽→왼쪽), -1 이전(왼쪽→오른쪽)
     const pos=seqPos();
     if(dir>0){
@@ -975,7 +1048,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function rootScrollTo(top,smooth){ const o={top:top,behavior:smooth?'smooth':'auto'}; const r=scrollRoot(); if(r) r.scrollTo(o); else window.scrollTo(o); }
   function go(route, query){
     if(query!==undefined) state.query=query;
-    const TOP=['chat','search','ai','board','log'], cur=location.hash.slice(1)||'chat';
+    const TOP=['hub','chat','debrief','search','ai','board','log'], cur=location.hash.slice(1)||'hub';
     // 47망·S·A·CH·IL 사이 이동은 방문 기록을 쌓지 않고 바꿔 끼운다. 기록이 쌓이면 안드로이드 크롬이 넘기기 때
     // '이전/다음 페이지' 캡처 카드를 띄워 하단 탭이 사라졌다 나타난다(녹화 영상에서 확인). 메뉴 항목 등은 기존처럼 기록.
     if(cur!==route && TOP.includes(route) && TOP.includes(cur)){ try{ history.replaceState(history.state,'','#'+route); state.route=route; closeSheet(); render(); return; }catch(_){ } }
@@ -983,8 +1056,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     state.route=route; render();
   }
   function routeFromHash(){
-    const h=(location.hash||'#chat').slice(1);
+    const h=(location.hash||'#hub').slice(1);
     if(h==='ai'||h==='chat-bot'){ chat.room='bot'; return 'ai'; }
+    if(h==='hub') return 'hub';
+    if(h==='debrief'){ chat.room=null; return 'debrief'; }
     if(h==='chat'||h.startsWith('chat-')){ chat.room = h.startsWith('chat-') ? h.slice(5) : null; return 'chat'; }
     if(h==='board'||h==='login'||h==='log') return h;
     if(SECTIONS.some(s=>s.slug===h)) return h;
@@ -998,7 +1073,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     MAIN.forEach(k=>{ const b=$('#tb-'+k); if(!b) return; if(r===k) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
     document.querySelectorAll('.top-nav [data-route]').forEach(a=>{ if(a.dataset.route===r) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
     const cb=$('#chatBtn'); if(r==='chat') cb.setAttribute('aria-current','page'); else cb.removeAttribute('aria-current');
-    const mb=$('#menuBtn'); if(!MAIN.includes(r) && r!=='chat') mb.setAttribute('aria-current','page'); else mb.removeAttribute('aria-current');
+    const mb=$('#menuBtn'); if(!MAIN.includes(r) && !ROOMS_R.includes(r) && r!=='hub') mb.setAttribute('aria-current','page'); else mb.removeAttribute('aria-current');
   }
 
   // ---------- 렌더 ----------
@@ -1010,7 +1085,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     document.body.classList.toggle('compact', !(r==='search' && !state.query.trim()));
     document.body.classList.toggle('nosearch', r!=='search');
     document.body.classList.toggle('home', r==='search' && !state.query.trim());
-    document.body.classList.toggle('chatview', r==='ai' || r==='chat');
+    document.body.classList.toggle('chatview', r==='ai' || ROOMS_R.includes(r));
+    document.body.classList.toggle('hubview', r==='hub');
     if(r==='search' && focusSearchAfter){ focusSearchAfter=false; const qi=$('#q'); if(qi){ qi.focus(); qi.select(); } }
     document.querySelectorAll('#sheetGrid a').forEach(a=>{ if(a.dataset.slug===r) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
     syncTabbar();
@@ -1019,7 +1095,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     else if(r==='board') renderBoard(panel);
     else if(r==='ai'){ chat.room='bot'; renderBotRoom(panel, ROOMS[0]); }
     else if(r==='log') renderReports(panel);
-    else if(r==='chat') renderChat(panel);
+    else if(r==='hub') renderHub(panel);
+    else if(r==='chat') renderChat(panel,'net');
+    else if(r==='debrief') renderChat(panel,'deb');
     else if(r==='login') renderPrep(panel,{slug:'login',title:'교관 로그인',desc:'교관·심의자 계정으로 기수 등록, 콘텐츠 승인, 채점, 심의를 수행하는 화면입니다.'});
     else renderPrep(panel, SECTIONS.find(s=>s.slug===r));
   }
@@ -1089,11 +1167,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const fmtDate=ts=>{ const d=new Date(ts*1000); return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`; };
   const libHref=(slug,f)=>SRV.on?SURL(`/lib/${slug}/${encodeURIComponent(f.name)}`):`lib/${slug}/${encodeURIComponent(f.name)}`;
   const libRow=(slug,f)=>`<a class="libfile" href="${libHref(slug,f)}" ${f.inline?'target="_blank" rel="noopener"':'download'}${f.ext==='pdf'?` data-pdfv="${esc(f.name)}"`:''}>${f.ext==='pdf'?`<span class="thumb wait" data-thumb="${esc(libHref(slug,f))}" aria-hidden="true"><span class="ext">PDF</span></span>`:`<span class="ext">${esc(f.ext)}</span>`}<span class="nm"><b>${esc(f.name.replace(/\.[^.]+$/,'')).replace(/([_\-.])/g,'$1<wbr>')}</b><small>${fmtSize(f.size)} · ${fmtDate(f.mtime)}${f.ext==='pdf'?`<span data-pg="${esc(libHref(slug,f))}"></span>`:''}</small></span><span class="go">${f.inline?'열기':'받기'}</span></a>`;
-  function syncSheetFoot(){ const el=$('#sheetFoot'); if(!el) return; if(!SRV.lib){ el.textContent='12개 섹션'; return; } const n=SECTIONS.filter(x=>(SRV.lib[x.slug]||[]).length).length; el.textContent=n?`12개 섹션 · 자료 있는 섹션 ${n}`:'12개 섹션 · 아직 올라온 자료 없음'; }
+  function syncSheetFoot(){ const el=$('#sheetFoot'); if(!el) return; if(!SRV.lib){ el.textContent=`자료 12개 섹션 · ${APP_VER}`; return; } const n=SECTIONS.filter(x=>!x.local&&(SRV.lib[x.slug]||[]).length).length; el.textContent=(n?`자료 있는 섹션 ${n}/12`:'아직 올라온 자료 없음')+` · ${APP_VER}`; }
   async function loadLib(){ const r=await api('/api/lib'); if(r.ok&&r.j.lib){ SRV.lib=r.j.lib; SRV.libErr=false; syncSheetFoot(); return true; }
     if(!SRV.on){ try{ const x=await fetch('lib/index.json',{cache:'no-cache'}); if(x.ok){ const j=await x.json(); if(j&&j.lib){ SRV.lib=j.lib; SRV.libStatic=true; SRV.libErr=false; syncSheetFoot(); return true; } } }catch(_){ } }
     SRV.libErr=true; return false; }
   function renderPrep(panel, s){
+    if(s.slug==='updates'){ renderUpdates(panel,s); return; }   // 앱 안에 든 기록(서버 자료 폴더와 무관)
     if(s.slug!=='login' && (SRV.on || SRV.libStatic)){ renderLibSection(panel,s); return; }   // 정적 목록(lib/index.json)이 없으면 기존 안내 화면 유지
     const docs=DOCS.filter(d=>d.sec===s.slug);
     const focus=state.focusDoc; state.focusDoc=null;
@@ -1298,7 +1377,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     $('#copyLog').addEventListener('click',async()=>{
       const txt=[`[SACHIL] 체크리스트 기록${state.situ.fields.target?' · '+state.situ.fields.target:''}`,...state.log.map(l=>`${l.ts}  +${l.el}  ${l.text}`)].join('\n'); const btn=$('#copyLog');
       try{ await navigator.clipboard.writeText(txt); btn.textContent='복사됨'; }
-      catch(_){ const ta=document.createElement('textarea'); ta.value=txt; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy'); btn.textContent='복사됨';}catch(e){btn.textContent='복사 실패';} ta.remove(); }
+      catch(_){ btn.textContent=legacyCopy(txt)?'복사됨':'복사 실패'; }
       setTimeout(()=>{ const b=$('#copyLog'); if(b) b.textContent='기록 복사'; },1500);
     });
   }
@@ -1648,9 +1727,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(btn.dataset.arm!=='1'){ btn.dataset.arm='1'; btn.dataset.orig=btn.textContent; btn.textContent=label; btn.classList.add('accent'); setTimeout(()=>{ if(btn.isConnected&&btn.dataset.arm==='1'){ btn.dataset.arm=''; btn.textContent=btn.dataset.orig; btn.classList.remove('accent'); syncRepUI(); } },2500); return; }
     btn.dataset.arm=''; btn.textContent=btn.dataset.orig; btn.classList.remove('accent'); fn();
   }
+  function legacyCopy(txt){   // 클립보드 API가 안 될 때(아이폰 일부·앱 속 브라우저) — 성공 여부를 정확히 돌려준다
+    const ta=document.createElement('textarea'); ta.value=txt; ta.contentEditable='true'; ta.style.position='fixed'; ta.style.top='0'; ta.style.opacity='0'; ta.style.fontSize='16px'; document.body.appendChild(ta);
+    let ok=false; try{ ta.focus(); ta.select(); ta.setSelectionRange(0,txt.length); ok=document.execCommand('copy'); }catch(_){ ok=false; } ta.remove(); return ok;
+  }
   async function copyText(txt, btn, label){
     try{ await navigator.clipboard.writeText(txt); btn.textContent='복사됨'; }
-    catch(_){ const ta=document.createElement('textarea'); ta.value=txt; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy'); btn.textContent='복사됨';}catch(e){btn.textContent='복사 실패';} ta.remove(); }
+    catch(_){ btn.textContent=legacyCopy(txt)?'복사됨':'복사 실패'; }
     setTimeout(()=>{ if(btn.isConnected) btn.textContent=label; },1500);
   }
   $('#repBody').addEventListener('input',()=>{
@@ -1736,7 +1819,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const q=qRaw.trim(), lq=q.toLowerCase();
     const has=(...ws)=>ws.some(w=>lq.includes(w));
     if(has('안녕','하이','hello','반가')) return {text:'안녕하세요. SACHIL AI 도우미입니다. SOP·법령·절차 문서를 찾아 드리고, 체크리스트와 사고보고서로 안내합니다. 아래 추천 질문을 눌러 보셔도 됩니다.'};
-    if(has('도움','사용법','뭐 할 수','뭘 할 수','기능')) return {text:'SACHIL은 이름이 곧 화면입니다.\nS 검색 — SOP·법령·절차·사례를 찾습니다.\nA AI 도우미 — 지금 보시는 화면.\nCH 체크리스트 — 출동부터 지휘소 운영까지 12단계, 발생개요·화재 원인·인명·재산 피해, 경과 타이머.\nIL 사고보고서 — 체크리스트에서 만든 보고서를 모아 보고 고칩니다.\n47망(디브리핑룸)(익명 의견·사진·PDF 공유)과 메뉴(12개 섹션)는 오른쪽 위 심벌에 있습니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
+    if(has('도움','사용법','뭐 할 수','뭘 할 수','기능')) return {text:'SACHIL은 이름이 곧 화면입니다.\nS 검색 — SOP·법령·절차·사례를 찾습니다.\nA AI 도우미 — 지금 보시는 화면.\nCH 체크리스트 — 출동부터 지휘소 운영까지 12단계, 발생개요·화재 원인·인명·재산 피해, 경과 타이머.\nIL 사고보고서 — 체크리스트에서 만든 보고서를 모아 보고 고칩니다.\n47망·디브리핑룸(익명 의견·사진·PDF 공유)과 메뉴(12개 섹션)는 오른쪽 위 심벌에 있습니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
     if(has('보고서','리포트','report')) return {text:'체크리스트 화면의 "보고서 작성"을 누르면 체크한 항목·화재 원인·인명 피해·재산 피해·시각 기록으로 보고서 초안이 바로 만들어지고 AI 작성본이 이어서 나옵니다. 만든 보고서는 IL 사고보고서 탭에 모이며, 두 본문 모두 직접 고칠 수 있습니다. 교관 확인 전 자료입니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
     if(has('상황판','체크리스트','타이머')) return {text:'체크리스트로 안내합니다. 시작을 누르면 경과 시간과 체크 시각이 기록되고, 사고일시가 자동으로 채워집니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'}]};
     if(has('차이','범위','역할') && has('선착대장','지휘대장')) return {text:'초안 기준 역할 경계입니다. 확정 기준은 교관 승인 후 반영됩니다.\n· 선착대장 — 도착 보고, 초기 상황판단, 선착대 전술(진입·배연·용수), 대원 안전, 지휘권 이양 준비까지.\n· 지휘대장 — 지휘권 인수, 상황 재평가, 대응단계 판단·건의, 자원 요청·배치, 안전관리, 지휘소 운영, 통제단 전환 직전까지.\n· 통제단장 — 이 플랫폼 범위 밖(중앙소방학교).', cards:[{title:'SOP-현장지휘론',slug:'sop',type:'섹션'}]};
@@ -1807,8 +1890,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       let url=volatile[a.id];
       if(!url && a.data){ try{ const blob=await (await fetch(a.data)).blob(); url=URL.createObjectURL(blob); volatile[a.id]=url; }catch(_){ } }
       if(!url){ b.textContent='열 수 없음'; return; }
-      let w=null; try{ w=window.open(url,'_blank'); if(w) w.opener=null; }catch(_){ }
-      if(!w) openPdfOverlay(url,a.name);
+      openPdf(url,a.name);   // 새 창(아이폰에서 막히거나 첫 쪽만 보임) 대신 앱 안 PDF 뷰어
     }));
   }
   // 라이트박스 / PDF 오버레이
@@ -1863,15 +1945,16 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   const footHtml=(left)=>`<div class="chat-foot"><span>${left} · 저장 ${fmtSize(storageUse())}${storageFull?' · <b class="warn">저장 공간 부족 — 새 내용은 이 세션에만 유지</b>':''}</span><span class="r"></span></div>`;
 
-  function renderChat(panel){
-    // AI 도우미에서 넘어올 때(로고·넘기기) 남아 있던 'bot' 방은 47망이 아니므로 버린다 — AI 도우미는 A 탭에서만
+  const ROOM_NAME={net:'47망', deb:'디브리핑룸'};
+  function renderChat(panel,kind){
+    // AI 도우미에서 넘어올 때(로고·넘기기) 남아 있던 'bot' 방은 채팅방이 아니므로 버린다 — AI 도우미는 A 탭에서만
     if(chat.room==='bot') chat.room=null;
-    renderDebrief(panel,chat.room);
+    renderDebrief(panel,kind||'net');
   }
 
   const roomHead=(room,sub,extra)=>`
       <div class="panel-head roomhead">
-        <div class="l">${room.id==='bot'?'':'<a class="back" href="#search" aria-label="검색 화면으로">‹</a>'}<div><span class="eyebrow">${room.id==='bot'?'A · AI assistant':'디브리핑룸'}</span><h2>${esc(room.title)}</h2></div></div>
+        <div class="l">${room.id==='bot'?'':'<a class="back" href="#hub" aria-label="첫 화면으로">‹</a>'}<div><span class="eyebrow">${room.id==='bot'?'A · AI assistant':'디브리핑룸'}</span><h2>${esc(room.title)}</h2></div></div>
         <div class="r"><span class="sub">${sub}</span>${extra||''}</div>
       </div>`;
   const msgMeHtml=m=>`<div class="msg me"><span class="t">${esc(m.t)}</span><div class="bub ${m.text?'':'only-att'}">${m.text?`<p>${esc(m.text)}</p>`:''}${attHtml(m.att)}</div></div>`;
@@ -1887,10 +1970,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           </div>
         </div>
         ${composerHtml('의견 입력')}
-        ${footHtml('47망(디브리핑룸)')}
+        ${footHtml(esc(room.title))}
       </div>`;
     bindAtts(panel); scrollEndOf(panel);
-    bindComposer((v,att)=>{ (roomMsgs[room.id]=roomMsgs[room.id]||[]).push({text:v,t:now(),att}); if(roomMsgs[room.id].length>100) roomMsgs[room.id].splice(0,roomMsgs[room.id].length-100); rsave(); renderUserRoom(panel,room); if(window.innerWidth>=600){ const i=$('#chatText'); if(i) i.focus(); } });
+    bindComposer((v,att)=>{ const had=document.activeElement&&document.activeElement.id==='chatText'; (roomMsgs[room.id]=roomMsgs[room.id]||[]).push({text:v,t:now(),att}); if(roomMsgs[room.id].length>100) roomMsgs[room.id].splice(0,roomMsgs[room.id].length-100); rsave(); renderUserRoom(panel,room); if(had||window.innerWidth>=600){ const i=$('#chatText'); if(i) i.focus(); } });   // 폰 키보드가 보낼 때마다 닫히지 않게
     $('#roomDel').addEventListener('click',()=>{ const b=$('#roomDel'); if(b.dataset.arm!=='1'){ b.dataset.arm='1'; b.textContent='정말 비우기'; b.classList.add('accent'); setTimeout(()=>{ if(b.isConnected){ b.dataset.arm=''; b.textContent='대화 비우기'; b.classList.remove('accent'); } },2500); return; } roomMsgs[room.id]=[]; rsave(); renderUserRoom(panel,room); });
     $('#dbRename').addEventListener('click',()=>{ setNick(''); toChat(); });
   }
@@ -1901,7 +1984,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const atEnd=c.scrollHeight-c.scrollTop-c.clientHeight<24;
     c.style.overflowY='auto'; c.style.overscrollBehavior='contain'; c.style.maxHeight=''; c.style.minHeight='';
     const mainEl=document.querySelector('main'), bar=document.querySelector('.tabbar');
-    const avail=window.innerHeight-(bar&&getComputedStyle(bar).display!=='none'?bar.getBoundingClientRect().height:0);
+    // 키보드가 뜨면(아이폰·안드로이드) 화면에 실제로 보이는 높이(visualViewport) 기준으로 줄인다 — 입력창이 키보드에 가리지 않게
+    const vv=window.visualViewport, kb=vv && vv.height < window.innerHeight-100;
+    const avail=kb ? vv.offsetTop+vv.height : window.innerHeight-(bar&&getComputedStyle(bar).display!=='none'?bar.getBoundingClientRect().height:0);
     const box=c.closest('.chat')||mainEl, padB=parseFloat(getComputedStyle(document.getElementById('panel')||mainEl).paddingBottom)||0;
     const over=Math.round(box.getBoundingClientRect().bottom+padB-avail), h=c.getBoundingClientRect().height;
     if(over>0){ c.style.minHeight='160px'; c.style.maxHeight=Math.max(160,Math.round(h-over))+'px'; }
@@ -1910,6 +1995,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     return c;
   }
   window.addEventListener('resize',()=>{ if(document.body.classList.contains('chatview')) fitConvo(); });
+  if(window.visualViewport){ let vq=false; visualViewport.addEventListener('resize',()=>{ if(vq||!document.body.classList.contains('chatview')) return; vq=true; requestAnimationFrame(()=>{ vq=false; fitConvo(); }); }); }
+  // 아이폰: 키보드가 닫힌 뒤 화면이 위로 밀린 채 남는 것 되돌리기
+  document.addEventListener('focusout',e=>{ if(e.target&&e.target.id==='chatText') setTimeout(()=>{ if(!(document.activeElement&&document.activeElement.id==='chatText')){ window.scrollTo(0,0); if(document.body.classList.contains('chatview')) fitConvo(); } },80); });
   window.__fitConvo=fitConvo;
   function scrollEndOf(panel){ const box=fitConvo(); if(box){ box.scrollTop=box.scrollHeight; return; } const c=$('#convo'); if(!c) return; const last=c.lastElementChild; if(!last||!last.classList.contains('msg')) return; const comp=$('#composer'); const cover=(comp?comp.getBoundingClientRect().height+16:0)+(window.innerWidth<600?68:0); const r=last.getBoundingClientRect(); const target=window.scrollY + r.bottom - (window.innerHeight - cover); if(target>window.scrollY) window.scrollTo({top:target,behavior:'auto'}); }
 
@@ -1939,7 +2027,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       push('me',v,[],att); chat.typing=true; renderBotRoom(panel,room);
       if(SRV.on && v && !localIntent(v)){
         const hist=[]; for(let i=chat.msgs.length-2;i>0&&hist.length<2;i--){ const b=chat.msgs[i], u=chat.msgs[i-1]; if(b.who==='bot'&&b.mode==='ai'&&u.who==='me'&&u.text) hist.unshift({q:u.text,a:b.text}); }
+        const g0=chat.gen||0;
         api('/api/ask',{json:{q:v,history:hist}}).then(r=>{
+          if((chat.gen||0)!==g0) return;   // 그사이 '대화 비우기' — 이전 질문의 답은 버림
           chat.typing=false;
           if(r.ok&&r.j.ok){ push('bot',String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,snip:String(x.snippet||'').slice(0,180)})); csave(); }
           else push('bot', r.status===0?'서버에 연결할 수 없습니다. 잠시 뒤 다시 물어보세요.':(r.j.error||'답변을 만들지 못했습니다.'),[]);
@@ -1953,11 +2043,34 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     bindComposer(send);
     panel.querySelectorAll('.quick button').forEach(b=>b.addEventListener('click',()=>send(b.dataset.q,[])));
     if(autoAsk){ const t=autoAsk; autoAsk=''; send(t,[]); }
-    $('#chatClear').addEventListener('click',()=>{ const b=$('#chatClear'); if(b.dataset.arm!=='1'){ b.dataset.arm='1'; b.textContent='정말 비우기'; b.classList.add('accent'); setTimeout(()=>{ if(b.isConnected){ b.dataset.arm=''; b.textContent='대화 비우기'; b.classList.remove('accent'); } },2500); return; } chat.msgs=[]; chat.typing=false; csave(); renderBotRoom(panel,room); });
+    $('#chatClear').addEventListener('click',()=>{ const b=$('#chatClear'); if(b.dataset.arm!=='1'){ b.dataset.arm='1'; b.textContent='정말 비우기'; b.classList.add('accent'); setTimeout(()=>{ if(b.isConnected){ b.dataset.arm=''; b.textContent='대화 비우기'; b.classList.remove('accent'); } },2500); return; } chat.msgs=[]; chat.typing=false; chat.gen=(chat.gen||0)+1; csave(); renderBotRoom(panel,room); });
   }
 
 
-  // ---------- 47망(디브리핑룸) ----------
+
+  // ---------- 첫 화면: 6개 박스(47망·디브리핑룸 / S·A / CH·IL) ----------
+  const HUB=[
+    {go:'chat', k:'47', y:true, t:'47망', d:'누구나 자유롭게 나누는 익명 채팅', ic:'<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 4.2c6 0 10.8 3.7 10.8 8.3S20 20.8 14 20.8c-1 0-2-.1-2.9-.3C9.6 22.7 7.4 24 4.8 24.3c1.2-1.2 2-2.7 2.2-4.3C4.6 18.5 3.2 15.7 3.2 12.5 3.2 7.9 8 4.2 14 4.2Z" fill="#fff" stroke="#191919" stroke-width="2" stroke-linejoin="round"/><text x="14" y="15.6" text-anchor="middle" font-size="8.6" font-weight="700" font-family="ui-monospace,monospace" fill="#191919">47</text></svg>'},
+    {go:'debrief', k:'DB', y:true, t:'디브리핑룸', d:'훈련·출동 뒤 함께 돌아보는 익명 대화', ic:'<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 7.5C4 5.6 5.6 4 7.5 4h9C18.4 4 20 5.6 20 7.5v5c0 1.9-1.6 3.5-3.5 3.5H10l-4 3.5V16C4.9 15.6 4 14.2 4 12.5v-5Z" fill="#fff" stroke="#191919" stroke-width="2" stroke-linejoin="round"/><path d="M22 10.5c1.2.4 2 1.6 2 2.9v4.1c0 1.4-.9 2.6-2 3v3l-3.4-2.9H13c-1.3 0-2.4-.7-3-1.8" fill="none" stroke="#191919" stroke-width="2" stroke-linejoin="round"/></svg>'},
+    {go:'search', k:'S', t:'검색', d:'SOP·법령·교재·사례 찾기'},
+    {go:'ai', k:'A', t:'AI 도우미', d:'자료를 근거로 대화하듯 답변'},
+    {go:'board', k:'CH', t:'체크리스트', d:'현재 시각·12단계 지휘 체크'},
+    {go:'log', k:'IL', t:'사고보고서', d:'만든 보고서 모아 보기·작성'}
+  ];
+  function renderHub(panel){
+    panel.innerHTML=`<nav class="hub" aria-label="SACHIL:47 첫 화면">${HUB.map(h=>`<a class="hub-box ${h.y?'chatbox':''}" href="#${h.go}" data-hub="${h.go}"><span class="hk ${h.ic?'ic':''}">${h.ic||h.k}</span><span class="ht">${h.t}</span><span class="hd">${h.d}</span></a>`).join('')}</nav>`;
+    panel.querySelectorAll('[data-hub]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const t=a.dataset.hub; if(t==='search'){ q.value=''; syncClear(); go('search',''); } else go(t); rootScrollTo(0); }));
+    fitHub();
+  }
+  // 6개 박스가 스크롤 없이 화면(헤더~하단 탭 사이)에 꼭 맞게 — 폰·폴드·탭·PC 공통
+  function fitHub(){
+    const h=$('.hub'); if(!h) return;
+    const tb=document.querySelector('.tabbar'), bottom=(tb&&getComputedStyle(tb).display!=='none')?tb.getBoundingClientRect().top:window.innerHeight;
+    const avail=Math.round(bottom-h.getBoundingClientRect().top-12);
+    h.style.height=Math.max(3*112+24, Math.min(avail, 720))+'px';
+  }
+  window.addEventListener('resize',()=>{ if(state.route==='hub') fitHub(); });
+  // ---------- 47망·디브리핑룸 ----------
   // 아이콘 → 동의 → 대화명(익명) → 47망(디브리핑룸) 하나. sachil_server.py로 열면 여럿이 함께 쓰고,
   // 아티팩트·파일로 열면 이 기기에만 저장한다. 체크리스트(CH)·사고보고서(IL)는 서버로 보내지 않는다.
   const DB_AGREE_KEY='sachil_db_agree_v1';
@@ -2009,28 +2122,27 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   const hm=ts=>{ if(!Number.isFinite(ts)) return ''; const d=new Date(ts*1000), h=d.getHours(); return `${h<12?'오전':'오후'} ${(h%12)||12}:${pad(d.getMinutes())}`; };   // 카카오톡처럼 '오후 3:05'(날짜는 날짜 줄로)
   const srvFoot=()=>`대화명 <b>${esc(SRV.me?SRV.me.name:'')}</b>${SRV.me&&SRV.me.role==='admin'?' · 관리자':''} · ${SRV.trim?'오래된 대화는 매주 정리, 최근 대화는 유지':SRV.retention+'일 뒤 자동 삭제'}`;
-  function toChat(){ if(location.hash==='#chat'){ state.route='chat'; chat.room=null; render(); } else location.hash='chat'; }   // 같은 주소면 hashchange가 없으므로 직접 다시 그림
-  function goHome(){ q.value=''; syncClear(); go('search',''); rootScrollTo(0); }   // 47망 → 검색 화면(예전 초기화면)
+  function toChat(){ const r=ROOMS_R.includes(state.route)?state.route:'chat'; if(location.hash==='#'+r){ state.route=r; chat.room=null; render(); } else location.hash=r; }   // 지금 있는 방(47망·디브리핑룸)을 다시 그림   // 같은 주소면 hashchange가 없으므로 직접 다시 그림
+  function goHome(){ go('hub'); rootScrollTo(0); }   // 대화방 입장 화면 → 첫 화면(6개 박스)
 
-  function renderDebrief(panel,id){
-    const toConsent=()=>{ if(id){ history.replaceState(null,'','#chat'); chat.room=null; } };
-    // 동의는 기기에 한 번만 묻는다. 대화명(서버 세션)이 있으면 바로 방으로.
-    if(!DB.agreed){ toConsent(); dbConsent(panel); return; }
-    if(SRV.on ? !SRV.me : !getNick()){ toConsent(); dbNick(panel); return; }
+  function renderDebrief(panel,kind){
+    // 동의는 기기에 한 번만 묻는다(47망·디브리핑룸 공통). 대화명(서버 세션)이 있으면 바로 방으로.
+    if(!DB.agreed){ dbConsent(panel,kind); return; }
+    if(SRV.on ? !SRV.me : !getNick()){ dbNick(panel,kind); return; }
     DB.enter=false;
     swipeTip();
-    if(SRV.on) srvRoom(panel); else localRoom(panel);
+    if(SRV.on) srvRoom(panel,kind); else localRoom(panel,kind);
   }
 
-  function dbConsent(panel){
+  function dbConsent(panel,kind){
     panel.innerHTML=`
       <div class="dbwrap">
         <section class="card consent" aria-labelledby="dbQ">
           ${AS.dbConsent?`<img class="art" src="${AS.dbConsent}" alt="">`:''}
-          <span class="eyebrow">47망 · 디브리핑룸</span>
-          <h2 id="dbQ"><span class="nw">47망(디브리핑룸)에</span> 입장하시겠습니까?</h2>
+          <span class="eyebrow">${ROOM_NAME[kind]||'47망'}</span>
+          <h2 id="dbQ"><span class="nw">${ROOM_NAME[kind]||'47망'}에</span> 입장하시겠습니까?</h2>
           <p>${DB_RULE}</p>
-          <div class="acts"><button type="button" class="btn ghost" id="dbHome">검색 화면으로</button><button type="button" class="btn primary" id="dbAgree">동의하고 입장</button></div>
+          <div class="acts"><button type="button" class="btn ghost" id="dbHome">첫 화면으로</button><button type="button" class="btn primary" id="dbAgree">동의하고 입장</button></div>
         </section>
       </div>`;
     $('#dbAgree').addEventListener('click',()=>{ DB.agreed=true; try{ localStorage.setItem(DB_AGREE_KEY,'1'); }catch(_){ } render(); });
@@ -2038,11 +2150,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(window.innerWidth>=600) $('#dbAgree').focus();
   }
 
-  function dbNick(panel){
+  function dbNick(panel,kind){
     panel.innerHTML=`
       <div class="dbwrap">
         <form class="card create" id="nickForm" autocomplete="off">
-          <span class="eyebrow">47망(디브리핑룸)</span>
+          <span class="eyebrow">${ROOM_NAME[kind]||'47망'}</span>
           <div class="anon-tip">${AS.icAnon?`<img src="${AS.icAnon}" alt="">`:''}<p><b>실명·소속·계급은 쓰지 마세요.</b> 다른 참여자에게는 대화명만 보입니다.</p></div>
           <div class="row"><label for="nick">대화명 (익명)</label><input id="nick" maxlength="12" placeholder="예: 47번대원" required enterkeyhint="go"></div>
           ${SRV.on&&SRV.requireCode?`<div class="row"><label for="dbCode">입장 코드</label><input id="dbCode" maxlength="40" inputmode="numeric" placeholder="교육 담당자에게 받은 코드" required></div>`:''}
@@ -2050,7 +2162,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           ${SRV.notice?`<p class="note" id="srvNote" role="status"><b>${esc(SRV.notice)}</b></p>`:''}
           ${SRV.on?`<details class="adm"><summary>관리자 입장</summary><div class="row"><label for="admCode">관리자 코드</label><input id="admCode" maxlength="40"></div></details>`:''}
           <p class="note err" id="nickErr" role="alert" hidden></p>
-          <div class="acts"><button type="button" class="btn ghost" id="dbHome">검색 화면으로</button><button type="submit" class="btn primary" id="nickGo">입장</button></div>
+          <div class="acts"><button type="button" class="btn ghost" id="dbHome">첫 화면으로</button><button type="submit" class="btn primary" id="nickGo">입장</button></div>
         </form>
       </div>`;
     const ni=$('#nick'); ni.value=getNick(); SRV.notice='';
@@ -2072,9 +2184,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     });
   }
 
-  function localRoom(panel){
-    let room=rooms.find(r=>r.id==='r47');
-    if(!room){ room={id:'r47',title:'47망(디브리핑룸)',cat:CATS[0],desc:'',created:now()}; rooms.unshift(room); roomMsgs.r47=roomMsgs.r47||[]; rsave(); }
+  function localRoom(panel,kind){
+    const id=kind==='deb'?'rdb':'r47', title=ROOM_NAME[kind]||'47망';
+    let room=rooms.find(r=>r.id===id);
+    if(!room){ room={id,title,cat:CATS[0],desc:'',created:now()}; rooms.unshift(room); roomMsgs[id]=roomMsgs[id]||[]; rsave(); }
+    room.title=title;
     renderUserRoom(panel,room);
   }
 
@@ -2100,12 +2214,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     return `<div class="msg other" data-mid="${esc(m.id)}"><span class="av ini" aria-hidden="true">${esc((m.name||'?').replace('참여자 ','').slice(0,2))}</span><div class="col"><span class="who">${esc(m.name)}</span><div class="bub ${cls}">${body}</div></div>${t}</div>`;
   }
 
-  async function srvRoom(panel){
-    const gen=SRV.gen, rid=SRV.room;
-    if(!rid){ panel.innerHTML='<p class="convo-note">디브리핑룸을 찾지 못했습니다. 서버를 다시 시작해 주세요.</p>'; return; }
-    pending=[]; SRV.last=0; SRV.seen=new Set(); SRV.epoch=''; SRV.msgs=new Map(); SRV.rp=[]; SRV.rv=-1; SRV.readSent=0; SRV.lastDay=''; SRV.replyTo=null;
+  async function srvRoom(panel,kind){
+    const gen=SRV.gen, rid=kind==='deb'?SRV.roomDb:SRV.room, title=ROOM_NAME[kind]||'47망';
+    if(!rid){ panel.innerHTML=`<p class="convo-note">${kind==='deb'?'디브리핑룸은 서버 PC를 새 버전(V57)으로 업데이트하면 열립니다. 지금은 47망을 이용해 주세요.':'47망을 찾지 못했습니다. 서버를 다시 시작해 주세요.'}</p>`; return; }
+    pending=[]; SRV.last=0; SRV.seen=new Set(); SRV.epoch=''; SRV.msgs=new Map(); SRV.rp=[]; SRV.rv=-1; SRV.readSent=0; SRV.lastDay=''; SRV.replyTo=null; SRV.dv=-1;
     const admin=SRV.me&&SRV.me.role==='admin';
-    panel.innerHTML=roomHead({id:'s'+rid,title:'47망(디브리핑룸)'},'익명 대화 · <b class="onl" id="onlineN">접속 확인 중</b>',`<button type="button" class="btn ghost" id="dbRename">대화명 바꾸기</button>${admin?'<button type="button" class="btn ghost" id="dbClear">대화 비우기</button>':''}`)+`
+    panel.innerHTML=roomHead({id:'s'+rid,title},'익명 대화 · <b class="onl" id="onlineN">접속 확인 중</b>',`<button type="button" class="btn ghost" id="dbRename">대화명 바꾸기</button>${admin?'<button type="button" class="btn ghost" id="dbClear">대화 비우기</button>':''}`)+`
       <div class="chat">
         <div class="card convo-card"><div class="convo" id="convo"><p class="convo-note" id="convoNote">불러오는 중…</p></div><button type="button" class="peek" id="peek" hidden></button></div>
         <div class="reply-bar" id="replyBar" hidden></div>
@@ -2128,8 +2242,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(Number.isFinite(j.online)){ const o=$('#onlineN'); if(o) o.textContent=`지금 ${j.online}명 접속`; }
       if(Array.isArray(j.rp)) SRV.rp=j.rp.filter(Number.isFinite).sort((a,b)=>a-b);
       if(Number.isFinite(j.rv)) SRV.rv=j.rv;
+      if(Array.isArray(j.deleted)) j.deleted.map(Number).filter(Number.isFinite).forEach(markDeleted);
+      if(Number.isFinite(j.dv)) SRV.dv=j.dv;
       applyUnread();
     };
+    function markDeleted(id){
+      const m=SRV.msgs.get(id); if(m){ m.text='(삭제된 메시지)'; m.files=[]; }
+      const c=$('#convo'); if(!c) return;
+      const el=c.querySelector(`.msg[data-mid="${id}"] .bub`); if(el){ el.classList.remove('only-att'); el.innerHTML='<p class="del">(삭제된 메시지)</p>'; }
+      c.querySelectorAll(`.rq[data-goto="${id}"] span`).forEach(x=>{ x.textContent='(삭제된 메시지)'; });
+      SRV.msgs.forEach(x=>{ if(x.reply&&Number(x.reply.id)===id) x.reply.text='(삭제된 메시지)'; });
+    }
     function applyUnread(){
       const c=$('#convo'); if(!c) return; const rp=SRV.rp;
       const below=id=>{ let lo=0,hi=rp.length; while(lo<hi){ const mid=(lo+hi)>>1; if(rp[mid]<id) lo=mid+1; else hi=mid; } return lo; };   // id보다 앞까지만 읽은 사람 수
@@ -2140,14 +2263,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     function markRead(){
       clearTimeout(readT);
       readT=setTimeout(async()=>{
-        if(SRV.gen!==gen || document.visibilityState!=='visible' || state.route!=='chat' || SRV.last<=SRV.readSent) return;
+        if(SRV.gen!==gen || document.visibilityState!=='visible' || !ROOMS_R.includes(state.route) || SRV.last<=SRV.readSent) return;
         const last=SRV.last; SRV.readSent=last;
         const r=await api(`/api/rooms/${rid}/read`,{json:{last}});
         if(SRV.gen!==gen) return; if(r.ok) applyState(r.j); else if(r.status===404){ SRV.readSent=Infinity; const o=$('#onlineN'); if(o) o.textContent='접속 수는 서버 업데이트 후 표시'; } else SRV.readSent=0;   // 예전 서버: 읽음 기능 없음 → 다시 묻지 않음
       },400);
     }
-    const onVis=()=>{ if(SRV.gen!==gen){ document.removeEventListener('visibilitychange',onVis); return; } if(document.visibilityState==='visible') markRead(); };
-    document.addEventListener('visibilitychange',onVis);
+    const onVis=()=>{ if(SRV.gen!==gen){ document.removeEventListener('visibilitychange',onVis); removeEventListener('pageshow',onShow); return; } if(document.visibilityState==='visible'){ if(SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } } markRead(); } };   // 다시 보이면 기다리던 연결을 새로
+    const onShow=e=>{ if(e.persisted&&SRV.gen===gen&&SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } } };
+    document.addEventListener('visibilitychange',onVis); addEventListener('pageshow',onShow);
     const EMPTY='아직 의견이 없습니다. 첫 의견을 남겨 주세요. 다른 참여자에게는 대화명만 보입니다. ＋ 버튼으로 사진·PDF를 올릴 수 있습니다.';
     const append=(list,opt)=>{
       opt=opt||{};
@@ -2182,7 +2306,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       return added;
     };
     const resetConvo=()=>{ const c=$('#convo'); if(c) c.innerHTML='<p class="convo-note" id="convoNote"></p>'; SRV.last=0; SRV.seen=new Set(); SRV.msgs=new Map(); SRV.lastDay=''; append([]); };
-    const restore=v=>{ if(SRV.gen!==gen) return; const i=$('#chatText'); if(i&&!i.value) i.value=v; };
+    const restore=v=>{ if(SRV.gen!==gen||!v) return; const i=$('#chatText'); if(i) i.value=i.value?(v+' '+i.value):v; };   // 여러 건이 실패해도 글을 잃지 않게 앞에 붙임
     const fail=(msg,v,att,i,status)=>{   // 실패: 입력·첨부를 작성창에 되돌린다(이미 올라간 파일은 _fid로 재사용)
       if(status===401){ att.forEach(a=>{ try{ delete a._fid; }catch(_){ } }); SRV.draft={text:v, att}; render(); return; }
       if(SRV.gen!==gen) return;
@@ -2196,7 +2320,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       bar.hidden=false; bar.querySelector('.x').addEventListener('click',()=>setReply(null)); fitConvo();
       const i=$('#chatText'); if(i) i.focus();
     }
-    bindComposer(async(v,att)=>{
+    let sendQ=Promise.resolve();
+    const sendOne=async(v,att)=>{
       const ids=[];
       for(let i=0;i<att.length;i++){
         const a=att[i];
@@ -2224,7 +2349,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       }
       stat(''); setReply(null);
       if(window.innerWidth>=600){ const i=$('#chatText'); if(i) i.focus(); }
-    });
+    };
+    bindComposer((v,att)=>{ sendQ=sendQ.then(()=>sendOne(v,att)).catch(()=>{}); });   // 빠르게 여러 번 보내도 차례대로
+    { const ct=$('#chatText'); if(ct) ct.maxLength=1000; }   // 서버 한도와 같게
     // ＋ 버튼: 최근 사진 3장 · 앨범 · 카메라 · 파일
     const comp=$('#composer'), plus=comp.querySelector('.attach');
     const pop=document.createElement('div'); pop.className='plus-pop'; pop.id='plusPop'; pop.hidden=true; pop.setAttribute('role','dialog'); pop.setAttribute('aria-label','첨부');
@@ -2270,6 +2397,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     async function fileBlobs(m){ const out=[]; for(const f of (m.files||[])){ try{ const bl=await (await fetch(FURL(f.id))).blob(); out.push(new File([bl], f.name, {type:bl.type||(f.kind==='image'?'image/jpeg':'application/pdf')})); }catch(_){ } } return out; }
     function openActs(m){
       const old=$('#actSheet'); if(old) old.remove();
+      let pre=null; const preP=(m.files||[]).length?fileBlobs(m).then(f=>{ pre=f; return f; }):Promise.resolve(pre=[]);
       const deleted=m.text==='(삭제된 메시지)'&&!(m.files||[]).length;
       const acts=[['reply','답장'], m.text&&!deleted?['copy','복사']:null, !deleted?['share','공유']:null, (m.files||[]).length?['save','저장']:null, m.can_delete&&!deleted?['del','삭제']:null].filter(Boolean);
       const sh=document.createElement('div'); sh.className='act-sheet'; sh.id='actSheet'; sh.setAttribute('role','dialog'); sh.setAttribute('aria-modal','true'); sh.setAttribute('aria-label','메시지 메뉴');
@@ -2278,11 +2406,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const close=()=>{ sh.remove(); };
       sh.addEventListener('click',async e=>{
         if(e.target===sh){ close(); return; }
-        const a=e.target.closest('[data-a]'); if(!a) return; const k=a.dataset.a; close();
+        const a=e.target.closest('[data-a]'); if(!a) return; const k=a.dataset.a;
+        if((k==='share'||k==='save') && pre===null){ a.textContent='파일 준비 중…'; await preP; a.textContent=k==='share'?'공유':'저장'; return; }   // 준비되면 한 번 더 누르게(누르는 순간 바로 공유해야 아이폰이 허용)
+        close();
         if(k==='reply') setReply(m);
-        else if(k==='copy'){ try{ await navigator.clipboard.writeText(m.text); toast('복사했습니다'); }catch(_){ toast('복사하지 못했습니다'); } }
+        else if(k==='copy'){ try{ await navigator.clipboard.writeText(m.text); toast('복사했습니다'); }catch(_){ toast(legacyCopy(m.text)?'복사했습니다':'복사하지 못했습니다'); } }
         else if(k==='share'){
-          const files=(m.files||[]).length?await fileBlobs(m):[];
+          const files=pre||[];
           try{
             if(files.length&&navigator.canShare&&navigator.canShare({files})) await navigator.share({files, text:m.text||undefined});
             else if(navigator.share&&m.text) await navigator.share({text:m.text});
@@ -2290,14 +2420,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
             else toast('이 브라우저는 파일 공유를 지원하지 않습니다. 저장을 이용하세요');
           }catch(err){ if(!(err&&err.name==='AbortError')) toast('공유하지 못했습니다'); }
         }
-        else if(k==='save'){ const files=await fileBlobs(m); files.forEach(f=>{ const u=URL.createObjectURL(f); const x=document.createElement('a'); x.href=u; x.download=f.name; document.body.appendChild(x); x.click(); setTimeout(()=>{ URL.revokeObjectURL(u); x.remove(); },800); }); if(!files.length) toast('파일을 가져오지 못했습니다'); }
+        else if(k==='save'){ const files=pre||[];
+          const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1), inapp=/KAKAOTALK|NAVER\(inapp|Instagram|FBAN|Line\//i.test(navigator.userAgent);
+          if((ios||inapp||files.length>1) && files.length && navigator.canShare && navigator.canShare({files})){ try{ await navigator.share({files}); }catch(err){ if(!(err&&err.name==='AbortError')) toast('저장하지 못했습니다'); } return; }   // 아이폰·앱 속 브라우저는 다운로드 대신 공유 시트의 '저장'
+          files.forEach(f=>{ const u=URL.createObjectURL(f); const x=document.createElement('a'); x.href=u; x.download=f.name; document.body.appendChild(x); x.click(); setTimeout(()=>{ URL.revokeObjectURL(u); x.remove(); },800); }); if(!files.length) toast('파일을 가져오지 못했습니다'); }
         else if(k==='del'){ const r=await api(`/api/messages/${m.id}`,{method:'DELETE'}); if(r.ok){ m.text='(삭제된 메시지)'; m.files=[]; const el=convo.querySelector(`.msg[data-mid="${m.id}"] .bub`); if(el){ el.classList.remove('only-att'); el.innerHTML='<p class="del">(삭제된 메시지)</p>'; } } else toast('삭제하지 못했습니다: '+(r.j.error||'연결 오류')); }
       });
       const first=sh.querySelector('button'); if(first) first.focus();
       sh.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); });
     }
     if(SRV.draft){ const d=SRV.draft; SRV.draft=null; const i=$('#chatText'); if(i&&d.text) i.value=d.text; if(d.att&&d.att.length){ pending=d.att.slice(0,MAX_FILES); renderPending(); } stat('다시 입장했습니다. 보내지 못한 내용을 되살렸습니다'); }
-    $('#dbRename').addEventListener('click',async()=>{ if(SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } SRV.ctl=null; } SRV.gen++; await api('/api/logout',{json:{}}); if(SRVBASE) setTok(''); SRV.me=null; toChat(); });
+    $('#dbRename').addEventListener('click',async()=>{ const rb=$('#dbRename'); if(rb.dataset.arm!=='1'){ rb.dataset.arm='1'; rb.textContent='한 번 더 누르면 바꿈'; rb.classList.add('accent'); stat('대화명을 바꾸면 지금까지 쓴 글은 다른 사람 글처럼 보이고 지울 수 없게 됩니다'); setTimeout(()=>{ if(rb.isConnected){ rb.dataset.arm=''; rb.textContent='대화명 바꾸기'; rb.classList.remove('accent'); stat(''); } },3500); return; } if(SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } SRV.ctl=null; } SRV.gen++; await api('/api/logout',{json:{}}); if(SRVBASE) setTok(''); SRV.me=null; toChat(); });
     const clr=$('#dbClear');
     if(clr) clr.addEventListener('click',async()=>{
       if(clr.dataset.arm!=='1'){ clr.dataset.arm='1'; clr.textContent='정말 비우기'; clr.classList.add('accent'); setTimeout(()=>{ if(clr.isConnected){ clr.dataset.arm=''; clr.textContent='대화 비우기'; clr.classList.remove('accent'); } },2500); return; }
@@ -2306,15 +2439,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     });
     let first=true, down=false;
     while(SRV.gen===gen){
-      const ctl=new AbortController(); SRV.ctl=ctl;
-      const r=await api(`/api/rooms/${rid}/messages?after=${SRV.last}&epoch=${encodeURIComponent(SRV.epoch)}${first?'':'&wait=1&rv='+SRV.rv}`,{signal:ctl.signal});
+      const ctl=new AbortController(); SRV.ctl=ctl; const to=setTimeout(()=>ctl.abort(),45000);   // 백그라운드 후 멈춘 연결을 끊고 다시
+      const r=await api(`/api/rooms/${rid}/messages?after=${SRV.last}&epoch=${encodeURIComponent(SRV.epoch)}${first?'':'&wait=1&rv='+SRV.rv+'&dv='+SRV.dv}`,{signal:ctl.signal});
+      clearTimeout(to);
       if(SRV.gen!==gen) return;
+      if(r.aborted){ await sleep(150); continue; }   // 시간 한도·화면 복귀로 일부러 끊은 것 — 바로 다시 연결
       if(r.ok){
         if(r.j.gone){ stat('디브리핑룸을 찾을 수 없습니다. 잠시 후 다시 확인합니다…'); await sleep(5000); first=true; continue; }
         if(SRV.epoch && r.j.epoch && r.j.epoch!==SRV.epoch){ SRV.epoch=r.j.epoch; resetConvo(); first=true; continue; }   // 관리자가 대화를 비움
         if(r.j.epoch) SRV.epoch=r.j.epoch;
         const list=Array.isArray(r.j.messages)?r.j.messages:[];
-        const rvChanged=Number.isFinite(r.j.rv)&&r.j.rv!==SRV.rv;
+        const rvChanged=(Number.isFinite(r.j.rv)&&r.j.rv!==SRV.rv)||(Number.isFinite(r.j.dv)&&r.j.dv!==SRV.dv);
         applyState(r.j);
         const added=append(list,{first, force:first&&!(r.j.my_read>0), myRead:first?(r.j.my_read||0):0}); first=false; if(down){ down=false; stat(''); }
         if(!added&&!rvChanged) await sleep(250);   // 서버가 즉시 응답하는 경로(빈 목록·이미 본 글)에서 최소 간격
@@ -2337,7 +2472,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   $('#clearBtn').addEventListener('click',()=>{ q.value=''; syncClear(); go('search',''); q.focus(); });
   $('#searchForm').addEventListener('submit',e=>{ e.preventDefault(); go('search', q.value); q.blur(); });
   // 브랜드(ICTC 아이콘·이름) 클릭 = 초기 화면: 검색어를 지우고 검색 화면으로
-  document.querySelector('.brand').addEventListener('click',e=>{ e.preventDefault(); q.value=''; syncClear(); state.query=''; go('chat'); rootScrollTo(0,true); });
+  document.querySelector('.brand').addEventListener('click',e=>{ e.preventDefault(); q.value=''; syncClear(); state.query=''; go('hub'); rootScrollTo(0,true); });   // 로고 = 첫 화면(6개 박스)
   $('#menuBtn').addEventListener('click',openSheet);
   document.querySelectorAll('.tabbar button').forEach(b=>b.addEventListener('click',()=>{ const t=b.dataset.go; if(t==='search'){ q.value=''; syncClear(); go('search',''); rootScrollTo(0); } else go(t); }));
   document.addEventListener('keydown',e=>{
@@ -2357,7 +2492,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   setPh(); if(mqNarrow.addEventListener) mqNarrow.addEventListener('change',setPh);
   load(); cload(); rload(); rpload();
   if(state.timer.running) startTick();
-  if(!location.hash) history.replaceState(null,'','#chat');
+  if(!location.hash) history.replaceState(null,'','#hub');
   state.route=routeFromHash();
   render();
   // 서버 감지: 첫 시도 10초, 연결 자체가 안 되면 5·15·30초 뒤 재시도(터널 콜드스타트·느린 망 대비)
@@ -2365,19 +2500,19 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),10000);
     const r=await api('/api/me',{signal:ctl.signal}); clearTimeout(t);
     if(r.ok && r.j && r.j.server==='sachil'){
-      const wasLocal = state.route==='chat' && !!chat.room;   // 파일 모드 방에 이미 들어가 있었음
+      const wasLocal = ROOMS_R.includes(state.route) && !!chat.room;   // 파일 모드 방에 이미 들어가 있었음
       SRV.probing=false; SRV.on=true; SRV.me=r.j.user||null;
       if(r.j.ai && !CAP.sample){ CAP.sample=serverSample; CAP.ready=true; syncRepUI(); }   // 보고서 AI: Claude 화면 밖에서는 SACHIL 서버(AI 키)로 작성
-      SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
+      SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.roomDb=r.j.room_debrief||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
       await loadLib();
-      if(state.route==='chat'){ if(DB.agreed){ SRV.notice='서버에 연결되어 공유 디브리핑룸으로 바뀌었습니다.'+(wasLocal?' 방금 쓴 내용은 이 기기에만 남습니다.':''); DB.enter=true; } render(); }
-      else if(SECTIONS.some(x=>x.slug===state.route) || (state.route==='search'&&state.query.trim())) render();
+      if(ROOMS_R.includes(state.route)){ if(DB.agreed){ SRV.notice='서버에 연결되어 공유 대화방으로 바뀌었습니다.'+(wasLocal?' 방금 쓴 내용은 이 기기에만 남습니다.':''); DB.enter=true; } render(); }
+      else if(SECTIONS.some(x=>x.slug===state.route) || (state.route==='search'&&state.query.trim()) || (state.route==='ai'&&!chat.typing)) render();
       return;
     }
     if(r.status===0 && !r.aborted && attempt<3){ await sleep([5000,15000,30000][attempt]); return detectServer(attempt+1); }
     if(r.status===0 && attempt<3){ return detectServer(attempt+1); }   // 10초 타임아웃 → 바로 재시도
     SRV.probing=false;
-    if(state.route==='chat' && !chat.room) render();
+    if(ROOMS_R.includes(state.route) && !chat.room) render();
   }
   if(/^https?:$/.test(location.protocol)){ SRV.probing=true; detectServer(0); loadLib(); }
 })();
@@ -2461,6 +2596,7 @@ body.chatview .chat-foot{font-size:11.5px;padding:0 6px;min-height:0;line-height
 body.chatview .chat-foot button{min-height:28px}
 body.chatview .panel{padding-bottom:6px}
 @media (max-width:380px){ .roomhead .btn{padding:0 8px;font-size:12px} }
+@media (pointer:coarse){ .roomhead .btn{height:auto;min-height:40px} }
 /* 체크리스트 상단 바로가기 */
 .timer .tclock{display:flex;flex-direction:column;gap:2px;min-width:0}
 .timer .tmeta{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);white-space:nowrap}
@@ -2487,7 +2623,7 @@ body.chatview .panel{padding-bottom:6px}
 }
 .timer .jrow{flex-basis:100%;width:100%;display:flex;align-items:flex-start;gap:6px;min-width:0}
 .timer .jall{flex:none;min-height:34px;padding:0 12px;border-radius:999px;border:0;background:var(--navy);color:#fff;font-size:12.5px;font-weight:700;white-space:nowrap;cursor:pointer}
-.timer .jgrid{flex-basis:100%;width:100%;max-height:min(60vh,520px);overflow:auto;overscroll-behavior:contain;border-top:1px solid var(--line);padding-top:8px}
+.timer .jgrid{flex-basis:100%;width:100%;max-height:min(60vh,520px,calc(100vh - 340px));max-height:min(60vh,520px,calc(100dvh - 340px));overflow:auto;overscroll-behavior:contain;border-top:1px solid var(--line);padding-top:8px}
 .timer .jgrid[hidden]{display:none}
 .timer .jg-h{margin:2px 0 6px;font-size:12px;font-weight:700;color:var(--muted)}
 .timer .jg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-bottom:10px}
@@ -2561,6 +2697,44 @@ body.chatview .panel{padding-bottom:6px}
 .act-sheet button:hover,.act-sheet button:focus-visible{background:var(--surface-2)}
 .act-sheet button.danger{color:#C62828}
 .act-sheet button.cancel{text-align:center;color:var(--muted);border-top:1px solid var(--line);border-radius:0 0 10px 10px}
+/* 가로 아이폰: 노치·둥근 모서리에 내용이 잘리지 않게 */
+@media (orientation:landscape) and (max-height:520px){
+  .wrap{padding-left:max(20px,var(--sal));padding-right:max(20px,var(--sar))}
+  .tabbar,.pdfv{padding-left:var(--sal);padding-right:var(--sar)}
+  .sheet{padding-left:max(16px,var(--sal));padding-right:max(16px,var(--sar))}
+  .lightbox{padding-left:max(16px,var(--sal));padding-right:max(16px,var(--sar))}
+}
+/* 첫 화면 6개 박스 — 2열 3줄, 화면 높이에 맞춰 균형 있게 */
+body.hubview footer{display:none}
+.hub{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,1fr);gap:12px;max-width:760px;margin:4px auto 0}
+.hub-box{display:flex;flex-direction:column;justify-content:flex-end;gap:4px;padding:16px;border-radius:20px;background:var(--surface);border:1px solid var(--line);color:var(--fg);text-decoration:none;box-shadow:0 2px 10px rgba(0,0,0,.05);min-height:0;overflow:hidden;position:relative;transition:transform .12s ease,border-color .12s ease}
+.hub-box:hover{border-color:var(--navy)}
+.hub-box:active{transform:scale(.98)}
+.hub-box .hk{position:absolute;top:14px;left:14px;display:grid;place-items:center;min-width:48px;height:48px;padding:0 8px;border-radius:14px;background:var(--navy-soft);color:var(--navy);font-family:var(--mono);font-size:18px;font-weight:800}
+.hub-box .hk.ic{background:var(--surface);border:1px solid var(--line);padding:0;width:48px}
+.hub-box .hk svg{width:30px;height:30px}
+.hub-box.chatbox{background:var(--ember);border-color:var(--ember)}
+.hub-box.chatbox .hk.ic{border-color:transparent}
+.hub-box .ht{font-size:19px;font-weight:800;letter-spacing:-.01em;margin-top:56px}
+.hub-box .hd{font-size:12.5px;line-height:1.4;color:var(--muted)}
+.hub-box.chatbox .hd{color:#3a3000}
+@media (min-width:600px){ .hub{gap:16px} .hub-box{padding:20px} .hub-box .ht{font-size:21px} .hub-box .hd{font-size:13.5px} }
+@media (max-height:680px){ .hub{gap:10px} .hub-box{padding:12px} .hub-box .hk{top:10px;left:10px;min-width:40px;height:40px;font-size:16px} .hub-box .hk.ic{width:40px} .hub-box .ht{margin-top:40px;font-size:17px} .hub-box .hd{font-size:12px} }
+/* 업데이트 내역 */
+.card.upd{padding:18px 16px}
+.upd-h{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.upd-h img{width:48px;height:48px;flex:none}
+.upd-h h2{margin:0;font-size:20px}
+.upd-h p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.upd-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.upd-list > li{border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.upd-list > li.new{border-color:var(--ember);box-shadow:inset 3px 0 0 var(--ember)}
+.upd-list .vh{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.upd-list .vh b{font-family:var(--mono);font-size:14px}
+.upd-list .vh span{font-size:12px;color:var(--muted-2)}
+.upd-list .vh em{font-style:normal;font-size:11px;font-weight:700;background:var(--ember);color:var(--navy);border-radius:999px;padding:1px 8px}
+.upd-list ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.55}
+.upd-note{margin:12px 0 0;font-size:12px;color:var(--muted-2)}
 /* AI 도우미 근거 발췌 */
 .bub .src-h{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);font-size:12px;font-weight:700;color:var(--muted)}
 .bub .src-h + ol.src{border-top:0;margin-top:2px;padding-top:0}
@@ -2607,6 +2781,8 @@ body.chatview .panel{padding-bottom:6px}
 .inst .tx b{display:block;font-size:14.5px;margin-bottom:1px}
 .inst .go{flex:none;min-height:40px;padding:0 14px;border:0;border-radius:999px;background:#FFC400;color:#191919;font-weight:700;font-size:14px;cursor:pointer}
 .inst .x{flex:none;width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:#bdbdbd;font-size:22px;line-height:1;cursor:pointer}
+.inst{flex-wrap:wrap}
+@media (max-width:599px){ .inst .tx{flex:1 1 calc(100% - 100px)} .inst .go{margin-left:54px} }   /* 좁은 폰: 버튼을 글 아래로(글이 세로로 길게 접히지 않게) */
 .sheet .foot .inst-menu{border:0;background:#FFC400;color:#191919;font-weight:700;font-size:13px;border-radius:999px;min-height:32px;padding:0 12px;cursor:pointer}
 </style>
 <script>
@@ -2644,6 +2820,8 @@ body.chatview .panel{padding-bottom:6px}
       hide();
     });
     document.body.appendChild(el);
+    const tb=document.querySelector('.tabbar'); if(tb&&getComputedStyle(tb).display!=='none'){ const top=tb.getBoundingClientRect().top; if(top>0&&top<innerHeight) el.style.bottom=Math.round(innerHeight-top+12)+'px'; }   // 실제 탭바 높이 위로
+    if(document.querySelector('.consent, #nickForm')){ const hd=document.querySelector('.top'); el.style.bottom='auto'; el.style.top=Math.round((hd?hd.getBoundingClientRect().bottom:56)+8)+'px'; }   // 대화방 입장 화면에서는 위쪽에(입장 버튼을 가리지 않게)
   }
   window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferred=e; syncMenu(); if(!seen()) show('install'); });
   window.addEventListener('appinstalled',()=>{ mark('installed'); deferred=null; hide(); syncMenu(); });
@@ -2657,6 +2835,8 @@ body.chatview .panel{padding-bottom:6px}
 /* 사용법(?) — 로고 바로 오른쪽. 누르면 화면 요소를 차례로 비추며 말풍선으로 설명(스포트라이트 투어) */
 .top-left{display:flex;align-items:center;gap:8px;flex:none}
 .help-btn{width:30px;height:30px;border-radius:50%;border:2px solid var(--navy);background:var(--surface);color:var(--navy);font-family:var(--mono);font-size:15px;font-weight:800;line-height:1;display:grid;place-items:center;cursor:pointer;padding:0}
+.help-btn{position:relative}
+.help-btn::after{content:"";position:absolute;inset:-8px}   /* 누르는 범위는 46px로 */
 .help-btn:hover{background:var(--ember)}
 .help-btn:focus-visible{outline:3px solid var(--navy-soft);outline-offset:2px}
 .tour{position:fixed;inset:0;z-index:80;cursor:pointer}
@@ -2696,10 +2876,10 @@ body.chatview .panel{padding-bottom:6px}
   const pick=(...sels)=>{ for(const s of sels){ const el=document.querySelector(s); if(vis(el)) return el; } return null; };   // 폰은 아래 탭바, PC는 위쪽 메뉴
   const STEPS=[
     {k:'47', t:'SACHIL:47 · 47망', get:()=>[pick('.brand'),pick('#chatBtn')],
-     d:['<b>SACHIL:47</b> 로고를 누르면 언제든 처음 화면으로 돌아옵니다.','<b>47 말풍선</b>은 47망(디브리핑룸)입니다. 대화명만 보이는 익명 채팅으로 사진·PDF를 나누고, 지금 접속 수와 안 읽은 수가 보입니다. 메시지를 길게 누르면 답장·복사·공유·저장.'],
+     d:['<b>SACHIL:47</b> 로고를 누르면 언제든 <b>첫 화면(6개 박스)</b>으로 돌아옵니다. 47망·디브리핑룸·S·A·CH·IL로 바로 들어갈 수 있어요.','<b>47 말풍선</b>은 47망입니다. 대화명만 보이는 익명 채팅으로 사진·PDF를 나누고, 지금 접속 수와 안 읽은 수가 보입니다. 메시지를 길게 누르면 답장·복사·공유·저장. 디브리핑룸은 첫 화면에서 들어갑니다.'],
      n:'실명·소속·계급과 개인정보는 쓰지 마세요.'},
     {k:'메뉴', t:'메뉴', get:()=>[pick('#menuBtn')],
-     d:['교육일정·SOP·긴급구조대응계획·RIT 등 <b>12개 섹션 자료</b>를 엽니다. PDF는 앱 안에서 바로 볼 수 있어요.','<b>앱 설치</b>(홈 화면 바로가기)와 교관 로그인도 여기 있습니다.']},
+     d:['교육일정·SOP·긴급구조대응계획·RIT 등 <b>12개 섹션 자료</b>를 엽니다. PDF는 앱 안에서 바로 볼 수 있어요. 맨 끝 <b>업데이트 내역</b>에서 버전별 바뀐 점을 봅니다.','<b>앱 설치</b>(홈 화면 바로가기)와 교관 로그인도 여기 있습니다.']},
     {k:'S', t:'검색', get:()=>[pick('.tabbar [data-go="search"]','#navSearch')],
      d:['SOP·법령·교재·사례를 <b>낱말로 찾습니다</b>.','결과를 누르면 PDF의 해당 쪽이 바로 열립니다.']},
     {k:'A', t:'AI 도우미', get:()=>[pick('.tabbar [data-go="ai"]','.top-nav [data-route="ai"]')],
