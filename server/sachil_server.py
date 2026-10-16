@@ -76,6 +76,7 @@ def load_conf():
         'weekly_trim_ratio': 0.9,    # 매주 월요일 04시, 오래된 대화의 이 비율을 정리(최근 것은 남김)
         'weekly_trim_keep_min': 30,  # 정리 후에도 최소 이만큼은 남김
         'named_tunnel': 'sachil',
+        'tunnel_token': '',            # Cloudflare 대시보드에서 만든 터널 토큰(있으면 로그인 인증서 대신 이것으로 연결)
         'public_url': '',
         'ai_api_key': '',               # Claude API 키(sk-ant-…). 비우면 AI 도우미는 자료 발췌형으로 답함
         'ai_model': 'claude-sonnet-5-5',
@@ -1706,7 +1707,10 @@ def run_tunnel(port, named):
         print('[터널] 외부 공개(터널)를 시작할 수 없습니다. 서버는 내부망 주소로는 계속 동작합니다.', flush=True)
         print('[터널] ' + tunnel_diagnosis(0, ['failed to request quick tunnel ' + why]), flush=True)
         return
-    if named:
+    if named and CONF.get('tunnel_token'):
+        # 대시보드 방식: 공개 주소→로컬 주소 연결은 대시보드의 Public Hostname 설정을 따른다
+        cmd = [exe, 'tunnel', '--no-autoupdate', 'run', '--token', CONF['tunnel_token']]
+    elif named:
         cmd = [exe, 'tunnel', '--no-autoupdate', 'run', '--url', f'http://127.0.0.1:{port}', CONF.get('named_tunnel') or 'sachil']
     else:
         cmd = [exe, 'tunnel', '--no-autoupdate', '--url', f'http://127.0.0.1:{port}']
@@ -1757,6 +1761,18 @@ def run_tunnel(port, named):
 
 
 def main():
+    if '--set-token' in sys.argv:
+        i = sys.argv.index('--set-token')
+        raw = ' '.join(sys.argv[i + 1:])
+        m = re.search(r'eyJ[A-Za-z0-9_\-=]{40,}', raw)   # 대시보드의 설치 명령을 통째로 붙여 넣어도 토큰만 뽑는다
+        if not m:
+            print('토큰을 찾지 못했습니다. 대시보드에 나온 eyJ로 시작하는 긴 글자를 붙여 넣으세요.')
+            sys.exit(1)
+        CONF['tunnel_token'] = m.group(0)
+        with open(CONF_PATH, 'w', encoding='utf-8') as f:
+            json.dump(CONF, f, ensure_ascii=False, indent=2)
+        print('터널 토큰 저장 완료 (' + m.group(0)[:10] + '…)')
+        return
     if '--set-url' in sys.argv:
         i = sys.argv.index('--set-url')
         url = sys.argv[i + 1].strip() if len(sys.argv) > i + 1 else ''
