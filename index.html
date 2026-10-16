@@ -553,7 +553,8 @@ footer b{color:var(--muted);font-weight:600}
   .panel-head #roomNew{order:9;width:100%}
   .rep-foot .note{display:none}
   .result .meta{display:none}
-  .tabbar{display:block}
+  .tabbar{display:block;transform:translateZ(0);-webkit-transform:translateZ(0);will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  body.chatview footer{display:none}   /* A·47망: 바닥글 때문에 화면보다 길어져 주소창이 접히며 하단 탭이 움직이던 것 방지 */
   .panel{padding-bottom:24px}
   .timer{gap:8px;padding:8px 10px}
   .timer .t{font-size:22px}
@@ -978,6 +979,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     document.body.classList.toggle('compact', !(r==='search' && !state.query.trim()));
     document.body.classList.toggle('nosearch', r!=='search');
     document.body.classList.toggle('home', r==='search' && !state.query.trim());
+    document.body.classList.toggle('chatview', r==='ai' || r==='chat');
     if(r==='search' && focusSearchAfter){ focusSearchAfter=false; const qi=$('#q'); if(qi){ qi.focus(); qi.select(); } }
     document.querySelectorAll('#sheetGrid a').forEach(a=>{ if(a.dataset.slug===r) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
     syncTabbar();
@@ -1001,7 +1003,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const score=(hay,title)=>terms.reduce((n,t)=>n+(title.toLowerCase().includes(t)?3:0)+(hay.includes(t)?1:0),0);
     const secHits=SECTIONS.map(s=>({s,score:score((s.title+' '+s.desc+' '+s.kw).toLowerCase(), s.title)})).filter(h=>h.score>0).sort((a,b)=>b.score-a.score).slice(0,6);
     const fileHits=[];
-    if(SRV.on&&SRV.lib) SECTIONS.forEach(sec=>(SRV.lib[sec.slug]||[]).forEach(f=>{ const sc=score((f.name+' '+sec.title).toLowerCase(), f.name); if(sc>0) fileHits.push({f,sec,score:sc}); }));
+    if(SRV.lib) SECTIONS.forEach(sec=>(SRV.lib[sec.slug]||[]).forEach(f=>{ const sc=score((f.name+' '+sec.title).toLowerCase(), f.name); if(sc>0) fileHits.push({f,sec,score:sc}); }));
     fileHits.sort((a,b)=>b.score-a.score); fileHits.splice(8);
     const mkHl=ts=>{ const list=[...new Set(ts.filter(Boolean))].sort((a,b)=>b.length-a.length); if(!list.length) return t=>esc(t); const re=new RegExp('('+list.map(rx).join('|')+')','ig'); return txt=>String(txt).split(re).map((p,i)=>i%2?'<mark>'+esc(p)+'</mark>':esc(p)).join(''); };
     const hl=mkHl(terms);
@@ -1054,12 +1056,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 
   const LIB_DIR={ 'ictc-schedule':'01_ICTC 교육일정','ictc-eval':'02_ICTC 평가일정','faq':'03_주요 질의응답','law':'04_관련법령','sop':'05_SOP-현장지휘론','ersp':'06_긴급구조대응계획','rit':'07_RIT','water':'08_무중단급수체계','safety':'09_안전관리','mci':'10_다수사상자','drone':'11_드론전술','cases':'12_대형화재사례' };
   const fmtDate=ts=>{ const d=new Date(ts*1000); return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`; };
-  const libHref=(slug,f)=>`/lib/${slug}/${encodeURIComponent(f.name)}`;
+  const libHref=(slug,f)=>SRV.on?`/lib/${slug}/${encodeURIComponent(f.name)}`:`lib/${slug}/${encodeURIComponent(f.name)}`;
   const libRow=(slug,f)=>`<a class="libfile" href="${libHref(slug,f)}" ${f.inline?'target="_blank" rel="noopener"':'download'}${f.ext==='pdf'?` data-pdfv="${esc(f.name)}"`:''}>${f.ext==='pdf'?`<span class="thumb wait" data-thumb="${esc(libHref(slug,f))}" aria-hidden="true"><span class="ext">PDF</span></span>`:`<span class="ext">${esc(f.ext)}</span>`}<span class="nm"><b>${esc(f.name.replace(/\.[^.]+$/,'')).replace(/([_\-.])/g,'$1<wbr>')}</b><small>${fmtSize(f.size)} · ${fmtDate(f.mtime)}${f.ext==='pdf'?`<span data-pg="${esc(libHref(slug,f))}"></span>`:''}</small></span><span class="go">${f.inline?'열기':'받기'}</span></a>`;
   function syncSheetFoot(){ const el=$('#sheetFoot'); if(!el) return; if(!SRV.lib){ el.textContent='12개 섹션'; return; } const n=SECTIONS.filter(x=>(SRV.lib[x.slug]||[]).length).length; el.textContent=n?`12개 섹션 · 자료 있는 섹션 ${n}`:'12개 섹션 · 아직 올라온 자료 없음'; }
-  async function loadLib(){ const r=await api('/api/lib'); if(r.ok&&r.j.lib){ SRV.lib=r.j.lib; SRV.libErr=false; syncSheetFoot(); return true; } SRV.libErr=true; return false; }
+  async function loadLib(){ const r=await api('/api/lib'); if(r.ok&&r.j.lib){ SRV.lib=r.j.lib; SRV.libErr=false; syncSheetFoot(); return true; }
+    if(!SRV.on){ try{ const x=await fetch('lib/index.json',{cache:'no-cache'}); if(x.ok){ const j=await x.json(); if(j&&j.lib){ SRV.lib=j.lib; SRV.libStatic=true; SRV.libErr=false; syncSheetFoot(); return true; } } }catch(_){ } }
+    SRV.libErr=true; return false; }
   function renderPrep(panel, s){
-    if(s.slug!=='login' && SRV.on){ renderLibSection(panel,s); return; }
+    if(s.slug!=='login' && (SRV.on || SRV.libStatic)){ renderLibSection(panel,s); return; }   // 정적 목록(lib/index.json)이 없으면 기존 안내 화면 유지
     const docs=DOCS.filter(d=>d.sec===s.slug);
     const focus=state.focusDoc; state.focusDoc=null;
     const art = s.icon ? `<img class="big" src="${s.icon}" alt="">` : (s.slug==='login' && AS.ic ? `<img class="illo" src="${AS.ic}" alt="">` : '');
@@ -1364,12 +1368,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   document.body.appendChild(pv);
   const PV={doc:null, task:null, gen:0, zoom:1, last:null, base:0, ratio:1.414, n:0, obs:null, live:[], pushed:false, loading:null};
   const ZOOMS=[0.75,1,1.25,1.5,2,2.5,3];
+  const PDFJS=()=>SRV.on?'/vendor/pdfjs/':'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
   function loadPdfJs(){
     if(window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
     if(PV.loading) return PV.loading;
     PV.loading=new Promise((res,rej)=>{
-      const sc=document.createElement('script'); sc.src='/vendor/pdfjs/pdf.min.js';
-      sc.onload=()=>{ if(window.pdfjsLib){ window.pdfjsLib.GlobalWorkerOptions.workerSrc='/vendor/pdfjs/pdf.worker.min.js'; res(window.pdfjsLib); } else { PV.loading=null; rej(new Error('pdf.js')); } };
+      const sc=document.createElement('script'); sc.src=PDFJS()+'pdf.min.js';
+      sc.onload=()=>{ if(window.pdfjsLib){ window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS()+'pdf.worker.min.js'; res(window.pdfjsLib); } else { PV.loading=null; rej(new Error('pdf.js')); } };
       sc.onerror=()=>{ PV.loading=null; rej(new Error('pdf.js')); };
       document.head.appendChild(sc);
     });
@@ -1438,7 +1443,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     try{ lib=await loadPdfJs(); }catch(_){ if(gen!==PV.gen) return; pvMsg(`${AS.icOffline?`<img class="st-ic" src="${AS.icOffline}" alt="">`:''}<p>앱 안 뷰어를 불러오지 못했습니다. 서버 연결을 확인하세요.</p><a class="btn primary" href="${esc(url)}" target="_blank" rel="noopener">새 탭에서 열기</a>`); $('#pvPage').textContent=''; return; }
     if(gen!==PV.gen) return;
     try{
-      PV.task=lib.getDocument({url, cMapUrl:'/vendor/pdfjs/cmaps/', cMapPacked:true, standardFontDataUrl:'/vendor/pdfjs/standard_fonts/', isEvalSupported:false, disableAutoFetch:true, rangeChunkSize:262144, withCredentials:true});
+      PV.task=lib.getDocument({url, cMapUrl:PDFJS()+'cmaps/', cMapPacked:true, standardFontDataUrl:PDFJS()+'standard_fonts/', isEvalSupported:false, disableAutoFetch:true, rangeChunkSize:262144, withCredentials:true});
       PV.task.onProgress=p=>{ if(gen===PV.gen&&!PV.n&&p.total) $('#pvPage').textContent=`불러오는 중… ${Math.round(p.loaded/p.total*100)}%`; };
       const doc=await PV.task.promise; if(gen!==PV.gen){ doc.destroy(); return; }
       PV.doc=doc; PV.n=doc.numPages;
@@ -1465,7 +1470,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     let task=null;
     try{
       const lib=await loadPdfJs();
-      task=lib.getDocument({url:key, cMapUrl:'/vendor/pdfjs/cmaps/', cMapPacked:true, standardFontDataUrl:'/vendor/pdfjs/standard_fonts/', isEvalSupported:false, disableAutoFetch:true, disableStream:true, rangeChunkSize:65536});
+      task=lib.getDocument({url:key, cMapUrl:PDFJS()+'cmaps/', cMapPacked:true, standardFontDataUrl:PDFJS()+'standard_fonts/', isEvalSupported:false, disableAutoFetch:true, disableStream:true, rangeChunkSize:65536});
       const doc=await task.promise; const page=await doc.getPage(1);
       const v=page.getViewport({scale:1}); const vp=page.getViewport({scale:180/v.width});
       const c=document.createElement('canvas'); c.width=Math.round(vp.width); c.height=Math.round(vp.height);
@@ -1477,7 +1482,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   function thumbPump(){ while(thumbBusy<2&&thumbQ.length){ const k=thumbQ.shift(); thumbBusy++; makeThumb(k).finally(()=>{ thumbBusy--; thumbPump(); }); } }
   function thumbsIn(root){
-    if(!SRV.on||!('IntersectionObserver' in window)) return;
+    if(!SRV.lib||!('IntersectionObserver' in window)) return;
     if(thumbObs) thumbObs.disconnect();
     thumbObs=new IntersectionObserver(es=>es.forEach(en=>{ if(!en.isIntersecting) return; thumbObs.unobserve(en.target); const k=en.target.dataset.thumb; if(THUMB.has(k)) paintThumb(k); else if(!thumbQ.includes(k)){ thumbQ.push(k); thumbPump(); } }),{rootMargin:'300px 0px'});
     root.querySelectorAll('[data-thumb]').forEach(el=>{ if(THUMB.has(el.dataset.thumb)) paintThumb(el.dataset.thumb); else thumbObs.observe(el); });
@@ -1505,7 +1510,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   window.addEventListener('resize',()=>{ if(pv.hidden) return; pvPlace(); if(PV.doc){ PV.live.forEach(pvUnrender); PV.live=[]; pvLayout(); pvObserve(); } });
   window.addEventListener('popstate',()=>{ if(!pv.hidden) closePdf(true); });
   document.addEventListener('click',e=>{
-    const a=e.target.closest&&e.target.closest('a[data-pdfv]'); if(!a||!SRV.on) return;
+    const a=e.target.closest&&e.target.closest('a[data-pdfv]'); if(!a||!(SRV.on||SRV.libStatic)) return;
     if(e.ctrlKey||e.metaKey||e.shiftKey||e.button!==0) return;   // 새 탭으로 열고 싶으면 Ctrl+클릭
     e.preventDefault(); openPdf(a.getAttribute('href'), a.dataset.pdfv, Number(a.dataset.page)||1);
   });
@@ -1787,7 +1792,24 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     $('#dbRename').addEventListener('click',()=>{ setNick(''); toChat(); });
   }
 
-  function scrollEndOf(panel){ const c=$('#convo'); if(!c) return; const last=c.lastElementChild; if(!last||!last.classList.contains('msg')) return; const comp=$('#composer'); const cover=(comp?comp.getBoundingClientRect().height+16:0)+(window.innerWidth<600?68:0); const r=last.getBoundingClientRect(); const target=window.scrollY + r.bottom - (window.innerHeight - cover); if(target>window.scrollY) window.scrollTo({top:target,behavior:'auto'}); }
+  // 폰: 대화 목록을 화면 안의 스크롤 상자로 맞춘다 → 문서 전체가 스크롤되지 않아 주소창·하단 탭이 움직이지 않음
+  function fitConvo(){
+    const c=$('#convo'); if(!c) return null;
+    if(window.innerWidth>=600){ c.style.maxHeight=''; c.style.overflowY=''; return null; }
+    const atEnd=c.scrollHeight-c.scrollTop-c.clientHeight<24;
+    c.style.overflowY='auto'; c.style.overscrollBehavior='contain'; c.style.maxHeight=''; c.style.minHeight='';
+    const mainEl=document.querySelector('main'), bar=document.querySelector('.tabbar');
+    const avail=window.innerHeight-(bar&&getComputedStyle(bar).display!=='none'?bar.getBoundingClientRect().height:0);
+    const box=c.closest('.chat')||mainEl, padB=parseFloat(getComputedStyle(document.getElementById('panel')||mainEl).paddingBottom)||0;
+    const over=Math.round(box.getBoundingClientRect().bottom+padB-avail), h=c.getBoundingClientRect().height;
+    if(over>0){ c.style.minHeight='160px'; c.style.maxHeight=Math.max(160,Math.round(h-over))+'px'; }
+    else if(over<0){ c.style.minHeight=Math.round(h-over)+'px'; c.style.maxHeight=c.style.minHeight; }   // 남는 공간까지 대화 배경으로 채움(메신저처럼)
+    if(atEnd) c.scrollTop=c.scrollHeight;
+    return c;
+  }
+  window.addEventListener('resize',()=>{ if(document.body.classList.contains('chatview')) fitConvo(); });
+  window.__fitConvo=fitConvo;
+  function scrollEndOf(panel){ const box=fitConvo(); if(box){ box.scrollTop=box.scrollHeight; return; } const c=$('#convo'); if(!c) return; const last=c.lastElementChild; if(!last||!last.classList.contains('msg')) return; const comp=$('#composer'); const cover=(comp?comp.getBoundingClientRect().height+16:0)+(window.innerWidth<600?68:0); const r=last.getBoundingClientRect(); const target=window.scrollY + r.bottom - (window.innerHeight - cover); if(target>window.scrollY) window.scrollTo({top:target,behavior:'auto'}); }
 
   function renderBotRoom(panel, room){
     const msgsHtml = chat.msgs.length ? chat.msgs.map(m=> m.who==='me' ? msgMeHtml(m) : `
@@ -2073,8 +2095,79 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     SRV.probing=false;
     if(state.route==='chat' && !chat.room) render();
   }
-  if(/^https?:$/.test(location.protocol)){ SRV.probing=true; detectServer(0); }
+  if(/^https?:$/.test(location.protocol)){ SRV.probing=true; detectServer(0); loadLib(); }
 })();
 </script>
 
+<style id="chat-kakao">
+/* 채팅 — 카카오톡형 배치 (색은 SACHIL 노랑·먹색 유지) */
+:root{--chat-bg:#DFE5EB;--chat-meta:#56606A}
+.chat > .card{background:var(--chat-bg);border-color:transparent;overflow:hidden}
+.convo{gap:4px;padding:14px 12px 12px}
+.msg{gap:6px;align-items:flex-end;flex-wrap:nowrap}
+.msg:not(.cont){margin-top:8px}
+.msg:first-child{margin-top:0}
+.msg.bot,.msg.other{align-items:flex-start}
+.msg .av{width:40px;height:40px;border-radius:15px;border:0;background:var(--surface);align-self:flex-start}
+.msg.other .av.ini{background:var(--navy);color:var(--ember);font-size:13px}
+.msg.cont .av{visibility:hidden;height:1px}
+.msg .col{display:flex;flex-direction:column;gap:3px;min-width:0;max-width:min(72%,520px)}
+.msg .col .bub{max-width:100%}
+.msg .who{font-size:12.5px;font-weight:500;color:var(--chat-meta);padding:0 0 1px 2px}
+.msg.cont .who{display:none}
+.bub{background:var(--surface);border:0;border-radius:14px;padding:8px 11px;font-size:14.5px;line-height:1.45}
+.msg.bot .bub,.msg.other .bub,.msg.other .col .bub{border-bottom-left-radius:14px;border-top-left-radius:4px}
+.msg.cont.bot .bub,.msg.cont.other .bub{border-top-left-radius:14px}
+.msg.me .bub{max-width:min(72%,520px);background:var(--ember);border:0;border-radius:14px;border-top-right-radius:4px}
+.msg.me.cont .bub{border-top-right-radius:14px}
+.msg .t{order:0;width:auto;padding:0 1px 1px;font-family:var(--sans);font-size:10.5px;color:var(--chat-meta);line-height:1.2;white-space:nowrap}
+.msg.me .t{order:0;text-align:right}
+.msg.bot .t,.msg.other .t{align-self:flex-end}
+.msg.hide-t .t{display:none}
+.bub.typing{background:var(--surface)}
+.bub .mini a{background:var(--surface-2)}
+.bub.only-att,.msg.me .bub.only-att{background:transparent;padding:0}
+.convo-note{align-self:center;max-width:92%;margin:6px auto;padding:7px 12px;border-radius:12px;background:rgba(0,0,0,.07);color:#3D454D;font-size:12.5px;line-height:1.5}
+.convo-note .convo-empty{background:transparent}
+.convo-empty{align-self:center}
+.chat > .card .quick{padding:2px 12px 12px}
+.chat > .card .quick button{background:var(--surface);border-color:transparent}
+@media (max-width:599px){
+  .msg{flex-wrap:nowrap}
+  .msg .t{width:auto;padding-left:1px;order:0}
+  .msg.me .t{order:0}
+  .bub,.msg.me .bub{max-width:76%}
+  .msg .col{max-width:calc(100% - 46px - 44px)}
+  .msg .col .bub{max-width:100%}
+  .chat > .card .quick{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .chat > .card .quick::-webkit-scrollbar{display:none}
+  .chat > .card .quick button{flex:none}
+}
+</style>
+<script>
+/* 카카오톡처럼: 같은 사람이 같은 분에 연달아 보낸 말은 프로필·이름을 한 번만, 시간은 마지막 말에만 */
+(function(){
+  function regroup(c){
+    let prev=null, prevKey='', prevT=null;
+    for(const m of c.children){
+      if(!m.classList.contains('msg')){ prev=null; prevKey=''; continue; }
+      if(m.classList.contains('bot') && !m.querySelector(':scope > .col')){
+        const b=m.querySelector(':scope > .bub'); if(b){ const col=document.createElement('div'); col.className='col'; col.innerHTML='<span class="who">SACHIL AI</span>'; m.insertBefore(col,b); col.appendChild(b); }
+      }
+      const who=m.classList.contains('me')?'me':m.classList.contains('bot')?'bot':'o:'+((m.querySelector('.who')||{}).textContent||'');
+      const tEl=m.querySelector(':scope > .t'), t=tEl?tEl.textContent.trim():'';
+      const same=prev && who===prevKey && (t===prevT || !t);
+      m.classList.toggle('cont',!!same);
+      m.classList.remove('hide-t');
+      if(same && prev && t) prev.classList.add('hide-t');
+      prev=m; prevKey=who; prevT=t;
+    }
+  }
+  let q=false;
+  const run=()=>{ q=false; const c=document.getElementById('convo'); if(!c) return; const end=c.scrollHeight-c.scrollTop-c.clientHeight<60; regroup(c); if(window.__fitConvo && document.body.classList.contains('chatview')) window.__fitConvo(); if(end && c.scrollHeight>c.clientHeight) c.scrollTop=c.scrollHeight; };
+  const go=()=>{ if(q) return; q=true; requestAnimationFrame(run); };
+  const start=()=>{ const root=document.getElementById('panel')||document.body; new MutationObserver(go).observe(root,{childList:true,subtree:true}); go(); };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+})();
+</script>
 </body></html>
