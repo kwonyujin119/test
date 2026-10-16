@@ -4,7 +4,7 @@ cd /d "%~dp0"
 title SACHIL:47 update + start
 
 if not exist sachil_server.py (
-  echo [ERROR] Put this file in the SACHIL folder ^(the 47 folder on drive D) next to sachil_server.py and run again.
+  echo [ERROR] Put this file in the SACHIL folder ^(the 47 folder on drive D^) next to sachil_server.py and run again.
   pause
   exit /b 1
 )
