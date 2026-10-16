@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <rect width="1024" height="1024" fill="#FFC400"/>
+  <g transform="translate(512 500) scale(1) translate(-512 -500)">
+    <path d="M512 196c-190 0-340 120-340 276 0 92 52 172 134 222l-30 118c-4 16 13 28 27 19l142-92c22 3 44 5 67 5 190 0 340-120 340-272S702 196 512 196z" fill="#FFFFFF"/>
+    <text x="512" y="560" text-anchor="middle" font-family="Inter Display Black, Inter Display, Inter" font-weight="900" font-size="300" letter-spacing="-12" fill="#191919">47</text>
+  </g></svg>
