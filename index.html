@@ -553,7 +553,7 @@ footer b{color:var(--muted);font-weight:600}
   .panel-head #roomNew{order:9;width:100%}
   .rep-foot .note{display:none}
   .result .meta{display:none}
-  .tabbar{display:block;transform:translateZ(0);-webkit-transform:translateZ(0);will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .tabbar{display:block}
   .panel{padding-bottom:24px}
   .timer{gap:8px;padding:8px 10px}
   .timer .t{font-size:22px}
@@ -854,7 +854,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const m=document.querySelector('main'); m.classList.remove('swipe-l','swipe-r'); void m.offsetWidth;
     m.classList.add(dir>0?'swipe-l':'swipe-r'); setTimeout(()=>m.classList.remove('swipe-l','swipe-r'),260);
     if(r==='search'){ q.value=''; syncClear(); go('search',''); } else go(r);
-    window.scrollTo({top:0});
+    rootScrollTo(0);
   }
   // 넘기면 안 되는 상황: 문서·사진·보고서가 열려 있음, 쓰던 글이 입력칸에 남아 있음
   function swipeBusy(){
@@ -945,6 +945,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 
   // ---------- 라우팅 ----------
   // 탭 이동은 해시를 바꿔 히스토리에 남긴다 — 안드로이드 뒤로가기가 이전 탭으로 돌아간다.
+  // 폰에서는 .app이 스크롤 상자(문서는 고정). PC에서는 문서가 스크롤.
+  const scrollRoot=()=>{ const a=document.querySelector('.app'); return (a&&/auto|scroll/.test(getComputedStyle(a).overflowY))?a:null; };
+  function rootScrollTo(top,smooth){ const o={top:top,behavior:smooth?'smooth':'auto'}; const r=scrollRoot(); if(r) r.scrollTo(o); else window.scrollTo(o); }
   function go(route, query){
     if(query!==undefined) state.query=query;
     const TOP=['chat','search','ai','board','log'], cur=location.hash.slice(1)||'chat';
@@ -1439,7 +1442,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     $('#pvTitle').textContent=String(name||'PDF').replace(/\.pdf$/i,'');
     $('#pvPage').textContent='불러오는 중…';
     const nw=$('#pvNew'); nw.href=url;
-    window.scrollTo(0,0); pv.hidden=false; pvPlace(); document.body.style.overflow='hidden';
+    rootScrollTo(0); pv.hidden=false; pvPlace(); document.body.style.overflow='hidden';
     try{ history.pushState({pv:1},''); PV.pushed=true; }catch(_){ PV.pushed=false; }
     pvMsg('<p>문서를 여는 중입니다…</p>'); $('#pvClose').focus();
     let lib;
@@ -1897,7 +1900,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const hm=ts=>{ if(!Number.isFinite(ts)) return ''; const d=new Date(ts*1000), t=new Date(); return (d.toDateString()===t.toDateString()?'':`${d.getMonth()+1}/${d.getDate()} `)+`${pad(d.getHours())}:${pad(d.getMinutes())}`; };
   const srvFoot=()=>`대화명 <b>${esc(SRV.me?SRV.me.name:'')}</b>${SRV.me&&SRV.me.role==='admin'?' · 관리자':''} · ${SRV.trim?'오래된 대화는 매주 정리, 최근 대화는 유지':SRV.retention+'일 뒤 자동 삭제'}`;
   function toChat(){ if(location.hash==='#chat'){ state.route='chat'; chat.room=null; render(); } else location.hash='chat'; }   // 같은 주소면 hashchange가 없으므로 직접 다시 그림
-  function goHome(){ q.value=''; syncClear(); go('search',''); window.scrollTo({top:0}); }   // 47망 → 검색 화면(예전 초기화면)
+  function goHome(){ q.value=''; syncClear(); go('search',''); rootScrollTo(0); }   // 47망 → 검색 화면(예전 초기화면)
 
   function renderDebrief(panel,id){
     const toConsent=()=>{ if(id){ history.replaceState(null,'','#chat'); chat.room=null; } };
@@ -2070,9 +2073,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   $('#clearBtn').addEventListener('click',()=>{ q.value=''; syncClear(); go('search',''); q.focus(); });
   $('#searchForm').addEventListener('submit',e=>{ e.preventDefault(); go('search', q.value); q.blur(); });
   // 브랜드(ICTC 아이콘·이름) 클릭 = 초기 화면: 검색어를 지우고 검색 화면으로
-  document.querySelector('.brand').addEventListener('click',e=>{ e.preventDefault(); q.value=''; syncClear(); state.query=''; go('chat'); window.scrollTo({top:0,behavior:'smooth'}); });
+  document.querySelector('.brand').addEventListener('click',e=>{ e.preventDefault(); q.value=''; syncClear(); state.query=''; go('chat'); rootScrollTo(0,true); });
   $('#menuBtn').addEventListener('click',openSheet);
-  document.querySelectorAll('.tabbar button').forEach(b=>b.addEventListener('click',()=>{ const t=b.dataset.go; if(t==='search'){ q.value=''; syncClear(); go('search',''); window.scrollTo({top:0}); } else go(t); }));
+  document.querySelectorAll('.tabbar button').forEach(b=>b.addEventListener('click',()=>{ const t=b.dataset.go; if(t==='search'){ q.value=''; syncClear(); go('search',''); rootScrollTo(0); } else go(t); }));
   document.addEventListener('keydown',e=>{
     if(e.isComposing) return;
     if(!pv.hidden){ if(e.key==='Escape') closePdf(); else if(e.key==='+'||e.key==='=') pvZoom(1); else if(e.key==='-') pvZoom(-1); return; }
@@ -2161,6 +2164,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 /* 크롬(안드로이드)의 '가로로 밀면 이전/다음 페이지' 기능 끄기: 앱의 S·A·CH·IL 넘기기와 겹쳐
    크롬이 화면 캡처 카드를 밀어 넣는 동안 하단 탭이 사라졌다 나타났다. 넘기기는 앱이 직접 처리한다. */
 html,body{overscroll-behavior-x:none}
+/* 폰: 앱 껍데기 레이아웃. 문서(페이지)는 절대 스크롤하지 않고 .app 안에서만 스크롤한다.
+   → 크롬 주소창이 접히지 않아 화면 높이가 변하지 않고, 하단 탭은 position:fixed가 아닌 보통 요소라
+     브라우저 애니메이션·캡처 카드와 무관하게 늘 같은 자리에 있다(카카오톡 등 웹앱 방식). */
+@media (max-width:599px){
+  html,body{height:100%;overflow:hidden}
+  body{display:flex;flex-direction:column;min-height:0}
+  .app{flex:1 1 auto;min-height:0;height:auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+  .tabbar{position:static;flex:none;display:block}
+  footer{padding-bottom:24px}
+  .composer{bottom:8px}
+}
 
 /* 대화방 머리: 한 줄 헤더로 압축(카카오톡처럼) — 공간 낭비 줄임 */
 body.chatview footer{display:none}   /* A·47망: 바닥글이 화면을 늘려 주소창·하단 탭이 움직이던 것 방지, 남는 공간은 대화에 */
