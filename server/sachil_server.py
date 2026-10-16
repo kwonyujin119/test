@@ -123,7 +123,12 @@ CREATE TABLE IF NOT EXISTS rooms(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEX
 CREATE TABLE IF NOT EXISTS messages(id INTEGER PRIMARY KEY AUTOINCREMENT, room INTEGER, author INTEGER, name TEXT, text TEXT, files TEXT, ts REAL);
 CREATE TABLE IF NOT EXISTS files(id TEXT PRIMARY KEY, room INTEGER, owner INTEGER, name TEXT, kind TEXT, mime TEXT, size INTEGER, used INTEGER DEFAULT 0, ts REAL);
 CREATE INDEX IF NOT EXISTS ix_msg_room ON messages(room, id);
+CREATE TABLE IF NOT EXISTS reads(room INTEGER, user INTEGER, last_id INTEGER, seen REAL, PRIMARY KEY(room, user));
 ''')
+try:   # 예전 DB에 답장 칸 추가
+    DB.execute('ALTER TABLE messages ADD COLUMN reply TEXT')
+except sqlite3.OperationalError:
+    pass
 DB.commit()
 
 
@@ -150,6 +155,11 @@ def ensure_room47():
 
 ROOM47 = ensure_room47()
 EPOCH = {}                               # 대화 비우기 표시(비우면 바뀜 → 모든 화면이 새로 그림)
+PRESENCE = {}                            # (방, 사용자) → 마지막으로 대화를 받아 간 시각 — '지금 접속' 수
+PRESENCE_LOCK = threading.Lock()
+READ_VER = {}                            # 방 → 읽음 표시가 바뀐 횟수(바뀌면 기다리던 화면이 깨어나 '안 읽은 수'를 고침)
+ONLINE_SEC = 40                          # 롱폴링(25초)보다 조금 길게
+MEMBER_DAYS = 7                          # 최근 7일 안에 들어온 사람만 '안 읽은 수'에 셈
 START_EPOCH = secrets.token_hex(4)
 epoch = lambda rid: EPOCH.get(rid, START_EPOCH)
 POSTS = {}
@@ -641,6 +651,7 @@ class H(BaseHTTPRequestHandler):
                 return self.err(401, '로그인이 필요합니다')
             if path == '/api/logout':
                 q('DELETE FROM sessions WHERE id=?', (self.user['id'],), commit=True)
+                q('DELETE FROM reads WHERE user=?', (self.user['id'],), commit=True)
                 return self.send(200, {'ok': True}, extra={'Set-Cookie': 'sachil=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict'})
             if path == '/api/rooms':
                 return self.room_create()
@@ -650,6 +661,9 @@ class H(BaseHTTPRequestHandler):
             m = re.fullmatch(r'/api/rooms/(\d{1,12})/upload', path)
             if m:
                 return self.upload(int(m.group(1)))
+            m = re.fullmatch(r'/api/rooms/(\d{1,12})/read', path)
+            if m:
+                return self.read_mark(int(m.group(1)))
             return self.err(404, '없는 주소입니다')
         except ValueError as e:
             return self.err(400, str(e))
@@ -976,17 +990,68 @@ class H(BaseHTTPRequestHandler):
     # --- 메시지
     def msg_out(self, r, alias=None):
         name = (alias or {}).get(r['author'], '참여자')
-        return {'id': r['id'], 'name': name, 'text': r['text'] or '', 'files': json.loads(r['files'] or '[]'),
-                'ts': r['ts'], 'mine': r['author'] == self.user['id'],
-                'can_delete': r['author'] == self.user['id'] or self.user['role'] == 'admin'}
+        out = {'id': r['id'], 'name': name, 'text': r['text'] or '', 'files': json.loads(r['files'] or '[]'),
+               'ts': r['ts'], 'mine': r['author'] == self.user['id'],
+               'can_delete': r['author'] == self.user['id'] or self.user['role'] == 'admin'}
+        try:
+            rp = json.loads(r['reply']) if r['reply'] else None
+        except (ValueError, IndexError, KeyError):
+            rp = None
+        if isinstance(rp, dict):
+            out['reply'] = {'id': rp.get('id'), 'name': (alias or {}).get(rp.get('author'), '참여자'), 'text': str(rp.get('text') or '')[:60]}
+        return out
+
+    # --- 읽음·접속: 이름 없이 숫자만 내보낸다(누가 안 읽었는지는 알리지 않음)
+    def touch(self, rid):
+        with PRESENCE_LOCK:
+            PRESENCE[(rid, self.user['id'])] = time.time()
+
+    def room_state(self, rid):
+        now = time.time()
+        with PRESENCE_LOCK:
+            for k in [k for k, t in PRESENCE.items() if now - t > ONLINE_SEC * 3]:
+                PRESENCE.pop(k, None)
+            online = sum(1 for (r, _u), t in PRESENCE.items() if r == rid and now - t <= ONLINE_SEC)
+        rows = q('SELECT r.last_id FROM reads r JOIN sessions s ON s.id=r.user WHERE r.room=? AND r.seen>?',
+                 (rid, now - MEMBER_DAYS * 86400))
+        return {'online': max(1, online), 'rp': sorted(x['last_id'] for x in rows), 'rv': READ_VER.get(rid, 0)}
+
+    def set_read(self, rid, last):
+        cur = q('SELECT last_id FROM reads WHERE room=? AND user=?', (rid, self.user['id']), one=True)
+        now = time.time()
+        if cur and cur['last_id'] >= last:
+            q('UPDATE reads SET seen=? WHERE room=? AND user=?', (now, rid, self.user['id']), commit=True)
+            return False
+        q('INSERT OR REPLACE INTO reads(room,user,last_id,seen) VALUES(?,?,?,?)',
+          (rid, self.user['id'], last, now), commit=True)
+        READ_VER[rid] = READ_VER.get(rid, 0) + 1
+        with NEW_MSG:
+            NEW_MSG.notify_all()
+        return True
+
+    def read_mark(self, rid):
+        if not q('SELECT id FROM rooms WHERE id=?', (rid,), one=True):
+            return self.err(404, '없는 디브리핑룸입니다')
+        b = self.body_json()
+        top = q('SELECT MAX(id) m FROM messages WHERE room=?', (rid,), one=True)['m'] or 0
+        last = max(0, min(to_int(b.get('last'), 0), top))
+        self.touch(rid)
+        self.set_read(rid, last)
+        return self.send(200, dict({'ok': True}, **self.room_state(rid)), log=False)
 
     def messages(self, rid, args):
         if not q('SELECT id FROM rooms WHERE id=?', (rid,), one=True):
             return self.send(200, {'ok': True, 'gone': True, 'messages': []}, log=False)
         after = to_int((args.get('after') or ['0'])[0], 0)
         wait = (args.get('wait') or ['0'])[0] == '1'
+        rv0 = to_int((args.get('rv') or ['-1'])[0], -1)
         deadline = time.time() + 25
         ep0 = (args.get('epoch') or [''])[0]
+        self.touch(rid)
+        my_read = None
+        if after <= 0:   # 처음 불러올 때: 내가 어디까지 읽었는지(안 읽은 곳에서 멈춤)
+            r0 = q('SELECT last_id FROM reads WHERE room=? AND user=?', (rid, self.user['id']), one=True)
+            my_read = r0['last_id'] if r0 else 0
         while True:
             if after <= 0:
                 rows = q('SELECT * FROM (SELECT * FROM messages WHERE room=? ORDER BY id DESC LIMIT 200) ORDER BY id', (rid,))
@@ -995,12 +1060,16 @@ class H(BaseHTTPRequestHandler):
             alive = q('SELECT id FROM rooms WHERE id=?', (rid,), one=True)
             if not alive:   # 기다리는 동안 방이 삭제됨 — 오류가 아니라 정상 응답으로 알린다
                 return self.send(200, {'ok': True, 'gone': True, 'messages': []}, log=False)
-            if rows or not wait or time.time() >= deadline or (ep0 and ep0 != epoch(rid)):
+            if rows or not wait or time.time() >= deadline or (ep0 and ep0 != epoch(rid)) or (rv0 >= 0 and rv0 != READ_VER.get(rid, 0)):
                 break
             with NEW_MSG:
                 NEW_MSG.wait(timeout=max(0.5, min(10, deadline - time.time())))
         al = self.aliases(rid)
-        return self.send(200, {'ok': True, 'epoch': epoch(rid), 'messages': [self.msg_out(r, al) for r in rows]}, log=False)
+        self.touch(rid)
+        out = dict({'ok': True, 'epoch': epoch(rid), 'messages': [self.msg_out(r, al) for r in rows]}, **self.room_state(rid))
+        if my_read is not None:
+            out['my_read'] = my_read
+        return self.send(200, out, log=False)
 
     def message_post(self, rid):
         if not q('SELECT id FROM rooms WHERE id=?', (rid,), one=True):
@@ -1024,16 +1093,26 @@ class H(BaseHTTPRequestHandler):
                 files.append({'id': f['id'], 'name': f['name'], 'kind': f['kind'], 'size': f['size']})
         if not text and not files:
             return self.err(400, '보낼 내용이 없습니다')
+        reply = None
+        rid_to = to_int(b.get('reply'), 0)
+        if rid_to > 0:   # 답장: 같은 방의 원래 메시지를 짧게 붙여 둔다(원문이 지워져도 인용은 남음)
+            o = q('SELECT * FROM messages WHERE id=? AND room=?', (rid_to, rid), one=True)
+            if o:
+                ofl = json.loads(o['files'] or '[]')
+                snip = (o['text'] or '').replace('\n', ' ')[:60] or (('사진' if ofl and ofl[0].get('kind') == 'image' else '파일') if ofl else '')
+                reply = json.dumps({'id': o['id'], 'author': o['author'], 'text': snip}, ensure_ascii=False)
         now = time.time()
-        mid = q('INSERT INTO messages(room,author,name,text,files,ts) VALUES(?,?,?,?,?,?)',
-                (rid, self.user['id'], self.user['name'], text, json.dumps(files, ensure_ascii=False), now), commit=True)
+        mid = q('INSERT INTO messages(room,author,name,text,files,ts,reply) VALUES(?,?,?,?,?,?,?)',
+                (rid, self.user['id'], self.user['name'], text, json.dumps(files, ensure_ascii=False), now, reply), commit=True)
         for f in files:
             q('UPDATE files SET used=1 WHERE id=?', (f['id'],), commit=True)
         q('UPDATE rooms SET last=? WHERE id=?', (now, rid), commit=True)
+        self.touch(rid)
+        self.set_read(rid, mid)   # 내 글은 내가 읽은 것(안에서 NEW_MSG도 깨움)
         with NEW_MSG:
             NEW_MSG.notify_all()
         r = q('SELECT * FROM messages WHERE id=?', (mid,), one=True)
-        return self.send(200, {'ok': True, 'message': self.msg_out(r, self.aliases(rid))})
+        return self.send(200, dict({'ok': True, 'message': self.msg_out(r, self.aliases(rid))}, **self.room_state(rid)))
 
     def message_delete(self, mid):
         r = q('SELECT * FROM messages WHERE id=?', (mid,), one=True)
