@@ -375,6 +375,13 @@ class Server(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = True
 
+    def handle_error(self, request, client_address):
+        # 폰이 화면을 끄거나 앱이 기다리던 요청을 끊으면 Windows가 WinError 10053/10054를 낸다 — 오류가 아니므로 조용히 넘긴다
+        e = sys.exc_info()[1]
+        if isinstance(e, (ConnectionError, TimeoutError, socket.timeout)):
+            return
+        super().handle_error(request, client_address)
+
     def process_request(self, request, client_address):
         if not CONN_SEM.acquire(blocking=False):
             try:
@@ -624,7 +631,7 @@ class H(BaseHTTPRequestHandler):
             if m:
                 return self.file_get(m.group(1))
             return self.err(404, '없는 주소입니다')
-        except (BrokenPipeError, ConnectionResetError, TimeoutError, socket.timeout):
+        except (ConnectionError, TimeoutError, socket.timeout):   # 끊김(WinError 10053/10054 포함)은 정상 상황
             self.close_connection = True
         except Exception as e:
             print('[오류]', self.command, path, e)
@@ -667,7 +674,7 @@ class H(BaseHTTPRequestHandler):
             return self.err(404, '없는 주소입니다')
         except ValueError as e:
             return self.err(400, str(e))
-        except (BrokenPipeError, ConnectionResetError, TimeoutError, socket.timeout):
+        except (ConnectionError, TimeoutError, socket.timeout):   # 끊김(WinError 10053/10054 포함)은 정상 상황
             self.close_connection = True
         except Exception as e:
             print('[오류]', self.command, path, e)
@@ -696,7 +703,7 @@ class H(BaseHTTPRequestHandler):
             if m:
                 return self.message_delete(int(m.group(1)))
             return self.err(404, '없는 주소입니다')
-        except (BrokenPipeError, ConnectionResetError, TimeoutError, socket.timeout):
+        except (ConnectionError, TimeoutError, socket.timeout):   # 끊김(WinError 10053/10054 포함)은 정상 상황
             self.close_connection = True
         except Exception as e:
             print('[오류]', self.command, path, e)
@@ -1876,6 +1883,8 @@ def run_tunnel(port, named):
                     shown = True
                     continue
                 # INF 안내문은 숨기고, 그 밖의 줄(경고·오류·실패)은 그대로 보여 준다
+                if 'context canceled' in line:   # 접속자가 먼저 끊은 요청(화면 끔·새로고침) — 정상
+                    continue
                 if ' INF ' not in line and s:
                     print('[터널]', s[:200], flush=True)
         code = p.wait()
