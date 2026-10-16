@@ -567,6 +567,12 @@ class H(BaseHTTPRequestHandler):
         args = urllib.parse.parse_qs(qs)
         try:
             if path in ('/', '/index.html'):
+                # 외부 주소(sachil47.com·app.sachil47.com)로 열면 최신 앱(github.io)으로 보낸다.
+                # 이 PC(localhost)나 같은 망(IP 주소)으로 열면 예전처럼 서버에 든 앱을 보여 준다.
+                host = (self.headers.get('Host') or '').split(':')[0].strip().lower()
+                app_url = str(CONF.get('app_url') or '').strip()
+                if app_url and host and host != 'localhost' and not re.fullmatch(r'[0-9.]+', host):
+                    return self.send(302, b'', 'text/plain', {'Location': app_url, 'Cache-Control': 'no-store'}, log=False)
                 return self.send_packed(packed('app', os.path.getmtime(APP_PATH), app_html), 'text/html; charset=utf-8', 'no-cache')
             if path == '/manifest.webmanifest':
                 return self.send(200, MANIFEST, 'application/manifest+json')
