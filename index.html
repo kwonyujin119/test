@@ -947,6 +947,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 탭 이동은 해시를 바꿔 히스토리에 남긴다 — 안드로이드 뒤로가기가 이전 탭으로 돌아간다.
   function go(route, query){
     if(query!==undefined) state.query=query;
+    const TOP=['chat','search','ai','board','log'], cur=location.hash.slice(1)||'chat';
+    // 47망·S·A·CH·IL 사이 이동은 방문 기록을 쌓지 않고 바꿔 끼운다. 기록이 쌓이면 안드로이드 크롬이 넘기기 때
+    // '이전/다음 페이지' 캡처 카드를 띄워 하단 탭이 사라졌다 나타난다(녹화 영상에서 확인). 메뉴 항목 등은 기존처럼 기록.
+    if(cur!==route && TOP.includes(route) && TOP.includes(cur)){ try{ history.replaceState(history.state,'','#'+route); state.route=route; closeSheet(); render(); return; }catch(_){ } }
     if(location.hash.slice(1)!==route){ state.route=route; location.hash=route; return; } // hashchange → render
     state.route=route; render();
   }
