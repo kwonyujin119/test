@@ -1831,9 +1831,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const footHtml=(left)=>`<div class="chat-foot"><span>${left} · 저장 ${fmtSize(storageUse())}${storageFull?' · <b class="warn">저장 공간 부족 — 새 내용은 이 세션에만 유지</b>':''}</span><span class="r"></span></div>`;
 
   function renderChat(panel){
-    const id=chat.room;
-    if(id==='bot'){ renderBotRoom(panel, ROOMS[0]); return; }
-    renderDebrief(panel,id);
+    // AI 도우미에서 넘어올 때(로고·넘기기) 남아 있던 'bot' 방은 47망이 아니므로 버린다 — AI 도우미는 A 탭에서만
+    if(chat.room==='bot') chat.room=null;
+    renderDebrief(panel,chat.room);
   }
 
   const roomHead=(room,sub,extra)=>`
