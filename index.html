@@ -858,13 +858,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   // 넘기면 안 되는 상황: 문서·사진·보고서가 열려 있음, 쓰던 글이 입력칸에 남아 있음
   function swipeBusy(){
+    if(state.route==='board' && !sheet.classList.contains('open')) return true;   // 체크리스트: 칩 줄·입력칸을 옆으로 끌다가 다른 탭으로 넘어가지 않게(탭바로만 이동)
     if(!document.getElementById('pdfv').hidden || !$('#report').hidden || !lb.hidden) return true;
     const ae=document.activeElement;
     if(ae && /^(INPUT|TEXTAREA)$/.test(ae.tagName) && ae.type!=='checkbox' && String(ae.value||'').trim()) return true;
     return false;
   }
-  const NOSWIPE='input,textarea,select,[contenteditable],.pdfv,.lightbox,.report,.atts,video,canvas';
-  const NOSWIPE_TOUCH='select,[contenteditable],.pdfv,.lightbox,.report,.atts,video,canvas';
+  const NOSWIPE='input,textarea,select,[contenteditable],.pdfv,.lightbox,.report,.atts,video,canvas,.jump,.jgrid';
+  const NOSWIPE_TOUCH='select,[contenteditable],.pdfv,.lightbox,.report,.atts,video,canvas,.jump,.jgrid';
   // 마우스는 링크·버튼에서 시작하면 클릭/끌기와 겹치므로 제외. 글자 위에서 시작하면 글자 선택으로 본다.
   const NOSWIPE_MOUSE=NOSWIPE+',a,button,label,summary,img,.tabbar,.top';
   function onText(el,x,y){
