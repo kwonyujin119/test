@@ -17,6 +17,17 @@ if not exist sachil_server.py (
   pause
   exit /b 1
 )
+rem The server file must be 3.3 or newer - older files only accept keys that start with AIza
+findstr /C:"key=len" sachil_server.py >nul 2>nul
+if errorlevel 1 (
+  echo [ERROR] sachil_server.py in this folder is an OLD version.
+  echo         1. Delete old SACHIL47-server-update zip files in your Downloads folder.
+  echo         2. Download SACHIL47-server-update.zip again and extract it.
+  echo         3. Copy ALL extracted files into this folder and overwrite.
+  echo         Folder: %~dp0
+  pause
+  exit /b 1
+)
 
 echo.
 echo Paste the Gemini API key copied from aistudio.google.com (API keys page) and press Enter.
@@ -29,7 +40,7 @@ if not defined KEY (
   pause
   exit /b 1
 )
-%PY% sachil_server.py --set-gemini-key %KEY%
+%PY% sachil_server.py --set-gemini-key "%KEY%"
 set "RC=%errorlevel%"
 set "KEY="
 if "%RC%"=="0" (
@@ -40,7 +51,7 @@ if "%RC%"=="0" (
 ) else (
   echo ===============================================================
   echo  The key test failed. Run this file again to see the reason,
-  echo  or check the key at aistudio.google.com (API keys)
+  echo  or check the key on the API keys page of aistudio.google.com
   echo ===============================================================
 )
 pause
