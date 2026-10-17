@@ -690,7 +690,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v82</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v83</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -724,9 +724,9 @@ footer b{color:var(--muted);font-weight:600}
         <button type="button" role="tab" id="repTabDraft" aria-selected="true">규칙 초안</button>
         <button type="button" role="tab" id="repTabAi" aria-selected="false" disabled>AI 작성본</button>
       </div>
-      <div class="right"><span class="rep-status" id="repStatus" aria-live="polite"></span><button type="button" class="btn ghost sm" id="repRegen" hidden>초안 새로 생성</button></div>
+      <div class="right"><span class="rep-status" id="repStatus" aria-live="polite"></span><button type="button" class="btn ghost sm" id="repRegen" hidden>초안 새로 생성</button><button type="button" class="btn primary sm" id="repEdit" hidden>초안 편집</button></div>
     </div>
-    <textarea class="rep-body" id="repBody" spellcheck="false" aria-label="보고서 본문 (편집 가능)"></textarea>
+    <textarea class="rep-body" id="repBody" spellcheck="false" aria-label="보고서 본문"></textarea>
     <div class="rep-web" id="repWebPanel" hidden>
       <p class="rw-h"><b>API 키 없이 AI 사이트로 보고서 쓰기</b> — 무료 계정도 됩니다</p>
       <ol class="rw-steps">
@@ -807,8 +807,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V82', SRV_VER='2.3';
+  const APP_VER='V83', SRV_VER='2.3';
   const UPDATES=[
+    {v:'V83', d:'2026-10-17', t:['보고서 창에서 교수로 로그인했을 때만 ‘초안 편집’ 버튼 — 고친 내용은 ‘편집 저장’(또는 창 닫기)으로 그대로 저장','교수가 아니면 보고서 본문은 읽기 전용']},
     {v:'V82', d:'2026-10-17', t:['IL 발생개요에 ‘발생개요’ 입력칸 추가: 사고일시 → 장소 → 대상 → 발생개요(여러 줄), 보고서에도 들어가요']},
     {v:'V81', d:'2026-10-17', t:['사용법(?) 설명을 하나씩 나눔: 1 SACHIL:47 → 2 47 시그니처 아이콘(47망) → 3 디브리핑룸 → 메뉴 → S·A·CH·IL','첫 화면에서 사용법을 볼 때는 하단 탭을 잠깐 띄워 설명','CH: 시각·시작·경과를 빼고 첫 줄에 전체·진행·초기화, 단계 칩은 두 줄(첫 체크 때 경과 시간이 자동으로 흐름)','IL: 배너 첫 줄에 초기화 · 작성된 보고서 · 보고서 만들기(누르면 바로 보고서)']},
     {v:'V80', d:'2026-10-17', t:['첫 화면 손글씨 47의 ‘7’에 시그니처처럼 짧은 가로획을 넣었어요','Search·Incident Log 글자 자리를 가로획과 겹치지 않게 다시 맞춤']},
@@ -1700,6 +1701,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!CAP.ready || CAP.sample) return '';
     return SRV.on ? '규칙 초안 · 서버에 AI 키가 없어 AI 작성은 꺼져 있음' : '규칙 초안 · AI 작성은 SACHIL 서버(AI 키) 연결 시 가능';
   }
+  let repEditing=false;
   function setRepView(v){
     if(!cur) return;
     repView=v; const body=$('#repBody');
@@ -1707,7 +1709,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     $('#repTabAi').disabled = !(cur.ai || repCtl);
     $('#repTabAi').closest('.seg').hidden = !(CAP.sample || cur.ai || repCtl);   // AI를 못 쓰면 탭 자체를 숨김(고장처럼 보이지 않게)
     body.value = v==='draft' ? cur.draft : (cur.ai || (repCtl ? 'AI가 사실을 읽고 보고서를 작성하는 중입니다…' : ''));
-    body.readOnly = !!repCtl && v==='ai';
+    body.readOnly = !repEditing || (!!repCtl && v==='ai');   // 편집은 교수 로그인 + '초안 편집'일 때만(V83)
+    { const eb=$('#repEdit'); if(eb){ eb.hidden=!isProf(); eb.textContent=repEditing?'편집 저장':'초안 편집'; eb.classList.toggle('accent',repEditing); } }
     $('#repRegen').hidden = !(v==='draft' && cur.draftEdited && cur.facts);
     $('#repStatus').textContent=repStatusText();
   }
@@ -1726,7 +1729,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const dropped=reports.length>=MAX_REPORTS; reports.unshift(e); const saved=rpsave(); openReport(e, saved?(dropped?'dropped':true):'nosave');
   }
   function openReport(e, fresh){
-    cur=e;
+    cur=e; repEditing=false;
     const dlg=$('#report'); dlg.hidden=false; document.body.style.overflow='hidden'; appEl.inert=true; tabbarEl.inert=true;
     repLast=document.activeElement;
     $('#repSub').textContent=`${e.place?e.place+' · ':''}이행 ${e.done}/${e.total} · 경과 ${e.elapsed||'—'} · ${fmtTs(e.ts)}${fresh===true?' · IL 사고보고서에 저장됨':fresh==='dropped'?' · 저장됨 (최대 30건 — 가장 오래된 보고서 1건 삭제)':fresh==='nosave'?' · 저장 공간 부족 — 이 세션에만 유지':''}`;
@@ -1901,7 +1904,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(repCtl){ repCtl.abort(); repCtl=null; }
     clearTimeout(repSaveT); rpsave();
     dlg.hidden=true; document.body.style.overflow=''; appEl.inert=false; tabbarEl.inert=false;
-    $('#repStatus').classList.remove('busy'); $('#repBody').readOnly=false; cur=null;
+    $('#repStatus').classList.remove('busy'); if(repEditing&&cur) rpsave(); repEditing=false; $('#repBody').readOnly=true; cur=null;
     if(state.route==='log') renderReports($('#panel'));
     if(repLast && repLast.isConnected && repLast.focus) repLast.focus();
   }
@@ -1923,7 +1926,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(HIDE_AI.includes(code)) CAP.sample=null;
       st.textContent = code==='cancelled' ? (e.ai?'중지됨 — 일부만 작성 (편집 가능)':'중지됨') : ((err&&err.message)||AI_MSG[code]||AI_MSG.upstream_error);
     }finally{
-      if(repCtl===ctl){ repCtl=null; st.classList.remove('busy'); body.readOnly=false; $('#repTabAi').disabled=!e.ai; if(!e.ai){ const msg=st.textContent; setRepView('draft'); st.textContent=msg; } syncRepUI(true); }
+      if(repCtl===ctl){ repCtl=null; st.classList.remove('busy'); body.readOnly=!repEditing; $('#repTabAi').disabled=!e.ai; if(!e.ai){ const msg=st.textContent; setRepView('draft'); st.textContent=msg; } syncRepUI(true); }
     }
   }
   function repText(){ return cur ? (repView==='ai' ? cur.ai : cur.draft) : ''; }
@@ -1940,8 +1943,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     catch(_){ btn.textContent=legacyCopy(txt)?'복사됨':'복사 실패'; }
     setTimeout(()=>{ if(btn.isConnected) btn.textContent=label; },1500);
   }
+  $('#repEdit').addEventListener('click',()=>{
+    if(!cur||!isProf()) return;
+    if(repEditing){ rpsave(); repEditing=false; toast('편집한 내용을 저장했습니다'); } else repEditing=true;
+    setRepView(repView); if(repEditing){ const b=$('#repBody'); b.focus(); }
+  });
   $('#repBody').addEventListener('input',()=>{
-    if(!cur) return; const v=$('#repBody').value;
+    if(!cur||!repEditing) return; const v=$('#repBody').value;
     if(repView==='draft'){ cur.draft=v; cur.draftEdited = v!==cur.draftAuto; $('#repRegen').hidden=!(cur.draftEdited&&cur.facts); }
     else { if(repCtl) return; cur.ai=v; cur.aiEdited = v!==cur.aiAuto; }
     $('#repStatus').textContent=repStatusText(); rpsaveSoon();
