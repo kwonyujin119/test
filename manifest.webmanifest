@@ -26,5 +26,12 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://kwonyujin119.github.io/test/manifest.webmanifest"
+    }
+  ],
+  "description": "소방 현장지휘관 교육용 — 검색·AI 도우미·체크리스트·사고보고서·47망"
 }
