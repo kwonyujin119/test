@@ -690,7 +690,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v84</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v85</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -807,8 +807,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V84', SRV_VER='2.3';
+  const APP_VER='V85', SRV_VER='2.3';
   const UPDATES=[
+    {v:'V85', d:'2026-10-17', t:['메뉴 ‘관련법령’에 법제처 국가법령정보센터 바로가기: 소방기본법·재난안전법·긴급구조대응활동 규칙·119구조구급법·화재조사법 등 법률·시행령·시행규칙을 누르면 현행 법령으로 바로 이동']},
     {v:'V84', d:'2026-10-17', t:['설치된 앱(PC 작업표시줄·폰 홈 화면) 아이콘이 새 시그니처 아이콘으로 바뀌도록 아이콘 주소를 새로 고침','PC 서버로 연 앱도 같은 새 아이콘·노랑 테마 사용']},
     {v:'V83', d:'2026-10-17', t:['보고서 창에서 교수로 로그인했을 때만 ‘초안 편집’ 버튼 — 고친 내용은 ‘편집 저장’(또는 창 닫기)으로 그대로 저장','교수가 아니면 보고서 본문은 읽기 전용']},
     {v:'V82', d:'2026-10-17', t:['IL 발생개요에 ‘발생개요’ 입력칸 추가: 사고일시 → 장소 → 대상 → 발생개요(여러 줄), 보고서에도 들어가요']},
@@ -1315,6 +1316,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <span class="badge">준비중</span>
         <h2>${esc(s.title)}</h2>
         <p>${esc(s.desc)}</p>
+        ${s.slug==='law'?lawLinksHtml():''}
         ${docs.length?`<div class="docs"><h4>예정 문서 ${docs.length}</h4><ul>${docs.map(d=>`<li class="${d.title===focus?'hit':''}"><span>${esc(d.title)}</span><span class="tag">${esc(d.type)}</span></li>`).join('')}</ul></div>`:''}
         <div class="links">
           <a class="btn" href="#search">검색으로 돌아가기</a>
@@ -1393,6 +1395,22 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           ${prof?`<div class="qna-adm"><textarea maxlength="2000" rows="2" data-ans placeholder="답변 입력">${esc(it.a)}</textarea><button type="button" class="btn primary" data-save>답변 저장</button><button type="button" class="btn ghost" data-qdel>삭제</button></div>`:''}
         </li>`).join('')}</ul></section>`;
   }
+  // 관련법령 → 법제처 국가법령정보센터 바로가기(V85). 주소 형식: law.go.kr/법령/법령명(띄어쓰기 없이) — 항상 현행 법령이 열림
+  const LAWS=[
+    {n:'소방기본법', k:['','시행령','시행규칙']},
+    {n:'재난 및 안전관리 기본법', k:['','시행령','시행규칙']},
+    {n:'긴급구조대응활동 및 현장지휘에 관한 규칙', k:['']},
+    {n:'119구조ㆍ구급에 관한 법률', k:['','시행령','시행규칙']},
+    {n:'소방의 화재조사에 관한 법률', k:['','시행령','시행규칙']},
+    {n:'화재의 예방 및 안전관리에 관한 법률', k:['','시행령','시행규칙']},
+    {n:'소방시설 설치 및 관리에 관한 법률', k:['','시행령','시행규칙']},
+    {n:'소방공무원 보건안전 및 복지 기본법', k:['','시행령']},
+    {n:'응급의료에 관한 법률', k:['','시행령','시행규칙']}
+  ];
+  const lawUrl=(n,k)=>'https://www.law.go.kr/'+encodeURIComponent('법령')+'/'+encodeURIComponent((n+(k?' '+k:'')).replace(/\s+/g,''));
+  function lawLinksHtml(){
+    return `<div class="laws"><h4>법제처 국가법령정보센터 바로가기 <small>현행 법령이 새 창으로 열립니다</small></h4><ul>${LAWS.map(l=>`<li><span class="ln">${esc(l.n)}</span><span class="lk">${l.k.map(k=>`<a class="btn ${k?'ghost':'primary'}" href="${lawUrl(l.n,k)}" target="_blank" rel="noopener">${k||(l.n.endsWith('규칙')?'규칙':'법률')}</a>`).join('')}</span></li>`).join('')}</ul></div>`;
+  }
   function renderLibSection(panel,s){
     const gen=SRV.gen;
     const art = s.icon ? `<img class="big" src="${s.icon}" alt="">` : '';
@@ -1404,6 +1422,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         ${Array.isArray(files)&&!files.length&&!SRV.libErr?'<span class="badge">준비중</span>':''}
         <h2>${esc(s.title)}</h2>
         <p>${esc(s.desc)}</p>
+        ${s.slug==='law'?lawLinksHtml():''}
         <div class="lib" aria-live="polite">
           ${files===null?(SRV.libErr?`<p class="none">${AS.offline?`<img class="st-illo" src="${AS.offline}" alt="">`:''}자료 목록을 불러오지 못했습니다. 서버 연결을 확인하세요. <button type="button" class="btn ghost" id="libRetry">다시 시도</button></p>`:'<p class="none">자료를 불러오는 중…</p>')
             : files.length?`<h4>자료 ${files.length}</h4>${files.map(f=>libRow(s.slug,f)).join('')}${SRV.libErr?'<p class="none"><b>서버 연결 끊김 — 마지막으로 받은 목록입니다</b> <button type="button" class="btn ghost" id="libRetry">다시 시도</button></p>':''}`
@@ -3223,6 +3242,17 @@ body.hubview #panel{padding-bottom:0}
 })();
 </script>
 <style id="prof-css">
+
+/* 관련법령 법제처 바로가기 (V85) */
+.laws{margin:14px 0 6px;text-align:left}
+.laws h4{margin:0 0 8px;font-size:15px}
+.laws h4 small{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-top:2px}
+.laws ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.laws li{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.laws .ln{flex:1 1 180px;font-weight:700;font-size:14.5px;line-height:1.4}
+.laws .lk{display:flex;gap:6px;flex-wrap:wrap}
+.laws .lk .btn{min-height:36px;padding:0 12px;font-size:13px}
+.laws .lk .btn.ghost{border:1px solid var(--navy);color:var(--navy);background:var(--surface)}
 /* 교수 로그인·자료 올리기·질의응답 (V79) */
 /* V81 CH 배너: 첫 줄 전체▾·진행·초기화, 아래 칩 두 줄 */
 .timer .chrow{flex-basis:100%;display:flex;align-items:center;gap:10px}
