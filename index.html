@@ -667,7 +667,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v62</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v63</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -783,8 +783,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V62', SRV_VER='2.1';
+  const APP_VER='V63', SRV_VER='2.1';
   const UPDATES=[
+    {v:'V63', d:'2026-10-17', t:['47망·디브리핑룸 스크롤 오류 수정: 위로 올려 지난 글을 보던 중 맨 위로 튀던 문제','사진이 있는 대화에 들어가거나 새 사진이 오면 맨 아래까지 내려가지 않던 문제','다시 들어왔을 때 ‘여기까지 읽었습니다’ 줄이 화면 밖에 있던 문제']},
     {v:'V62', d:'2026-10-17', t:['상단 로고(SACHIL:47)와 검색 버튼(Search)을 손글씨 시그니처 이미지로 바꿨어요']},
     {v:'V61', d:'2026-10-17', t:['갤럭시 뒤로(<) 버튼 오류 수정: 다른 화면에서 뒤로를 눌러도 앱이 바로 꺼지던 문제, 첫 화면에서 ‘종료하려면 다시 누르세요.’가 안 뜨던 문제를 고쳤어요(크롬·삼성인터넷의 기록 차단 규칙을 피하는 방식으로 변경)']},
     {v:'V60', d:'2026-10-17', t:['갤럭시 뒤로(<) 버튼을 인스타그램처럼: 열린 창 닫기 → 화면을 움직였으면 처음 위치로 → 다른 화면이면 첫 화면으로 → 첫 화면에서는 ‘종료하려면 다시 누르세요.’']},
@@ -2072,7 +2073,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 대화 목록을 화면 안의 스크롤 상자로 맞춘다(폰·PC 공통) → 문서 전체가 스크롤되지 않아 주소창·하단 탭이 움직이지 않음
   function fitConvo(){
     const c=$('#convo'); if(!c) return null;
-    const atEnd=c.scrollHeight-c.scrollTop-c.clientHeight<24;
+    // 맨 아래에 붙어 있는지: 사용자가 스크롤한 결과(_stick)를 우선 — 사진이 늦게 커져도 '아래 붙음'이 풀리지 않게(V63)
+    if(!c._stickOn){ c._stickOn=1;
+      // 맨 아래에 닿으면 언제든 '붙음'. 떨어짐은 사용자가 직접 움직였을 때만(사진이 커지며 생긴 이동·스크롤 보정은 무시)
+      const touch=()=>{ c._userAt=Date.now(); };
+      ['touchstart','touchmove','touchend','wheel','pointerdown','keydown'].forEach(t=>c.addEventListener(t,touch,{passive:true}));
+      c.addEventListener('scroll',()=>{ const end=c.scrollHeight-c.scrollTop-c.clientHeight<40; if(end) c._stick=true; else if(Date.now()-(c._userAt||0)<1500) c._stick=false; },{passive:true});
+      c.addEventListener('load',e=>{ if(e.target.tagName==='IMG' && c._stick!==false) c.scrollTop=c.scrollHeight; },true);   // 사진이 다 오면 다시 맨 아래로
+    }
+    const atEnd=c._stick!==undefined ? c._stick : c.scrollHeight-c.scrollTop-c.clientHeight<24, keep=c.scrollTop;
     c.style.overflowY='auto'; c.style.overscrollBehavior='contain'; c.style.maxHeight=''; c.style.minHeight='';
     const mainEl=document.querySelector('main'), bar=document.querySelector('.tabbar');
     // 키보드가 뜨면(아이폰·안드로이드) 화면에 실제로 보이는 높이(visualViewport) 기준으로 줄인다 — 입력창이 키보드에 가리지 않게
@@ -2082,7 +2091,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const over=Math.round(box.getBoundingClientRect().bottom+padB-avail), h=c.getBoundingClientRect().height;
     if(over>0){ c.style.minHeight='160px'; c.style.maxHeight=Math.max(160,Math.round(h-over))+'px'; }
     else if(over<0){ c.style.minHeight=Math.round(h-over)+'px'; c.style.maxHeight=c.style.minHeight; }   // 남는 공간까지 대화 배경으로 채움(메신저처럼)
-    if(atEnd) c.scrollTop=c.scrollHeight;
+    c.scrollTop=atEnd ? c.scrollHeight : keep;   // 높이를 다시 재는 동안 위치가 0으로 풀리던 문제(위로 올려 보던 중 맨 위로 튐) 수정
     return c;
   }
   window.addEventListener('resize',()=>{ if(document.body.classList.contains('chatview')) fitConvo(); });
@@ -2387,7 +2396,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           let anchor=firstNew; if(anchor.previousElementSibling&&anchor.previousElementSibling.classList.contains('day-sep')) anchor=anchor.previousElementSibling;
           anchor.insertAdjacentHTML('beforebegin','<div class="unread-line" id="unreadLine" role="separator"><span>여기까지 읽었습니다</span></div>');
           const box=fitConvo(); const line=$('#unreadLine');
-          if(box&&line){ box.scrollTop=Math.max(0,line.offsetTop-box.offsetTop-8); if(!nearEnd()) showPeek(SRV.msgs.get(SRV.last)); }
+          if(box&&line){ box.scrollTop=Math.max(0,line.offsetTop-box.offsetTop-8); box._stick=false; if(!nearEnd()) showPeek(SRV.msgs.get(SRV.last)); }
           markRead(); return added;
         }
       }
