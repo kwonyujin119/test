@@ -176,6 +176,8 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .phases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 /* 상황 박스 — 화재·인명 (역할 공통) */
 .situ{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.il-situ{margin:0 0 16px}
+.il-h{margin:4px 4px 8px;font-size:15px;font-weight:800}
 .situ .phase{border-color:var(--line);box-shadow:inset 0 3px 0 var(--navy)}
 .situ .st{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
 .situ .st.inv{background:var(--ember-soft);border-color:transparent;color:var(--ember-text)}
@@ -683,7 +685,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v76</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v77</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -692,7 +694,7 @@ footer b{color:var(--muted);font-weight:600}
 <nav class="tabbar" aria-label="주요 기능">
   <div class="in">
     <button type="button" data-go="search" id="tb-search"><span class="k"><i class="sg sg-S" role="img" aria-label="S"></i></span>검색</button>
-    <button type="button" data-go="ai" id="tb-ai"><span class="k"><i class="sg sg-A" role="img" aria-label="A"></i></span>AI 도우미</button>
+    <button type="button" data-go="ai" id="tb-ai" aria-label="AI 도우미"><span class="k"><i class="sg sg-A" role="img" aria-label="A"></i></span>AI</button>
     <button type="button" data-go="board" id="tb-board"><span class="k"><i class="sg sg-CH" role="img" aria-label="CH"></i></span>체크리스트</button>
     <button type="button" data-go="log" id="tb-log"><span class="k"><i class="sg sg-IL" role="img" aria-label="IL"></i></span>사고보고서</button>
   </div>
@@ -800,8 +802,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V76', SRV_VER='2.1';
+  const APP_VER='V77', SRV_VER='2.2';
   const UPDATES=[
+    {v:'V77', d:'2026-10-17', t:['AI 도우미는 입장코드를 넣어야 쓸 수 있어요(한 번 맞히면 이 기기에서 기억)','AI 도우미 답변 모델을 가장 저렴한 Haiku로(보고서는 그대로)','발생개요·화재 원인·인명 피해·재산 피해와 보고서 만들기를 CH에서 IL 탭으로 옮겼어요','아래 탭 이름 ‘AI 도우미’ → ‘AI’']},
     {v:'V76', d:'2026-10-17', t:['대칭 구성은 그대로, 손글씨 ‘47’ 획을 다시 살렸어요 — AI 칸 왼쪽 사선 → 가운데 가로선 → CHecklist 오른쪽 사선이 한 획(4·7), 4의 세로획까지','47이 잘 보이게 사선 기울기를 키우고 글자 자리를 다시 맞췄어요']},
     {v:'V75', d:'2026-10-17', t:['첫 화면을 대칭 구성으로: 위 줄 Search · AI(사다리꼴) · 47망, 아래 줄 디브리핑룸 · CHecklist · Incident Log가 위아래 거울 모양','47망·디브리핑룸 설명이 어떤 화면에서도 보여요(좁으면 줄을 나누고 글씨를 한 단계 작게)']},
     {v:'V74', d:'2026-10-17', t:['첫 화면 S·IL 칸을 넓혔어요: 왼쪽 사선은 오른쪽으로, 오른쪽 사선은 왼쪽으로, 가운데 가로선은 짧게(Search 약 +80%, Incident Log 약 +75%)','47망·디브리핑룸 크기는 그대로, 412폭 폰에서도 47망 설명이 보여요']},
@@ -1384,40 +1387,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   { let q=false; const on=()=>{ if(q) return; q=true; requestAnimationFrame(()=>{ q=false; syncJump(); }); };
     window.addEventListener('scroll',on,{passive:true}); document.addEventListener('scroll',on,{passive:true,capture:true}); }
 
-  function renderBoard(panel){
-    const phases=CHECKLIST, checks=state.checks;
-    const total=TOTAL_ITEMS, done=Object.keys(checks).length;
-    const illo = AS.first;
-    panel.innerHTML=`
-      <div class="rolecard">
-        ${illo?`<img src="${illo}" alt="">`:''}
-        <div class="txt"><span class="eyebrow">CH · CHecklist</span><h2>현장지휘 체크리스트</h2><p>출동부터 지휘소 운영까지 12단계. 발생개요·화재 원인·인명 피해·재산 피해를 함께 기록합니다. 항목은 초안 예시이며 교관 승인 후 확정됩니다.</p></div>
-      </div>
-      <div class="board">
-        <div class="card timer ${state.timer.running?'live':''}" id="timerBar">
-          <div class="tclock">
-            <span class="tline"><span class="t" id="tm" aria-live="off" aria-label="현재 시각">${clock(new Date())}</span><span class="prog" aria-label="진행">${done}/${total}</span></span>
-            <span class="tmeta"><span class="el ${state.timer.running?'live':''}" aria-label="경과 시간">경과 <b id="tmEl">${hhmmss(elapsed())}</b></span></span>
-          </div>
-          <div class="btns">
-            <button type="button" class="btn ${state.timer.running?'':'accent'}" id="tmToggle">${state.timer.running?'정지':'시작'}</button>
-            <button type="button" class="btn ghost" id="tmReset">초기화</button>
-            <button type="button" class="btn primary" id="mkReport">보고서<span class="lg">&nbsp;만들기</span></button>
-          </div>
-          <div class="jrow"><button type="button" class="jall" id="jumpAll" aria-expanded="${jumpOpen}" aria-controls="jgrid">${jumpOpen?'닫기 ▴':'전체 ▾'}</button>
-          <nav class="jump" id="jump" aria-label="항목 바로가기">
-            <div class="jl">${SITU.map(b=>{const st=situStatus(b); return `<button type="button" data-j="sec-${b.id}"><i class="d ${st.cls}" aria-hidden="true"></i>${esc(b.name.replace(/\s+/g,''))}</button>`;}).join('')}<button type="button" data-j="sec-log">시각 기록</button></div>
-            <div class="jl">${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}">${pi+1} ${esc(p.name)} <span class="c">${d}/${p.items.length}</span></button>`;}).join('')}</div>
-          </nav></div>
-          <div class="jgrid" id="jgrid" ${jumpOpen?'':'hidden'} aria-label="전체 항목">
-            <p class="jg-h">현장 기록</p>
-            <div class="jg">${SITU.map(b=>{const st=situStatus(b); return `<button type="button" data-j="sec-${b.id}"><i class="d ${st.cls}" aria-hidden="true"></i><span class="n">${esc(b.name)}</span><span class="c">${esc(st.t)}</span></button>`;}).join('')}<button type="button" data-j="sec-log"><span class="n">시각 기록</span></button></div>
-            <p class="jg-h">12단계 · ${done}/${total}</p>
-            <div class="jg">${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}"><b>${pi+1}</b><span class="n">${esc(p.name)}</span><span class="c">${d}/${p.items.length}</span><i class="bar" style="--p:${Math.round(d/p.items.length*100)}%" aria-hidden="true"></i></button>`;}).join('')}</div>
-          </div>
-        </div>
-        ${done===total?`<div class="card done-card" role="status"><img src="img/board-done.webp" alt="" width="360" height="409" decoding="async" onerror="this.remove()"><div><b>36개 항목 모두 완료</b><p>경과 ${hhmmss(elapsed())} · 기록을 보고서로 정리하세요.</p><button type="button" class="btn primary" id="mkReport2">보고서 만들기</button></div></div>`:''}
-        <div class="situ" aria-label="화재 원인 · 인명 피해 · 재산 피해">
+  // ---------- 현장 기록(발생개요·화재 원인·인명 피해·재산 피해) — V77부터 IL 탭에서 입력 ----------
+  function situHtml(){
+    return `<div class="situ" aria-label="화재 원인 · 인명 피해 · 재산 피해">
           ${SITU.map(b=>{const ic=situIcon(b), st=situStatus(b), inv=state.situ.inv[b.id]; return `<section class="card phase" id="sec-${b.id}">
               <header><h3>${ic?`<img src="${ic}" alt="">`:''}${esc(b.name)}</h3><span class="st ${st.cls}">${st.t}</span></header>
               ${b.noInv?'':`<ul class="items">
@@ -1430,7 +1402,64 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
                 : f.type==='text' ? `<input id="${id}" data-f="${f.k}" type="text" maxlength="120" placeholder="${esc(f.ph||'미기재')}" value="${esc(v)}" autocomplete="off">`
                 : `<input id="${id}" data-f="${f.k}" type="number" inputmode="numeric" min="0" max="${f.max||999}" placeholder="미기재" value="${esc(v)}">`}</label>`;}).join('')}</div>
             </section>`;}).join('')}
+        </div>`;
+  }
+  function bindSitu(panel, redraw){
+    panel.querySelectorAll('.item input[data-inv]').forEach(cb=>cb.addEventListener('change',()=>{
+      const id=cb.dataset.inv, b=SITU.find(x=>x.id===id);
+      if(cb.checked){ state.situ.inv[id]=clock(new Date()); addLog(`[${b.name}] 조사 중 ✔`); }
+      else delete state.situ.inv[id];
+      save(); redraw();
+    }));
+    panel.querySelectorAll('.item input[data-txt]').forEach(el=>el.addEventListener('change',()=>{
+      const id=el.dataset.txt, b=SITU.find(x=>x.id===id), v=el.value.trim().slice(0,200);
+      if(v===(state.situ.text[id]||'')) return;
+      if(v) state.situ.text[id]=v; else delete state.situ.text[id];
+      if(v) addLog(`[${b.name}] ${v}`);
+      save(); renderLog();
+      const st=situStatus(b), chip=el.closest('.phase').querySelector('.st'); chip.className='st '+st.cls; chip.textContent=st.t;
+    }));
+    panel.querySelectorAll('.fields [data-f]').forEach(el=>el.addEventListener('change',()=>{
+      const b=SITU.find(x=>x.fields.some(f=>f.k===el.dataset.f)), f=b.fields.find(x=>x.k===el.dataset.f); let v=el.value;
+      if(f.type==='num'){ const n=Number(v); v=(v.trim()===''||!Number.isFinite(n))?'':String(Math.min(f.max||999,Math.max(0,Math.floor(n)))); el.value=v; }
+      else if(f.type==='datetime'){ if(!DT.test(v)) v=''; }
+      else if(f.type==='text'){ v=v.trim().slice(0,120); }
+      if(v===(state.situ.fields[f.k]||'')) return;
+      if(v) state.situ.fields[f.k]=v; else delete state.situ.fields[f.k];
+      if(v) addLog(f.opts ? `[${b.name}] ${f.label}: ${v}` : f.type==='num' ? `[${b.name}] ${f.label} ${v}${f.unit||''}` : `[${b.name}] ${f.label}: ${showDT(v)}`);
+      save(); renderLog();
+      const st=situStatus(b), chip=el.closest('.phase').querySelector('.st'); chip.className='st '+st.cls; chip.textContent=st.t;
+    }));
+  }
+  function renderBoard(panel){
+    const phases=CHECKLIST, checks=state.checks;
+    const total=TOTAL_ITEMS, done=Object.keys(checks).length;
+    const illo = AS.first;
+    panel.innerHTML=`
+      <div class="rolecard">
+        ${illo?`<img src="${illo}" alt="">`:''}
+        <div class="txt"><span class="eyebrow">CH · CHecklist</span><h2>현장지휘 체크리스트</h2><p>출동부터 지휘소 운영까지 12단계와 시각 기록. 항목은 초안 예시이며 교관 승인 후 확정됩니다.</p></div>
+      </div>
+      <div class="board">
+        <div class="card timer ${state.timer.running?'live':''}" id="timerBar">
+          <div class="tclock">
+            <span class="tline"><span class="t" id="tm" aria-live="off" aria-label="현재 시각">${clock(new Date())}</span><span class="prog" aria-label="진행">${done}/${total}</span></span>
+            <span class="tmeta"><span class="el ${state.timer.running?'live':''}" aria-label="경과 시간">경과 <b id="tmEl">${hhmmss(elapsed())}</b></span></span>
+          </div>
+          <div class="btns">
+            <button type="button" class="btn ${state.timer.running?'':'accent'}" id="tmToggle">${state.timer.running?'정지':'시작'}</button>
+            <button type="button" class="btn ghost" id="tmReset">초기화</button>
+          </div>
+          <div class="jrow"><button type="button" class="jall" id="jumpAll" aria-expanded="${jumpOpen}" aria-controls="jgrid">${jumpOpen?'닫기 ▴':'전체 ▾'}</button>
+          <nav class="jump" id="jump" aria-label="항목 바로가기">
+            <div class="jl">${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}">${pi+1} ${esc(p.name)} <span class="c">${d}/${p.items.length}</span></button>`;}).join('')}<button type="button" data-j="sec-log">시각 기록</button></div>
+          </nav></div>
+          <div class="jgrid" id="jgrid" ${jumpOpen?'':'hidden'} aria-label="전체 항목">
+            <p class="jg-h">12단계 · ${done}/${total}</p>
+            <div class="jg">${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}"><b>${pi+1}</b><span class="n">${esc(p.name)}</span><span class="c">${d}/${p.items.length}</span><i class="bar" style="--p:${Math.round(d/p.items.length*100)}%" aria-hidden="true"></i></button>`;}).join('')}</div>
+          </div>
         </div>
+        ${done===total?`<div class="card done-card" role="status"><img src="img/board-done.webp" alt="" width="360" height="409" decoding="async" onerror="this.remove()"><div><b>36개 항목 모두 완료</b><p>경과 ${hhmmss(elapsed())} · IL에서 보고서로 정리하세요.</p><a class="btn primary" href="#log">IL 사고보고서로</a></div></div>`:''}
         <div class="phases">
           ${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length;return `<section class="card phase ${d===p.items.length?'done':''}" id="ph-${pi}">
               <header><h3><span class="no">${pi+1}</span>${phaseIcon(pi)?`<img src="${phaseIcon(pi)}" alt="">`:''}${esc(p.name)}</h3><span class="cnt">${d}/${p.items.length}</span></header>
@@ -1453,33 +1482,6 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       else delete checks[k];
       save(); renderBoard(panel);
     }));
-    panel.querySelectorAll('.item input[data-inv]').forEach(cb=>cb.addEventListener('change',()=>{
-      const id=cb.dataset.inv, b=SITU.find(x=>x.id===id);
-      if(cb.checked){ state.situ.inv[id]=clock(new Date()); addLog(`[${b.name}] 조사 중 ✔`); }
-      else delete state.situ.inv[id];
-      save(); renderBoard(panel);
-    }));
-    panel.querySelectorAll('.item input[data-txt]').forEach(el=>el.addEventListener('change',()=>{
-      const id=el.dataset.txt, b=SITU.find(x=>x.id===id), v=el.value.trim().slice(0,200);
-      if(v===(state.situ.text[id]||'')) return;
-      if(v) state.situ.text[id]=v; else delete state.situ.text[id];
-      if(v) addLog(`[${b.name}] ${v}`);
-      save(); renderLog();
-      const st=situStatus(b), chip=el.closest('.phase').querySelector('.st'); chip.className='st '+st.cls; chip.textContent=st.t;
-    }));
-    panel.querySelectorAll('.fields [data-f]').forEach(el=>el.addEventListener('change',()=>{
-      const b=SITU.find(x=>x.fields.some(f=>f.k===el.dataset.f)), f=b.fields.find(x=>x.k===el.dataset.f); let v=el.value;
-      if(f.type==='num'){ const n=Number(v); v=(v.trim()===''||!Number.isFinite(n))?'':String(Math.min(f.max||999,Math.max(0,Math.floor(n)))); el.value=v; }
-      else if(f.type==='datetime'){ if(!DT.test(v)) v=''; }
-      else if(f.type==='text'){ v=v.trim().slice(0,120); }
-      if(v===(state.situ.fields[f.k]||'')) return;
-      if(v) state.situ.fields[f.k]=v; else delete state.situ.fields[f.k];
-      if(v) addLog(f.opts ? `[${b.name}] ${f.label}: ${v}` : f.type==='num' ? `[${b.name}] ${f.label} ${v}${f.unit||''}` : `[${b.name}] ${f.label}: ${showDT(v)}`);
-      save(); renderLog();
-      const st=situStatus(b), chip=el.closest('.phase').querySelector('.st'); chip.className='st '+st.cls; chip.textContent=st.t;
-    }));
-    $('#mkReport').addEventListener('click',newReport);
-    { const b2=$('#mkReport2'); if(b2) b2.addEventListener('click',newReport); }
     $('#tmToggle').addEventListener('click',()=>{
       if(state.timer.running){ state.timer.acc=elapsed(); state.timer.running=false; }
       else { state.timer.start=Date.now(); state.timer.running=true; if(!state.timer.acc) addLog('체크리스트 시작'); if(!state.situ.fields.dt){ state.situ.fields.dt=localDT(new Date()); addLog('[발생개요] 사고일시 자동 입력 '+showDT(state.situ.fields.dt)); } startTick(); }
@@ -1911,11 +1913,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     panel.innerHTML=`
       <div class="panel-head">
         <div><span class="eyebrow">IL · Incident Log</span><h2 style="margin-top:4px">사고보고서</h2></div>
-        <a class="btn primary" href="#board">체크리스트에서 새 보고서</a>
+        <button type="button" class="btn primary" id="mkReport">보고서 만들기</button>
       </div>
-      <div class="card replist">${rows || `<div class="rep-empty">${AS.ilEmpty?`<img src="${AS.ilEmpty}" alt="">`:''}<p>아직 보고서가 없습니다. <b>CH 체크리스트</b>에서 항목을 체크하고 <b>보고서 만들기</b>를 누르면 여기에 쌓입니다.</p><a class="btn" href="#board">체크리스트 열기</a></div>`}</div>
+      <div class="il-situ">${situHtml()}</div>
+      <h3 class="il-h">작성된 보고서</h3>
+      <div class="card replist">${rows || `<div class="rep-empty">${AS.ilEmpty?`<img src="${AS.ilEmpty}" alt="">`:''}<p>아직 보고서가 없습니다. 위 현장 기록과 <b>CH 체크리스트</b>를 채우고 <b>보고서 만들기</b>를 누르면 여기에 쌓입니다.</p><a class="btn" href="#board">체크리스트 열기</a></div>`}</div>
       <p class="hint-row" style="margin:10px 4px 0;font-size:12px;color:var(--muted-2)">보고서는 이 기기에만 저장됩니다 · ${reports.length}건 (최대 ${MAX_REPORTS}건)${storageFull?' · <b>저장 공간 부족</b>':''}</p>`;
     panel.querySelectorAll('[data-rep]').forEach(b=>b.addEventListener('click',()=>{ const r=reports.find(x=>x.id===b.dataset.rep); if(r) openReport(r); }));
+    $('#mkReport').addEventListener('click',newReport);
+    bindSitu(panel,()=>{ const y=(scrollRoot()||document.scrollingElement).scrollTop; renderReports(panel); (scrollRoot()||document.scrollingElement).scrollTop=y; });
     panel.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>arm(b,'정말 삭제',()=>{ reports=reports.filter(x=>x.id!==b.dataset.del); rpsave(); renderReports(panel); })));
   }
 
@@ -1954,7 +1960,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const q=qRaw.trim(), lq=q.toLowerCase();
     const has=(...ws)=>ws.some(w=>lq.includes(w));
     if(has('안녕','하이','hello','반가')) return {text:'안녕하세요. SACHIL AI 도우미입니다. SOP·법령·절차 문서를 찾아 드리고, 체크리스트와 사고보고서로 안내합니다. 아래 추천 질문을 눌러 보셔도 됩니다.'};
-    if(has('도움','사용법','뭐 할 수','뭘 할 수','기능')) return {text:'SACHIL은 이름이 곧 화면입니다.\nS 검색 — SOP·법령·절차·사례를 찾습니다.\nA AI 도우미 — 지금 보시는 화면.\nCH 체크리스트 — 출동부터 지휘소 운영까지 12단계, 발생개요·화재 원인·인명·재산 피해, 경과 타이머.\nIL 사고보고서 — 체크리스트에서 만든 보고서를 모아 보고 고칩니다.\n47망·디브리핑룸(익명 의견·사진·PDF 공유)과 메뉴(12개 섹션)는 오른쪽 위 심벌에 있습니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
+    if(has('도움','사용법','뭐 할 수','뭘 할 수','기능')) return {text:'SACHIL은 이름이 곧 화면입니다.\nS 검색 — SOP·법령·절차·사례를 찾습니다.\nA AI 도우미 — 지금 보시는 화면.\nCH 체크리스트 — 출동부터 지휘소 운영까지 12단계, 경과 타이머.\nIL 사고보고서 — 발생개요·화재 원인·인명·재산 피해를 적고 보고서 만들기.\n47망·디브리핑룸(익명 의견·사진·PDF 공유)과 메뉴(12개 섹션)는 오른쪽 위 심벌에 있습니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
     if(has('보고서','리포트','report')) return {text:'체크리스트 화면의 "보고서 작성"을 누르면 체크한 항목·화재 원인·인명 피해·재산 피해·시각 기록으로 보고서 초안이 바로 만들어지고 AI 작성본이 이어서 나옵니다. 만든 보고서는 IL 사고보고서 탭에 모이며, 두 본문 모두 직접 고칠 수 있습니다. 교관 확인 전 자료입니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
     if(has('상황판','체크리스트','타이머')) return {text:'체크리스트로 안내합니다. 시작을 누르면 경과 시간과 체크 시각이 기록되고, 사고일시가 자동으로 채워집니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'}]};
     if(has('차이','범위','역할') && has('선착대장','지휘대장')) return {text:'초안 기준 역할 경계입니다. 확정 기준은 교관 승인 후 반영됩니다.\n· 선착대장 — 도착 보고, 초기 상황판단, 선착대 전술(진입·배연·용수), 대원 안전, 지휘권 이양 준비까지.\n· 지휘대장 — 지휘권 인수, 상황 재평가, 대응단계 판단·건의, 자원 요청·배치, 안전관리, 지휘소 운영, 통제단 전환 직전까지.\n· 통제단장 — 이 플랫폼 범위 밖(중앙소방학교).', cards:[{title:'SOP-현장지휘론',slug:'sop',type:'섹션'}]};
@@ -2158,7 +2164,34 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   window.__fitConvo=fitConvo;
   function scrollEndOf(panel){ const box=fitConvo(); if(box){ box.scrollTop=box.scrollHeight; return; } const c=$('#convo'); if(!c) return; const last=c.lastElementChild; if(!last||!last.classList.contains('msg')) return; const comp=$('#composer'); const cover=(comp?comp.getBoundingClientRect().height+16:0)+(window.innerWidth<600?68:0); const r=last.getBoundingClientRect(); const target=window.scrollY + r.bottom - (window.innerHeight - cover); if(target>window.scrollY) window.scrollTo({top:target,behavior:'auto'}); }
 
+  // AI 도우미 입장코드(V77): 서버가 확인한다. 이 기기에 한 번 맞히면 기억
+  const AICODE_KEY='sachil_ai_code';
+  const aiCode=()=>{ try{ return localStorage.getItem(AICODE_KEY)||''; }catch(_){ return ''; } };
+  const setAiCode=v=>{ try{ if(v) localStorage.setItem(AICODE_KEY,v); else localStorage.removeItem(AICODE_KEY); }catch(_){ } };
+  function aiGate(panel,room){
+    panel.innerHTML=`<div class="dbwrap"><form class="card create ai-gate" id="aiGate" autocomplete="off">
+        <span class="eyebrow">AI 도우미</span>
+        <div class="row"><label for="aiCodeIn">입장코드</label><input id="aiCodeIn" type="password" inputmode="numeric" maxlength="20" required enterkeyhint="go" autocomplete="off"></div>
+        <p class="note err" id="aiCodeErr" role="alert" hidden></p>
+        <div class="acts"><button type="button" class="btn ghost" id="aiHome">첫 화면으로</button><button type="submit" class="btn primary" id="aiCodeGo">확인</button></div>
+      </form></div>`;
+    const inp=$('#aiCodeIn'), err=$('#aiCodeErr');
+    $('#aiHome').addEventListener('click',goHome);
+    if(window.innerWidth>=600) inp.focus();
+    $('#aiGate').addEventListener('submit',async e=>{
+      e.preventDefault(); const v=inp.value.trim(); if(!v) return;
+      const btn=$('#aiCodeGo'); btn.disabled=true; err.hidden=true;
+      if(SRV.on){
+        const r=await api('/api/ask',{json:{q:'',code:v}});   // 빈 질문: 코드만 확인(AI 호출 없음)
+        btn.disabled=false;
+        if(r.status===403||r.status===429){ err.textContent=r.status===429?(r.j.error||'잠시 뒤 다시 시도하세요'):'코드가 맞지 않습니다'; err.hidden=false; inp.select(); return; }
+        if(r.status===0){ err.textContent='서버에 연결할 수 없습니다'; err.hidden=false; return; }
+      }
+      setAiCode(v); renderBotRoom(panel,room);
+    });
+  }
   function renderBotRoom(panel, room){
+    if(!aiCode()){ aiGate(panel,room); return; }
     const msgsHtml = chat.msgs.length ? chat.msgs.map(m=> m.who==='me' ? msgMeHtml(m) : `
       <div class="msg bot">${avHtml()}
         <div class="bub">${botTextHtml(m)}${botSrcHtml(m)}${botModeHtml(m)}${m.cards&&m.cards.length?`<ul class="mini">${m.cards.map(c=>`<li><a href="#${esc(c.slug)}"><span class="tag">${esc(c.type)}</span><span>${esc(c.title)}</span><span class="arrow">→</span></a></li>`).join('')}</ul>`:''}</div>
@@ -2185,9 +2218,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(SRV.on && v && !localIntent(v)){
         const hist=[]; for(let i=chat.msgs.length-2;i>0&&hist.length<2;i--){ const b=chat.msgs[i], u=chat.msgs[i-1]; if(b.who==='bot'&&b.mode==='ai'&&u.who==='me'&&u.text) hist.unshift({q:u.text,a:b.text}); }
         const g0=chat.gen||0;
-        api('/api/ask',{json:{q:v,history:hist}}).then(r=>{
+        api('/api/ask',{json:{q:v,history:hist,code:aiCode()}}).then(r=>{
           if((chat.gen||0)!==g0) return;   // 그사이 '대화 비우기' — 이전 질문의 답은 버림
           chat.typing=false;
+          if(r.status===403&&r.j&&r.j.code==='need_code'){ chat.msgs.pop(); csave(); setAiCode(''); if(chat.room==='bot'&&state.route==='ai') aiGate(panel,room); return; }   // 코드가 바뀜 → 다시 입력
           if(r.ok&&r.j.ok){ push('bot',String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,snip:String(x.snippet||'').slice(0,180)})); csave(); }
           else push('bot', r.status===0?'서버에 연결할 수 없습니다. 잠시 뒤 다시 물어보세요.':(r.j.error||'답변을 만들지 못했습니다.'),[]);
           if(chat.room==='bot'&&state.route==='ai'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp&&window.innerWidth>=600) inp.focus(); }
@@ -3246,9 +3280,9 @@ body.hubview footer{display:none}
      d:['메뉴에 올린 자료를 근거로 <b>사람이 말하듯</b> 답합니다.','답변 속 [1] 같은 번호를 누르면 근거가 된 원문 쪽이 열립니다.'],
      n:'AI 답변은 학습용입니다. 중요한 내용은 원문으로 확인하세요.'},
     {k:'CH', t:'체크리스트', get:()=>[pick('.tabbar [data-go="board"]','.top-nav [data-route="board"]')],
-     d:['위에는 <b>현재 시각과 경과 시간</b>, 아래에는 출동부터 지휘소 운영까지 <b>12단계 체크</b>가 있습니다.','발생개요·화재 원인·인명·재산 피해를 적고 <b>보고서 만들기</b>를 누르면 보고서가 바로 나옵니다. ‘전체 ▾’로 모든 항목을 한눈에.']},
+     d:['위에는 <b>현재 시각과 경과 시간</b>, 아래에는 출동부터 지휘소 운영까지 <b>12단계 체크</b>가 있습니다.','<b>시작</b>을 누르면 경과 시간이 흐르고, 체크한 항목은 시각이 자동으로 남습니다. ‘전체 ▾’로 모든 항목을 한눈에.']},
     {k:'IL', t:'사고보고서', get:()=>[pick('.tabbar [data-go="log"]','.top-nav [data-route="log"]')],
-     d:['체크리스트에서 만든 <b>보고서가 모이는 곳</b>입니다.','고치기, AI로 작성, 복사·저장·공유를 할 수 있어요.'],
+     d:['<b>발생개요·화재 원인·인명 피해·재산 피해</b>를 적고 <b>보고서 만들기</b>를 누르면 체크리스트 기록과 합쳐 보고서가 나옵니다.','만든 보고서는 아래에 모여 고치기, AI로 작성, 복사·저장·공유를 할 수 있어요.'],
      n:'화면을 좌우로 밀면 옆 탭으로 넘어갑니다.'}
   ];
   let i=0, last=null;
