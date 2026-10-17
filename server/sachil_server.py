@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '3.9'
-APP_VERSION = 'V102'
+VERSION = '4.0'
+APP_VERSION = 'V103'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -741,6 +741,8 @@ class H(BaseHTTPRequestHandler):
             m = re.fullmatch(r'/api/rooms/(\d{1,12})/read', path)
             if m:
                 return self.read_mark(int(m.group(1)))
+            if path == '/api/admin/ai':
+                return self.admin_ai()
             m = re.fullmatch(r'/api/lib/([a-z\-]{2,20})/upload', path)
             if m:
                 return self.lib_upload(m.group(1))
@@ -954,6 +956,60 @@ class H(BaseHTTPRequestHandler):
             REPORT_CACHE.clear()
         REPORT_CACHE[key] = (now, text)
         return self.send(200, {'ok': True, 'text': text}, log=False)
+
+    # --- 교수(관리자) AI 키 관리 (V103): 휴대폰 앱에서 키를 넣고 시험. 키는 되돌려 보내지 않고 끝 4자리만 보인다
+    def admin_ai(self):
+        if self.user['role'] != 'admin':
+            return self.err(403, '교수(관리자)만 할 수 있습니다')
+        j = self.body_json(4000)
+        act = str(j.get('action') or 'status')
+        def status():
+            return {'ok': True, 'provider': ai_provider(), 'order': ai_has(),
+                    'keys': {p: ('…' + str(CONF.get(AI_KEYS[p]))[-4:]) if CONF.get(AI_KEYS[p]) else '' for p in AI_KEYS},
+                    'models': {'gemini': CONF.get('gemini_model'), 'groq': CONF.get('groq_model'), 'claude': CONF.get('ai_assist_model')},
+                    'today': AI_DAY.get('n', 0) if AI_DAY.get('d') == time.strftime('%Y-%m-%d') else 0,
+                    'limit': int(CONF.get('ai_daily_limit') or 0), 'version': VERSION}
+        if act == 'status':
+            return self.send(200, status(), log=False)
+        prov = str(j.get('provider') or '')
+        if prov not in AI_KEYS:
+            return self.err(400, 'AI 회사를 고르세요')
+        ip, now = self.ip(), time.time()
+        with FAILS_LOCK:
+            lst = [t for t in FAILS.get('aikey:' + ip, []) if now - t < LOGIN_WINDOW]
+            if len(lst) >= 10:
+                FAILS['aikey:' + ip] = lst
+                return self.err(429, '시도가 너무 많습니다. 10분 뒤 다시 하세요')
+            FAILS['aikey:' + ip] = lst + [now]
+        if act == 'delete':
+            CONF[AI_KEYS[prov]] = ''
+            with open(CONF_PATH, 'w', encoding='utf-8') as f:
+                json.dump(CONF, f, ensure_ascii=False, indent=2)
+            self.alog(200, f'ai-key-delete {prov}')
+            return self.send(200, dict(status(), msg=f'{AI_NAMES[prov]} 키를 지웠습니다'), log=False)
+        raw = str(j.get('key') or '').strip()
+        pat = {'claude': r'sk-ant-[A-Za-z0-9_\-]{20,}', 'groq': r'gsk_[0-9A-Za-z_\-]{20,}', 'gemini': r'[0-9A-Za-z_\-.]{30,}'}[prov]
+        m = re.search(pat, raw)
+        if not m or len(raw) > 300:
+            return self.err(400, {'claude': 'sk-ant- 로 시작하는 Claude 키를 넣으세요', 'groq': 'gsk_ 로 시작하는 Groq 키를 넣으세요',
+                                  'gemini': 'AI Studio에서 복사한 Gemini 키를 그대로 넣으세요'}[prov])
+        key = m.group(0)
+        old = CONF.get(AI_KEYS[prov])
+        CONF[AI_KEYS[prov]] = key   # 시험하는 동안만 바꿔 두고, 실패하면 되돌린다
+        tsys, tmsg = '짧게 답한다.', [{'role': 'user', 'content': '연결 확인입니다. "연결됨"이라고만 답하세요.'}]
+        text, why, _c = (call_gemini(tsys, tmsg, 1000) if prov == 'gemini' else call_groq(tsys, tmsg, 1000) if prov == 'groq'
+                         else call_claude(tsys, tmsg, 1000, 'low'))
+        if not text:
+            CONF[AI_KEYS[prov]] = old
+            self.alog(400, f'ai-key-test-fail {prov}')
+            return self.send(200, dict(status(), ok=False, error=f'시험 실패: {why} — 이전 키를 그대로 둡니다'), log=False)
+        if prov == 'groq' and GROQ_OK_MODEL[0]:
+            CONF['groq_model'] = GROQ_OK_MODEL[0]
+        with open(CONF_PATH, 'w', encoding='utf-8') as f:
+            json.dump(CONF, f, ensure_ascii=False, indent=2)
+        self.alog(200, f'ai-key-set {prov}')
+        print(f'[AI] 교수 화면에서 {AI_NAMES[prov]} 키를 바꿨습니다(…{key[-4:]}), 시험 성공', flush=True)
+        return self.send(200, dict(status(), msg=f'{AI_NAMES[prov]} 키 저장·시험 성공 — 바로 적용됩니다'), log=False)
 
     # --- 교수(관리자) 메뉴 자료 올리기·지우기 (V79)
     def lib_upload(self, slug):

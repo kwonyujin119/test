@@ -735,7 +735,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v102</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v103</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -852,8 +852,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V102', SRV_VER='3.8';
+  const APP_VER='V103', SRV_VER='4.0';
   const UPDATES=[
+    {v:'V103', d:'2026-10-17', t:['교수 로그인 화면에 ‘AI 키 관리’: 휴대폰에서 Gemini·Groq·Claude 키를 넣고 바로 시험(실패하면 이전 키 유지), 연결 상태·오늘 사용 횟수 보기 — PC에서 bat 파일을 실행하지 않아도 됨']},
     {v:'V102', d:'2026-10-17', t:['AI 도우미: 같은 질문(띄어쓰기·물음표만 다른 것 포함)은 서버에 저장된 답을 바로 보여 줌 — AI 사용량·하루 한도를 쓰지 않음(3일 보관, 메뉴 자료가 바뀌면 새로 답함)']},
     {v:'V101', d:'2026-10-17', t:['AI가 잠시 실패해 ‘자료 발췌’로 답할 때도 결론 → 설명 → 근거 형식으로, 실패 이유를 설명 줄에 표시','AI 일시 오류(바쁨·분당 한도)는 서버가 한 번 더 시도','추천 질문은 3분마다 바뀜']},
     {v:'V100', d:'2026-10-17', t:['AI 도우미 입력창 위 추천 질문: 메뉴 자료 범위의 질문 36개 중 5개를 무작위로 띄우고 15초마다 새 질문으로 바뀜(자주·이전 검색과 무관, 입력·누르는 중엔 멈춤)']},
@@ -1419,9 +1420,22 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
             <h2>교수로 로그인되어 있습니다</h2>
             <ul class="prof-do"><li>메뉴의 각 섹션에서 <b>자료 올리기</b>·<b>지우기</b></li><li><b>주요 질의응답</b>에서 질문에 답변·삭제</li></ul>
             <div class="acts"><button type="button" class="btn ghost" id="profOut">로그아웃</button><button type="button" class="btn primary" id="profMenu">메뉴 열기</button></div>
+          </section>
+          <section class="card create prof aikeys" id="aiKeys" aria-labelledby="aiKeysH">
+            <span class="eyebrow">AI 키 관리</span>
+            <h2 id="aiKeysH">AI 연결</h2>
+            <div id="aiStat" class="aist"><p class="note">불러오는 중…</p></div>
+            <form id="aiKeyForm" autocomplete="off">
+              <div class="row"><label for="aiProv">AI 회사</label><select id="aiProv"><option value="gemini">Gemini (aistudio.google.com)</option><option value="groq">Groq · 예비 (console.groq.com)</option><option value="claude">Claude (console.anthropic.com)</option></select></div>
+              <div class="row"><label for="aiKeyIn">API 키</label><input id="aiKeyIn" type="password" maxlength="300" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="복사한 키를 붙여넣기"></div>
+              <p class="note err" id="aiKeyMsg" role="status" hidden></p>
+              <div class="acts"><button type="submit" class="btn primary" id="aiKeyGo">저장하고 시험</button></div>
+              <p class="note">키는 서버 PC에만 저장되고 다시 보여 주지 않습니다(끝 4자리만). 시험에 실패하면 이전 키를 그대로 둡니다. 키를 채팅·카카오톡에 붙이지 마세요.</p>
+            </form>
           </section></div>`;
         $('#profOut').addEventListener('click',profLogout);
         $('#profMenu').addEventListener('click',()=>{ const b=$('#menuBtn'); if(b) b.click(); });
+        aiKeysBind();
         return;
       }
       panel.innerHTML=`<div class="dbwrap"><form class="card create prof" id="profForm" autocomplete="off">
@@ -1442,6 +1456,30 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     };
     draw();
     if(!PROF.checked&&PROF.tok) checkProf().then(()=>{ if(state.route==='login') draw(); });
+  }
+  // 교수: AI 키 관리(V103) — 휴대폰에서 Gemini·Groq·Claude 키를 넣고 바로 시험
+  const AI_NM={gemini:'Gemini',groq:'Groq',claude:'Claude'};
+  function aiStatHtml(j){
+    if(!j||!j.keys) return '<p class="note">서버가 이 기능을 아직 모릅니다 — 서버가 4.0으로 업데이트되면 보입니다.</p>';
+    const order=j.order||[];
+    return `<ul class="aikl">${['gemini','groq','claude'].map(p=>`<li><b>${AI_NM[p]}</b><span>${j.keys[p]?`연결됨 ${esc(j.keys[p])}${j.provider===p?' · <em>지금 사용</em>':order.includes(p)?' · 예비':''}`:'없음'}</span>${j.keys[p]?`<button type="button" class="btn ghost aidel" data-del="${p}">지우기</button>`:''}</li>`).join('')}</ul>
+      <p class="note">오늘 AI 답변 ${j.today}회${j.limit?` / 하루 ${j.limit}회(교수 사용 제외)`:''} · 서버 ${esc(j.version||'')}</p>`;
+  }
+  async function aiKeysBind(){
+    const st=$('#aiStat'), f=$('#aiKeyForm'), msg=$('#aiKeyMsg'); if(!st||!f) return;
+    const show=(t,bad)=>{ msg.hidden=!t; msg.textContent=t||''; msg.classList.toggle('err',!!bad); };
+    const paint=j=>{ st.innerHTML=aiStatHtml(j); st.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>arm(b,'정말 지우기',async()=>{
+      const r=await api('/api/admin/ai',{json:{action:'delete',provider:b.dataset.del},tok:PROF.tok}); if(r.ok&&r.j.keys){ paint(r.j); show(r.j.msg||''); } else show(r.j.error||'지우지 못했습니다',true); }))); };
+    const r=await api('/api/admin/ai',{json:{action:'status'},tok:PROF.tok});
+    if(!st.isConnected) return;
+    paint(r.ok?r.j:null);
+    f.addEventListener('submit',async e=>{
+      e.preventDefault(); const key=$('#aiKeyIn').value.trim(), prov=$('#aiProv').value, b=$('#aiKeyGo'); if(!key) return;
+      b.disabled=true; show('시험하는 중… (최대 1분)');
+      const x=await api('/api/admin/ai',{json:{action:'set',provider:prov,key},tok:PROF.tok}); b.disabled=false;
+      if(x.ok&&x.j.ok){ $('#aiKeyIn').value=''; paint(x.j); show(x.j.msg||'저장했습니다'); }
+      else { if(x.j&&x.j.keys) paint(x.j); show(x.status===404?'서버가 아직 이 기능을 모릅니다(서버 4.0 필요)':(x.j.error||'저장하지 못했습니다'),true); }
+    });
   }
   // 교수: 섹션 자료 올리기·지우기
   function profLibBar(slug){ return isProf()&&SRV.on?`<div class="prof-up"><label class="btn primary"><input type="file" id="libUp" multiple hidden>자료 올리기</label><span class="pu-st" id="libUpSt" aria-live="polite"></span></div>`:''; }
@@ -3494,6 +3532,12 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .ilbar .ilrow #mkReport{margin-left:0}
 
 .prof h2{margin:6px 0 10px;font-size:18px}
+.aikeys{margin-top:14px}
+.aikl{list-style:none;margin:0 0 6px;padding:0;display:grid;gap:6px}
+.aikl li{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:14px}
+.aikl li b{min-width:58px}.aikl li span{flex:1;color:var(--muted)}.aikl li em{font-style:normal;color:var(--navy);font-weight:700}
+.aikl .aidel{min-height:32px;padding:0 10px;font-size:12.5px}
+.aikeys select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 10px;font:inherit;background:var(--surface);color:var(--fg)}
 .prof-do{margin:0 0 6px;padding-left:18px;line-height:1.7;font-size:14px}
 .prof-up{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0 4px}
 .prof-up label{cursor:pointer}
