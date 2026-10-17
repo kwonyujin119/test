@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '3.7'
-APP_VERSION = 'V101'
+VERSION = '3.8'
+APP_VERSION = 'V102'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -93,6 +93,7 @@ def load_conf():
         'gemini_api_key': '',           # Google AI Studio API 키(AIza…) — V96. gemini-key-setup.bat으로 넣음
         'gemini_model': 'gemini-flash-latest',   # Gemini 모델 이름(AI Studio에 나온 이름으로 바꿀 수 있음)
         'ai_provider': 'auto',
+        'ai_cache_days': 3,             # V102: 같은 질문의 AI 답을 이 기간 저장해 다시 씀(AI 호출·한도 안 씀). 0이면 끔
         'auto_update': True,            # V102: 서버 파일을 GitHub에서 스스로 받아 다시 켬(접속자 없을 때). false면 끔
         'update_check_hours': 2,        # 새 버전 확인 간격(시간)
         'update_url': 'https://raw.githubusercontent.com/kwonyujin119/test/main/server/sachil_server.py',          # auto(키 있는 쪽, 둘 다면 gemini) | gemini | claude
@@ -884,6 +885,11 @@ class H(BaseHTTPRequestHandler):
         if len(qtext) < 2:
             raise ValueError('질문을 입력하세요')   # 앱은 빈 질문으로 입장코드만 확인한다(AI 호출 없음)
         hist = j.get('history') if isinstance(j.get('history'), list) else []
+        ck = ans_cache_key(qtext)
+        hit = ans_cache_get(ck)
+        if hit:   # V102: 같은 질문(띄어쓰기·물음표만 다른 것 포함)은 저장된 답으로 — AI 호출·하루 한도를 쓰지 않는다
+            return self.send(200, {'ok': True, 'mode': hit['mode'], 'note': '', 'answer': hit['answer'], 'sources': hit['sources'],
+                                   'status': DOCS_IDX.status(), 'cached': True}, log=False)
         terms, hits = DOCS_IDX.search(qtext, limit=10)
         hits = focus_hits(hits)[:7]
         if hits and len(terms) >= 2 and ai_ready() and max(len(h['hit']) for h in hits) / len(terms) < 0.5:
@@ -895,6 +901,8 @@ class H(BaseHTTPRequestHandler):
             if ok:
                 ans, why = ask_general(qtext, hist)
                 if ans:
+                    if not hist:
+                        ans_cache_put(ck, 'general', ans, [])
                     return self.send(200, {'ok': True, 'mode': 'general', 'note': '', 'answer': ans, 'sources': [], 'status': st}, log=False)
         if not hits:
             if st['pending'] or not st['ready']:
@@ -911,6 +919,8 @@ class H(BaseHTTPRequestHandler):
                 ans, why = ask_llm(qtext, hits, hist)
                 if ans:
                     mode = 'ai'
+                    if not hist:   # 앞 대화에 기대지 않은 답만 저장(이어 묻는 질문의 답이 남에게 가지 않게)
+                        ans_cache_put(ck, 'ai', ans, sources)
             note = why
         if not ans:
             ans = extract_as_format(extract_answer(qtext, hits, terms), note if ai_ready() else 'AI 키 미연결')
@@ -2067,6 +2077,59 @@ def history_msgs(history):
             msgs.append({'role': 'user', 'content': turn['q'][:300]})
             msgs.append({'role': 'assistant', 'content': order_answer(turn['a'])[:900]})
     return msgs
+
+
+# ---- 같은 질문 답 저장(V102): data/ai_cache.json. 메뉴 자료가 바뀌면(색인 서명 변경) 모두 무효
+ANS_CACHE_PATH = os.path.join(DATA, 'ai_cache.json')
+ANS_CACHE_LOCK = threading.Lock()
+try:
+    with open(ANS_CACHE_PATH, encoding='utf-8') as _f:
+        ANS_CACHE = json.load(_f)
+    if not isinstance(ANS_CACHE, dict):
+        ANS_CACHE = {}
+except Exception:
+    ANS_CACHE = {}
+
+
+def ans_cache_key(q):
+    k = re.sub(r'[\W_]+', '', unicodedata.normalize('NFKC', str(q)).lower())   # 띄어쓰기·물음표·문장부호 차이는 같은 질문
+    return f'{ai_provider()}:{k}' if len(k) >= 6 else ''   # '왜요?' 같은 짧은 이어 묻기는 저장하지 않음
+
+
+def ans_cache_sig():
+    return hashlib.sha1(repr(DOCS_IDX.sig).encode('utf-8')).hexdigest()[:12]
+
+
+def ans_cache_get(key):
+    days = float(CONF.get('ai_cache_days') or 0)
+    if not key or days <= 0 or not ai_ready():
+        return None
+    with ANS_CACHE_LOCK:
+        e = ANS_CACHE.get(key)
+    if e and time.time() - e.get('t', 0) < days * 86400 and e.get('sig') == ans_cache_sig():
+        return e
+    return None
+
+
+def ans_cache_put(key, mode, answer, sources):
+    if not key or float(CONF.get('ai_cache_days') or 0) <= 0:
+        return
+    now = time.time()
+    with ANS_CACHE_LOCK:
+        ANS_CACHE[key] = {'t': now, 'sig': ans_cache_sig(), 'mode': mode, 'answer': answer, 'sources': sources}
+        days = float(CONF.get('ai_cache_days') or 0)
+        for k in [k for k, v in ANS_CACHE.items() if now - v.get('t', 0) > days * 86400]:
+            ANS_CACHE.pop(k, None)
+        if len(ANS_CACHE) > 500:   # 오래된 것부터 정리
+            for k, _v in sorted(ANS_CACHE.items(), key=lambda x: x[1].get('t', 0))[:len(ANS_CACHE) - 500]:
+                ANS_CACHE.pop(k, None)
+        try:
+            tmp = ANS_CACHE_PATH + '.tmp'
+            with open(tmp, 'w', encoding='utf-8') as f:
+                json.dump(ANS_CACHE, f, ensure_ascii=False)
+            os.replace(tmp, ANS_CACHE_PATH)
+        except OSError:
+            pass
 
 
 def ask_general(question, history):
