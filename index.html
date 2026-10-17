@@ -728,7 +728,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v92</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v93</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -845,8 +845,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V92', SRV_VER='2.8';
+  const APP_VER='V93', SRV_VER='2.9';
   const UPDATES=[
+    {v:'V93', d:'2026-10-17', t:['AI 하루 답변 한도 300회 → 50회(AI 도우미·보고서 합계). 교수로 로그인해 쓰면 한도에서 제외']},
     {v:'V92', d:'2026-10-17', t:['AI 도우미 업그레이드: 질문마다 메뉴 자료에서 해당 조문·쪽을 찾아 ‘결론 → 근거(조문 인용) → 설명(무엇은 어떤 근거로 어떻게 해야 하는지) → 현장에서’ 순서로 답해요','근거 목록과 Search 본문 결과에 조문 번호(예: 제16조(소방활동))를 함께 표시','참고문헌·목차 쪽은 근거에서 뒤로 미룸','47망·디브리핑룸 위쪽: 이름 중복을 없애고 ‘47망 - n명’을 제목 줄에 표시']},
     {v:'V91', d:'2026-10-17', t:['같은 기기에서 같은 방에 대화명을 여러 번 만들면 마지막 1개만 유효(예전 대화명은 로그아웃되고 참여자 수에서도 빠짐)']},
     {v:'V90', d:'2026-10-17', t:['메뉴: 준비가 끝난 항목(관련법령, 서버 연결 시 주요 질의응답)은 ‘준비중’ 표시를 지움','47망·디브리핑룸 위쪽: ‘익명 대화 · 지금 n명 접속’ 대신 ‘47망 - n명’처럼 참여자 수(대화명을 정하고 들어온 사람)','7일 동안 쓰지 않으면 자동 로그아웃 — 다시 들어올 때 대화명을 새로 입력']},
@@ -2439,7 +2440,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(SRV.on && v && !localIntent(v)){
         const hist=[]; for(let i=chat.msgs.length-2;i>0&&hist.length<2;i--){ const b=chat.msgs[i], u=chat.msgs[i-1]; if(b.who==='bot'&&b.mode==='ai'&&u.who==='me'&&u.text) hist.unshift({q:u.text,a:b.text}); }
         const g0=chat.gen||0;
-        api('/api/ask',{json:{q:v,history:hist,code:aiCode()}}).then(r=>{
+        api('/api/ask',{json:{q:v,history:hist,code:aiCode()}, ...(isProf()?{tok:PROF.tok}:{})}).then(r=>{
           if((chat.gen||0)!==g0) return;   // 그사이 '대화 비우기' — 이전 질문의 답은 버림
           chat.typing=false;
           if(r.status===403&&r.j&&r.j.code==='need_code'){ chat.msgs.pop(); csave(); setAiCode(''); if(chat.room==='bot'&&state.route==='ai') aiGate(panel,room); return; }   // 코드가 바뀜 → 다시 입력
@@ -2628,7 +2629,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 보고서 AI를 SACHIL 서버의 /api/report로 보낸다(window.claude가 없는 github.io·서버 화면용). CAP.sample과 같은 모양으로 돌려준다.
   async function serverSample(prompt,opt){
     opt=opt||{};
-    const r=await api('/api/report',{json:{prompt, force:opt.cache===false, code:aiCode()}, signal:opt.signal});
+    const r=await api('/api/report',{json:{prompt, force:opt.cache===false, code:aiCode()}, signal:opt.signal, ...(isProf()?{tok:PROF.tok}:{})});   // 교수는 하루 한도에서 제외(V93)
     if(r.aborted) throw {code:'cancelled'};
     if(r.status===403&&r.j.code==='need_code'){ setAiCode(''); throw {code:'need_code', message:'AI 입장코드가 필요합니다. 아래 AI 탭에서 입장코드를 넣은 뒤 다시 누르세요.'}; }
     if(r.status===429) throw {code:'rate_limited', message:r.j.error||'잠시 뒤 다시 시도하세요'};
