@@ -683,7 +683,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v70</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v71</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -800,8 +800,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V70', SRV_VER='2.1';
+  const APP_VER='V71', SRV_VER='2.1';
   const UPDATES=[
+    {v:'V71', d:'2026-10-17', t:['첫 화면을 새 구성으로: 번개 모양 선이 S·A·CH·IL 네 칸을 나누고(읽으면 SACHIL), 47망(오른쪽 위)·디브리핑룸(왼쪽 아래)은 둥근 버튼','칸 모양 그대로 눌리고, 폰·폴드·PC 화면 크기에 맞춰 자동으로 다시 그려요']},
     {v:'V70', d:'2026-10-17', t:['첫 화면 47망·디브리핑룸: 아이콘을 크게 가운데로, 이름 > 설명 순으로 글씨 크기를 나눠 가운데 정렬','작은 폰에서도 설명이 두 줄에 맞게, CH·IL 심벌 크기를 다른 심벌과 눈높이로 맞춤']},
     {v:'V69', d:'2026-10-17', t:['디브리핑룸 설명을 두 줄로: 익명으로 개선사항 도출 / 의견 청취로 지휘역량 강화','첫 화면 S·A·CH·IL 심벌을 박스 가운데 크게, 작은 설명 글씨는 뺐어요','메뉴 ‘SACHIL 시그니처’ 안내를 새 판(정리 v3)으로 바꿨어요']},
     {v:'V68', d:'2026-10-17', t:['위쪽에 디브리핑룸 바로가기 버튼(47망과 메뉴 사이)','47망·디브리핑룸 설명 추가: 첫 화면 박스, 입장 화면, 대화방 위 📌 한 줄(누르면 예시)','첫 화면 S·A·CH·IL 심벌을 크게, 이름을 Search · AI assistant · CHecklist · Incident Log로']},
@@ -2209,17 +2210,56 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {go:'log', k:'IL', t:'Incident Log', d:'만든 보고서 모아 보기·작성'}
   ];
   const sigK=k=>['S','A','CH','IL'].includes(k)?`<i class="sg sg-${k}" role="img" aria-label="${k}"></i>`:k;   // 시그니처 심벌
+  // 첫 화면(V71): 사용자 스케치 — 번개(지그재그) 선이 화면을 4칸으로 나눠 S·A / CH·IL(읽으면 SACHIL),
+  // 47망·디브리핑룸은 둥근 버튼. 칸은 SVG 다각형(모서리 둥글게, 칸 사이 틈)으로 그려 그 모양대로 눌린다.
+  // 꼭짓점·글자 위치는 화면 비율(0~1). P1 위 → P2 왼쪽 → P3 오른쪽 → P4 아래
+  const HZ={P1:[.52,0], P2:[0,.60], P3:[1,.32], P4:[.48,1],
+    lab:{search:[.17,.21], ai:[.33,.40], board:[.55,.56], log:[.83,.80]}};
   function renderHub(panel){
-    panel.innerHTML=`<nav class="hub" aria-label="SACHIL:47 첫 화면">${HUB.map(h=>`<a class="hub-box ${h.y?'chatbox':'sgbox'}" href="#${h.go}" data-hub="${h.go}"><span class="hk ${h.ic?'ic':'sgk'}">${h.ic||sigK(h.k)}</span><span class="ht">${h.t}</span>${h.y?`<span class="hd">${h.d}</span>`:''}</a>`).join('')}</nav>`;
+    const cell=h=>h.y
+      ? `<a class="hz-c" href="#${h.go}" data-hub="${h.go}" data-c="${h.go}" aria-label="${h.t}"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd">${h.d}</span></a>`
+      : `<span class="hz-l" data-l="${h.go}" aria-hidden="true">${sigK(h.k)}<b>${h.t}</b></span>`;
+    panel.innerHTML=`<nav class="hub hz" aria-label="SACHIL:47 첫 화면"><svg class="hz-svg" xmlns="http://www.w3.org/2000/svg">${HUB.filter(h=>!h.y).map(h=>`<a href="#${h.go}" data-hub="${h.go}" aria-label="${h.t}"><path class="hz-p" data-p="${h.go}"/></a>`).join('')}</svg>${HUB.map(cell).join('')}</nav>`;
     panel.querySelectorAll('[data-hub]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const t=a.dataset.hub; if(t==='search'){ q.value=''; syncClear(); go('search',''); } else go(t); rootScrollTo(0); }));
     fitHub();
   }
-  // 6개 박스가 스크롤 없이 화면(헤더~하단 탭 사이)에 꼭 맞게 — 폰·폴드·탭·PC 공통
+  // 볼록 다각형을 안쪽으로 d만큼 줄이고(칸 사이 틈), 모서리를 r로 둥글린 SVG 경로
+  function hzPath(pts,d,r){
+    const n=pts.length, cx=pts.reduce((s,p)=>s+p[0],0)/n, cy=pts.reduce((s,p)=>s+p[1],0)/n;
+    const lines=pts.map((p,i)=>{ const q=pts[(i+1)%n]; let dx=q[0]-p[0], dy=q[1]-p[1]; const L=Math.hypot(dx,dy)||1; let nx=-dy/L, ny=dx/L;
+      if((cx-p[0])*nx+(cy-p[1])*ny<0){ nx=-nx; ny=-ny; } return {x:p[0]+nx*d, y:p[1]+ny*d, dx, dy}; });
+    const v=lines.map((A,i)=>{ const B=lines[(i+1)%n], den=A.dx*B.dy-A.dy*B.dx; const t=den?((B.x-A.x)*B.dy-(B.y-A.y)*B.dx)/den:0; return [A.x+A.dx*t, A.y+A.dy*t]; });
+    let out='';
+    v.forEach((c,i)=>{ const a=v[(i-1+n)%n], b=v[(i+1)%n], la=Math.hypot(a[0]-c[0],a[1]-c[1]), lb=Math.hypot(b[0]-c[0],b[1]-c[1]), rr=Math.min(r,la/2.2,lb/2.2);
+      const p1=[c[0]+(a[0]-c[0])/la*rr, c[1]+(a[1]-c[1])/la*rr], p2=[c[0]+(b[0]-c[0])/lb*rr, c[1]+(b[1]-c[1])/lb*rr];
+      out+=(i?'L':'M')+p1[0].toFixed(1)+' '+p1[1].toFixed(1)+'Q'+c[0].toFixed(1)+' '+c[1].toFixed(1)+' '+p2[0].toFixed(1)+' '+p2[1].toFixed(1); });
+    return out+'Z';
+  }
+  // 첫 화면이 스크롤 없이 화면(헤더~하단 탭 사이)에 꼭 맞게 — 폰·폴드·탭·PC 공통, 크기가 바뀌면 다시 그림
   function fitHub(){
     const h=$('.hub'); if(!h) return;
     const tb=document.querySelector('.tabbar'), bottom=(tb&&getComputedStyle(tb).display!=='none')?tb.getBoundingClientRect().top:window.innerHeight;
     const avail=Math.round(bottom-h.getBoundingClientRect().top-12);
-    h.style.height=Math.max(3*112+24, Math.min(avail, 720))+'px';
+    h.style.height=Math.max(420, Math.min(avail, 720))+'px';
+    if(!h.classList.contains('hz')) return;
+    const W=h.clientWidth, H=h.clientHeight, P=k=>[HZ[k][0]*W, HZ[k][1]*H];
+    const R={search:[[0,0],P('P1'),P('P2')], ai:[P('P1'),[W,0],P('P3'),P('P2')], board:[P('P2'),P('P3'),P('P4'),[0,H]], log:[P('P3'),[W,H],P('P4')]};
+    const gap=W<600?5:7, rad=W<600?18:22;
+    Object.keys(R).forEach(k=>{ const el=h.querySelector(`[data-p="${k}"]`); if(el) el.setAttribute('d',hzPath(R[k],gap,rad)); });
+    const svg=h.querySelector('.hz-svg'); svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    Object.entries(HZ.lab).forEach(([k,[x,y]])=>{ const el=h.querySelector(`[data-l="${k}"]`); if(el){ el.style.left=(x*W)+'px'; el.style.top=(y*H)+'px'; } });
+    // 둥근 버튼: 47망은 오른쪽 위, 디브리핑룸은 왼쪽 아래(가로·세로 중 짧은 쪽 기준 크기)
+    const m=Math.round(W<600?6:10), g2=gap*2+4;
+    const dist=(cx,cy,A,B)=>Math.abs((B[0]-A[0])*(A[1]-cy)-(A[0]-cx)*(B[1]-A[1]))/Math.hypot(B[0]-A[0],B[1]-A[1]);
+    let D=Math.round(Math.min(W*0.5, H*0.29, 220));
+    for(;D>110;D-=2){ const r=D/2, a=[W-m-r, m+r], b=[m+r, H-m-r];   // 둥근 버튼이 번개 선을 넘지 않을 때까지 줄임
+      if(dist(a[0],a[1],P('P1'),P('P2'))>=r+g2 && dist(a[0],a[1],P('P2'),P('P3'))>=r+g2 && dist(b[0],b[1],P('P3'),P('P4'))>=r+g2 && dist(b[0],b[1],P('P2'),P('P3'))>=r+g2) break; }
+    h.style.setProperty('--cd',D+'px');
+    const c47=h.querySelector('[data-c="chat"]'), cdb=h.querySelector('[data-c="debrief"]');
+    if(c47){ c47.style.left=(W-D-m)+'px'; c47.style.top=m+'px'; }
+    if(cdb){ cdb.style.left=m+'px'; cdb.style.top=(H-D-m)+'px'; }
+    h.classList.toggle('hz-sm', D<148);
+    if(!h._ro && window.ResizeObserver){ h._ro=new ResizeObserver(()=>{ if(h.isConnected) requestAnimationFrame(fitHub); }); h._ro.observe(h); }   // 늦게 적용되는 스타일·회전·폴드 펼침에도 다시 맞춤   // 작은 버튼이면 설명 글씨 생략
   }
   window.addEventListener('resize',()=>{ if(state.route==='hub') fitHub(); });
   // ---------- 47망·디브리핑룸 ----------
@@ -2972,6 +3012,32 @@ body.hubview footer{display:none}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
 </script>
+<style id="hub-z-css">
+/* V71 첫 화면 — 스케치 구성(지그재그 4칸 + 둥근 버튼 2개). 색은 기존 그대로: 칸=흰 바탕·회색 테두리, 버튼=심벌 옐로 */
+.hub.hz{position:relative;display:block;max-width:760px;margin:4px auto 0}
+.hz-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.hz-svg a{cursor:pointer;outline:none}
+.hz-p{fill:var(--surface);stroke:var(--line);stroke-width:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.06));transition:stroke .12s,fill .12s}
+.hz-svg a:hover .hz-p{stroke:var(--navy)}
+.hz-svg a:focus-visible .hz-p{stroke:var(--navy);stroke-width:3}
+.hz-svg a:active .hz-p{fill:var(--navy-soft)}
+.hz-l{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;white-space:nowrap;text-align:center}
+.hz-l .sg{height:52px}
+.hz-l .sg-CH,.hz-l .sg-IL{height:44px}
+.hz-l b{font-size:15px;font-weight:800;color:var(--fg);letter-spacing:-.005em}
+.hz-c{position:absolute;width:var(--cd);height:var(--cd);border-radius:50%;background:var(--ember);color:var(--fg);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px;text-decoration:none;box-shadow:0 6px 18px rgba(36,78,162,.18);z-index:1;transition:transform .12s}
+.hz-c:active{transform:scale(.97)}
+.hz-c:focus-visible{outline:3px solid var(--navy);outline-offset:3px}
+.hz-c .ic{display:grid;place-items:center;width:calc(var(--cd)*.26);height:calc(var(--cd)*.26);border-radius:28%;background:#fff;overflow:hidden;margin-bottom:2px}
+.hz-c .ic img{width:100%;height:100%;display:block}
+.hz-c .ic svg{width:66%;height:66%}
+.hz-c b{font-size:calc(var(--cd)*.11);font-weight:800;line-height:1.15}
+.hz-c .hd{font-size:max(10px,calc(var(--cd)*.062));line-height:1.4;font-weight:600;color:#4a3d00;letter-spacing:-.02em}
+.hz-sm .hz-c .hd{display:none}
+.hz-sm .hz-c b{font-size:16px}
+@media (min-width:600px){ .hz-l .sg{height:70px} .hz-l .sg-CH,.hz-l .sg-IL{height:60px} .hz-l b{font-size:19px} }
+@media (max-height:680px){ .hz-l .sg{height:40px} .hz-l .sg-CH,.hz-l .sg-IL{height:34px} .hz-l b{font-size:13.5px} .hz-l{gap:3px} }
+</style>
 <style id="install-css">
 /* 앱 설치 묻기(V64): 처음 접속에 한 번, 아래에서 올라오는 시트로 묻는다. 메뉴의 '앱 설치'로는 언제든 */
 .inst-dim{position:fixed;inset:0;z-index:70;background:rgba(25,25,25,.5);display:flex;align-items:flex-end;justify-content:center;animation:instFade .2s ease-out}
