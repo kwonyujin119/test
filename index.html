@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><style>:root{color-scheme:light;box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/favicon-48.png" type="image/png" sizes="48x48"><link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="theme-color" content="#FDD000"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SACHIL:47"></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><style>:root{color-scheme:light;box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest?v=84"><link rel="icon" href="icons/favicon-48.png?v=84" type="image/png" sizes="48x48"><link rel="icon" href="icons/icon-192.png?v=84" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=84"><meta name="theme-color" content="#FDD000"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SACHIL:47"></head><body>
 <title>SACHIL 지휘역량강화 플랫폼</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
@@ -690,7 +690,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v83</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v84</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -807,8 +807,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V83', SRV_VER='2.3';
+  const APP_VER='V84', SRV_VER='2.3';
   const UPDATES=[
+    {v:'V84', d:'2026-10-17', t:['설치된 앱(PC 작업표시줄·폰 홈 화면) 아이콘이 새 시그니처 아이콘으로 바뀌도록 아이콘 주소를 새로 고침','PC 서버로 연 앱도 같은 새 아이콘·노랑 테마 사용']},
     {v:'V83', d:'2026-10-17', t:['보고서 창에서 교수로 로그인했을 때만 ‘초안 편집’ 버튼 — 고친 내용은 ‘편집 저장’(또는 창 닫기)으로 그대로 저장','교수가 아니면 보고서 본문은 읽기 전용']},
     {v:'V82', d:'2026-10-17', t:['IL 발생개요에 ‘발생개요’ 입력칸 추가: 사고일시 → 장소 → 대상 → 발생개요(여러 줄), 보고서에도 들어가요']},
     {v:'V81', d:'2026-10-17', t:['사용법(?) 설명을 하나씩 나눔: 1 SACHIL:47 → 2 47 시그니처 아이콘(47망) → 3 디브리핑룸 → 메뉴 → S·A·CH·IL','첫 화면에서 사용법을 볼 때는 하단 탭을 잠깐 띄워 설명','CH: 시각·시작·경과를 빼고 첫 줄에 전체·진행·초기화, 단계 칩은 두 줄(첫 체크 때 경과 시간이 자동으로 흐름)','IL: 배너 첫 줄에 초기화 · 작성된 보고서 · 보고서 만들기(누르면 바로 보고서)']},
