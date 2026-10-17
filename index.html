@@ -728,7 +728,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v95</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v96</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -845,8 +845,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V95', SRV_VER='3.1';
+  const APP_VER='V96', SRV_VER='3.2';
   const UPDATES=[
+    {v:'V96', d:'2026-10-17', t:['AI 도우미·AI 보고서를 Google Gemini API 키(aistudio.google.com)로도 쓸 수 있게 — 서버 PC에서 gemini-key-setup.bat으로 키 입력','AI 도우미 위쪽에 연결된 AI 이름(Gemini/Claude) 표시']},
     {v:'V95', d:'2026-10-17', t:['메뉴 자료의 휴대전화 번호는 검색·AI 도우미에 ‘010-****-****’로만 보이게(서버 보호)','긴급구조대응계획(안) PDF의 휴대전화 번호 뒷자리를 가린 파일로 교체']},
     {v:'V94', d:'2026-10-17', t:['AI 도우미·검색 결과에서 PDF 글자가 □로 깨져 보이던 기호를 지움(서버 색인 때 정리, 이미 저장된 대화도 화면에서 정리)']},
     {v:'V93', d:'2026-10-17', t:['AI 하루 답변 한도 300회 → 50회(AI 도우미·보고서 합계). 교수로 로그인해 쓰면 한도에서 제외']},
@@ -2069,7 +2070,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     $('#repTabAi').disabled=false; $('#repTabAi').closest('.seg').hidden=false; setRepView('ai'); syncRepUI();
   });
   $('#repAi').addEventListener('click',()=>{ const b=$('#repAi');
-    if(!CAP.sample){ const st=$('#repStatus'); st.textContent = SRV.on ? 'AI 작성 꺼짐 — 서버 PC에서 ai-key-setup.bat으로 Claude API 키를 넣고 서버를 다시 켜면 켜집니다' : 'AI 작성 꺼짐 — SACHIL 서버에 연결되지 않았습니다(서버 PC가 꺼져 있는지 확인)'; st.classList.add('warn'); setTimeout(()=>st.classList.remove('warn'),2500); return; }
+    if(!CAP.sample){ const st=$('#repStatus'); st.textContent = SRV.on ? 'AI 작성 꺼짐 — 서버 PC에서 gemini-key-setup.bat으로 Gemini API 키를 넣고 서버를 다시 켜면 켜집니다' : 'AI 작성 꺼짐 — SACHIL 서버에 연결되지 않았습니다(서버 PC가 꺼져 있는지 확인)'; st.classList.add('warn'); setTimeout(()=>st.classList.remove('warn'),2500); return; }
     if(repCtl){ runAi(true); return; } if(cur&&cur.aiEdited) arm(b,'편집 내용 버리고 다시 작성',()=>runAi(true)); else runAi(true); });
   $('#repCopy').addEventListener('click',()=>copyText(repText(), $('#repCopy'), '복사'));
   $('#repShare').addEventListener('click',async()=>{ try{ await navigator.share({title:'지휘활동 보고서', text:repText()}); }catch(_){ } });
@@ -2422,7 +2423,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <div class="bub">${botTextHtml(m)}${botSrcHtml(m)}${botModeHtml(m)}${toSrch(m,i)}${m.cards&&m.cards.length?`<ul class="mini">${m.cards.map(c=>`<li><a href="#${esc(c.slug)}"><span class="tag">${esc(c.type)}</span><span>${esc(c.title)}</span><span class="arrow">→</span></a></li>`).join('')}</ul>`:''}</div>
         <span class="t">${esc(m.t)}</span>
       </div>`).join('') : '';
-    panel.innerHTML=roomHead(room, SRV.on ? (SRV.ai?'메뉴 자료 근거 · Claude 연결':'메뉴 자료 근거 · 발췌 답변') : '메뉴 안내 · 서버로 열면 자료 근거 답변',`<button type="button" class="btn ghost" id="chatClear">대화 비우기</button>`)+`
+    panel.innerHTML=roomHead(room, SRV.on ? (SRV.ai?`메뉴 자료 근거 · ${esc(SRV.aiName||'AI')} 연결`:'메뉴 자료 근거 · 발췌 답변') : '메뉴 안내 · 서버로 열면 자료 근거 답변',`<button type="button" class="btn ghost" id="chatClear">대화 비우기</button>`)+`
       <div class="chat">
         <div class="card">
           <div class="convo" id="convo">
@@ -3062,7 +3063,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const wasLocal = ROOMS_R.includes(state.route) && !!chat.room;   // 파일 모드 방에 이미 들어가 있었음
       SRV.probing=false; SRV.on=true; SRV.me=r.j.user||null;
       if(r.j.ai && !CAP.sample){ CAP.sample=serverSample; CAP.ready=true; syncRepUI(); }   // 보고서 AI: Claude 화면 밖에서는 SACHIL 서버(AI 키)로 작성
-      SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.roomDb=r.j.room_debrief||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
+      SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.roomDb=r.j.room_debrief||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.aiName=String(r.j.ai_name||'').slice(0,20); SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
       if(PROF.tok) checkProf();   // 교수로 로그인해 둔 기기면 교수 표시줄
       await loadLib();
       if(ROOMS_R.includes(state.route)){ if(DB.agreed){ SRV.notice='서버에 연결되어 공유 대화방으로 바뀌었습니다.'+(wasLocal?' 방금 쓴 내용은 이 기기에만 남습니다.':''); DB.enter=true; } render(); }

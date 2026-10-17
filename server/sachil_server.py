@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '3.1'
-APP_VERSION = 'V95'
+VERSION = '3.2'
+APP_VERSION = 'V96'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -90,6 +90,9 @@ def load_conf():
         'tunnel_token': '',            # Cloudflare 대시보드에서 만든 터널 토큰(있으면 로그인 인증서 대신 이것으로 연결)
         'public_url': '',
         'ai_api_key': '',               # Claude API 키(sk-ant-…). 비우면 AI 도우미는 자료 발췌형으로 답함
+        'gemini_api_key': '',           # Google AI Studio API 키(AIza…) — V96. gemini-key-setup.bat으로 넣음
+        'gemini_model': 'gemini-flash-latest',   # Gemini 모델 이름(AI Studio에 나온 이름으로 바꿀 수 있음)
+        'ai_provider': 'auto',          # auto(키 있는 쪽, 둘 다면 gemini) | gemini | claude
         'ai_model': 'claude-sonnet-5-5',
         'ai_daily_limit': 50,           # 하루 AI 답변 최대 횟수(비용 상한, 교수 로그인은 제외). 0이면 무제한
         'ai_assist_model': 'claude-haiku-5-5',   # AI 도우미 전용 모델(가장 저렴). 보고서는 ai_model
@@ -675,7 +678,7 @@ class H(BaseHTTPRequestHandler):
                                        'trim_ratio': CONF.get('weekly_trim_ratio'),
                                        'require_code': bool(CONF.get('require_code')),
                                        'retention_days': CONF.get('retention_days'), 'max_files': 10,
-                                       'ai': bool(CONF.get('ai_api_key')), 'index': DOCS_IDX.status()})
+                                       'ai': ai_ready(), 'ai_name': AI_NAMES.get(ai_provider(), ''), 'index': DOCS_IDX.status()})
             if not self.user:
                 return self.err(401, '로그인이 필요합니다')
             if path == '/api/rooms':
@@ -891,7 +894,7 @@ class H(BaseHTTPRequestHandler):
                 msg = '첨부된 자료에서 관련 내용을 찾지 못했습니다. 다른 낱말로 물어보세요. 예: "RIT 편성 기준", "현장지휘소 설치 위치".'
             return self.send(200, {'ok': True, 'mode': 'none', 'note': '', 'answer': msg, 'sources': [], 'status': st}, log=False)
         mode, note, ans = 'extract', '', ''
-        if CONF.get('ai_api_key'):
+        if ai_ready():
             ok, why = ai_allowed(self.ip(), self.is_prof())
             if ok:
                 ans, why = ask_llm(qtext, hits, hist)
@@ -908,8 +911,8 @@ class H(BaseHTTPRequestHandler):
         prompt = str(j.get('prompt') or '')[:30000]
         if len(prompt) < 20:
             raise ValueError('보고서 자료가 비어 있습니다')
-        if not CONF.get('ai_api_key'):
-            return self.send(200, {'ok': False, 'code': 'not_granted', 'error': '서버에 AI 키(ai_api_key)가 설정되지 않았습니다'}, log=False)
+        if not ai_ready():
+            return self.send(200, {'ok': False, 'code': 'not_granted', 'error': '서버에 AI 키(Gemini 또는 Claude)가 설정되지 않았습니다'}, log=False)
         bad = self.ai_gate(j)   # 보고서 AI도 같은 입장코드(공짜 AI 중계·하루 한도 소진 방지)
         if bad:
             return bad
@@ -1761,7 +1764,7 @@ class DocIndex:
     def status(self):
         return {'files': self.files, 'pages': self.pages, 'busy': self.busy, 'pending': self.pending,
                 'failed': [{'name': k, 'why': v} for k, v in list(self.failed.items())[:20]], 'ready': self.sig is not None,
-                'ai': bool(CONF.get('ai_api_key'))}
+                'ai': ai_ready()}
 
 
 _BIB = re.compile(r'\(\s?(?:19|20)\d\d[a-z]?\s?\)|\bet al\b|\bpp?\.\s?\d|\bvol\.|\bdoi\b|journal|proceedings|procedia', re.I)
@@ -1995,7 +1998,82 @@ def ask_llm(question, hits, history):
     return text, why
 
 
+AI_NAMES = {'gemini': 'Gemini', 'claude': 'Claude'}
+
+
+def ai_provider():
+    """지금 쓸 AI 회사. 키가 없으면 ''(자료 발췌형)."""
+    want = str(CONF.get('ai_provider') or 'auto').lower()
+    has = {'gemini': bool(CONF.get('gemini_api_key')), 'claude': bool(CONF.get('ai_api_key'))}
+    if want in has:
+        return want if has[want] else ''
+    return 'gemini' if has['gemini'] else ('claude' if has['claude'] else '')
+
+
+def ai_ready():
+    return bool(ai_provider())
+
+
 def call_llm(system, msgs, max_tokens, effort='', model=''):
+    """설정된 AI 회사로 한 번 호출. (본문, 실패 사유, 오류 코드)."""
+    if ai_provider() == 'gemini':
+        return call_gemini(system, msgs, max_tokens)
+    return call_claude(system, msgs, max_tokens, effort, model)
+
+
+def call_gemini(system, msgs, max_tokens):
+    """Google Gemini API(generateContent) 한 번 호출. 키는 머리글(x-goog-api-key)로만 보낸다(주소에 넣지 않음)."""
+    import urllib.request, urllib.error, ssl
+    model = re.sub(r'[^A-Za-z0-9.\-_]', '', str(CONF.get('gemini_model') or 'gemini-flash-latest')) or 'gemini-flash-latest'
+    base = (CONF.get('gemini_api_url') or 'https://generativelanguage.googleapis.com/v1beta').rstrip('/')
+    body = {'systemInstruction': {'parts': [{'text': system}]},
+            'contents': [{'role': 'model' if m['role'] == 'assistant' else 'user', 'parts': [{'text': m['content']}]} for m in msgs],
+            'generationConfig': {'maxOutputTokens': max(int(max_tokens), 8192)}}   # 생각(thinking) 몫까지 넉넉히
+    req = urllib.request.Request(f'{base}/models/{model}:generateContent', data=json.dumps(body).encode('utf-8'), method='POST',
+                                 headers={'x-goog-api-key': CONF.get('gemini_api_key', ''), 'content-type': 'application/json'})
+    code, why = 'upstream_error', ''
+    try:
+        with urllib.request.urlopen(req, timeout=180) as r:
+            j = json.loads(r.read().decode('utf-8'))
+        fb = (j.get('promptFeedback') or {}).get('blockReason')
+        cands = j.get('candidates') or []
+        if fb or not cands:
+            return '', 'AI가 이 요청에는 답하지 않았습니다(안전 정책)', 'refusal'
+        c = cands[0]
+        text = ''.join(p.get('text', '') for p in ((c.get('content') or {}).get('parts') or []) if not p.get('thought')).strip()
+        if not text:
+            fr = c.get('finishReason')
+            return '', ('AI 답변이 길이 한도에서 끊겼습니다' if fr == 'MAX_TOKENS' else
+                        'AI가 이 요청에는 답하지 않았습니다(안전 정책)' if fr in ('SAFETY', 'PROHIBITED_CONTENT', 'BLOCKLIST') else
+                        'AI가 내용을 내지 않았습니다'), 'empty_completion'
+        return text, '', ''
+    except urllib.error.HTTPError as e:
+        try:
+            err = json.loads(e.read().decode('utf-8')).get('error') or {}
+        except Exception:
+            err = {}
+        msg = json.dumps(err, ensure_ascii=False)
+        if 'API_KEY_INVALID' in msg or e.code in (401,):
+            why = 'Gemini API 키가 틀렸습니다'
+        elif e.code == 403:
+            why = 'Gemini API 키 권한이 없습니다(AI Studio에서 키·프로젝트 확인)'
+        elif e.code == 404:
+            why = f'gemini_model 이름({model})을 확인하세요'
+        elif e.code == 429:
+            why, code = 'Gemini 무료 사용 한도 초과(잠시 뒤 또는 내일 다시)', 'rate_limited'
+        elif e.code in (500, 503):
+            why, code = 'Gemini 서버가 바쁩니다', 'rate_limited'
+        else:
+            why = f'Gemini 요청 오류 {e.code} ' + str(err.get('message') or '')[:60]
+    except ssl.SSLError:
+        why = '인증서 오류(망의 HTTPS 검사 장비가 막음)'
+    except Exception as e:
+        why = f'AI 연결 실패 ({str(e)[:60]})'
+    print('[AI]', why, flush=True)
+    return '', why, code
+
+
+def call_claude(system, msgs, max_tokens, effort='', model=''):
     """Claude API 한 번 호출. (본문, 실패 사유, 오류 코드). 성공이면 사유·코드는 빈 문자열.
     최신 모델은 답하기 전에 생각(thinking)부터 하므로 max_tokens를 넉넉히 주고 effort로 생각 깊이를 정한다.
     안전 정책 거절(refusal)이 나면 다른 모델로 이어 받도록 server-side fallback을 켠다. 이전 모델·프록시 주소처럼
@@ -2266,6 +2344,27 @@ def main():
             json.dump(CONF, f, ensure_ascii=False, indent=2)
         print('터널 토큰 저장 완료 (' + m.group(0)[:10] + '…)')
         return
+    if '--set-gemini-key' in sys.argv:
+        i = sys.argv.index('--set-gemini-key')
+        raw = ' '.join(sys.argv[i + 1:])
+        m = re.search(r'AIza[0-9A-Za-z_\-]{30,}', raw)
+        if not m:
+            print('Gemini API 키를 찾지 못했습니다. aistudio.google.com에서 만든 AIza 로 시작하는 키를 붙여 넣으세요.')
+            sys.exit(1)
+        CONF['gemini_api_key'] = m.group(0)
+        CONF['ai_provider'] = 'gemini'
+        with open(CONF_PATH, 'w', encoding='utf-8') as f:
+            json.dump(CONF, f, ensure_ascii=False, indent=2)
+        print('Gemini 키 저장 완료 (' + m.group(0)[:8] + '…). 연결을 시험합니다…')
+        text, why, _c = call_llm('짧게 답한다.', [{'role': 'user', 'content': '연결 확인입니다. "연결됨"이라고만 답하세요.'}], 1000)
+        if text:
+            print('시험 성공: AI 응답 =', text[:40])
+            print('이제 서버를 다시 켜면 AI 도우미와 AI 보고서 작성이 Gemini로 동작합니다.')
+        else:
+            print('시험 실패:', why)
+            print('키는 저장했습니다. 키를 다시 복사했는지, aistudio.google.com에서 키가 살아 있는지 확인하세요.')
+            sys.exit(2)
+        return
     if '--set-ai-key' in sys.argv:
         i = sys.argv.index('--set-ai-key')
         raw = ' '.join(sys.argv[i + 1:])
@@ -2274,6 +2373,7 @@ def main():
             print('API 키를 찾지 못했습니다. console.anthropic.com에서 만든 sk-ant- 로 시작하는 키를 붙여 넣으세요.')
             sys.exit(1)
         CONF['ai_api_key'] = m.group(0)
+        CONF['ai_provider'] = 'claude'
         with open(CONF_PATH, 'w', encoding='utf-8') as f:
             json.dump(CONF, f, ensure_ascii=False, indent=2)
         print('AI 키 저장 완료 (' + m.group(0)[:12] + '…). 연결을 시험합니다…')
@@ -2319,8 +2419,8 @@ def main():
         '관리자 코드: ********   ← 본인만 (관리자 입장·교수 로그인. 바꾸기: --set-admin-code 새코드)',
         f'47망(디브리핑룸): 매주 월 04시 오래된 대화 {int(float(CONF.get("weekly_trim_ratio") or 0) * 100)}% 정리 (최근 대화 유지)',
         f'메뉴 자료 폴더: {LIB}',
-        ('AI 도우미:   Claude 연결 (도우미 ' + str(CONF.get('ai_assist_model')) + ' · 보고서 ' + str(CONF.get('ai_model')) + f', 하루 {CONF.get("ai_daily_limit") or "무제한"}회' + (', 입장코드 사용' if CONF.get('ai_code') else '') + ')') if CONF.get('ai_api_key')
-        else 'AI 도우미:   자료 발췌형 (자연어 답변은 config.json의 ai_api_key에 Claude API 키 입력)',
+        (f'AI 도우미:   {AI_NAMES[ai_provider()]} 연결 (' + (f'모델 {CONF.get("gemini_model")}' if ai_provider() == 'gemini' else f'도우미 {CONF.get("ai_assist_model")} · 보고서 {CONF.get("ai_model")}') + f', 하루 {CONF.get("ai_daily_limit") or "무제한"}회' + (', 입장코드 사용' if CONF.get('ai_code') else '') + ')') if ai_ready()
+        else 'AI 도우미:   자료 발췌형 (자연어 답변은 gemini-key-setup.bat으로 Gemini API 키 입력)',
     ])
     threading.Thread(target=index_loop, daemon=True).start()
     if '--tunnel' in sys.argv or '--named' in sys.argv:
