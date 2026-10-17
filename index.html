@@ -2216,15 +2216,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 7의 가로획 위 모서리(1시) = 47망, 8시→6시 사선 아래 모서리(7시) = 디브리핑룸, 나머지 4칸 = S·A·CH·IL(읽으면 SACHIL).
   // 칸은 SVG 다각형(틈·둥근 모서리)이라 보이는 모양 그대로 눌린다. 좌표는 화면 비율(0~1)
   const HZ={
-    pts:{P12:[.40,0], R2:[1,.42], L4:[0,.54], R7:[1,.46], L8:[0,.60], B6:[.56,1], V1:[.30,.44], V2:[.22,.66], TL:[0,0], TR:[1,0], BR:[1,1], BL:[0,1]},
+    pts:{P12:[.38,0], R2:[1,.44], L4:[0,.53], R7:[1,.47], L8:[0,.56], B6:[.62,1], V1:[.34,.42], V2:[.27,.62], TL:[0,0], TR:[1,0], BR:[1,1], BL:[0,1]},
     X:{},
     reg:{search:['TL','P12','L4'], ai:['P12','R2','R7','L4'], chat:['P12','TR','R2'], board:['L4','R7','B6','L8'], log:['R7','BR','B6'], debrief:['L8','B6','BL']},
     // 한 번에 그은 획: 12시 ↙ 꺾어 → 가로획(4·7 공유) ↙ 6시  +  4의 세로획(칸 경계 아님)
     strokes:[['P12','L4','R7','B6'],['V1','V2']],
-    lab:{search:[.14,.20], ai:[.66,.27], board:[.48,.68], log:[.80,.86]}};   // 우선 자리(디자인·사용성 검토 반영). 안 들어가면 자동 자리
+    lab:{search:[.17,.13], ai:[.50,.30], board:[.50,.70], log:[.83,.87]}};   // 우선 자리(디자인·사용성 검토 반영). 안 들어가면 자동 자리
   function renderHub(panel){
     const corner=h=>h.go==='chat'
-      ? `<span class="hz-k tr" data-k="chat" aria-hidden="true"><span class="r1"><b>${h.t}</b><span class="ic">${h.ic}</span></span><span class="hd">${h.d}</span></span>`
+      ? `<span class="hz-k tr" data-k="chat" aria-hidden="true"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd">지휘·작전망으로<br>어려운 내용<br>47망으로 전달하세요</span></span>`
       : `<span class="hz-k bl" data-k="debrief" aria-hidden="true"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd">${h.d}</span></span>`;
     const cell=h=>h.y?corner(h):`<span class="hz-l" data-l="${h.go}" aria-hidden="true">${sigK(h.k)}<b>${h.t}</b></span>`;
     panel.innerHTML=`<nav class="hub hz" aria-label="SACHIL:47 첫 화면"><svg class="hz-svg" xmlns="http://www.w3.org/2000/svg">${HUB.map(h=>`<a href="#${h.go}" data-hub="${h.go}" aria-label="${h.t}"><path class="hz-p${h.y?' y':''}" data-p="${h.go}"/><path class="hz-hit" data-hit="${h.go}"/></a>`).join('')}${HZ.strokes.map((_,i)=>`<path class="hz-47" data-s="${i}"/>`).join('')}</svg>${HUB.map(cell).join('')}</nav>`;
@@ -2254,8 +2254,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function fitHub(){
     const h=$('.hub'); if(!h) return;
     const tb=document.querySelector('.tabbar'), bottom=(tb&&getComputedStyle(tb).display!=='none')?tb.getBoundingClientRect().top:window.innerHeight;
-    const avail=Math.round(bottom-h.getBoundingClientRect().top-12);
-    h.style.height=Math.max(420, Math.min(avail, 720))+'px';
+    const avail=Math.round(bottom-(h.getBoundingClientRect().top-(parseFloat(h.style.marginTop)||4)+4)-12);   // 지난번 가운데 맞춤 여백은 빼고 잼
+    const hh=Math.max(420, Math.min(avail, Math.round(h.clientWidth*2.1)));
+    h.style.height=hh+'px'; h.style.marginTop=Math.max(4, Math.round((avail-hh)/2))+'px';
     if(!h.classList.contains('hz')) return;
     const W=h.clientWidth, H=h.clientHeight;
     const P=k=>[HZ.pts[k][0]*W, HZ.pts[k][1]*H], pt={}; Object.keys(HZ.pts).forEach(k=>{ pt[k]=P(k); });
