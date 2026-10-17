@@ -728,7 +728,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v93</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v94</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -845,8 +845,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V93', SRV_VER='2.9';
+  const APP_VER='V94', SRV_VER='3.0';
   const UPDATES=[
+    {v:'V94', d:'2026-10-17', t:['AI 도우미·검색 결과에서 PDF 글자가 □로 깨져 보이던 기호를 지움(서버 색인 때 정리, 이미 저장된 대화도 화면에서 정리)']},
     {v:'V93', d:'2026-10-17', t:['AI 하루 답변 한도 300회 → 50회(AI 도우미·보고서 합계). 교수로 로그인해 쓰면 한도에서 제외']},
     {v:'V92', d:'2026-10-17', t:['AI 도우미 업그레이드: 질문마다 메뉴 자료에서 해당 조문·쪽을 찾아 ‘결론 → 근거(조문 인용) → 설명(무엇은 어떤 근거로 어떻게 해야 하는지) → 현장에서’ 순서로 답해요','근거 목록과 Search 본문 결과에 조문 번호(예: 제16조(소방활동))를 함께 표시','참고문헌·목차 쪽은 근거에서 뒤로 미룸','47망·디브리핑룸 위쪽: 이름 중복을 없애고 ‘47망 - n명’을 제목 줄에 표시']},
     {v:'V91', d:'2026-10-17', t:['같은 기기에서 같은 방에 대화명을 여러 번 만들면 마지막 1개만 유효(예전 대화명은 로그아웃되고 참여자 수에서도 빠짐)']},
@@ -1336,7 +1337,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const stTxt = st.pending ? `자료 읽는 중 — 남은 파일 ${st.pending}개(완료되면 더 많이 찾습니다)` : (st.files?`PDF ${st.files}개 · ${st.pages}쪽에서 찾았습니다`:'메뉴에 첨부된 PDF가 아직 없습니다');
       const row=h=>`<a class="card result hitp" href="${libHref(h.slug,{name:h.name})}" target="_blank" rel="noopener" data-pdfv="${esc(h.name)}" data-page="${h.page}">
           <span class="ico">${h.page}쪽</span>
-          <span class="body"><p class="t">${bh(pdfName(h.name))}${h.art?` <span class="art">${esc(h.art)}</span>`:''}</p><p class="d snip">${bh(h.snippet)}</p></span>
+          <span class="body"><p class="t">${bh(pdfName(h.name))}${h.art?` <span class="art">${esc(h.art)}</span>`:''}</p><p class="d snip">${bh(deGlyph(h.snippet))}</p></span>
           <span class="arrow">→</span></a>`;
       box.innerHTML = hits.length
         ? `<div class="results">${hits.slice(0,6).map(row).join('')}</div>${hits.length>6?`<div class="srch-more" id="srchMoreBox"><button type="button" class="btn ghost" id="srchMore">본문 결과 ${hits.length-6}건 더 보기</button></div>`:''}<p class="srch-note">${esc(stTxt)}</p>`
@@ -2131,10 +2132,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     return null;
   }
   const srcHref=s=>libHref(s.slug,{name:s.name});
+  // PDF에서 뽑은 글에 섞인 깨진 기호(□) 지우기(V94) — 예전 서버 답·이 기기에 저장된 대화에도 적용
+  const deGlyph=t=>String(t||'').replace(/[\uE000-\uF8FF\uFFFD\u1100-\u11FF\uA960-\uA97F\uD7B0-\uD7FF\u2E80-\u2FDF\uA000-\uA6FF]|[\uDB80-\uDBFF][\uDC00-\uDFFF]/g,' ').replace(/[ \t]{2,}/g,' ');
   function botTextHtml(m){
     const ref=l=>l.replace(/\[(\d{1,2})\]/g,(x,n)=>{ const sc=m.src&&m.src[Number(n)-1]; return sc?`<a class="ref" href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}" aria-label="근거 ${n}: ${esc(pdfName(sc.name))} ${sc.page}쪽">${n}</a>`:x; });
     // V92 답 형식: 결론 → 근거(- 줄) → 설명 → 현장에서. 이름표는 굵게, 근거 줄은 들여쓴 목록으로
-    return esc(m.text).split('\n').filter(l=>l.trim()).map(l=>{
+    return esc(deGlyph(m.text)).split('\n').filter(l=>l.trim()).map(l=>{
       const lb=l.match(/^\s*(결론|근거|설명|현장에서|확인할 점)\s*[:：]?\s*(.*)$/);
       if(lb) return `<p class="ab ab-${lb[1]==='결론'?'k':lb[1]==='근거'?'g':'x'}"><b class="lbl">${lb[1]}</b>${lb[2]?' '+ref(lb[2]):''}</p>`;
       const li=l.match(/^\s*[-•·]\s+(.*)$/);
@@ -2144,7 +2147,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function botSrcHtml(m){
     if(!m.src||!m.src.length) return '';
     const cited=new Set([...String(m.text).matchAll(/\[(\d{1,2})\]/g)].map(x=>Number(x[1])-1));   // 본문에서 인용한 근거만 보인다
-    return `<div class="src-h">근거 자료</div><ol class="src" aria-label="근거 자료">${m.src.map((sc,i)=>(cited.size&&!cited.has(i))?'':`<li><a href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}"><b>[${i+1}]</b><em>${esc(pdfName(sc.name))}${sc.art?` · ${esc(sc.art)}`:''}</em><span>${sc.page}쪽</span></a>${sc.snip?`<q class="snip">${esc(sc.snip)}</q>`:''}</li>`).join('')}</ol>`;
+    return `<div class="src-h">근거 자료</div><ol class="src" aria-label="근거 자료">${m.src.map((sc,i)=>(cited.size&&!cited.has(i))?'':`<li><a href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}"><b>[${i+1}]</b><em>${esc(pdfName(sc.name))}${sc.art?` · ${esc(sc.art)}`:''}</em><span>${sc.page}쪽</span></a>${sc.snip?`<q class="snip">${esc(deGlyph(sc.snip))}</q>`:''}</li>`).join('')}</ol>`;
   }
   const botModeHtml=m=> m.mode==='ai' ? '<span class="mode">AI 도우미 · 메뉴 자료 근거 답변 — 중요한 내용은 원문으로 확인하세요</span>'
     : m.mode==='extract' ? `<span class="mode">교수 에이전트 · 원문 발췌 정리${m.note?` · ${esc(m.note)}`:' · AI 키 연결 시 해설형 답변'}</span>` : '';

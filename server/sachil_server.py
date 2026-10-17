@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '2.9'
-APP_VERSION = 'V93'
+VERSION = '3.0'
+APP_VERSION = 'V94'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -1506,6 +1506,15 @@ SYN = {
 }
 
 
+# PDF 글꼴이 유니코드 대응 없이 쓴 기호(사용자 정의 영역 글자·낱자모·부수 등)는 앱 글꼴에 없어 □로 깨져 보인다(V94)
+_JUNK = re.compile('[\ue000-\uf8ff\ufffd\u1100-\u11ff\ua960-\ua97f\ud7b0-\ud7ff\u2e80-\u2fdf\ua000-\ua6ff\U000f0000-\U0010ffff\x00-\x08\x0b\x0c\x0e-\x1f\x7f]')
+
+
+def clean_glyph(t):
+    t = _JUNK.sub(' ', t or '')
+    return re.sub(r'[ \t]{2,}', ' ', t)
+
+
 def nrm(s):
     return _KEEP.sub('', unicodedata.normalize('NFKC', str(s)).lower())
 
@@ -1631,7 +1640,7 @@ class DocIndex:
                 print(f'[색인] {name} 실패: {e}', flush=True)
             self.pending -= 1
         self.busy = ''
-        self._build(loaded)
+        self._build([(sl, nm, [clean_glyph(p) for p in ps]) for sl, nm, ps in loaded])   # 깨진 글자는 색인 때 지움(V94, 캐시는 그대로)
         self.sig = sig
         # 지운 파일의 캐시 정리
         keep = {os.path.basename(self._cache_path(x[5])) for x in docs}
