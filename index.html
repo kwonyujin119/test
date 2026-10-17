@@ -123,6 +123,10 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .bub p.ab{margin-top:8px}.bub p.ab:first-child{margin-top:0}
 .bub .lbl{display:inline-block;padding:1px 8px;margin-right:4px;border-radius:999px;background:var(--navy-soft);color:var(--navy);font-size:12px;font-weight:700;vertical-align:1px}
 .bub p.ab-k .lbl{background:var(--navy);color:#fff}
+.bub p.ab-w .lbl,.bub .nb{background:#FFF1D6;color:#9A5B00}
+.bub .nb{display:inline-block;padding:0 6px;margin-left:3px;border-radius:999px;font-size:11px;font-weight:700;vertical-align:1px}
+.bub p.ab-w{font-size:.92em;color:var(--muted)}
+.bub .mode.warn{color:#9A5B00}
 .bub p.ali{margin:4px 0 0;padding-left:14px;position:relative;font-size:.95em}
 .bub p.ali::before{content:'';position:absolute;left:3px;top:.62em;width:5px;height:5px;border-radius:50%;background:var(--navy)}
 .result .art{font-size:12px;font-weight:600;color:var(--navy);white-space:nowrap}
@@ -728,7 +732,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v96</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v97</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -845,8 +849,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V96', SRV_VER='3.2';
+  const APP_VER='V97', SRV_VER='3.4';
   const UPDATES=[
+    {v:'V97', d:'2026-10-17', t:['AI 도우미 답 순서: 결론 → 설명 → 현장에서 → 근거','메뉴 자료에 없는 내용도 AI가 일반 지식으로 짧게 설명 — ‘근거 부족’ 표시를 붙여 자료 근거 답과 구분']},
     {v:'V96', d:'2026-10-17', t:['AI 도우미·AI 보고서를 Google Gemini API 키(aistudio.google.com)로도 쓸 수 있게 — 서버 PC에서 gemini-key-setup.bat으로 키 입력','AI 도우미 위쪽에 연결된 AI 이름(Gemini/Claude) 표시']},
     {v:'V95', d:'2026-10-17', t:['메뉴 자료의 휴대전화 번호는 검색·AI 도우미에 ‘010-****-****’로만 보이게(서버 보호)','긴급구조대응계획(안) PDF의 휴대전화 번호 뒷자리를 가린 파일로 교체']},
     {v:'V94', d:'2026-10-17', t:['AI 도우미·검색 결과에서 PDF 글자가 □로 깨져 보이던 기호를 지움(서버 색인 때 정리, 이미 저장된 대화도 화면에서 정리)']},
@@ -2137,11 +2142,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // PDF에서 뽑은 글에 섞인 깨진 기호(□) 지우기(V94) — 예전 서버 답·이 기기에 저장된 대화에도 적용
   const deGlyph=t=>String(t||'').replace(/[\uE000-\uF8FF\uFFFD\u1100-\u11FF\uA960-\uA97F\uD7B0-\uD7FF\u2E80-\u2FDF\uA000-\uA6FF]|[\uDB80-\uDBFF][\uDC00-\uDFFF]/g,' ').replace(/[ \t]{2,}/g,' ');
   function botTextHtml(m){
-    const ref=l=>l.replace(/\[(\d{1,2})\]/g,(x,n)=>{ const sc=m.src&&m.src[Number(n)-1]; return sc?`<a class="ref" href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}" aria-label="근거 ${n}: ${esc(pdfName(sc.name))} ${sc.page}쪽">${n}</a>`:x; });
+    const ref=l=>l.replace(/\[근거 부족\]/g,'<span class="nb">근거 부족</span>').replace(/\[(\d{1,2})\]/g,(x,n)=>{ const sc=m.src&&m.src[Number(n)-1]; return sc?`<a class="ref" href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}" aria-label="근거 ${n}: ${esc(pdfName(sc.name))} ${sc.page}쪽">${n}</a>`:x; });
     // V92 답 형식: 결론 → 근거(- 줄) → 설명 → 현장에서. 이름표는 굵게, 근거 줄은 들여쓴 목록으로
     return esc(deGlyph(m.text)).split('\n').filter(l=>l.trim()).map(l=>{
-      const lb=l.match(/^\s*(결론|근거|설명|현장에서|확인할 점)\s*[:：]?\s*(.*)$/);
-      if(lb) return `<p class="ab ab-${lb[1]==='결론'?'k':lb[1]==='근거'?'g':'x'}"><b class="lbl">${lb[1]}</b>${lb[2]?' '+ref(lb[2]):''}</p>`;
+      const lb=l.match(/^\s*\[?(결론|근거 부족|근거|설명|현장에서|확인할 점)\]?\s*[:：]?\s*(.*)$/);
+      if(lb) return `<p class="ab ab-${lb[1]==='결론'?'k':lb[1]==='근거 부족'?'w':lb[1]==='근거'?'g':'x'}"><b class="lbl">${lb[1]}</b>${lb[2]?' '+ref(lb[2]):''}</p>`;
       const li=l.match(/^\s*[-•·]\s+(.*)$/);
       return li?`<p class="ali">${ref(li[1])}</p>`:`<p>${ref(l)}</p>`;
     }).join('');
@@ -2152,6 +2157,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     return `<div class="src-h">근거 자료</div><ol class="src" aria-label="근거 자료">${m.src.map((sc,i)=>(cited.size&&!cited.has(i))?'':`<li><a href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}"><b>[${i+1}]</b><em>${esc(pdfName(sc.name))}${sc.art?` · ${esc(sc.art)}`:''}</em><span>${sc.page}쪽</span></a>${sc.snip?`<q class="snip">${esc(deGlyph(sc.snip))}</q>`:''}</li>`).join('')}</ol>`;
   }
   const botModeHtml=m=> m.mode==='ai' ? '<span class="mode">AI 도우미 · 메뉴 자료 근거 답변 — 중요한 내용은 원문으로 확인하세요</span>'
+    : m.mode==='general' ? '<span class="mode warn">AI 일반 설명 · 메뉴 자료에 근거 없음 — 소속 기관 지침·원문으로 확인하세요</span>'
     : m.mode==='extract' ? `<span class="mode">교수 에이전트 · 원문 발췌 정리${m.note?` · ${esc(m.note)}`:' · AI 키 연결 시 해설형 답변'}</span>` : '';
 
   function answer(qRaw){
@@ -2417,7 +2423,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   function renderBotRoom(panel, room){
     if(!aiCode()){ aiGate(panel,room); return; }
-    const toSrch=(m,i)=>{ const u=chat.msgs[i-1]; return (m.mode==='ai'||m.mode==='extract') && u && u.who==='me' && u.text ? `<button type="button" class="to-srch" data-srch="${esc(u.text)}">Search에서 원문 더 찾기 →</button>` : ''; };
+    const toSrch=(m,i)=>{ const u=chat.msgs[i-1]; return (m.mode==='ai'||m.mode==='extract'||m.mode==='general') && u && u.who==='me' && u.text ? `<button type="button" class="to-srch" data-srch="${esc(u.text)}">Search에서 원문 더 찾기 →</button>` : ''; };
     const msgsHtml = chat.msgs.length ? chat.msgs.map((m,i)=> m.who==='me' ? msgMeHtml(m) : `
       <div class="msg bot">${avHtml()}
         <div class="bub">${botTextHtml(m)}${botSrcHtml(m)}${botModeHtml(m)}${toSrch(m,i)}${m.cards&&m.cards.length?`<ul class="mini">${m.cards.map(c=>`<li><a href="#${esc(c.slug)}"><span class="tag">${esc(c.type)}</span><span>${esc(c.title)}</span><span class="arrow">→</span></a></li>`).join('')}</ul>`:''}</div>
@@ -2443,7 +2449,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const v=String(text||'').trim(); att=att||[]; if((!v&&!att.length)||chat.typing) return;
       push('me',v,[],att); chat.typing=true; renderBotRoom(panel,room);
       if(SRV.on && v && !localIntent(v)){
-        const hist=[]; for(let i=chat.msgs.length-2;i>0&&hist.length<2;i--){ const b=chat.msgs[i], u=chat.msgs[i-1]; if(b.who==='bot'&&b.mode==='ai'&&u.who==='me'&&u.text) hist.unshift({q:u.text,a:b.text}); }
+        const hist=[]; for(let i=chat.msgs.length-2;i>0&&hist.length<2;i--){ const b=chat.msgs[i], u=chat.msgs[i-1]; if(b.who==='bot'&&(b.mode==='ai'||b.mode==='general')&&u.who==='me'&&u.text) hist.unshift({q:u.text,a:b.text}); }
         const g0=chat.gen||0;
         api('/api/ask',{json:{q:v,history:hist,code:aiCode()}, ...(isProf()?{tok:PROF.tok}:{})}).then(r=>{
           if((chat.gen||0)!==g0) return;   // 그사이 '대화 비우기' — 이전 질문의 답은 버림
