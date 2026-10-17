@@ -43,12 +43,14 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '2.2'
-APP_VERSION = 'V78'
+VERSION = '2.3'
+APP_VERSION = 'V79'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
 MAX_STORE = 3 * 1024 * 1024 * 1024     # 첨부 총량 3GB
+LIB_MAX = 60 * 1024 * 1024             # 교수 메뉴 자료 업로드 파일 1개 60MB
+QNA_HITS, QNA_LOCK = {}, threading.Lock()   # 질의응답 질문 IP별 횟수
 SESSION_DAYS = 30
 LOGIN_FAILS, LOGIN_WINDOW = 8, 600      # 10분에 8번 틀리면 잠금
 
@@ -126,6 +128,7 @@ CREATE TABLE IF NOT EXISTS messages(id INTEGER PRIMARY KEY AUTOINCREMENT, room I
 CREATE TABLE IF NOT EXISTS files(id TEXT PRIMARY KEY, room INTEGER, owner INTEGER, name TEXT, kind TEXT, mime TEXT, size INTEGER, used INTEGER DEFAULT 0, ts REAL);
 CREATE INDEX IF NOT EXISTS ix_msg_room ON messages(room, id);
 CREATE TABLE IF NOT EXISTS reads(room INTEGER, user INTEGER, last_id INTEGER, seen REAL, PRIMARY KEY(room, user));
+CREATE TABLE IF NOT EXISTS qna(id INTEGER PRIMARY KEY AUTOINCREMENT, ts REAL, name TEXT, q TEXT, a TEXT, a_ts REAL, ip TEXT);
 ''')
 try:   # 예전 DB에 답장 칸 추가
     DB.execute('ALTER TABLE messages ADD COLUMN reply TEXT')
@@ -367,7 +370,7 @@ def clean_name(s):
     return re.sub(r'\s+', ' ', s)[:20]
 
 
-IMPERSONATE = re.compile(r'교관|관리자|운영자|admin|sachil|사칠', re.I)
+IMPERSONATE = re.compile(r'교관|교수|관리자|운영자|admin|sachil|사칠', re.I)
 
 def looks_like_staff(name):
     return bool(IMPERSONATE.search(re.sub(r'[\s_\-.·]', '', name)))
@@ -609,6 +612,8 @@ class H(BaseHTTPRequestHandler):
                 return self.send(200, {'ok': True})
             if path == '/api/lib':
                 return self.lib_list()
+            if path == '/api/qna':
+                return self.qna_list()
             if path == '/api/search':
                 qtext = (args.get('q') or [''])[0][:200]
                 terms, hits = DOCS_IDX.search(qtext, limit=12)
@@ -660,6 +665,8 @@ class H(BaseHTTPRequestHandler):
                 return self.ask()
             if path == '/api/report':
                 return self.report()
+            if path == '/api/qna':
+                return self.qna_ask()
             self.user = self.get_user()
             if not self.user:
                 return self.err(401, '로그인이 필요합니다')
@@ -681,6 +688,12 @@ class H(BaseHTTPRequestHandler):
             m = re.fullmatch(r'/api/rooms/(\d{1,12})/read', path)
             if m:
                 return self.read_mark(int(m.group(1)))
+            m = re.fullmatch(r'/api/lib/([a-z\-]{2,20})/upload', path)
+            if m:
+                return self.lib_upload(m.group(1))
+            m = re.fullmatch(r'/api/qna/(\d{1,12})/answer', path)
+            if m:
+                return self.qna_answer(int(m.group(1)))
             return self.err(404, '없는 주소입니다')
         except ValueError as e:
             return self.err(400, str(e))
@@ -712,6 +725,12 @@ class H(BaseHTTPRequestHandler):
             m = re.fullmatch(r'/api/messages/(\d{1,12})', path)
             if m:
                 return self.message_delete(int(m.group(1)))
+            m = re.fullmatch(r'/api/lib/([a-z\-]{2,20})/(.+)', path)
+            if m:
+                return self.lib_delete(m.group(1), urllib.parse.unquote(m.group(2)))
+            m = re.fullmatch(r'/api/qna/(\d{1,12})', path)
+            if m:
+                return self.qna_delete(int(m.group(1)))
             return self.err(404, '없는 주소입니다')
         except (ConnectionError, TimeoutError, socket.timeout):   # 끊김(WinError 10053/10054 포함)은 정상 상황
             self.close_connection = True
@@ -762,23 +781,35 @@ class H(BaseHTTPRequestHandler):
         out.sort(key=lambda x: x['name'])
         return out
 
+    def ai_gate(self, j):
+        """AI 입장코드 확인(도우미·보고서 공통). 통과면 None, 아니면 이미 보낸 응답.
+        IP별 10분 8회 + 전체 10분 60회 실패면 잠금(여러 IP로 나눠 맞히기 차단)."""
+        need = norm_code(CONF.get('ai_code'))
+        if not need:
+            return None
+        ip, now = self.ip(), time.time()
+        with FAILS_LOCK:
+            lst = [t for t in FAILS.get('ai:' + ip, []) if now - t < LOGIN_WINDOW]
+            FAILS['ai:' + ip] = lst
+            allf = [t for t in FAILS.get('ai:*', []) if now - t < LOGIN_WINDOW]
+            FAILS['ai:*'] = allf
+        if len(lst) >= LOGIN_FAILS or len(allf) >= 60:
+            return self.send(429, {'ok': False, 'code': 'locked', 'error': '여러 번 틀려 10분간 잠겼습니다'}, log=False)
+        if not secrets.compare_digest(norm_code(j.get('code'))[:40].encode('utf-8'), need.encode('utf-8')):
+            if j.get('code'):
+                with FAILS_LOCK:
+                    FAILS.setdefault('ai:' + ip, []).append(now)
+                    FAILS.setdefault('ai:*', []).append(now)
+            return self.send(403, {'ok': False, 'code': 'need_code', 'error': '입장코드'}, log=False)
+        return None
+
     def ask(self):
         """AI 도우미: 메뉴 자료 본문에서 근거를 찾아 답한다. 로그인 없이 쓰되 IP별·하루 횟수 제한."""
         j = self.body_json(8000)
         qtext = re.sub(r'\s+', ' ', str(j.get('q') or '')).strip()[:300]
-        need = norm_code(CONF.get('ai_code'))
-        if need:   # AI 도우미 입장코드(서버에서 확인, 틀리면 IP별로 잠금)
-            ip, now = self.ip(), time.time()
-            with FAILS_LOCK:
-                lst = [t for t in FAILS.get('ai:' + ip, []) if now - t < LOGIN_WINDOW]
-                FAILS['ai:' + ip] = lst
-            if len(lst) >= LOGIN_FAILS:
-                return self.send(429, {'ok': False, 'code': 'locked', 'error': '여러 번 틀려 10분간 잠겼습니다'}, log=False)
-            if not secrets.compare_digest(norm_code(j.get('code'))[:40].encode('utf-8'), need.encode('utf-8')):
-                if j.get('code'):
-                    with FAILS_LOCK:
-                        FAILS.setdefault('ai:' + ip, []).append(now)
-                return self.send(403, {'ok': False, 'code': 'need_code', 'error': '입장코드'}, log=False)
+        bad = self.ai_gate(j)
+        if bad:
+            return bad
         if len(qtext) < 2:
             raise ValueError('질문을 입력하세요')   # 앱은 빈 질문으로 입장코드만 확인한다(AI 호출 없음)
         hist = j.get('history') if isinstance(j.get('history'), list) else []
@@ -814,6 +845,9 @@ class H(BaseHTTPRequestHandler):
             raise ValueError('보고서 자료가 비어 있습니다')
         if not CONF.get('ai_api_key'):
             return self.send(200, {'ok': False, 'code': 'not_granted', 'error': '서버에 AI 키(ai_api_key)가 설정되지 않았습니다'}, log=False)
+        bad = self.ai_gate(j)   # 보고서 AI도 같은 입장코드(공짜 AI 중계·하루 한도 소진 방지)
+        if bad:
+            return bad
         key = hashlib.sha256(prompt.encode('utf-8')).hexdigest()
         now = time.time()
         hit = REPORT_CACHE.get(key)
@@ -829,6 +863,119 @@ class H(BaseHTTPRequestHandler):
             REPORT_CACHE.clear()
         REPORT_CACHE[key] = (now, text)
         return self.send(200, {'ok': True, 'text': text}, log=False)
+
+    # --- 교수(관리자) 메뉴 자료 올리기·지우기 (V79)
+    def lib_upload(self, slug):
+        if self.user['role'] != 'admin':
+            return self.err(403, '교수(관리자)만 올릴 수 있습니다')
+        if slug not in SEC_DIR:
+            return self.err(404, '없는 메뉴입니다')
+        n = self.clen()
+        if n <= 0:
+            return self.err(400, '빈 파일입니다')
+        if n > LIB_MAX:
+            self.close_connection = True
+            return self.err(413, '파일은 60MB 이하만 올릴 수 있습니다')
+        name = urllib.parse.unquote(self.headers.get('X-Filename') or '')
+        name = re.sub(r'[\x00-\x1f\x7f<>:"/\\|?*]', '', name).strip().strip('.')[:120]
+        ext = os.path.splitext(name)[1].lower()
+        if not name or name.startswith('~$') or ext not in LIB_TYPES:
+            self.close_connection = True
+            return self.err(415, '올릴 수 없는 파일 형식입니다')
+        d = os.path.join(LIB, SEC_DIR[slug])
+        os.makedirs(d, exist_ok=True)
+        fp = os.path.join(d, name)
+        if not os.path.realpath(fp).startswith(os.path.realpath(d) + os.sep):
+            return self.err(400, '파일 이름을 쓸 수 없습니다')
+        tmp = os.path.join(d, '.up-' + secrets.token_hex(6))
+        left = n
+        try:
+            with open(tmp, 'wb') as f:
+                while left > 0:
+                    b = self.rfile.read(min(262144, left))
+                    if not b:
+                        raise ConnectionError('업로드가 끊겼습니다')
+                    f.write(b)
+                    left -= len(b)
+            self._body_read = True
+            if ext == '.pdf':
+                with open(tmp, 'rb') as f:
+                    if not f.read(5).startswith(b'%PDF'):
+                        raise ValueError('PDF 파일이 아닙니다')
+            if os.path.exists(fp):   # 같은 이름이면 기존 파일은 data\trash로 옮겨 둔다
+                trash = os.path.join(DATA, 'trash')
+                os.makedirs(trash, exist_ok=True)
+                os.replace(fp, os.path.join(trash, time.strftime('%Y%m%d-%H%M%S-') + name))
+            os.replace(tmp, fp)
+        finally:
+            if os.path.exists(tmp):
+                os.remove(tmp)
+        print(f'[자료] 교수 업로드: {SEC_DIR[slug]}/{name} ({n // 1024}KB)', flush=True)
+        return self.send(200, {'ok': True, 'files': self.lib_files(slug)})
+
+    def lib_delete(self, slug, name):
+        if self.user['role'] != 'admin':
+            return self.err(403, '교수(관리자)만 지울 수 있습니다')
+        if slug not in SEC_DIR:
+            return self.err(404, '없는 메뉴입니다')
+        if name not in {f['name'] for f in self.lib_files(slug)}:   # 목록에 있는 이름만(경로 조작 차단)
+            return self.err(404, '파일이 없습니다')
+        trash = os.path.join(DATA, 'trash')   # 바로 지우지 않고 data\trash로 옮김(실수 복구)
+        os.makedirs(trash, exist_ok=True)
+        os.replace(os.path.join(LIB, SEC_DIR[slug], name), os.path.join(trash, time.strftime('%Y%m%d-%H%M%S-') + name))
+        print(f'[자료] 교수 삭제(→data\\trash): {SEC_DIR[slug]}/{name}', flush=True)
+        return self.send(200, {'ok': True, 'files': self.lib_files(slug)})
+
+    # --- 주요 질의응답: 누구나 질문, 교수(관리자)가 답변 (V79)
+    @staticmethod
+    def qna_row(r):
+        return {'id': r['id'], 'ts': r['ts'], 'name': r['name'], 'q': r['q'], 'a': r['a'] or '', 'a_ts': r['a_ts']}
+
+    def qna_list(self):
+        rows = q('SELECT * FROM qna ORDER BY id DESC LIMIT 200')
+        return self.send(200, {'ok': True, 'items': [self.qna_row(r) for r in rows]}, log=False)
+
+    def qna_ask(self):
+        j = self.body_json(4000)
+        text = re.sub(r'[\x00-\x08\x0b-\x1f\x7f]', '', str(j.get('q') or '')).strip()[:500]
+        name = clean_name(j.get('name'))[:12] or '익명'
+        if len(text) < 2:
+            raise ValueError('질문을 입력하세요')
+        if looks_like_staff(name):
+            name = '익명'
+        ip, now = self.ip(), time.time()
+        with QNA_LOCK:
+            lst = [t for t in QNA_HITS.get(ip, []) if now - t < 600]
+            if len(lst) >= 6:
+                QNA_HITS[ip] = lst
+                return self.err(429, '질문이 너무 잦습니다. 10분 뒤 다시 올려 주세요')
+            lst.append(now)
+            QNA_HITS[ip] = lst
+        if (q("SELECT COUNT(*) n FROM qna WHERE ip=? AND (a IS NULL OR a='')", (ip,), one=True)['n'] or 0) >= 5:
+            return self.err(429, '답변을 기다리는 질문이 5개 있습니다. 답변 후 다시 올려 주세요')
+        if (q('SELECT COUNT(*) n FROM qna WHERE ts>?', (now - 3600,), one=True)['n'] or 0) >= 60:
+            return self.err(429, '지금 질문이 많이 몰렸습니다. 잠시 뒤 다시 올려 주세요')
+        q("DELETE FROM qna WHERE (a IS NULL OR a='') AND ts<?", (now - 60 * 86400,), commit=True)   # 60일 넘은 미답변은 정리
+        if (q('SELECT COUNT(*) n FROM qna', one=True)['n'] or 0) >= 2000:
+            return self.err(507, '질문이 너무 많이 쌓였습니다. 교수에게 정리를 요청하세요')
+        q('INSERT INTO qna(ts,name,q,a,a_ts,ip) VALUES(?,?,?,?,?,?)', (now, name, text, '', None, ip), commit=True)
+        return self.qna_list()
+
+    def qna_answer(self, qid):
+        if self.user['role'] != 'admin':
+            return self.err(403, '교수(관리자)만 답할 수 있습니다')
+        j = self.body_json(8000)
+        a = re.sub(r'[\x00-\x08\x0b-\x1f\x7f]', '', str(j.get('a') or '')).strip()[:2000]
+        if not q('SELECT id FROM qna WHERE id=?', (qid,), one=True):
+            return self.err(404, '없는 질문입니다')
+        q('UPDATE qna SET a=?, a_ts=? WHERE id=?', (a, time.time() if a else None, qid), commit=True)
+        return self.qna_list()
+
+    def qna_delete(self, qid):
+        if self.user['role'] != 'admin':
+            return self.err(403, '교수(관리자)만 지울 수 있습니다')
+        q('DELETE FROM qna WHERE id=?', (qid,), commit=True)
+        return self.qna_list()
 
     def lib_list(self):
         return self.send(200, {'ok': True, 'lib': {slug: self.lib_files(slug) for slug, _ in SECTIONS}}, log=False)
