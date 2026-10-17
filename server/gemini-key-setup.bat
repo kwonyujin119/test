@@ -19,7 +19,7 @@ if not exist sachil_server.py (
 )
 
 echo.
-echo Paste the Gemini API key from aistudio.google.com (starts with AIza) and press Enter.
+echo Paste the Gemini API key copied from aistudio.google.com (API keys page) and press Enter.
 echo Never share this key in chat, KakaoTalk or GitHub.
 echo.
 set "KEY="

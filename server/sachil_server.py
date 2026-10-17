@@ -44,7 +44,7 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '3.2'
+VERSION = '3.3'
 APP_VERSION = 'V96'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
@@ -2347,15 +2347,17 @@ def main():
     if '--set-gemini-key' in sys.argv:
         i = sys.argv.index('--set-gemini-key')
         raw = ' '.join(sys.argv[i + 1:])
+        # 예전 키는 AIza…, 새로 만든 키는 다른 글자로 시작할 수 있다 → AIza가 없으면 붙여 넣은 것 중 가장 긴 키 모양 글자를 쓴다
         m = re.search(r'AIza[0-9A-Za-z_\-]{30,}', raw)
-        if not m:
-            print('Gemini API 키를 찾지 못했습니다. aistudio.google.com에서 만든 AIza 로 시작하는 키를 붙여 넣으세요.')
+        key = m.group(0) if m else max(re.findall(r'[0-9A-Za-z_\-.]{30,}', raw) or [''], key=len)
+        if not key:
+            print('Gemini API 키를 찾지 못했습니다. aistudio.google.com의 API 키 화면에서 키를 복사해 그대로 붙여 넣으세요.')
             sys.exit(1)
-        CONF['gemini_api_key'] = m.group(0)
+        CONF['gemini_api_key'] = key
         CONF['ai_provider'] = 'gemini'
         with open(CONF_PATH, 'w', encoding='utf-8') as f:
             json.dump(CONF, f, ensure_ascii=False, indent=2)
-        print('Gemini 키 저장 완료 (' + m.group(0)[:8] + '…). 연결을 시험합니다…')
+        print('Gemini 키 저장 완료 (' + key[:6] + '…' + key[-4:] + '). 연결을 시험합니다…')
         text, why, _c = call_llm('짧게 답한다.', [{'role': 'user', 'content': '연결 확인입니다. "연결됨"이라고만 답하세요.'}], 1000)
         if text:
             print('시험 성공: AI 응답 =', text[:40])
