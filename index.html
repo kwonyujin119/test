@@ -735,7 +735,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v101</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v102</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -852,8 +852,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V101', SRV_VER='3.6';
+  const APP_VER='V102', SRV_VER='3.8';
   const UPDATES=[
+    {v:'V102', d:'2026-10-17', t:['AI 도우미: 같은 질문(띄어쓰기·물음표만 다른 것 포함)은 서버에 저장된 답을 바로 보여 줌 — AI 사용량·하루 한도를 쓰지 않음(3일 보관, 메뉴 자료가 바뀌면 새로 답함)']},
     {v:'V101', d:'2026-10-17', t:['AI가 잠시 실패해 ‘자료 발췌’로 답할 때도 결론 → 설명 → 근거 형식으로, 실패 이유를 설명 줄에 표시','AI 일시 오류(바쁨·분당 한도)는 서버가 한 번 더 시도','추천 질문은 3분마다 바뀜']},
     {v:'V100', d:'2026-10-17', t:['AI 도우미 입력창 위 추천 질문: 메뉴 자료 범위의 질문 36개 중 5개를 무작위로 띄우고 15초마다 새 질문으로 바뀜(자주·이전 검색과 무관, 입력·누르는 중엔 멈춤)']},
     {v:'V99', d:'2026-10-17', t:['CH·IL 초기화 위치 통일: 두 화면 모두 위 줄 맨 왼쪽(주 버튼과 떨어진 자리), 이름은 ‘체크 초기화’ / ‘기록 초기화’로 무엇이 지워지는지 구분','초기화 뒤 6초 동안 ‘되돌리기’','보고서 만들기: 연타해도 1건만, 미기재 섹션이 있거나 30건이 꽉 차면 한 번 더 눌러 확인','AI 다시 작성이 실패·중지되면 이전 AI 작성본을 되살림, AI 사이트 결과로 덮어쓸 때 확인','‘저장’ 버튼 → ‘파일로 받기’, 편집 안내 문구를 실제 동작에 맞춤, 앱을 닫는 순간의 마지막 입력도 저장']},
@@ -2216,8 +2217,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const cited=new Set([...String(m.text).matchAll(/\[(\d{1,2})\]/g)].map(x=>Number(x[1])-1));   // 본문에서 인용한 근거만 보인다
     return `<div class="src-h">근거 자료</div><ol class="src" aria-label="근거 자료">${m.src.map((sc,i)=>(cited.size&&!cited.has(i))?'':`<li><a href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}"><b>[${i+1}]</b><em>${esc(pdfName(sc.name))}${sc.art?` · ${esc(sc.art)}`:''}</em><span>${sc.page}쪽</span></a>${sc.snip?`<q class="snip">${esc(deGlyph(sc.snip))}</q>`:''}</li>`).join('')}</ol>`;
   }
-  const botModeHtml=m=> m.mode==='ai' ? '<span class="mode">AI 도우미 · 메뉴 자료 근거 답변 — 중요한 내용은 원문으로 확인하세요</span>'
-    : m.mode==='general' ? '<span class="mode warn">AI 일반 설명 · 메뉴 자료에 근거 없음 — 소속 기관 지침·원문으로 확인하세요</span>'
+  const cacheTag=m=>m.cached?' · 같은 질문의 저장된 답':'';
+  const botModeHtml=m=> m.mode==='ai' ? `<span class="mode">AI 도우미 · 메뉴 자료 근거 답변${cacheTag(m)} — 중요한 내용은 원문으로 확인하세요</span>`
+    : m.mode==='general' ? `<span class="mode warn">AI 일반 설명 · 메뉴 자료에 근거 없음${cacheTag(m)} — 소속 기관 지침·원문으로 확인하세요</span>`
     : m.mode==='extract' ? `<span class="mode">교수 에이전트 · 원문 발췌 정리${m.note?` · ${esc(m.note)}`:' · AI 키 연결 시 해설형 답변'}</span>` : '';
 
   function answer(qRaw){
@@ -2515,7 +2517,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           if((chat.gen||0)!==g0) return;   // 그사이 '대화 비우기' — 이전 질문의 답은 버림
           chat.typing=false;
           if(r.status===403&&r.j&&r.j.code==='need_code'){ chat.msgs.pop(); csave(); setAiCode(''); if(chat.room==='bot'&&state.route==='ai') aiGate(panel,room); return; }   // 코드가 바뀜 → 다시 입력
-          if(r.ok&&r.j.ok){ push('bot',String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,art:String(x.art||'').slice(0,40),snip:String(x.snippet||'').slice(0,180)})); csave(); }
+          if(r.ok&&r.j.ok){ push('bot',String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.cached=!!r.j.cached; m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,art:String(x.art||'').slice(0,40),snip:String(x.snippet||'').slice(0,180)})); csave(); }
           else push('bot', r.status===0?'서버에 연결할 수 없습니다. 잠시 뒤 다시 물어보세요.':(r.j.error||'답변을 만들지 못했습니다.'),[]);
           if(chat.room==='bot'&&state.route==='ai'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp&&window.innerWidth>=600) inp.focus(); }
         });
