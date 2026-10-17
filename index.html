@@ -721,7 +721,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v89</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v90</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -838,8 +838,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V89', SRV_VER='2.5';
+  const APP_VER='V90', SRV_VER='2.6';
   const UPDATES=[
+    {v:'V90', d:'2026-10-17', t:['메뉴: 준비가 끝난 항목(관련법령, 서버 연결 시 주요 질의응답)은 ‘준비중’ 표시를 지움','47망·디브리핑룸 위쪽: ‘익명 대화 · 지금 n명 접속’ 대신 ‘47망 - n명’처럼 참여자 수(대화명을 정하고 들어온 사람)','7일 동안 쓰지 않으면 자동 로그아웃 — 다시 들어올 때 대화명을 새로 입력']},
     {v:'V89', d:'2026-10-17', t:['Search는 ‘찾기’, AI 도우미는 ‘풀기’로 역할을 나누고 서로 잇기','Search 결과 아래 ‘이 결과로 AI에게 묻기’ — 근거 후보(자료·쪽)를 함께 표시','AI 답 아래 ‘Search에서 원문 더 찾기’','Search에 문장으로 물으면 AI 도우미를, AI에 낱말만 쓰면 Search를 안내']},
     {v:'V88', d:'2026-10-17', t:['관리자(교수) 코드를 ********로 변경(서버에는 암호화해 저장)','47망과 디브리핑룸의 대화명을 따로: 한 곳에서 정했어도 다른 방에 처음 들어가면 대화명을 새로 정해요','사진 크게 보기에서 왼쪽→오른쪽으로 끌면 이전 사진, 오른쪽→왼쪽은 다음 사진','크게 본 사진을 한 번 더 누르면 위에 반투명 줄과 갤러리 버튼 — 갤러리는 날짜별로 정리','사진을 여러 장 함께 보내면 대표 사진 1장 + 아래 작은 5칸(지금 보는 사진 표시, 나머지는 미리보기)','교수로 로그인돼 있으면 메뉴의 ‘교수 로그인’ 링크를 숨김']},
     {v:'V87', d:'2026-10-17', t:['교수로 로그인하면 맨 위에 남색 ‘교수 모드’ 띠와 로그아웃 버튼이 보여요','첫 화면 Search는 47망과, Incident Log는 디브리핑룸과 같은 높이로']},
@@ -1344,6 +1345,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   async function loadLib(){ const r=await api('/api/lib'); if(r.ok&&r.j.lib){ SRV.lib=r.j.lib; SRV.libErr=false; syncSheetFoot(); return true; }
     if(!SRV.on){ try{ const x=await fetch('lib/index.json',{cache:'no-cache'}); if(x.ok){ const j=await x.json(); if(j&&j.lib){ SRV.lib=j.lib; SRV.libStatic=true; SRV.libErr=false; syncSheetFoot(); return true; } } }catch(_){ } }
     SRV.libErr=true; return false; }
+  const hasOwn=s=>s.slug==='law' || (s.slug==='faq'&&SRV.on);   // 파일이 없어도 내용이 있는 섹션(V90: '준비중' 표시 안 함)
   function renderPrep(panel, s){
     if(s.slug==='updates'){ renderUpdates(panel,s); return; }
     if(s.slug==='signature'){ renderSignature(panel,s); return; }   // 앱 안에 든 기록(서버 자료 폴더와 무관)
@@ -1354,7 +1356,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     panel.innerHTML=`
       <div class="card prep">
         ${art}
-        <span class="badge">준비중</span>
+        ${hasOwn(s)||s.slug==='login'?'':'<span class="badge">준비중</span>'}
         <h2>${esc(s.title)}</h2>
         <p>${esc(s.desc)}</p>
         ${s.slug==='law'?lawLinksHtml():''}
@@ -1463,7 +1465,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       panel.innerHTML=`
       <div class="card prep">
         ${art}
-        ${Array.isArray(files)&&!files.length&&!SRV.libErr?'<span class="badge">준비중</span>':''}
+        ${Array.isArray(files)&&!files.length&&!SRV.libErr&&!hasOwn(s)?'<span class="badge">준비중</span>':''}
         <h2>${esc(s.title)}</h2>
         <p>${esc(s.desc)}</p>
         ${s.slug==='law'?lawLinksHtml():''}
@@ -2743,7 +2745,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!rid){ panel.innerHTML=`<p class="convo-note">${kind==='deb'?'디브리핑룸은 서버 PC를 새 버전(V57)으로 업데이트하면 열립니다. 지금은 47망을 이용해 주세요.':'47망을 찾지 못했습니다. 서버를 다시 시작해 주세요.'}</p>`; return; }
     pending=[]; SRV.last=0; SRV.seen=new Set(); SRV.epoch=''; SRV.msgs=new Map(); SRV.rp=[]; SRV.rv=-1; SRV.readSent=0; SRV.lastDay=''; SRV.replyTo=null; SRV.dv=-1;
     const admin=SRV.me&&SRV.me.role==='admin';
-    panel.innerHTML=roomHead({id:'s'+rid,title},'익명 대화 · <b class="onl" id="onlineN">접속 확인 중</b>',`<button type="button" class="btn ghost" id="dbRename">대화명 바꾸기</button>${admin?'<button type="button" class="btn ghost" id="dbClear">대화 비우기</button>':''}`)+`
+    panel.innerHTML=roomHead({id:'s'+rid,title},`<b class="onl" id="onlineN">${esc(title)} - …명</b>`,`<button type="button" class="btn ghost" id="dbRename">대화명 바꾸기</button>${admin?'<button type="button" class="btn ghost" id="dbClear">대화 비우기</button>':''}`)+`
       <div class="chat">
         <div class="card convo-card"><div class="convo" id="convo"><p class="convo-note" id="convoNote">불러오는 중…</p></div><button type="button" class="peek" id="peek" hidden></button></div>
         <div class="reply-bar" id="replyBar" hidden></div>
@@ -2763,7 +2765,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     // 지금 접속 수·안 읽은 수
     const applyState=j=>{
       if(!j) return;
-      if(Number.isFinite(j.online)){ const o=$('#onlineN'); if(o) o.textContent=`지금 ${j.online}명 접속`; }
+      // 참여자 수(V90): 대화명을 정하고 이 방에 들어온 사람(로그아웃·7일 미사용이면 빠짐). 예전 서버는 지금 접속 수
+      { const o=$('#onlineN'); if(o){ if(Number.isFinite(j.members)) o.textContent=`${title} - ${j.members.toLocaleString('ko-KR')}명`; else if(Number.isFinite(j.online)) o.textContent=`${title} - 지금 ${j.online}명 접속`; } }
       if(Array.isArray(j.rp)) SRV.rp=j.rp.filter(Number.isFinite).sort((a,b)=>a-b);
       if(Number.isFinite(j.rv)) SRV.rv=j.rv;
       if(Array.isArray(j.deleted)) j.deleted.map(Number).filter(Number.isFinite).forEach(markDeleted);
@@ -2790,7 +2793,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         if(SRV.gen!==gen || document.visibilityState!=='visible' || !ROOMS_R.includes(state.route) || SRV.last<=SRV.readSent) return;
         const last=SRV.last; SRV.readSent=last;
         const r=await api(`/api/rooms/${rid}/read`,{json:{last}});
-        if(SRV.gen!==gen) return; if(r.ok) applyState(r.j); else if(r.status===404){ SRV.readSent=Infinity; const o=$('#onlineN'); if(o) o.textContent='접속 수는 서버 업데이트 후 표시'; } else SRV.readSent=0;   // 예전 서버: 읽음 기능 없음 → 다시 묻지 않음
+        if(SRV.gen!==gen) return; if(r.ok) applyState(r.j); else if(r.status===404){ SRV.readSent=Infinity; const o=$('#onlineN'); if(o) o.textContent='참여자 수는 서버 업데이트 후 표시'; } else SRV.readSent=0;   // 예전 서버: 읽음 기능 없음 → 다시 묻지 않음
       },400);
     }
     const onVis=()=>{ if(SRV.gen!==gen){ document.removeEventListener('visibilitychange',onVis); removeEventListener('pageshow',onShow); return; } if(document.visibilityState==='visible'){ if(SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } } markRead(); } };   // 다시 보이면 기다리던 연결을 새로
