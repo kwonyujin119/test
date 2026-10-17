@@ -690,7 +690,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v85</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v86</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -807,8 +807,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V85', SRV_VER='2.3';
+  const APP_VER='V86', SRV_VER='2.4';
   const UPDATES=[
+    {v:'V86', d:'2026-10-17', t:['메뉴 자료 PDF 미리보기를 첫 쪽 그림으로 바로 보여 줘요 — 빙글빙글 로딩 표시 없음','미리보기 그림은 교수가 메뉴를 한 번 열면 자동으로 만들어져 모두에게 보여요(서버 2.4)']},
     {v:'V85', d:'2026-10-17', t:['메뉴 ‘관련법령’에 법제처 국가법령정보센터 바로가기: 소방기본법·재난안전법·긴급구조대응활동 규칙·119구조구급법·화재조사법 등 법률·시행령·시행규칙을 누르면 현행 법령으로 바로 이동']},
     {v:'V84', d:'2026-10-17', t:['설치된 앱(PC 작업표시줄·폰 홈 화면) 아이콘이 새 시그니처 아이콘으로 바뀌도록 아이콘 주소를 새로 고침','PC 서버로 연 앱도 같은 새 아이콘·노랑 테마 사용']},
     {v:'V83', d:'2026-10-17', t:['보고서 창에서 교수로 로그인했을 때만 ‘초안 편집’ 버튼 — 고친 내용은 ‘편집 저장’(또는 창 닫기)으로 그대로 저장','교수가 아니면 보고서 본문은 읽기 전용']},
@@ -1298,7 +1299,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const LIB_DIR={ 'ictc-schedule':'01_ICTC 교육일정','ictc-eval':'02_ICTC 평가일정','faq':'03_주요 질의응답','law':'04_관련법령','sop':'05_SOP-현장지휘론','ersp':'06_긴급구조대응계획','rit':'07_RIT','water':'08_무중단급수체계','safety':'09_안전관리','mci':'10_다수사상자','drone':'11_드론전술','cases':'12_대형화재사례' };
   const fmtDate=ts=>{ const d=new Date(ts*1000); return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`; };
   const libHref=(slug,f)=>SRV.on?SURL(`/lib/${slug}/${encodeURIComponent(f.name)}`):`lib/${slug}/${encodeURIComponent(f.name)}`;
-  const libRow=(slug,f)=>`<a class="libfile" href="${libHref(slug,f)}" ${f.inline?'target="_blank" rel="noopener"':'download'}${f.ext==='pdf'?` data-pdfv="${esc(f.name)}"`:''}>${f.ext==='pdf'?`<span class="thumb wait" data-thumb="${esc(libHref(slug,f))}" aria-hidden="true"><span class="ext">PDF</span></span>`:`<span class="ext">${esc(f.ext)}</span>`}<span class="nm"><b>${esc(f.name.replace(/\.[^.]+$/,'')).replace(/([_\-.])/g,'$1<wbr>')}</b><small>${fmtSize(f.size)} · ${fmtDate(f.mtime)}${f.ext==='pdf'?`<span data-pg="${esc(libHref(slug,f))}"></span>`:''}</small></span><span class="go">${f.inline?'열기':'받기'}</span></a>`;
+  const libRow=(slug,f)=>`<a class="libfile" href="${libHref(slug,f)}" ${f.inline?'target="_blank" rel="noopener"':'download'}${f.ext==='pdf'?` data-pdfv="${esc(f.name)}"`:''}>${f.ext==='pdf'?(f.thumb?`<span class="thumb" aria-hidden="true"><img src="${esc(SURL('/lib-thumb/'+f.thumb+'.jpg'))}" alt="" loading="lazy" decoding="async"><span class="ext">PDF</span></span>`:`<span class="thumb" data-thumb="${esc(libHref(slug,f))}" data-slug="${esc(slug)}" data-tname="${esc(f.name)}" aria-hidden="true"><span class="ext">PDF</span></span>`):`<span class="ext">${esc(f.ext)}</span>`}<span class="nm"><b>${esc(f.name.replace(/\.[^.]+$/,'')).replace(/([_\-.])/g,'$1<wbr>')}</b><small>${fmtSize(f.size)} · ${fmtDate(f.mtime)}${f.pages?` · ${f.pages}쪽`:''}</small></span><span class="go">${f.inline?'열기':'받기'}</span></a>`;
   function syncSheetFoot(){ const el=$('#sheetFoot'); if(!el) return; if(!SRV.lib){ el.textContent=`자료 12개 섹션 · ${APP_VER}`; return; } const n=SECTIONS.filter(x=>!x.local&&(SRV.lib[x.slug]||[]).length).length; el.textContent=(n?`자료 있는 섹션 ${n}/12`:'아직 올라온 자료 없음')+` · ${APP_VER}`; }
   async function loadLib(){ const r=await api('/api/lib'); if(r.ok&&r.j.lib){ SRV.lib=r.j.lib; SRV.libErr=false; syncSheetFoot(); return true; }
     if(!SRV.on){ try{ const x=await fetch('lib/index.json',{cache:'no-cache'}); if(x.ok){ const j=await x.json(); if(j&&j.lib){ SRV.lib=j.lib; SRV.libStatic=true; SRV.libErr=false; syncSheetFoot(); return true; } } }catch(_){ } }
@@ -1885,9 +1886,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     }catch(_){ THUMB.set(key,{src:'',pages:0}); }
     finally{ try{ if(task) task.destroy(); }catch(_){ } }
     paintThumb(key);
+    document.querySelectorAll('[data-thumb]').forEach(el=>{ if(el.dataset.thumb===key&&el.dataset.slug&&!el.dataset.up){ el.dataset.up='1'; upThumb(el,key); } });
   }
   function thumbPump(){ while(thumbBusy<2&&thumbQ.length){ const k=thumbQ.shift(); thumbBusy++; makeThumb(k).finally(()=>{ thumbBusy--; thumbPump(); }); } }
+  // V86: 미리보기는 서버에 저장된 그림(첫 쪽)으로 바로 보여 준다(로딩 표시 없음). 그림이 없는 PDF는 교수 화면이 한 번 그려 서버에 올려 둔다
+  async function upThumb(el,key){
+    const t=THUMB.get(key); if(!t||!t.src||!isProf()) return;
+    try{ const bl=await (await fetch(t.src)).blob(); const r=await api(`/api/lib/${el.dataset.slug}/thumb?n=${encodeURIComponent(el.dataset.tname)}&p=${t.pages||0}`,{body:bl,headers:{'Content-Type':'image/jpeg'},tok:PROF.tok});
+      if(r.ok&&SRV.lib&&SRV.lib[el.dataset.slug]){ const f=SRV.lib[el.dataset.slug].find(x=>x.name===el.dataset.tname); if(f){ f.thumb=r.j.thumb; f.pages=r.j.pages; } } }catch(_){ }
+  }
   function thumbsIn(root){
+    if(!isProf()) return;   // 학생 화면은 PDF를 내려받아 그리지 않음(로딩 표시·데이터 낭비 없음)
     if(!SRV.lib||!('IntersectionObserver' in window)) return;
     if(thumbObs) thumbObs.disconnect();
     thumbObs=new IntersectionObserver(es=>es.forEach(en=>{ if(!en.isIntersecting) return; thumbObs.unobserve(en.target); const k=en.target.dataset.thumb; if(THUMB.has(k)) paintThumb(k); else if(!thumbQ.includes(k)){ thumbQ.push(k); thumbPump(); } }),{rootMargin:'300px 0px'});
