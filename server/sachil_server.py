@@ -44,7 +44,7 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.zip': ('application/zip', False),
 }
 VERSION = '2.3'
-APP_VERSION = 'V78'
+APP_VERSION = 'V79'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -370,7 +370,7 @@ def clean_name(s):
     return re.sub(r'\s+', ' ', s)[:20]
 
 
-IMPERSONATE = re.compile(r'교관|관리자|운영자|admin|sachil|사칠', re.I)
+IMPERSONATE = re.compile(r'교관|교수|관리자|운영자|admin|sachil|사칠', re.I)
 
 def looks_like_staff(name):
     return bool(IMPERSONATE.search(re.sub(r'[\s_\-.·]', '', name)))
@@ -781,23 +781,35 @@ class H(BaseHTTPRequestHandler):
         out.sort(key=lambda x: x['name'])
         return out
 
+    def ai_gate(self, j):
+        """AI 입장코드 확인(도우미·보고서 공통). 통과면 None, 아니면 이미 보낸 응답.
+        IP별 10분 8회 + 전체 10분 60회 실패면 잠금(여러 IP로 나눠 맞히기 차단)."""
+        need = norm_code(CONF.get('ai_code'))
+        if not need:
+            return None
+        ip, now = self.ip(), time.time()
+        with FAILS_LOCK:
+            lst = [t for t in FAILS.get('ai:' + ip, []) if now - t < LOGIN_WINDOW]
+            FAILS['ai:' + ip] = lst
+            allf = [t for t in FAILS.get('ai:*', []) if now - t < LOGIN_WINDOW]
+            FAILS['ai:*'] = allf
+        if len(lst) >= LOGIN_FAILS or len(allf) >= 60:
+            return self.send(429, {'ok': False, 'code': 'locked', 'error': '여러 번 틀려 10분간 잠겼습니다'}, log=False)
+        if not secrets.compare_digest(norm_code(j.get('code'))[:40].encode('utf-8'), need.encode('utf-8')):
+            if j.get('code'):
+                with FAILS_LOCK:
+                    FAILS.setdefault('ai:' + ip, []).append(now)
+                    FAILS.setdefault('ai:*', []).append(now)
+            return self.send(403, {'ok': False, 'code': 'need_code', 'error': '입장코드'}, log=False)
+        return None
+
     def ask(self):
         """AI 도우미: 메뉴 자료 본문에서 근거를 찾아 답한다. 로그인 없이 쓰되 IP별·하루 횟수 제한."""
         j = self.body_json(8000)
         qtext = re.sub(r'\s+', ' ', str(j.get('q') or '')).strip()[:300]
-        need = norm_code(CONF.get('ai_code'))
-        if need:   # AI 도우미 입장코드(서버에서 확인, 틀리면 IP별로 잠금)
-            ip, now = self.ip(), time.time()
-            with FAILS_LOCK:
-                lst = [t for t in FAILS.get('ai:' + ip, []) if now - t < LOGIN_WINDOW]
-                FAILS['ai:' + ip] = lst
-            if len(lst) >= LOGIN_FAILS:
-                return self.send(429, {'ok': False, 'code': 'locked', 'error': '여러 번 틀려 10분간 잠겼습니다'}, log=False)
-            if not secrets.compare_digest(norm_code(j.get('code'))[:40].encode('utf-8'), need.encode('utf-8')):
-                if j.get('code'):
-                    with FAILS_LOCK:
-                        FAILS.setdefault('ai:' + ip, []).append(now)
-                return self.send(403, {'ok': False, 'code': 'need_code', 'error': '입장코드'}, log=False)
+        bad = self.ai_gate(j)
+        if bad:
+            return bad
         if len(qtext) < 2:
             raise ValueError('질문을 입력하세요')   # 앱은 빈 질문으로 입장코드만 확인한다(AI 호출 없음)
         hist = j.get('history') if isinstance(j.get('history'), list) else []
@@ -833,6 +845,9 @@ class H(BaseHTTPRequestHandler):
             raise ValueError('보고서 자료가 비어 있습니다')
         if not CONF.get('ai_api_key'):
             return self.send(200, {'ok': False, 'code': 'not_granted', 'error': '서버에 AI 키(ai_api_key)가 설정되지 않았습니다'}, log=False)
+        bad = self.ai_gate(j)   # 보고서 AI도 같은 입장코드(공짜 AI 중계·하루 한도 소진 방지)
+        if bad:
+            return bad
         key = hashlib.sha256(prompt.encode('utf-8')).hexdigest()
         now = time.time()
         hit = REPORT_CACHE.get(key)
@@ -887,6 +902,10 @@ class H(BaseHTTPRequestHandler):
                 with open(tmp, 'rb') as f:
                     if not f.read(5).startswith(b'%PDF'):
                         raise ValueError('PDF 파일이 아닙니다')
+            if os.path.exists(fp):   # 같은 이름이면 기존 파일은 data\trash로 옮겨 둔다
+                trash = os.path.join(DATA, 'trash')
+                os.makedirs(trash, exist_ok=True)
+                os.replace(fp, os.path.join(trash, time.strftime('%Y%m%d-%H%M%S-') + name))
             os.replace(tmp, fp)
         finally:
             if os.path.exists(tmp):
@@ -932,6 +951,11 @@ class H(BaseHTTPRequestHandler):
                 return self.err(429, '질문이 너무 잦습니다. 10분 뒤 다시 올려 주세요')
             lst.append(now)
             QNA_HITS[ip] = lst
+        if (q("SELECT COUNT(*) n FROM qna WHERE ip=? AND (a IS NULL OR a='')", (ip,), one=True)['n'] or 0) >= 5:
+            return self.err(429, '답변을 기다리는 질문이 5개 있습니다. 답변 후 다시 올려 주세요')
+        if (q('SELECT COUNT(*) n FROM qna WHERE ts>?', (now - 3600,), one=True)['n'] or 0) >= 60:
+            return self.err(429, '지금 질문이 많이 몰렸습니다. 잠시 뒤 다시 올려 주세요')
+        q("DELETE FROM qna WHERE (a IS NULL OR a='') AND ts<?", (now - 60 * 86400,), commit=True)   # 60일 넘은 미답변은 정리
         if (q('SELECT COUNT(*) n FROM qna', one=True)['n'] or 0) >= 2000:
             return self.err(507, '질문이 너무 많이 쌓였습니다. 교수에게 정리를 요청하세요')
         q('INSERT INTO qna(ts,name,q,a,a_ts,ip) VALUES(?,?,?,?,?,?)', (now, name, text, '', None, ip), commit=True)
