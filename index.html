@@ -664,7 +664,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v60</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v61</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -780,8 +780,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V60', SRV_VER='2.1';
+  const APP_VER='V61', SRV_VER='2.1';
   const UPDATES=[
+    {v:'V61', d:'2026-10-17', t:['갤럭시 뒤로(<) 버튼 오류 수정: 다른 화면에서 뒤로를 눌러도 앱이 바로 꺼지던 문제, 첫 화면에서 ‘종료하려면 다시 누르세요.’가 안 뜨던 문제를 고쳤어요(크롬·삼성인터넷의 기록 차단 규칙을 피하는 방식으로 변경)']},
     {v:'V60', d:'2026-10-17', t:['갤럭시 뒤로(<) 버튼을 인스타그램처럼: 열린 창 닫기 → 화면을 움직였으면 처음 위치로 → 다른 화면이면 첫 화면으로 → 첫 화면에서는 ‘종료하려면 다시 누르세요.’']},
     {v:'V59', d:'2026-10-17', t:['새 47 시그니처 아이콘(노란 바탕·흰 말풍선·파란 47)으로 앱 아이콘·상단 47 버튼·첫 화면 교체','시그니처 컬러 적용: 심벌 옐로 #FDD000 · 화이트 · 인천 오션 #244EA2 — 버튼·탭·강조색을 파랑으로, 노랑은 새 노랑으로']},
     {v:'V58', d:'2026-10-17', t:['보고서: ‘AI 사이트로 작성’ — API 키 없이 ChatGPT·Claude·Gemini 웹(무료 계정 포함)에 요청문을 붙여넣고, 받은 보고서를 붙여넣어 AI 작성본으로 저장']},
@@ -1067,7 +1068,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     // 열린 창 닫기 → 위로 스크롤 → 첫 화면 → '종료하려면 다시 누르세요'(인스타그램 방식)
     if(ROOMS_R.includes(route)) chat.room=null;
     try{ history.replaceState(history.state,'','#'+route); }catch(_){ }
-    state.route=route; closeSheet(); render(); armGuard();
+    state.route=route; closeSheet(); render();
   }
   function routeFromHash(){
     const h=(location.hash||'#hub').slice(1);
@@ -1079,11 +1080,21 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(SECTIONS.some(s=>s.slug===h)) return h;
     return 'search';
   }
-  window.addEventListener('hashchange',()=>{ if(skipHash) return; state.route=routeFromHash(); closeSheet(); render(); armGuard(); });
+  window.addEventListener('hashchange',()=>{ if(skipHash) return; state.route=routeFromHash(); closeSheet(); render(); });
   // ---------- 갤럭시 '<'(뒤로) — 인스타그램 방식 ----------
-  // 기록에 '보호' 칸을 하나 두고, 뒤로를 누르면 그 칸이 빠지는 순간(popstate) 앱이 할 일을 정한다.
+  // 기록에 '보호' 칸(G)을 하나 두고, 뒤로를 누르면 G가 빠지는 순간(popstate) 앱이 할 일을 정한다.
+  // 크롬·삼성인터넷은 '사용자 터치 없이 만든 기록 칸'을 뒤로 버튼이 건너뛴다(기록 조작 차단) — 그래서
+  //  ① G는 터치·키 입력 이벤트 안에서만 만들고  ② 뒤로 처리 뒤에는 새로 만들지 않고 history.forward()로 G에 되돌아간다(V61).
   let skipHash=false, exitT=null, histLen=0;
-  function armGuard(){ try{ if(!(history.state&&history.state.sachil==='guard')) history.pushState({sachil:'guard'},'','#'+state.route); }catch(_){ } histLen=history.length; }
+  const onGuard=()=>!!(history.state&&history.state.sachil==='guard');
+  function armGuard(e){   // 사용자 입력 이벤트 안에서만(스크립트가 만든 click 등은 제외)
+    if(!e||!e.isTrusted||onGuard()) return;
+    if(exitT){ clearTimeout(exitT); exitT=null; }
+    try{ history.pushState({sachil:'guard'},'','#'+state.route); }catch(_){ }
+    histLen=history.length;
+  }
+  ['pointerup','touchend','click','keydown'].forEach(t=>document.addEventListener(t,armGuard,{capture:true,passive:true}));
+  function reGuard(){ skipHash=true; setTimeout(()=>{ skipHash=false; },120); try{ history.forward(); }catch(_){ } }
   function scrolledAway(){
     const c=document.getElementById('convo');
     if(c && document.body.classList.contains('chatview')) return c.scrollHeight-c.scrollTop-c.clientHeight>80 ? ()=>{ c.scrollTo({top:c.scrollHeight,behavior:'smooth'}); } : null;   // 대화방: 처음 상태 = 맨 아래
@@ -1104,14 +1115,18 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     return false;
   }
   window.addEventListener('popstate',e=>{
-    if(e.state&&e.state.sachil==='guard') return;   // 앞으로 가기로 보호 칸에 다시 온 경우
-    skipHash=true; setTimeout(()=>{ skipHash=false; },60);
-    if(history.length!==histLen){ state.route=routeFromHash(); closeSheet(); render(); armGuard(); return; }   // 뒤로가 아니라 링크·주소로 #… 이동(크롬은 이때도 popstate를 냄)
+    if(onGuard()){   // forward()로 G에 돌아옴 — 주소만 지금 화면으로
+      skipHash=true; setTimeout(()=>{ skipHash=false; },120);
+      try{ history.replaceState({sachil:'guard'},'','#'+state.route); }catch(_){ }
+      histLen=history.length; return;
+    }
+    skipHash=true; setTimeout(()=>{ skipHash=false; },120);
+    if(history.length!==histLen){ histLen=history.length; state.route=routeFromHash(); closeSheet(); render(); return; }   // 뒤로가 아니라 링크·주소로 #… 이동(크롬은 이때도 popstate를 냄)
     try{ history.replaceState(null,'','#'+state.route); }catch(_){ }   // 주소는 지금 화면 그대로
-    if(backStep()){ clearTimeout(exitT); exitT=null; armGuard(); return; }
-    // 첫 화면: 한 번 더 누르면 종료(보호 칸을 2초 동안 비워 둠)
+    if(backStep()){ clearTimeout(exitT); exitT=null; reGuard(); return; }
+    // 첫 화면: 2초 안에 한 번 더 누르면 종료(그동안 G를 비워 둠). 2초가 지나면 G로 되돌아간다.
     toast('종료하려면 다시 누르세요.');
-    clearTimeout(exitT); exitT=setTimeout(()=>{ exitT=null; armGuard(); },2000);
+    clearTimeout(exitT); exitT=setTimeout(()=>{ exitT=null; reGuard(); },2000);
   });
   // 앱 안 링크(#…)도 기록을 쌓지 않게 go()로
   document.addEventListener('click',e=>{
@@ -2567,7 +2582,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   if(!location.hash) history.replaceState(null,'','#hub');
   state.route=routeFromHash();
   render();
-  armGuard();   // 뒤로가기 보호 칸
+  histLen=history.length;   // 보호 칸(G)은 첫 터치 때 만든다(V61)
   // 서버 감지: 첫 시도 10초, 연결 자체가 안 되면 5·15·30초 뒤 재시도(터널 콜드스타트·느린 망 대비)
   async function detectServer(attempt){
     const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),10000);
