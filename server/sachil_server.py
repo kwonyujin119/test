@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '2.6'
-APP_VERSION = 'V90'
+VERSION = '2.7'
+APP_VERSION = 'V91'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -156,6 +156,11 @@ try:   # 예전 DB에 답장 칸 추가
     DB.execute('ALTER TABLE messages ADD COLUMN reply TEXT')
 except sqlite3.OperationalError:
     pass
+for _col in ('dev TEXT', 'kind TEXT'):   # V91: 기기(해시)·방 종류 — 같은 기기·같은 방은 마지막 대화명만 유효
+    try:
+        DB.execute('ALTER TABLE sessions ADD COLUMN ' + _col)
+    except sqlite3.OperationalError:
+        pass
 DB.commit()
 
 
@@ -1155,8 +1160,13 @@ class H(BaseHTTPRequestHandler):
             js.append(now)
             JOINS[ip] = js
         token = secrets.token_urlsafe(32)
-        sid = q('INSERT INTO sessions(token,name,role,created,seen,ip) VALUES(?,?,?,?,?,?)',
-                (th(token), name, role, now, now, ip), commit=True)
+        dev = str(b.get('dev') or '')
+        dev = th('dev:' + dev) if re.fullmatch(r'[A-Za-z0-9_\-]{16,64}', dev) else None
+        kind = 'deb' if b.get('room') == 'deb' else 'net'
+        if dev:   # 같은 기기에서 같은 방에 새 대화명을 만들면 예전 대화명은 로그아웃(참여자 수에서도 빠짐)
+            q('DELETE FROM sessions WHERE dev=? AND kind=?', (dev, kind), commit=True)
+        sid = q('INSERT INTO sessions(token,name,role,created,seen,ip,dev,kind) VALUES(?,?,?,?,?,?,?,?)',
+                (th(token), name, role, now, now, ip, dev, kind if dev else None), commit=True)
         self.user = {'id': sid, 'name': name, 'role': role}
         cookie = f'sachil={token}; Path=/; Max-Age={SESSION_DAYS * 86400}; HttpOnly; SameSite=Strict' + ('; Secure' if self.secure() else '')
         out = {'ok': True, 'user': self.user, 'token': token}   # 앱이 방별로 토큰을 따로 보관(V88)
