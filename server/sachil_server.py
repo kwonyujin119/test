@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '4.0'
-APP_VERSION = 'V103'
+VERSION = '4.1'
+APP_VERSION = 'V104'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -968,9 +968,16 @@ class H(BaseHTTPRequestHandler):
                     'keys': {p: ('…' + str(CONF.get(AI_KEYS[p]))[-4:]) if CONF.get(AI_KEYS[p]) else '' for p in AI_KEYS},
                     'models': {'gemini': CONF.get('gemini_model'), 'groq': CONF.get('groq_model'), 'claude': CONF.get('ai_assist_model')},
                     'today': AI_DAY.get('n', 0) if AI_DAY.get('d') == time.strftime('%Y-%m-%d') else 0,
-                    'limit': int(CONF.get('ai_daily_limit') or 0), 'version': VERSION}
+                    'limit': int(CONF.get('ai_daily_limit') or 0), 'version': VERSION,
+                    'auto_update': bool(CONF.get('auto_update')) and os.environ.get('SACHIL_LOOP') == '1'}
         if act == 'status':
             return self.send(200, status(), log=False)
+        if act == 'update':   # V104: 교수 화면에서 '서버 업데이트 지금 확인'
+            if not (CONF.get('auto_update') and os.environ.get('SACHIL_LOOP') == '1'):
+                return self.send(200, dict(status(), ok=False, error='이 서버는 자동 업데이트가 꺼져 있거나 옛 start-domain.bat로 켜져 있습니다 — PC에서 업데이트 묶음을 한 번 받아 주세요'), log=False)
+            UPDATE_NOW.set()
+            upd_log('교수 화면에서 지금 확인 요청')
+            return self.send(200, dict(status(), msg='새 버전 확인을 시작했습니다 — 있으면 받아서 접속자가 없을 때 몇 초간 다시 켜집니다(1~2분 뒤 이 화면을 새로 열어 서버 버전을 확인하세요)'), log=False)
         prov = str(j.get('provider') or '')
         if prov not in AI_KEYS:
             return self.err(400, 'AI 회사를 고르세요')
@@ -2596,6 +2603,9 @@ def room_idle():
     return not busy and not AI_BUSY[0]
 
 
+UPDATE_NOW = threading.Event()
+
+
 def auto_update_loop():
     """V102: 2시간(update_check_hours)마다 새 서버 파일을 확인 → 검사 → 접속자 없을 때 교체하고 종료(75).
     start-domain.bat가 75를 받으면 바로 다시 켜고, 새 파일이 곧바로 죽으면 이전 파일(.bak)로 되돌린다."""
@@ -2625,8 +2635,9 @@ def auto_update_loop():
         if CONF.get('auto_update'):
             upd_log('start-domain.bat가 옛 버전이라 자동 업데이트를 쉽니다 — 업데이트 묶음의 start-domain.bat로 덮어쓰세요')
         return
-    time.sleep(120)
+    UPDATE_NOW.wait(120)
     while True:
+        UPDATE_NOW.clear()
         if CONF.get('auto_update'):
             try:
                 got = fetch_new_server()
@@ -2656,7 +2667,7 @@ def auto_update_loop():
             hrs = float(CONF.get('update_check_hours') or 2)
         except (TypeError, ValueError):
             hrs = 2
-        time.sleep(max(0.25, hrs) * 3600)
+        UPDATE_NOW.wait(max(0.25, hrs) * 3600)   # 교수 화면의 '지금 확인'을 누르면 바로 깸(V104)
 
 
 def run_tunnel(port, named):
