@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '3.5'
-APP_VERSION = 'V100'
+VERSION = '3.6'
+APP_VERSION = 'V101'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -910,7 +910,7 @@ class H(BaseHTTPRequestHandler):
                     mode = 'ai'
             note = why
         if not ans:
-            ans = extract_answer(qtext, hits, terms) or '관련 쪽은 찾았지만 질문에 딱 맞는 문장을 고르지 못했습니다. 아래 원문을 열어 확인하세요.'
+            ans = extract_as_format(extract_answer(qtext, hits, terms), note if ai_ready() else 'AI 키 미연결')
         return self.send(200, {'ok': True, 'mode': mode, 'note': note, 'answer': ans, 'sources': sources, 'status': st}, log=False)
 
     def report(self):
@@ -1862,6 +1862,25 @@ def focus_hits(hits):
 _HEAD = re.compile(r'❙[^❙]{1,40}❙\s*\d*\s*|(?:^|\s)-\s?\d{1,3}\s?-(?=\s|$)|^\s*(?:CHAPTER|PART)\s+\S+\s+')
 
 
+def extract_as_format(ans, why):
+    """AI를 못 쓸 때의 발췌 답을 AI 답과 같은 이름표 형식(결론 → 근거)으로 바꾼다(V101). 화면에서 형식이 어긋나 보이지 않게."""
+    if not ans:
+        return ('결론: 관련 쪽은 찾았지만 질문에 딱 맞는 문장을 고르지 못했어요. 아래 근거 원문을 열어 확인하세요.'
+                + (f'\n설명: AI 해설을 쓰지 못했어요({why}).' if why else ''))
+    items = []
+    for ln in ans.split('\n')[1:]:   # 첫 줄('…그대로 옮겨 드릴게요')은 결론으로 바꾼다
+        t = ln.strip()
+        if not t or t in ('■ 핵심 정리', '■ 함께 보면 좋은 내용') or t.startswith('「'):
+            continue
+        t = re.sub(r'^■\s*(핵심 정리|함께 보면 좋은 내용)\s*[—-]\s*', '', t)
+        t = re.sub(r'^(?:[•■◦○●▪]|\d{1,2}[.)])\s*', '', t)
+        if t:
+            items.append('- ' + t)
+    head = '결론: 메뉴 자료의 관련 원문을 그대로 옮겨 드려요. 번호를 누르면 해당 쪽이 열려요.'
+    expl = f'설명: 지금은 AI 해설을 쓰지 못했어요({why or "AI 미연결"}). 잠시 뒤 다시 물으면 해설형으로 답해요.'
+    return '\n'.join([head, expl, '근거'] + items[:12])
+
+
 def extract_answer(question, hits, terms):
     """AI 없이: 질문 낱말을 가장 많이 담은 문장을 자료별로 골라 정리한다."""
     if not hits:
@@ -2071,10 +2090,22 @@ def ai_ready():
 
 
 def call_llm(system, msgs, max_tokens, effort='', model=''):
-    """설정된 AI 회사로 한 번 호출. (본문, 실패 사유, 오류 코드)."""
-    if ai_provider() == 'gemini':
-        return call_gemini(system, msgs, max_tokens)
-    return call_claude(system, msgs, max_tokens, effort, model)
+    """설정된 AI 회사로 호출. (본문, 실패 사유, 오류 코드).
+    V101: 일시 오류(바쁨·분당 한도 429·연결 끊김)는 2초 뒤 한 번 더 시도하고, 그래도 안 되면 다른 회사 키가 있으면 그쪽으로."""
+    prov = ai_provider()
+    call = (lambda: call_gemini(system, msgs, max_tokens)) if prov == 'gemini' else (lambda: call_claude(system, msgs, max_tokens, effort, model))
+    text, why, code = call()
+    if not text and code in ('rate_limited', 'upstream_error') and '키' not in why and '모델' not in why and 'model' not in why:
+        time.sleep(2)
+        text, why2, code = call()
+        why = why2 or why
+    if not text and code != 'refusal':
+        other = 'claude' if prov == 'gemini' else 'gemini'
+        if CONF.get('ai_api_key' if other == 'claude' else 'gemini_api_key'):
+            t2, w2, c2 = call_claude(system, msgs, max_tokens, effort, model) if other == 'claude' else call_gemini(system, msgs, max_tokens)
+            if t2:
+                return t2, '', ''
+    return text, why, code
 
 
 def call_gemini(system, msgs, max_tokens):
@@ -2124,7 +2155,8 @@ def call_gemini(system, msgs, max_tokens):
     except ssl.SSLError:
         why = '인증서 오류(망의 HTTPS 검사 장비가 막음)'
     except Exception as e:
-        why = f'AI 연결 실패 ({str(e)[:60]})'
+        why = 'AI 서버에 연결하지 못했어요(인터넷·방화벽 확인)'
+        print('[AI] 연결 오류:', str(e)[:120], flush=True)
     print('[AI]', why, flush=True)
     return '', why, code
 
@@ -2169,7 +2201,8 @@ def call_claude(system, msgs, max_tokens, effort='', model=''):
         except ssl.SSLError:
             why = '인증서 오류(망의 HTTPS 검사 장비가 막음)'
         except Exception as e:
-            why = f'AI 연결 실패 ({str(e)[:60]})'
+            why = 'AI 서버에 연결하지 못했어요(인터넷·방화벽 확인)'
+        print('[AI] 연결 오류:', str(e)[:120], flush=True)
         break
     print('[AI]', why, flush=True)
     return '', why, code
