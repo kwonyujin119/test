@@ -683,7 +683,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v75</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v76</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -800,8 +800,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V75', SRV_VER='2.1';
+  const APP_VER='V76', SRV_VER='2.1';
   const UPDATES=[
+    {v:'V76', d:'2026-10-17', t:['대칭 구성은 그대로, 손글씨 ‘47’ 획을 다시 살렸어요 — AI 칸 왼쪽 사선 → 가운데 가로선 → CHecklist 오른쪽 사선이 한 획(4·7), 4의 세로획까지','47이 잘 보이게 사선 기울기를 키우고 글자 자리를 다시 맞췄어요']},
     {v:'V75', d:'2026-10-17', t:['첫 화면을 대칭 구성으로: 위 줄 Search · AI(사다리꼴) · 47망, 아래 줄 디브리핑룸 · CHecklist · Incident Log가 위아래 거울 모양','47망·디브리핑룸 설명이 어떤 화면에서도 보여요(좁으면 줄을 나누고 글씨를 한 단계 작게)']},
     {v:'V74', d:'2026-10-17', t:['첫 화면 S·IL 칸을 넓혔어요: 왼쪽 사선은 오른쪽으로, 오른쪽 사선은 왼쪽으로, 가운데 가로선은 짧게(Search 약 +80%, Incident Log 약 +75%)','47망·디브리핑룸 크기는 그대로, 412폭 폰에서도 47망 설명이 보여요']},
     {v:'V73', d:'2026-10-17', t:['첫 화면 47망·디브리핑룸 칸을 더 크게, 47망 설명 글씨도 보이게(좁은 폰은 이름만)','S·A·CH·IL 위치를 균형 있게 다시 잡고, 칸 테두리를 진하게(야외에서도 보이게)','칸 사이 틈을 눌러도 가까운 칸이 열리게, 4의 세로획은 연하게(칸 경계로 착각하지 않게)']},
@@ -2218,12 +2219,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 7의 가로획 위 모서리(1시) = 47망, 8시→6시 사선 아래 모서리(7시) = 디브리핑룸, 나머지 4칸 = S·A·CH·IL(읽으면 SACHIL).
   // 칸은 SVG 다각형(틈·둥근 모서리)이라 보이는 모양 그대로 눌린다. 좌표는 화면 비율(0~1)
   const HZ={
-    // V75: 좌우·상하 대칭 — 위 줄 S | A(사다리꼴) | 47망, 아래 줄 디브리핑룸 | CH(뒤집은 사다리꼴) | IL
-    pts:{A1:[.38,0], A2:[.62,0], M1:[.27,.5], M2:[.73,.5], LM:[0,.5], RM:[1,.5], B1:[.38,1], B2:[.62,1], TL:[0,0], TR:[1,0], BR:[1,1], BL:[0,1]},
+    // V76: 좌우·상하 대칭 6칸 + 칸 경계 위 손글씨 '47'
+    // A 왼쪽 변(↙)·가운데 가로선·CH 오른쪽 변(↙)을 한 획으로 = 4와 7(가로획 공유), 4의 세로획 장식. 획은 화면 중심 180° 회전 대칭
+    pts:{A1:[.40,0], A2:[.60,0], M1:[.21,.5], M2:[.79,.5], LM:[0,.5], RM:[1,.5], B1:[.40,1], B2:[.60,1], V1:[.36,.37], V2:[.32,.63], TL:[0,0], TR:[1,0], BR:[1,1], BL:[0,1]},
     X:{},
     reg:{search:['TL','A1','M1','LM'], ai:['A1','A2','M2','M1'], chat:['A2','TR','RM','M2'], debrief:['LM','M1','B1','BL'], board:['M1','M2','B2','B1'], log:['M2','RM','BR','B2']},
-    strokes:[],
-    lab:{search:[.16,.34], ai:[.50,.34], board:[.50,.66], log:[.84,.66]}};   // 위 줄·아래 줄 글자 높이를 맞추고 상하 대칭
+    strokes:[['A1','M1','M2','B2'],['V1','V2']],
+    lab:{search:[.14,.26], ai:[.52,.31], board:[.48,.69], log:[.86,.74]}};   // 글자 자리도 화면 중심 점대칭
   function renderHub(panel){
     const corner=h=>h.go==='chat'
       ? `<span class="hz-k tr" data-k="chat" aria-hidden="true"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd w">지휘·작전망으로 어려운 내용<br>47망으로 전달하세요</span><span class="hd n">지휘·작전망으로<br>어려운 내용<br>47망으로<br>전달하세요</span></span>`
@@ -3070,7 +3072,7 @@ body.hubview footer{display:none}
 .hz-svg a:active .hz-p{fill:var(--navy-soft)}
 .hz-svg a:active .hz-p.y{fill:#f0c400}
 .hz-47{fill:none;stroke:var(--navy);stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;opacity:.92}
-.hz-47[data-s="1"]{stroke-width:3;opacity:.35}   /* 4의 세로획: 장식(칸 경계 아님) — 연하게 */
+.hz-47[data-s="1"]{stroke-width:3.5;opacity:.75}   /* 4의 세로획: 장식(칸 경계 아님) — 연하게 */
 .hz-hit{fill:transparent;stroke:transparent;pointer-events:all}
 .hz-l{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;white-space:nowrap;text-align:center}
 .hz-l .sg{height:50px}
