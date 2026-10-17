@@ -664,7 +664,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v59</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v60</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -780,8 +780,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V59', SRV_VER='2.1';
+  const APP_VER='V60', SRV_VER='2.1';
   const UPDATES=[
+    {v:'V60', d:'2026-10-17', t:['갤럭시 뒤로(<) 버튼을 인스타그램처럼: 열린 창 닫기 → 화면을 움직였으면 처음 위치로 → 다른 화면이면 첫 화면으로 → 첫 화면에서는 ‘종료하려면 다시 누르세요.’']},
     {v:'V59', d:'2026-10-17', t:['새 47 시그니처 아이콘(노란 바탕·흰 말풍선·파란 47)으로 앱 아이콘·상단 47 버튼·첫 화면 교체','시그니처 컬러 적용: 심벌 옐로 #FDD000 · 화이트 · 인천 오션 #244EA2 — 버튼·탭·강조색을 파랑으로, 노랑은 새 노랑으로']},
     {v:'V58', d:'2026-10-17', t:['보고서: ‘AI 사이트로 작성’ — API 키 없이 ChatGPT·Claude·Gemini 웹(무료 계정 포함)에 요청문을 붙여넣고, 받은 보고서를 붙여넣어 AI 작성본으로 저장']},
     {v:'V57', d:'2026-10-17', t:['첫 화면을 6개 박스로: 47망·디브리핑룸 / S 검색·A AI 도우미 / CH 체크리스트·IL 사고보고서','47망과 디브리핑룸을 두 개의 대화방으로 분리(기존 대화는 47망에 그대로)','로고를 누르면 첫 화면으로']},
@@ -1062,12 +1063,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function rootScrollTo(top,smooth){ const o={top:top,behavior:smooth?'smooth':'auto'}; const r=scrollRoot(); if(r) r.scrollTo(o); else window.scrollTo(o); }
   function go(route, query){
     if(query!==undefined) state.query=query;
-    const TOP=['hub','chat','debrief','search','ai','board','log'], cur=location.hash.slice(1)||'hub';
-    // 47망·S·A·CH·IL 사이 이동은 방문 기록을 쌓지 않고 바꿔 끼운다. 기록이 쌓이면 안드로이드 크롬이 넘기기 때
-    // '이전/다음 페이지' 캡처 카드를 띄워 하단 탭이 사라졌다 나타난다(녹화 영상에서 확인). 메뉴 항목 등은 기존처럼 기록.
-    if(cur!==route && TOP.includes(route) && TOP.includes(cur)){ try{ history.replaceState(history.state,'','#'+route); state.route=route; closeSheet(); render(); return; }catch(_){ } }
-    if(location.hash.slice(1)!==route){ state.route=route; location.hash=route; return; } // hashchange → render
-    state.route=route; render();
+    // 화면 이동은 방문 기록을 쌓지 않고 바꿔 끼운다(V60). 갤럭시 '<'(뒤로)는 아래 뒤로가기 처리가 맡는다 —
+    // 열린 창 닫기 → 위로 스크롤 → 첫 화면 → '종료하려면 다시 누르세요'(인스타그램 방식)
+    if(ROOMS_R.includes(route)) chat.room=null;
+    try{ history.replaceState(history.state,'','#'+route); }catch(_){ }
+    state.route=route; closeSheet(); render(); armGuard();
   }
   function routeFromHash(){
     const h=(location.hash||'#hub').slice(1);
@@ -1079,7 +1079,47 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(SECTIONS.some(s=>s.slug===h)) return h;
     return 'search';
   }
-  window.addEventListener('hashchange',()=>{ state.route=routeFromHash(); closeSheet(); render(); });
+  window.addEventListener('hashchange',()=>{ if(skipHash) return; state.route=routeFromHash(); closeSheet(); render(); armGuard(); });
+  // ---------- 갤럭시 '<'(뒤로) — 인스타그램 방식 ----------
+  // 기록에 '보호' 칸을 하나 두고, 뒤로를 누르면 그 칸이 빠지는 순간(popstate) 앱이 할 일을 정한다.
+  let skipHash=false, exitT=null, histLen=0;
+  function armGuard(){ try{ if(!(history.state&&history.state.sachil==='guard')) history.pushState({sachil:'guard'},'','#'+state.route); }catch(_){ } histLen=history.length; }
+  function scrolledAway(){
+    const c=document.getElementById('convo');
+    if(c && document.body.classList.contains('chatview')) return c.scrollHeight-c.scrollTop-c.clientHeight>80 ? ()=>{ c.scrollTo({top:c.scrollHeight,behavior:'smooth'}); } : null;   // 대화방: 처음 상태 = 맨 아래
+    const r=scrollRoot(), y=r?r.scrollTop:window.scrollY;
+    return y>40 ? ()=>rootScrollTo(0,true) : null;
+  }
+  function backStep(){   // 처리했으면 true
+    const tour=document.getElementById('tour'); if(tour&&!tour.hidden){ document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true})); return true; }
+    const act=document.getElementById('actSheet'); if(act){ act.remove(); return true; }
+    const pop=document.getElementById('plusPop'); if(pop&&!pop.hidden){ pop.hidden=true; return true; }
+    if(!lb.hidden){ closeLightbox(); return true; }
+    if(!pv.hidden){ closePdf(true); return true; }
+    if(!$('#report').hidden){ closeReport(true); return true; }
+    if(sheet.classList.contains('open')){ closeSheet(); return true; }
+    const jg=document.getElementById('jgrid'); if(jg&&!jg.hidden){ const b=document.getElementById('jumpAll'); if(b) b.click(); return true; }
+    const sc=scrolledAway(); if(sc){ sc(); return true; }
+    if(state.route!=='hub'){ go('hub'); rootScrollTo(0); return true; }
+    return false;
+  }
+  window.addEventListener('popstate',e=>{
+    if(e.state&&e.state.sachil==='guard') return;   // 앞으로 가기로 보호 칸에 다시 온 경우
+    skipHash=true; setTimeout(()=>{ skipHash=false; },60);
+    if(history.length!==histLen){ state.route=routeFromHash(); closeSheet(); render(); armGuard(); return; }   // 뒤로가 아니라 링크·주소로 #… 이동(크롬은 이때도 popstate를 냄)
+    try{ history.replaceState(null,'','#'+state.route); }catch(_){ }   // 주소는 지금 화면 그대로
+    if(backStep()){ clearTimeout(exitT); exitT=null; armGuard(); return; }
+    // 첫 화면: 한 번 더 누르면 종료(보호 칸을 2초 동안 비워 둠)
+    toast('종료하려면 다시 누르세요.');
+    clearTimeout(exitT); exitT=setTimeout(()=>{ exitT=null; armGuard(); },2000);
+  });
+  // 앱 안 링크(#…)도 기록을 쌓지 않게 go()로
+  document.addEventListener('click',e=>{
+    if(e.defaultPrevented||e.button!==0||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey) return;
+    const a=e.target.closest&&e.target.closest('a[href^="#"]'); if(!a||a.target) return;
+    const r=a.getAttribute('href').slice(1); if(!r) return;
+    e.preventDefault(); if(r==='search'){ state.query=''; } go(r==='chat-bot'?'ai':r); rootScrollTo(0);
+  });
 
   const MAIN=['search','ai','board','log'];
   function syncTabbar(){
@@ -1539,13 +1579,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     $('#repSub').textContent=`${e.place?e.place+' · ':''}이행 ${e.done}/${e.total} · 경과 ${e.elapsed||'—'} · ${fmtTs(e.ts)}${fresh===true?' · IL 사고보고서에 저장됨':fresh==='dropped'?' · 저장됨 (최대 30건 — 가장 오래된 보고서 1건 삭제)':fresh==='nosave'?' · 저장 공간 부족 — 이 세션에만 유지':''}`;
     $('#repStatus').classList.remove('busy');
     setRepView(e.ai ? 'ai' : 'draft'); syncRepUI();
-    try{ if(!history.state||!history.state.rep) history.pushState({rep:1},''); }catch(_){ } // 안드로이드 뒤로가기 = 보고서 닫기
     $('#repBody').scrollTop=0;
     setTimeout(()=>{ if(mqNarrow.matches) $('#repClose').focus(); else { const b=$('#repBody'); b.focus(); try{ b.setSelectionRange(0,0); }catch(_){ } b.scrollTop=0; } },40);
     // 원클릭: AI를 쓸 수 있고 작성본이 없으면 바로 작성 (같은 사실이면 5분간 재사용 → 사용량 추가 없음). 기록이 비어 있으면 생략.
     if(CAP.sample && !e.ai && e.facts){ if(repEmpty(e)) $('#repStatus').textContent='기록이 없어 AI 작성을 생략했습니다 — 체크·기록 후 "AI로 작성"'; else runAi(false); }
   }
-  window.addEventListener('popstate',()=>{ if(!$('#report').hidden) closeReport(true); });
 
   // ---------- PDF 뷰어 (서버 모드: 서버가 함께 내보내는 /vendor/pdfjs 로 앱 안에서 넘겨 본다) ----------
   const pv=document.createElement('div'); pv.className='pdfv'; pv.id='pdfv'; pv.hidden=true;
@@ -1629,7 +1667,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     $('#pvPage').textContent='불러오는 중…';
     const nw=$('#pvNew'); nw.href=url;
     rootScrollTo(0); pv.hidden=false; pvPlace(); document.body.style.overflow='hidden';
-    try{ history.pushState({pv:1},''); PV.pushed=true; }catch(_){ PV.pushed=false; }
+    PV.pushed=false;
     pvMsg('<p>문서를 여는 중입니다…</p>'); $('#pvClose').focus();
     let lib;
     try{ lib=await loadPdfJs(); }catch(_){ if(gen!==PV.gen) return; pvMsg(`${AS.icOffline?`<img class="st-ic" src="${AS.icOffline}" alt="">`:''}<p>앱 안 뷰어를 불러오지 못했습니다. 서버 연결을 확인하세요.</p><a class="btn primary" href="${esc(url)}" target="_blank" rel="noopener">새 탭에서 열기</a>`); $('#pvPage').textContent=''; return; }
@@ -1700,7 +1738,6 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   $('#pvOut').addEventListener('click',()=>pvZoom(-1));
   pvBody().addEventListener('scroll',()=>{ if(!PV.pvT){ PV.pvT=requestAnimationFrame(()=>{ PV.pvT=0; pvCurrent(); }); } },{passive:true});
   window.addEventListener('resize',()=>{ if(pv.hidden) return; pvPlace(); if(PV.doc){ PV.live.forEach(pvUnrender); PV.live=[]; pvLayout(); pvObserve(); } });
-  window.addEventListener('popstate',()=>{ if(!pv.hidden) closePdf(true); });
   document.addEventListener('click',e=>{
     const a=e.target.closest&&e.target.closest('a[data-pdfv]'); if(!a||!(SRV.on||SRV.libStatic)) return;
     if(e.ctrlKey||e.metaKey||e.shiftKey||e.button!==0) return;   // 새 탭으로 열고 싶으면 Ctrl+클릭
@@ -1712,7 +1749,6 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     clearTimeout(repSaveT); rpsave();
     dlg.hidden=true; document.body.style.overflow=''; appEl.inert=false; tabbarEl.inert=false;
     $('#repStatus').classList.remove('busy'); $('#repBody').readOnly=false; cur=null;
-    if(!fromPop && history.state && history.state.rep){ try{ history.back(); }catch(_){ } }
     if(state.route==='log') renderReports($('#panel'));
     if(repLast && repLast.isConnected && repLast.focus) repLast.focus();
   }
@@ -2158,7 +2194,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   const hm=ts=>{ if(!Number.isFinite(ts)) return ''; const d=new Date(ts*1000), h=d.getHours(); return `${h<12?'오전':'오후'} ${(h%12)||12}:${pad(d.getMinutes())}`; };   // 카카오톡처럼 '오후 3:05'(날짜는 날짜 줄로)
   const srvFoot=()=>`대화명 <b>${esc(SRV.me?SRV.me.name:'')}</b>${SRV.me&&SRV.me.role==='admin'?' · 관리자':''} · ${SRV.trim?'오래된 대화는 매주 정리, 최근 대화는 유지':SRV.retention+'일 뒤 자동 삭제'}`;
-  function toChat(){ const r=ROOMS_R.includes(state.route)?state.route:'chat'; if(location.hash==='#'+r){ state.route=r; chat.room=null; render(); } else location.hash=r; }   // 지금 있는 방(47망·디브리핑룸)을 다시 그림   // 같은 주소면 hashchange가 없으므로 직접 다시 그림
+  function toChat(){ go(ROOMS_R.includes(state.route)?state.route:'chat'); }   // 지금 있는 방(47망·디브리핑룸)을 다시 그림   // 같은 주소면 hashchange가 없으므로 직접 다시 그림
   function goHome(){ go('hub'); rootScrollTo(0); }   // 대화방 입장 화면 → 첫 화면(6개 박스)
 
   function renderDebrief(panel,kind){
@@ -2531,6 +2567,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   if(!location.hash) history.replaceState(null,'','#hub');
   state.route=routeFromHash();
   render();
+  armGuard();   // 뒤로가기 보호 칸
   // 서버 감지: 첫 시도 10초, 연결 자체가 안 되면 5·15·30초 뒤 재시도(터널 콜드스타트·느린 망 대비)
   async function detectServer(attempt){
     const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),10000);

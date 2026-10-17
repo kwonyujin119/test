@@ -44,7 +44,7 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.zip': ('application/zip', False),
 }
 VERSION = '2.1'
-APP_VERSION = 'V59'
+APP_VERSION = 'V60'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
