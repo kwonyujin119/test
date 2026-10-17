@@ -44,15 +44,15 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '2.5'
-APP_VERSION = 'V89'
+VERSION = '2.6'
+APP_VERSION = 'V90'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
 MAX_STORE = 3 * 1024 * 1024 * 1024     # 첨부 총량 3GB
 LIB_MAX = 60 * 1024 * 1024             # 교수 메뉴 자료 업로드 파일 1개 60MB
 QNA_HITS, QNA_LOCK = {}, threading.Lock()   # 질의응답 질문 IP별 횟수
-SESSION_DAYS = 30
+SESSION_DAYS = 7    # V90: 7일 동안 쓰지 않으면 자동 로그아웃(쓸 때마다 다시 7일)
 LOGIN_FAILS, LOGIN_WINDOW = 8, 600      # 10분에 8번 틀리면 잠금
 
 os.makedirs(FILES, exist_ok=True)
@@ -149,6 +149,8 @@ CREATE TABLE IF NOT EXISTS files(id TEXT PRIMARY KEY, room INTEGER, owner INTEGE
 CREATE INDEX IF NOT EXISTS ix_msg_room ON messages(room, id);
 CREATE TABLE IF NOT EXISTS reads(room INTEGER, user INTEGER, last_id INTEGER, seen REAL, PRIMARY KEY(room, user));
 CREATE TABLE IF NOT EXISTS qna(id INTEGER PRIMARY KEY AUTOINCREMENT, ts REAL, name TEXT, q TEXT, a TEXT, a_ts REAL, ip TEXT);
+CREATE TABLE IF NOT EXISTS members(room INTEGER, user INTEGER, joined REAL, PRIMARY KEY(room, user));
+INSERT OR IGNORE INTO members SELECT room, user, seen FROM reads;
 ''')
 try:   # 예전 DB에 답장 칸 추가
     DB.execute('ALTER TABLE messages ADD COLUMN reply TEXT')
@@ -183,6 +185,7 @@ ROOM47 = ensure_room('47', '47망')            # 기존 대화는 47망에 그�
 ROOM_DB = ensure_room('DB', '디브리핑룸')      # V57: 47망과 디브리핑룸을 두 방으로 분리
 EPOCH = {}                               # 대화 비우기 표시(비우면 바뀜 → 모든 화면이 새로 그림)
 PRESENCE = {}                            # (방, 사용자) → 마지막으로 대화를 받아 간 시각 — '지금 접속' 수
+MEMBER_SEEN = set()                      # members 표에 이미 넣은 (방, 사용자) — 매 요청마다 DB에 쓰지 않게
 PRESENCE_LOCK = threading.Lock()
 READ_VER = {}                            # 방 → 읽음 표시가 바뀐 횟수(바뀌면 기다리던 화면이 깨어나 '안 읽은 수'를 고침)
 ONLINE_SEC = 40                          # 롱폴링(25초)보다 조금 길게
@@ -313,6 +316,7 @@ def cleanup():
                     pass
             q('DELETE FROM files WHERE used=0 AND ts < ?', (now - 86400,), commit=True)
             q('DELETE FROM sessions WHERE seen < ?', (now - SESSION_DAYS * 86400,), commit=True)
+            q('DELETE FROM members WHERE user NOT IN (SELECT id FROM sessions)', commit=True)
         except Exception as e:
             print('[정리 오류]', e)
         time.sleep(3600)
@@ -574,7 +578,11 @@ class H(BaseHTTPRequestHandler):
         r = q('SELECT id,name,role,seen FROM sessions WHERE token=?', (th(tok),), one=True)
         if not r:
             return None
-        if time.time() - (r['seen'] or 0) > 300:
+        age = time.time() - (r['seen'] or 0)
+        if age > SESSION_DAYS * 86400:   # 7일 넘게 안 쓴 대화명은 로그아웃(다시 대화명 입력)
+            q('DELETE FROM sessions WHERE id=?', (r['id'],), commit=True)
+            return None
+        if age > 300:
             q('UPDATE sessions SET seen=? WHERE id=?', (time.time(), r['id']), commit=True)
         return {'id': r['id'], 'name': r['name'], 'role': r['role']}
 
@@ -1255,6 +1263,10 @@ class H(BaseHTTPRequestHandler):
     def touch(self, rid):
         with PRESENCE_LOCK:
             PRESENCE[(rid, self.user['id'])] = time.time()
+            new = (rid, self.user['id']) not in MEMBER_SEEN
+            MEMBER_SEEN.add((rid, self.user['id']))
+        if new:   # 참여자: 대화명을 정하고 이 방에 들어온 사람(로그아웃·7일 미사용이면 빠짐)
+            q('INSERT OR IGNORE INTO members(room,user,joined) VALUES(?,?,?)', (rid, self.user['id'], time.time()), commit=True)
 
     def room_state(self, rid):
         now = time.time()
@@ -1264,7 +1276,8 @@ class H(BaseHTTPRequestHandler):
             online = sum(1 for (r, _u), t in PRESENCE.items() if r == rid and now - t <= ONLINE_SEC)
         rows = q('SELECT r.last_id FROM reads r JOIN sessions s ON s.id=r.user WHERE r.room=? AND r.seen>?',
                  (rid, now - MEMBER_DAYS * 86400))
-        return {'online': max(1, online), 'rp': sorted(x['last_id'] for x in rows), 'rv': READ_VER.get(rid, 0)}
+        mem = q('SELECT COUNT(*) n FROM members m JOIN sessions s ON s.id=m.user WHERE m.room=?', (rid,), one=True)['n']
+        return {'online': max(1, online), 'members': max(1, mem), 'rp': sorted(x['last_id'] for x in rows), 'rv': READ_VER.get(rid, 0)}
 
     def set_read(self, rid, last):
         cur = q('SELECT last_id FROM reads WHERE room=? AND user=?', (rid, self.user['id']), one=True)
