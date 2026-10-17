@@ -119,6 +119,13 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .ask-ai{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px}
 .ask-ai p{margin:0;flex:1 1 220px;font-size:14px;color:var(--fg)}
 .ask-ai .nw{white-space:nowrap}
+.roomhead h2 .cnt{font-size:.62em;font-weight:600;color:var(--muted);white-space:nowrap}
+.bub p.ab{margin-top:8px}.bub p.ab:first-child{margin-top:0}
+.bub .lbl{display:inline-block;padding:1px 8px;margin-right:4px;border-radius:999px;background:var(--navy-soft);color:var(--navy);font-size:12px;font-weight:700;vertical-align:1px}
+.bub p.ab-k .lbl{background:var(--navy);color:#fff}
+.bub p.ali{margin:4px 0 0;padding-left:14px;position:relative;font-size:.95em}
+.bub p.ali::before{content:'';position:absolute;left:3px;top:.62em;width:5px;height:5px;border-radius:50%;background:var(--navy)}
+.result .art{font-size:12px;font-weight:600;color:var(--navy);white-space:nowrap}
 .xhint{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px;padding:10px 14px;border-radius:12px;background:var(--navy-soft);font-size:13.5px;color:var(--fg)}
 .xhint span{flex:1 1 200px}
 .xhint.sm{margin:6px 0 0;padding:8px 12px;font-size:12.5px}
@@ -721,7 +728,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v91</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v92</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -838,8 +845,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V91', SRV_VER='2.7';
+  const APP_VER='V92', SRV_VER='2.8';
   const UPDATES=[
+    {v:'V92', d:'2026-10-17', t:['AI 도우미 업그레이드: 질문마다 메뉴 자료에서 해당 조문·쪽을 찾아 ‘결론 → 근거(조문 인용) → 설명(무엇은 어떤 근거로 어떻게 해야 하는지) → 현장에서’ 순서로 답해요','근거 목록과 Search 본문 결과에 조문 번호(예: 제16조(소방활동))를 함께 표시','참고문헌·목차 쪽은 근거에서 뒤로 미룸','47망·디브리핑룸 위쪽: 이름 중복을 없애고 ‘47망 - n명’을 제목 줄에 표시']},
     {v:'V91', d:'2026-10-17', t:['같은 기기에서 같은 방에 대화명을 여러 번 만들면 마지막 1개만 유효(예전 대화명은 로그아웃되고 참여자 수에서도 빠짐)']},
     {v:'V90', d:'2026-10-17', t:['메뉴: 준비가 끝난 항목(관련법령, 서버 연결 시 주요 질의응답)은 ‘준비중’ 표시를 지움','47망·디브리핑룸 위쪽: ‘익명 대화 · 지금 n명 접속’ 대신 ‘47망 - n명’처럼 참여자 수(대화명을 정하고 들어온 사람)','7일 동안 쓰지 않으면 자동 로그아웃 — 다시 들어올 때 대화명을 새로 입력']},
     {v:'V89', d:'2026-10-17', t:['Search는 ‘찾기’, AI 도우미는 ‘풀기’로 역할을 나누고 서로 잇기','Search 결과 아래 ‘이 결과로 AI에게 묻기’ — 근거 후보(자료·쪽)를 함께 표시','AI 답 아래 ‘Search에서 원문 더 찾기’','Search에 문장으로 물으면 AI 도우미를, AI에 낱말만 쓰면 Search를 안내']},
@@ -1327,7 +1335,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const stTxt = st.pending ? `자료 읽는 중 — 남은 파일 ${st.pending}개(완료되면 더 많이 찾습니다)` : (st.files?`PDF ${st.files}개 · ${st.pages}쪽에서 찾았습니다`:'메뉴에 첨부된 PDF가 아직 없습니다');
       const row=h=>`<a class="card result hitp" href="${libHref(h.slug,{name:h.name})}" target="_blank" rel="noopener" data-pdfv="${esc(h.name)}" data-page="${h.page}">
           <span class="ico">${h.page}쪽</span>
-          <span class="body"><p class="t">${bh(pdfName(h.name))}</p><p class="d snip">${bh(h.snippet)}</p></span>
+          <span class="body"><p class="t">${bh(pdfName(h.name))}${h.art?` <span class="art">${esc(h.art)}</span>`:''}</p><p class="d snip">${bh(h.snippet)}</p></span>
           <span class="arrow">→</span></a>`;
       box.innerHTML = hits.length
         ? `<div class="results">${hits.slice(0,6).map(row).join('')}</div>${hits.length>6?`<div class="srch-more" id="srchMoreBox"><button type="button" class="btn ghost" id="srchMore">본문 결과 ${hits.length-6}건 더 보기</button></div>`:''}<p class="srch-note">${esc(stTxt)}</p>`
@@ -2123,12 +2131,19 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   const srcHref=s=>libHref(s.slug,{name:s.name});
   function botTextHtml(m){
-    return esc(m.text).split('\n').map(l=>`<p>${l.replace(/\[(\d{1,2})\]/g,(x,n)=>{ const sc=m.src&&m.src[Number(n)-1]; return sc?`<a class="ref" href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}" aria-label="근거 ${n}: ${esc(pdfName(sc.name))} ${sc.page}쪽">${n}</a>`:x; })}</p>`).join('');
+    const ref=l=>l.replace(/\[(\d{1,2})\]/g,(x,n)=>{ const sc=m.src&&m.src[Number(n)-1]; return sc?`<a class="ref" href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}" aria-label="근거 ${n}: ${esc(pdfName(sc.name))} ${sc.page}쪽">${n}</a>`:x; });
+    // V92 답 형식: 결론 → 근거(- 줄) → 설명 → 현장에서. 이름표는 굵게, 근거 줄은 들여쓴 목록으로
+    return esc(m.text).split('\n').filter(l=>l.trim()).map(l=>{
+      const lb=l.match(/^\s*(결론|근거|설명|현장에서|확인할 점)\s*[:：]?\s*(.*)$/);
+      if(lb) return `<p class="ab ab-${lb[1]==='결론'?'k':lb[1]==='근거'?'g':'x'}"><b class="lbl">${lb[1]}</b>${lb[2]?' '+ref(lb[2]):''}</p>`;
+      const li=l.match(/^\s*[-•·]\s+(.*)$/);
+      return li?`<p class="ali">${ref(li[1])}</p>`:`<p>${ref(l)}</p>`;
+    }).join('');
   }
   function botSrcHtml(m){
     if(!m.src||!m.src.length) return '';
     const cited=new Set([...String(m.text).matchAll(/\[(\d{1,2})\]/g)].map(x=>Number(x[1])-1));   // 본문에서 인용한 근거만 보인다
-    return `<div class="src-h">근거 자료</div><ol class="src" aria-label="근거 자료">${m.src.map((sc,i)=>(cited.size&&!cited.has(i))?'':`<li><a href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}"><b>[${i+1}]</b><em>${esc(pdfName(sc.name))}</em><span>${sc.page}쪽</span></a>${sc.snip?`<q class="snip">${esc(sc.snip)}</q>`:''}</li>`).join('')}</ol>`;
+    return `<div class="src-h">근거 자료</div><ol class="src" aria-label="근거 자료">${m.src.map((sc,i)=>(cited.size&&!cited.has(i))?'':`<li><a href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}"><b>[${i+1}]</b><em>${esc(pdfName(sc.name))}${sc.art?` · ${esc(sc.art)}`:''}</em><span>${sc.page}쪽</span></a>${sc.snip?`<q class="snip">${esc(sc.snip)}</q>`:''}</li>`).join('')}</ol>`;
   }
   const botModeHtml=m=> m.mode==='ai' ? '<span class="mode">AI 도우미 · 메뉴 자료 근거 답변 — 중요한 내용은 원문으로 확인하세요</span>'
     : m.mode==='extract' ? `<span class="mode">교수 에이전트 · 원문 발췌 정리${m.note?` · ${esc(m.note)}`:' · AI 키 연결 시 해설형 답변'}</span>` : '';
@@ -2312,8 +2327,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 
   const roomHead=(room,sub,extra)=>`
       <div class="panel-head roomhead">
-        <div class="l">${room.id==='bot'?'':'<a class="back" href="#hub" aria-label="첫 화면으로">‹</a>'}<div><span class="eyebrow">${room.id==='bot'?'A · AI assistant':'디브리핑룸'}</span><h2>${esc(room.title)}</h2></div></div>
-        <div class="r"><span class="sub">${sub}</span>${extra||''}</div>
+        <div class="l">${room.id==='bot'?'':'<a class="back" href="#hub" aria-label="첫 화면으로">‹</a>'}<div><span class="eyebrow">${room.id==='bot'?'A · AI assistant':'디브리핑룸'}</span><h2>${esc(room.title)}${room.cnt?`<span class="cnt" id="onlineN"> - …명</span>`:''}</h2></div></div>
+        <div class="r">${sub?`<span class="sub">${sub}</span>`:''}${extra||''}</div>
       </div>`;
   const msgMeHtml=m=>`<div class="msg me"><span class="t">${esc(m.t)}</span><div class="bub ${m.text?'':'only-att'}">${m.text?`<p>${esc(m.text)}</p>`:''}${attHtml(m.att)}</div></div>`;
 
@@ -2428,7 +2443,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           if((chat.gen||0)!==g0) return;   // 그사이 '대화 비우기' — 이전 질문의 답은 버림
           chat.typing=false;
           if(r.status===403&&r.j&&r.j.code==='need_code'){ chat.msgs.pop(); csave(); setAiCode(''); if(chat.room==='bot'&&state.route==='ai') aiGate(panel,room); return; }   // 코드가 바뀜 → 다시 입력
-          if(r.ok&&r.j.ok){ push('bot',String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,snip:String(x.snippet||'').slice(0,180)})); csave(); }
+          if(r.ok&&r.j.ok){ push('bot',String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,art:String(x.art||'').slice(0,40),snip:String(x.snippet||'').slice(0,180)})); csave(); }
           else push('bot', r.status===0?'서버에 연결할 수 없습니다. 잠시 뒤 다시 물어보세요.':(r.j.error||'답변을 만들지 못했습니다.'),[]);
           if(chat.room==='bot'&&state.route==='ai'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp&&window.innerWidth>=600) inp.focus(); }
         });
@@ -2748,7 +2763,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!rid){ panel.innerHTML=`<p class="convo-note">${kind==='deb'?'디브리핑룸은 서버 PC를 새 버전(V57)으로 업데이트하면 열립니다. 지금은 47망을 이용해 주세요.':'47망을 찾지 못했습니다. 서버를 다시 시작해 주세요.'}</p>`; return; }
     pending=[]; SRV.last=0; SRV.seen=new Set(); SRV.epoch=''; SRV.msgs=new Map(); SRV.rp=[]; SRV.rv=-1; SRV.readSent=0; SRV.lastDay=''; SRV.replyTo=null; SRV.dv=-1;
     const admin=SRV.me&&SRV.me.role==='admin';
-    panel.innerHTML=roomHead({id:'s'+rid,title},`<b class="onl" id="onlineN">${esc(title)} - …명</b>`,`<button type="button" class="btn ghost" id="dbRename">대화명 바꾸기</button>${admin?'<button type="button" class="btn ghost" id="dbClear">대화 비우기</button>':''}`)+`
+    panel.innerHTML=roomHead({id:'s'+rid,title,cnt:true},'',`<button type="button" class="btn ghost" id="dbRename">대화명 바꾸기</button>${admin?'<button type="button" class="btn ghost" id="dbClear">대화 비우기</button>':''}`)+`
       <div class="chat">
         <div class="card convo-card"><div class="convo" id="convo"><p class="convo-note" id="convoNote">불러오는 중…</p></div><button type="button" class="peek" id="peek" hidden></button></div>
         <div class="reply-bar" id="replyBar" hidden></div>
@@ -2769,7 +2784,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const applyState=j=>{
       if(!j) return;
       // 참여자 수(V90): 대화명을 정하고 이 방에 들어온 사람(로그아웃·7일 미사용이면 빠짐). 예전 서버는 지금 접속 수
-      { const o=$('#onlineN'); if(o){ if(Number.isFinite(j.members)) o.textContent=`${title} - ${j.members.toLocaleString('ko-KR')}명`; else if(Number.isFinite(j.online)) o.textContent=`${title} - 지금 ${j.online}명 접속`; } }
+      { const o=$('#onlineN'); if(o){ if(Number.isFinite(j.members)) o.textContent=` - ${j.members.toLocaleString('ko-KR')}명`; else if(Number.isFinite(j.online)) o.textContent=` - 지금 ${j.online}명 접속`; } }
       if(Array.isArray(j.rp)) SRV.rp=j.rp.filter(Number.isFinite).sort((a,b)=>a-b);
       if(Number.isFinite(j.rv)) SRV.rv=j.rv;
       if(Array.isArray(j.deleted)) j.deleted.map(Number).filter(Number.isFinite).forEach(markDeleted);
@@ -2796,7 +2811,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         if(SRV.gen!==gen || document.visibilityState!=='visible' || !ROOMS_R.includes(state.route) || SRV.last<=SRV.readSent) return;
         const last=SRV.last; SRV.readSent=last;
         const r=await api(`/api/rooms/${rid}/read`,{json:{last}});
-        if(SRV.gen!==gen) return; if(r.ok) applyState(r.j); else if(r.status===404){ SRV.readSent=Infinity; const o=$('#onlineN'); if(o) o.textContent='참여자 수는 서버 업데이트 후 표시'; } else SRV.readSent=0;   // 예전 서버: 읽음 기능 없음 → 다시 묻지 않음
+        if(SRV.gen!==gen) return; if(r.ok) applyState(r.j); else if(r.status===404){ SRV.readSent=Infinity; const o=$('#onlineN'); if(o) o.textContent=''; } else SRV.readSent=0;   // 예전 서버: 읽음 기능 없음 → 다시 묻지 않음
       },400);
     }
     const onVis=()=>{ if(SRV.gen!==gen){ document.removeEventListener('visibilitychange',onVis); removeEventListener('pageshow',onShow); return; } if(document.visibilityState==='visible'){ if(SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } } markRead(); } };   // 다시 보이면 기다리던 연결을 새로
