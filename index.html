@@ -683,7 +683,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v74</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v75</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -800,8 +800,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V74', SRV_VER='2.1';
+  const APP_VER='V75', SRV_VER='2.1';
   const UPDATES=[
+    {v:'V75', d:'2026-10-17', t:['첫 화면을 대칭 구성으로: 위 줄 Search · AI(사다리꼴) · 47망, 아래 줄 디브리핑룸 · CHecklist · Incident Log가 위아래 거울 모양','47망·디브리핑룸 설명이 어떤 화면에서도 보여요(좁으면 줄을 나누고 글씨를 한 단계 작게)']},
     {v:'V74', d:'2026-10-17', t:['첫 화면 S·IL 칸을 넓혔어요: 왼쪽 사선은 오른쪽으로, 오른쪽 사선은 왼쪽으로, 가운데 가로선은 짧게(Search 약 +80%, Incident Log 약 +75%)','47망·디브리핑룸 크기는 그대로, 412폭 폰에서도 47망 설명이 보여요']},
     {v:'V73', d:'2026-10-17', t:['첫 화면 47망·디브리핑룸 칸을 더 크게, 47망 설명 글씨도 보이게(좁은 폰은 이름만)','S·A·CH·IL 위치를 균형 있게 다시 잡고, 칸 테두리를 진하게(야외에서도 보이게)','칸 사이 틈을 눌러도 가까운 칸이 열리게, 4의 세로획은 연하게(칸 경계로 착각하지 않게)']},
     {v:'V72', d:'2026-10-17', t:['첫 화면 동그라미를 없애고 모서리 칸으로: 12시→2시 사선 위(1시)는 47망, 8시→6시 사선 아래(7시)는 디브리핑룸','칸을 나누는 네이비 획이 손글씨 ‘47’ — 12시에서 한 번에 내려 그은 4·7(가로획 공유)과 4의 세로획']},
@@ -2217,17 +2218,16 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 7의 가로획 위 모서리(1시) = 47망, 8시→6시 사선 아래 모서리(7시) = 디브리핑룸, 나머지 4칸 = S·A·CH·IL(읽으면 SACHIL).
   // 칸은 SVG 다각형(틈·둥근 모서리)이라 보이는 모양 그대로 눌린다. 좌표는 화면 비율(0~1)
   const HZ={
-    // V74: 왼쪽 사선 →, 오른쪽 사선 ←, 가운데 가로선 짧게(L4~R7) — S·IL 칸 확대(사용성·디자인 에이전트 비교 후 채택)
-    // 가로선 끝 L4→L8, R7→R2는 획 없는 틈(칸 경계만)
-    pts:{P12:[.42,0], R2:[1,.475], L4:[.15,.52], R7:[.85,.50], L8:[0,.525], B6:[.58,1], V1:[.36,.42], V2:[.30,.62], TL:[0,0], TR:[1,0], BR:[1,1], BL:[0,1]},
+    // V75: 좌우·상하 대칭 — 위 줄 S | A(사다리꼴) | 47망, 아래 줄 디브리핑룸 | CH(뒤집은 사다리꼴) | IL
+    pts:{A1:[.38,0], A2:[.62,0], M1:[.27,.5], M2:[.73,.5], LM:[0,.5], RM:[1,.5], B1:[.38,1], B2:[.62,1], TL:[0,0], TR:[1,0], BR:[1,1], BL:[0,1]},
     X:{},
-    reg:{search:['TL','P12','L4','L8'], ai:['P12','R2','R7','L4'], chat:['P12','TR','R2'], board:['L4','R7','B6','L8'], log:['R7','R2','BR','B6'], debrief:['L8','B6','BL']},
-    strokes:[['P12','L4','R7','B6'],['V1','V2']],
-    lab:{search:[.17,.20], ai:[.57,.32], board:[.43,.68], log:[.84,.82]}};
+    reg:{search:['TL','A1','M1','LM'], ai:['A1','A2','M2','M1'], chat:['A2','TR','RM','M2'], debrief:['LM','M1','B1','BL'], board:['M1','M2','B2','B1'], log:['M2','RM','BR','B2']},
+    strokes:[],
+    lab:{search:[.16,.34], ai:[.50,.34], board:[.50,.66], log:[.84,.66]}};   // 위 줄·아래 줄 글자 높이를 맞추고 상하 대칭
   function renderHub(panel){
     const corner=h=>h.go==='chat'
-      ? `<span class="hz-k tr" data-k="chat" aria-hidden="true"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd">지휘·작전망으로<br>어려운 내용<br>47망으로 전달하세요</span></span>`
-      : `<span class="hz-k bl" data-k="debrief" aria-hidden="true"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd">${h.d}</span></span>`;
+      ? `<span class="hz-k tr" data-k="chat" aria-hidden="true"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd w">지휘·작전망으로 어려운 내용<br>47망으로 전달하세요</span><span class="hd n">지휘·작전망으로<br>어려운 내용<br>47망으로<br>전달하세요</span></span>`
+      : `<span class="hz-k bl" data-k="debrief" aria-hidden="true"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd w">익명으로 개선사항 도출<br>의견 청취로 지휘역량 강화</span><span class="hd n">익명으로<br>개선사항 도출<br>의견 청취로<br>지휘역량 강화</span></span>`;
     const cell=h=>h.y?corner(h):`<span class="hz-l" data-l="${h.go}" aria-hidden="true">${sigK(h.k)}<b>${h.t}</b></span>`;
     panel.innerHTML=`<nav class="hub hz" aria-label="SACHIL:47 첫 화면"><svg class="hz-svg" xmlns="http://www.w3.org/2000/svg">${HUB.map(h=>`<a href="#${h.go}" data-hub="${h.go}" aria-label="${h.t}"><path class="hz-p${h.y?' y':''}" data-p="${h.go}"/><path class="hz-hit" data-hit="${h.go}"/></a>`).join('')}${HZ.strokes.map((_,i)=>`<path class="hz-47" data-s="${i}"/>`).join('')}</svg>${HUB.map(cell).join('')}</nav>`;
     panel.querySelectorAll('[data-hub]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const t=a.dataset.hub; if(t==='search'){ q.value=''; syncClear(); go('search',''); } else go(t); rootScrollTo(0); }));
@@ -2271,7 +2271,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     // S·A·CH·IL 글자 블록: 칸 안에서 경계·획으로부터 가장 넉넉한 자리(화면마다 다시 계산 → 어느 기기에서도 균형)
     const segD=(p,A,B)=>{ const dx=B[0]-A[0], dy=B[1]-A[1], L=dx*dx+dy*dy||1; let t=((p[0]-A[0])*dx+(p[1]-A[1])*dy)/L; t=Math.max(0,Math.min(1,t)); return Math.hypot(p[0]-A[0]-t*dx, p[1]-A[1]-t*dy); };
     const strokeSegs=[]; HZ.strokes.forEach(n=>{ for(let i=0;i<n.length-1;i++) strokeSegs.push([pt[n[i]],pt[n[i+1]]]); });
-    const place=(k,el)=>{
+    const place=(k,el,auto)=>{
       const poly=HZ.reg[k].map(n=>pt[n]), n=poly.length, cx=poly.reduce((s,p)=>s+p[0],0)/n, cy=poly.reduce((s,p)=>s+p[1],0)/n;
       const edges=poly.map((p,i)=>{ const q=poly[(i+1)%n]; let nx=-(q[1]-p[1]), ny=q[0]-p[0]; const L=Math.hypot(nx,ny)||1; nx/=L; ny/=L; if((cx-p[0])*nx+(cy-p[1])*ny<0){ nx=-nx; ny=-ny; } return [p,nx,ny]; });
       const inside=q=>Math.min(...edges.map(([p,nx,ny])=>(q[0]-p[0])*nx+(q[1]-p[1])*ny));   // 칸 안쪽 거리(음수면 밖)
@@ -2280,7 +2280,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const score=c=>{ const pts4=[[c[0]-bw,c[1]-bh],[c[0]+bw,c[1]-bh],[c[0]-bw,c[1]+bh],[c[0]+bw,c[1]+bh],[c[0],c[1]-bh],[c[0],c[1]+bh],[c[0]-bw,c[1]],[c[0]+bw,c[1]]];
         let sc=Math.min(...pts4.map(inside)); strokeSegs.forEach(([A,B])=>{ sc=Math.min(sc, ...pts4.map(q=>segD(q,A,B)), segD(c,A,B)-Math.max(bw,bh)); }); return sc; };
       const pref=HZ.lab[k]&&[HZ.lab[k][0]*W, HZ.lab[k][1]*H];
-      if(pref){ const ps=score(pref); if(ps>=10){ el.style.left=pref[0]+'px'; el.style.top=pref[1]+'px'; return ps; } }
+      if(pref){ const ps=score(pref); if(ps>=(el.classList.contains('sm')?2:6)){ el.style.left=pref[0]+'px'; el.style.top=pref[1]+'px'; return 99; } }
+      if(!auto) return -1;
       let best=null, bs=-1e9;
       for(let i=1;i<28;i++) for(let j=1;j<28;j++){
         const c=[x0+(x1-x0)*i/28, y0+(y1-y0)*j/28];
@@ -2293,16 +2294,16 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(best){ el.style.left=best[0]+'px'; el.style.top=best[1]+'px'; }
       return bs;
     };
-    ['search','ai','board','log'].forEach(k=>{ const el=h.querySelector(`[data-l="${k}"]`); if(!el) return; el.classList.remove('sm'); if(place(k,el)<6){ el.classList.add('sm'); place(k,el); } });   // 안 들어가면 한 단계 작게
-    // 모서리 칸(47망·디브리핑룸): 글은 직각 모서리 쪽에 붙이고, 빗변을 넘으면 설명 글씨를 줄이거나 뺀다
-    const hb=h.getBoundingClientRect(), pad=gap+12;
-    const side=(A,B,p)=>((B[0]-A[0])*(p[1]-A[1])-(B[1]-A[1])*(p[0]-A[0]))/Math.hypot(B[0]-A[0],B[1]-A[1]);
-    [['chat',pt[HZ.reg.chat[0]],pt[HZ.reg.chat[2]],pt[HZ.reg.chat[1]],r=>[r.left-hb.left, r.bottom-hb.top]],['debrief',pt[HZ.reg.debrief[0]],pt[HZ.reg.debrief[1]],pt[HZ.reg.debrief[2]],r=>[r.right-hb.left, r.top-hb.top]]].forEach(([k,A,B,corner,inner])=>{
-      const el=h.querySelector(`[data-k="${k}"]`); if(!el) return;
-      el.classList.remove('s1','s2'); el.style.setProperty('--fs', W<600?'1':'1.2');
-      const want=Math.sign(side(A,B,corner));
-      const fits=()=>[...el.querySelectorAll('.r1,.ic,b,.hd')].every(c=>{ const rc=c.getBoundingClientRect(); if(!rc.width) return true; return side(A,B,inner(rc))*want>=8; });
-      if(!fits()){ el.classList.add('s1'); if(!fits()){ el.classList.add('s2'); } }
+    ['search','ai','board','log'].forEach(k=>{ const el=h.querySelector(`[data-l="${k}"]`); if(!el) return; el.classList.remove('sm'); if(place(k,el,false)>0) return; el.classList.add('sm'); if(place(k,el,false)>0) return; el.classList.remove('sm'); if(place(k,el,true)<6){ el.classList.add('sm'); place(k,el,true); } });   // 정한 자리(상하 대칭)를 지키려고 먼저 한 단계 작게, 그래도 안 되면 자동 자리   // 안 들어가면 한 단계 작게
+    // 모서리 칸(47망·디브리핑룸): 글이 칸 안에 다 들어갈 때까지 줄바꿈 → 한 단계 작게 → 두 단계 작게(문구는 숨기지 않음)
+    const hb=h.getBoundingClientRect();
+    const inPoly=(poly,q,m)=>{ const n=poly.length, cx=poly.reduce((s,p)=>s+p[0],0)/n, cy=poly.reduce((s,p)=>s+p[1],0)/n;
+      return poly.every((p,i)=>{ const r=poly[(i+1)%n]; let nx=-(r[1]-p[1]), ny=r[0]-p[0]; const L=Math.hypot(nx,ny)||1; nx/=L; ny/=L; if((cx-p[0])*nx+(cy-p[1])*ny<0){ nx=-nx; ny=-ny; } return (q[0]-p[0])*nx+(q[1]-p[1])*ny>=m; }); };
+    ['chat','debrief'].forEach(k=>{
+      const el=h.querySelector(`[data-k="${k}"]`); if(!el) return; const poly=HZ.reg[k].map(n=>pt[n]);
+      const fits=()=>[...el.querySelectorAll('.ic,b,.hd')].filter(c=>c.offsetParent).every(c=>{ const rc=c.getBoundingClientRect(); return [[rc.left,rc.top],[rc.right,rc.top],[rc.left,rc.bottom],[rc.right,rc.bottom]].every(([x,y])=>inPoly(poly,[x-hb.left,y-hb.top],gap+6)); });
+      el.style.setProperty('--fs', W<600?'1':'1.2');
+      for(const c of ['', 'nar', 'nar s1', 'nar s1 s2']){ el.classList.remove('nar','s1','s2'); if(c) c.split(' ').forEach(x=>el.classList.add(x)); if(fits()) break; }
     });
     if(!h._ro && window.ResizeObserver){ h._ro=new ResizeObserver(()=>{ if(h.isConnected) requestAnimationFrame(fitHub); }); h._ro.observe(h); }   // 늦게 적용되는 스타일·회전·폴드 펼침에도 다시 맞춤
   }
@@ -3079,16 +3080,23 @@ body.hubview footer{display:none}
 .hz-l[data-l="search"] b,.hz-l[data-l="log"] b{font-size:13.5px}
 .hz-l.sm .sg{height:34px!important} .hz-l.sm b{font-size:12px!important}
 .hz-k{position:absolute;display:flex;flex-direction:column;gap:3px;pointer-events:none;color:var(--fg);white-space:nowrap;--fs:1}
-.hz-k.tr{top:18px;right:18px;align-items:flex-end;text-align:right}
-.hz-k.bl{bottom:18px;left:18px;align-items:flex-start;text-align:left}
+.hz-k.tr{top:16px;right:16px;align-items:flex-end;text-align:right}
+.hz-k.bl{bottom:16px;left:16px;align-items:flex-start;text-align:left}
 .hz-k .r1{display:flex;align-items:center;gap:8px}
 .hz-k .ic{display:grid;place-items:center;width:calc(38px*var(--fs));height:calc(38px*var(--fs));border-radius:11px;background:#fff;overflow:hidden;box-shadow:0 2px 6px rgba(36,78,162,.15)}
 .hz-k .ic img{width:100%;height:100%;display:block}
 .hz-k .ic svg{width:70%;height:70%}
 .hz-k b{font-size:calc(20px*var(--fs));font-weight:800;line-height:1.15}
 .hz-k .hd{font-size:calc(11px*var(--fs));line-height:1.4;font-weight:600;color:#4a3d00;letter-spacing:-.02em}
-.hz-k.s1 .hd{font-size:calc(10.5px*var(--fs));letter-spacing:-.03em}
-.hz-k.s2 .hd{display:none}
+.hz-k .hd.n{display:none}
+.hz-k.nar .hd.w{display:none}
+.hz-k.nar .hd.n{display:block}
+.hz-k.s1 b{font-size:calc(17px*var(--fs))}
+.hz-k.s1 .ic{width:calc(32px*var(--fs));height:calc(32px*var(--fs))}
+.hz-k.s1 .hd{font-size:calc(10.5px*var(--fs))}
+.hz-k.s2 b{font-size:15px}
+.hz-k.s2 .ic{width:26px;height:26px}
+.hz-k.s2 .hd{font-size:10px;line-height:1.3}
 @media (min-width:600px){ .hz-l .sg{height:68px} .hz-l[data-l="search"] .sg{height:56px} .hz-l .sg-CH,.hz-l .sg-IL{height:58px} .hz-l b{font-size:19px} .hz-l[data-l="search"] b,.hz-l[data-l="log"] b{font-size:17px} .hz-k.tr{top:24px;right:26px} .hz-k.bl{bottom:24px;left:26px} }
 @media (max-height:680px){ .hz-l .sg{height:38px} .hz-l[data-l="search"] .sg{height:30px} .hz-l .sg-CH,.hz-l .sg-IL{height:32px} .hz-l b{font-size:13px} .hz-l[data-l="search"] b,.hz-l[data-l="log"] b{font-size:12px} .hz-l{gap:3px} .hz-k .ic{width:30px;height:30px} .hz-k b{font-size:17px} }
 </style>
