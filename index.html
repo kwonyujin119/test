@@ -683,7 +683,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v71</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v72</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -800,8 +800,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V71', SRV_VER='2.1';
+  const APP_VER='V72', SRV_VER='2.1';
   const UPDATES=[
+    {v:'V72', d:'2026-10-17', t:['첫 화면 동그라미를 없애고 모서리 칸으로: 12시→2시 사선 위(1시)는 47망, 8시→6시 사선 아래(7시)는 디브리핑룸','칸을 나누는 네이비 획이 손글씨 ‘47’ — 12시에서 한 번에 내려 그은 4·7(가로획 공유)과 4의 세로획']},
     {v:'V71', d:'2026-10-17', t:['첫 화면을 새 구성으로: 번개 모양 선이 S·A·CH·IL 네 칸을 나누고(읽으면 SACHIL), 47망(오른쪽 위)·디브리핑룸(왼쪽 아래)은 둥근 버튼','칸 모양 그대로 눌리고, 폰·폴드·PC 화면 크기에 맞춰 자동으로 다시 그려요']},
     {v:'V70', d:'2026-10-17', t:['첫 화면 47망·디브리핑룸: 아이콘을 크게 가운데로, 이름 > 설명 순으로 글씨 크기를 나눠 가운데 정렬','작은 폰에서도 설명이 두 줄에 맞게, CH·IL 심벌 크기를 다른 심벌과 눈높이로 맞춤']},
     {v:'V69', d:'2026-10-17', t:['디브리핑룸 설명을 두 줄로: 익명으로 개선사항 도출 / 의견 청취로 지휘역량 강화','첫 화면 S·A·CH·IL 심벌을 박스 가운데 크게, 작은 설명 글씨는 뺐어요','메뉴 ‘SACHIL 시그니처’ 안내를 새 판(정리 v3)으로 바꿨어요']},
@@ -2214,11 +2215,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 7의 가로획 위 모서리(1시) = 47망, 8시→6시 사선 아래 모서리(7시) = 디브리핑룸, 나머지 4칸 = S·A·CH·IL(읽으면 SACHIL).
   // 칸은 SVG 다각형(틈·둥근 모서리)이라 보이는 모양 그대로 눌린다. 좌표는 화면 비율(0~1)
   const HZ={
-    pts:{T4:[.36,0], L4:[0,.50], T7:[.50,0], R7:[1,.36], B7:[.64,1], L8:[0,.64], B6:[.50,1], TL:[0,0], TR:[1,0], BR:[1,1], BL:[0,1], E4:[1,.44]},
-    X:{X:['L4','E4','R7','B7']},   // X = 선분 L4–E4와 R7–B7의 교점
-    reg:{search:['TL','T4','L4'], ai:['T4','T7','R7','X','L4'], chat:['T7','TR','R7'], board:['L4','X','B7','B6','L8'], log:['R7','BR','B7'], debrief:['L8','B6','BL']},
-    strokes:[['T4','L4','X'],['T7','R7','B7']],
-    lab:{search:[.12,.15], ai:[.47,.27], board:[.50,.70], log:[.86,.86]}};
+    pts:{P12:[.50,0], R2:[1,.36], L4:[0,.52], R7:[1,.45], L8:[0,.64], B6:[.50,1], V1:[.42,.36], V2:[.33,.58], TL:[0,0], TR:[1,0], BR:[1,1], BL:[0,1]},
+    X:{},
+    reg:{search:['TL','P12','L4'], ai:['P12','R2','R7','L4'], chat:['P12','TR','R2'], board:['L4','R7','B6','L8'], log:['R7','BR','B6'], debrief:['L8','B6','BL']},
+    // 한 번에 그은 획: 12시 ↙ 꺾어 → 가로획(4·7 공유) ↙ 6시  +  4의 세로획(칸 경계 아님)
+    strokes:[['P12','L4','R7','B6'],['V1','V2']],
+    lab:{search:[.15,.12], ai:[.60,.27], board:[.55,.63], log:[.82,.92]}};
   function renderHub(panel){
     const corner=h=>h.go==='chat'
       ? `<span class="hz-k tr" data-k="chat" aria-hidden="true"><span class="r1"><b>${h.t}</b><span class="ic">${h.ic}</span></span><span class="hd">${h.d}</span></span>`
