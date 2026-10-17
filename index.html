@@ -149,6 +149,8 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 @media (prefers-reduced-motion:reduce){ .swipe-l,.swipe-r{animation:none} }
 .toast{position:fixed;left:50%;top:calc(var(--sat) + 72px);transform:translateX(-50%);z-index:60;background:var(--navy);color:#fff;font-size:13px;padding:10px 16px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.18);max-width:calc(100vw - 32px);text-align:center;opacity:0;transition:opacity .25s;pointer-events:none}
 .toast.on{opacity:1}
+.toast.act.on{pointer-events:auto}
+.toast button{margin-left:10px;border:0;background:rgba(255,255,255,.18);color:#FFD400;font:inherit;font-weight:700;padding:4px 10px;border-radius:999px;cursor:pointer}
 
 .group-title{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2);margin:18px 0 8px}
 .group-title:first-child{margin-top:0}
@@ -732,7 +734,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v98</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v99</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -787,8 +789,8 @@ footer b{color:var(--muted);font-weight:600}
       <span class="sp"></span>
       <button type="button" class="btn" id="repCopy">복사</button>
       <button type="button" class="btn" id="repShare" hidden>공유</button>
-      <button type="button" class="btn" id="repSave">저장</button>
-      <span class="note">만든 시점의 체크 항목·시각 기록 스냅샷으로 작성되어 IL 사고보고서에 저장됩니다. 본문은 바로 고칠 수 있습니다. AI에는 사실과 작성자가 고친 초안만 주고 새 사실을 추가하지 않도록 지시합니다. 평가 판정이 아닙니다.</span>
+      <button type="button" class="btn" id="repSave">파일로 받기</button>
+      <span class="note">만든 시점의 체크 항목·시각 기록 스냅샷으로 작성되어 IL 사고보고서에 저장됩니다. 본문 편집은 교수 로그인 후 ‘초안 편집’으로 할 수 있습니다. AI에는 사실과 작성자가 고친 초안만 주고 새 사실을 추가하지 않도록 지시합니다. 평가 판정이 아닙니다.</span>
     </div>
   </div>
 </div>
@@ -849,8 +851,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V98', SRV_VER='3.5';
+  const APP_VER='V99', SRV_VER='3.5';
   const UPDATES=[
+    {v:'V99', d:'2026-10-17', t:['CH·IL 초기화 위치 통일: 두 화면 모두 위 줄 맨 왼쪽(주 버튼과 떨어진 자리), 이름은 ‘체크 초기화’ / ‘기록 초기화’로 무엇이 지워지는지 구분','초기화 뒤 6초 동안 ‘되돌리기’','보고서 만들기: 연타해도 1건만, 미기재 섹션이 있거나 30건이 꽉 차면 한 번 더 눌러 확인','AI 다시 작성이 실패·중지되면 이전 AI 작성본을 되살림, AI 사이트 결과로 덮어쓸 때 확인','‘저장’ 버튼 → ‘파일로 받기’, 편집 안내 문구를 실제 동작에 맞춤, 앱을 닫는 순간의 마지막 입력도 저장']},
     {v:'V98', d:'2026-10-17', t:['AI 도우미 답이 이전 순서(결론 → 근거 → 설명)로 나오던 문제 수정: AI가 어떤 순서로 쓰든 결론 → 설명 → 현장에서 → 근거로 다시 정렬(이미 저장된 대화도)']},
     {v:'V97', d:'2026-10-17', t:['AI 도우미 답 순서: 결론 → 설명 → 현장에서 → 근거','메뉴 자료에 없는 내용도 AI가 일반 지식으로 짧게 설명 — ‘근거 부족’ 표시를 붙여 자료 근거 답과 구분']},
     {v:'V96', d:'2026-10-17', t:['AI 도우미·AI 보고서를 Google Gemini API 키(aistudio.google.com)로도 쓸 수 있게 — 서버 PC에서 gemini-key-setup.bat으로 키 입력','AI 도우미 위쪽에 연결된 AI 이름(Gemini/Claude) 표시']},
@@ -1164,9 +1167,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     document.addEventListener('dragstart',e=>{ if(md&&md.on) e.preventDefault(); },true);
   })();
   let toastT=null;
-  function toast(msg){
+  function toast(msg, undo){   // undo: 되돌리기 함수(V99) — 6초 동안 '되돌리기' 버튼
     let el=document.getElementById('toast'); if(!el){ el=document.createElement('div'); el.id='toast'; el.className='toast'; el.setAttribute('role','status'); document.body.appendChild(el); }
-    el.textContent=msg; el.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('on'),3800);
+    el.textContent=msg; el.classList.toggle('act',!!undo);
+    if(undo){ const b=document.createElement('button'); b.type='button'; b.textContent='되돌리기'; b.addEventListener('click',()=>{ el.classList.remove('on','act'); clearTimeout(toastT); undo(); }); el.appendChild(b); }
+    el.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('on','act'),undo?6000:3800);
   }
   function swipeTip(){
     try{ const n=Number(localStorage.getItem('sachil_swipe_tip_v27')||0); if(n>=2) return; localStorage.setItem('sachil_swipe_tip_v27',String(n+1)); }catch(_){ return; }
@@ -1625,7 +1630,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       </div>
       <div class="board">
         <div class="card timer ${state.timer.running?'live':''}" id="timerBar">
-          <div class="chrow"><button type="button" class="jall" id="jumpAll" aria-expanded="${jumpOpen}" aria-controls="jgrid">${jumpOpen?'닫기 ▴':'전체 ▾'}</button><span class="prog" aria-label="진행">${done}/${total}</span><button type="button" class="btn ghost" id="tmReset">초기화</button></div>
+          <div class="chrow"><button type="button" class="btn ghost" id="tmReset" title="체크·시각 기록·타이머를 비웁니다(IL 현장 기록은 그대로)">체크 초기화</button><button type="button" class="jall" id="jumpAll" aria-expanded="${jumpOpen}" aria-controls="jgrid">${jumpOpen?'닫기 ▴':'전체 ▾'}</button><span class="prog" aria-label="진행">${done}/${total}</span></div>
           <nav class="jump" id="jump" aria-label="항목 바로가기">
             <div class="jl">${phases.slice(0,6).map((p,k)=>{const pi=k, d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}">${pi+1} ${esc(p.name)} <span class="c">${d}/${p.items.length}</span></button>`;}).join('')}</div>
             <div class="jl">${phases.slice(6).map((p,k)=>{const pi=k+6, d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}">${pi+1} ${esc(p.name)} <span class="c">${d}/${p.items.length}</span></button>`;}).join('')}<button type="button" data-j="sec-log">시각 기록</button></div>
@@ -1659,11 +1664,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       else delete checks[k];
       save(); renderBoard(panel);
     }));
-    $('#tmReset').addEventListener('click',()=>{
-      const btn=$('#tmReset');
-      if(btn.dataset.arm!=='1'){ btn.dataset.arm='1'; btn.textContent='정말 초기화'; btn.classList.add('accent'); setTimeout(()=>{ if(btn.isConnected){ btn.dataset.arm=''; btn.textContent='초기화'; btn.classList.remove('accent'); } },2500); return; }
-      state.timer={running:false,start:0,acc:0}; state.checks={}; state.log=[]; save(); renderBoard(panel);   // 현장 기록(발생개요 등)은 IL의 초기화로
-    });
+    $('#tmReset').addEventListener('click',()=>arm($('#tmReset'),'체크·시각 지움?',()=>{   // 현장 기록(발생개요 등)은 IL의 '기록 초기화'로
+      const old={timer:{...state.timer}, checks:{...state.checks}, log:state.log.slice()};
+      state.timer={running:false,start:0,acc:0}; state.checks={}; state.log=[]; save(); renderBoard(panel);
+      toast('체크·시각 기록을 비웠습니다(IL 현장 기록은 그대로)',()=>{ state.timer=old.timer; state.checks=old.checks; state.log=old.log; save(); if(old.timer.running) startTick(); if(state.route==='board') render(); });
+    }));
     $('#logForm').addEventListener('submit',e=>{ e.preventDefault(); const v=$('#logText').value.trim(); if(!v) return; addLog(v); save(); $('#logText').value=''; renderLog(); });
     $('#copyLog').addEventListener('click',async()=>{
       const txt=[`[SACHIL] 체크리스트 기록${state.situ.fields.target?' · '+state.situ.fields.target:''}`,...state.log.map(l=>`${l.ts}  +${l.el}  ${l.text}`)].join('\n'); const btn=$('#copyLog');
@@ -1702,7 +1707,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     }catch(_){ }
   }
   function rpsave(){ if(reports.length>MAX_REPORTS) reports.length=MAX_REPORTS; return trySet(RLKEY, JSON.stringify(reports)); }
-  function rpsaveSoon(){ clearTimeout(repSaveT); repSaveT=setTimeout(rpsave,200); }
+  function rpsaveSoon(){ clearTimeout(repSaveT); repSaveT=setTimeout(()=>{ repSaveT=null; rpsave(); },200); }
+  window.addEventListener('pagehide',()=>{ if(repSaveT){ clearTimeout(repSaveT); repSaveT=null; rpsave(); } });   // 앱을 닫는 순간의 마지막 입력도 저장(V99)
   const fmtTs=iso=>{ const d=new Date(iso); if(isNaN(d)) return ''; return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 
   function reportFacts(){
@@ -1807,6 +1813,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!keepStatus && !$('#report').hidden && !repCtl) $('#repStatus').textContent=repStatusText();
   }
   function newReport(){
+    if(!$('#report').hidden) return;   // 연타로 같은 보고서가 두 번 생기지 않게(V99)
     const facts=reportFacts(), ts=new Date().toISOString();
     const e={id:'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), ts, place:(state.situ.fields.target||state.situ.fields.place||'').slice(0,120), done:facts.done, total:facts.total, elapsed:facts.elapsed, facts,
       draftAuto:'', draft:'', draftEdited:false, ai:'', aiAuto:'', aiEdited:false, at:''};
@@ -2006,6 +2013,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(repCtl){ repCtl.abort(); return; }
     const e=cur, ctl=new AbortController(); repCtl=ctl;
     const body=$('#repBody'), st=$('#repStatus');
+    const prev={ai:e.ai, aiAuto:e.aiAuto, aiEdited:e.aiEdited, aiSrc:e.aiSrc, at:e.at};   // 실패·중지하면 이전 AI 작성본으로 되돌린다(V99)
     e.ai=''; e.aiAuto=''; e.aiEdited=false; e.aiSrc=''; setRepView('ai'); body.readOnly=true; body.value='AI가 사실을 읽고 보고서를 작성하는 중입니다…'; st.textContent='작성 중'; st.classList.add('busy'); syncRepUI();
     try{
       const r=await CAP.sample(reportPrompt(e),{signal:ctl.signal, modelTier:'quick', cache:!force, onText:({text})=>{ if(repCtl!==ctl) return; e.ai=text; if(repView==='ai') body.value=text; }});
@@ -2013,9 +2021,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       e.ai=r.text; e.aiAuto=r.text; if(repView==='ai') body.value=r.text; e.at=now(); rpsave();
       st.textContent = r.truncated ? `47 · AI 작성본 ${e.at} · 길이 제한으로 잘림` : `47 · AI 작성본 ${e.at} · 교관 확인 전`;
     }catch(err){
-      if(repCtl!==ctl) return; // 닫기·초기화로 이미 버린 호출 — 상태를 되돌리지 않는다
+      if(repCtl!==ctl){ if(!e.ai && prev.ai){ Object.assign(e,prev); rpsave(); } return; } // 닫기로 버린 호출 — 이전 작성본만 되살림
       const code=(err&&err.code)||'upstream_error';
-      if(err&&err.text){ const t=(code==='cancelled'?'※ 중지로 일부만 작성됨\n':'')+err.text; e.ai=t; e.aiAuto=t; if(repView==='ai') body.value=t; e.at=now(); rpsave(); } else { e.ai=''; }
+      if(err&&err.text && !prev.ai){ const t=(code==='cancelled'?'※ 중지로 일부만 작성됨\n':'')+err.text; e.ai=t; e.aiAuto=t; if(repView==='ai') body.value=t; e.at=now(); rpsave(); }
+      else { Object.assign(e,prev); if(repView==='ai') body.value=e.ai||''; rpsave(); }
       if(HIDE_AI.includes(code)) CAP.sample=null;
       st.textContent = code==='cancelled' ? (e.ai?'중지됨 — 일부만 작성 (편집 가능)':'중지됨') : ((err&&err.message)||AI_MSG[code]||AI_MSG.upstream_error);
     }finally{
@@ -2061,20 +2070,26 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   $('#repWeb').addEventListener('click',()=>{ const pn=$('#repWebPanel'), b=$('#repWeb'); pn.hidden=!pn.hidden; b.setAttribute('aria-expanded',String(!pn.hidden)); if(!pn.hidden) pn.scrollIntoView({block:'nearest'}); });
   $('#repWebPanel').querySelectorAll('[data-web]').forEach(btn=>btn.addEventListener('click',()=>{
     const txt=webPrompt(); if(!txt) return; const site=btn.dataset.web, st=$('#repStatus');
-    let copied=false;
-    try{ navigator.clipboard.writeText(txt).then(()=>{},()=>{ if(!legacyCopy(txt)) st.textContent='복사하지 못했습니다 — 길게 눌러 직접 복사하세요'; }); copied=true; }catch(_){ copied=legacyCopy(txt); }   // 누른 순간 바로 복사(아이폰은 기다리면 막음)
+    const tail=site?` · ${site}에 붙여넣어 보내세요`:'';
+    const okMsg=()=>{ st.textContent='요청문 복사됨'+tail; }, failMsg=()=>{ st.textContent='요청문 복사 실패 — 아래 칸 위 요청문을 길게 눌러 직접 복사하세요'; };
+    st.textContent='요청문 복사 중…';
+    try{ navigator.clipboard.writeText(txt).then(okMsg,()=>{ legacyCopy(txt)?okMsg():failMsg(); }); }catch(_){ legacyCopy(txt)?okMsg():failMsg(); }   // 누른 순간 바로 복사(아이폰은 기다리면 막음), 문구는 결과가 나온 뒤에
     if(site&&WEB_AI[site]){ let w=null; try{ w=window.open(WEB_AI[site],'_blank'); if(w) w.opener=null; }catch(_){ } if(!w) location.href=WEB_AI[site]; }
-    st.textContent = (copied?'요청문 복사됨':'요청문 복사 실패')+(site?` · ${site}에 붙여넣어 보내세요`:'');
     $('#repWebPanel').dataset.site=site||'';
   }));
   $('#repWebPaste').addEventListener('click',async()=>{ try{ const t=await navigator.clipboard.readText(); if(t) $('#repWebIn').value=t; else $('#repStatus').textContent='클립보드가 비어 있습니다'; }catch(_){ $('#repStatus').textContent='이 브라우저는 자동 붙여넣기를 막습니다 — 칸을 길게 눌러 붙여넣기 하세요'; } });
   $('#repWebSave').addEventListener('click',()=>{
-    const t=$('#repWebIn').value.trim(), st=$('#repStatus'); if(!cur) return;
+    const t=$('#repWebIn').value.trim(), st=$('#repStatus'), b=$('#repWebSave'); if(!cur) return;
     if(t.length<20){ st.textContent='붙여넣은 보고서가 너무 짧습니다'; return; }
+    if(cur.ai) return arm(b,'기존 AI 작성본 덮어쓰기',()=>webSave(t));   // V99: 확인 없이 덮어쓰지 않게
+    webSave(t);
+  });
+  function webSave(t){
+    if(!cur) return;
     cur.ai=t.slice(0,8000); cur.aiAuto=cur.ai; cur.aiEdited=false; cur.aiSrc=$('#repWebPanel').dataset.site||'AI 사이트'; cur.at=now(); rpsave();
     $('#repWebIn').value=''; $('#repWebPanel').hidden=true; $('#repWeb').setAttribute('aria-expanded','false');
     $('#repTabAi').disabled=false; $('#repTabAi').closest('.seg').hidden=false; setRepView('ai'); syncRepUI();
-  });
+  }
   $('#repAi').addEventListener('click',()=>{ const b=$('#repAi');
     if(!CAP.sample){ const st=$('#repStatus'); st.textContent = SRV.on ? 'AI 작성 꺼짐 — 서버 PC에서 gemini-key-setup.bat으로 Gemini API 키를 넣고 서버를 다시 켜면 켜집니다' : 'AI 작성 꺼짐 — SACHIL 서버에 연결되지 않았습니다(서버 PC가 꺼져 있는지 확인)'; st.classList.add('warn'); setTimeout(()=>st.classList.remove('warn'),2500); return; }
     if(repCtl){ runAi(true); return; } if(cur&&cur.aiEdited) arm(b,'편집 내용 버리고 다시 작성',()=>runAi(true)); else runAi(true); });
@@ -2104,7 +2119,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <div><span class="eyebrow">IL · Incident Log</span><h2 style="margin-top:4px">사고보고서</h2></div>
       </div>
       <div class="card timer ilbar" id="timerBar">
-        <div class="ilrow"><button type="button" class="btn ghost" id="ilReset">초기화</button><button type="button" class="reps" data-j="sec-reps" id="ilReps">작성된 보고서 <span class="c">${reports.length}</span></button><button type="button" class="btn primary" id="mkReport">보고서 만들기</button></div>
+        <div class="ilrow"><button type="button" class="btn ghost" id="ilReset" title="발생개요 등 현장 기록을 비웁니다(CH 체크·작성된 보고서는 그대로)">기록 초기화</button><button type="button" class="reps" data-j="sec-reps" id="ilReps">작성된 보고서 <span class="c">${reports.length}</span></button><button type="button" class="btn primary" id="mkReport">보고서 만들기</button></div>
         <nav class="jump" id="jump" aria-label="항목 바로가기"><div class="jl">${SITU.map(b=>{const st=situStatus(b); return `<button type="button" data-j="sec-${b.id}"><i class="d ${st.cls}" aria-hidden="true"></i>${esc(b.name.replace(/\s+/g,''))}</button>`;}).join('')}</div></nav>
       </div>
       <div class="il-situ">${situHtml()}</div>
@@ -2112,9 +2127,18 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       <div class="card replist">${rows || `<div class="rep-empty">${AS.ilEmpty?`<img src="${AS.ilEmpty}" alt="">`:''}<p>아직 보고서가 없습니다. 위 현장 기록과 <b>CH 체크리스트</b>를 채우고 <b>보고서 만들기</b>를 누르면 여기에 쌓입니다.</p><a class="btn" href="#board">체크리스트 열기</a></div>`}</div>
       <p class="hint-row" style="margin:10px 4px 0;font-size:12px;color:var(--muted-2)">보고서는 이 기기에만 저장됩니다 · ${reports.length}건 (최대 ${MAX_REPORTS}건)${storageFull?' · <b>저장 공간 부족</b>':''}</p>`;
     panel.querySelectorAll('[data-rep]').forEach(b=>b.addEventListener('click',()=>{ const r=reports.find(x=>x.id===b.dataset.rep); if(r) openReport(r); }));
-    $('#mkReport').addEventListener('click',newReport);
+    $('#mkReport').addEventListener('click',()=>{   // V99: 미기재 섹션·30건 꽉 참이면 한 번 더 눌러 확인
+      const b=$('#mkReport'), miss=SITU.filter(x=>!situStatus(x).cls).length, full=reports.length>=MAX_REPORTS;
+      if(b.dataset.arm!=='1' && (miss||full)) return arm(b, full?'오래된 1건 지우고 만들기':`미기재 ${miss}곳 · 그래도 만들기`, newReport);
+      if(b.dataset.arm==='1') return arm(b,'',newReport);
+      newReport();
+    });
     $('#ilReps').addEventListener('click',()=>jumpTo('sec-reps'));
-    $('#ilReset').addEventListener('click',()=>{ const b=$('#ilReset'); arm(b,'정말 초기화',()=>{ state.situ={inv:{},text:{},fields:{}}; addLog('[현장 기록] 초기화'); save(); renderReports(panel); toast('현장 기록을 비웠습니다(작성된 보고서는 그대로)'); }); });
+    $('#ilReset').addEventListener('click',()=>{ const b=$('#ilReset'); arm(b,'현장 기록 지움?',()=>{
+      const old=JSON.parse(JSON.stringify(state.situ));
+      state.situ={inv:{},text:{},fields:{}}; addLog('[현장 기록] 초기화 (CH 체크는 유지)'); save(); renderReports(panel);
+      toast('현장 기록을 비웠습니다(CH 체크·작성된 보고서는 그대로)',()=>{ state.situ=old; save(); if(state.route==='log') render(); });
+    }); });
     bindJump(panel);
     bindSitu(panel,()=>{ const y=(scrollRoot()||document.scrollingElement).scrollTop; renderReports(panel); (scrollRoot()||document.scrollingElement).scrollTop=y; });
     panel.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>arm(b,'정말 삭제',()=>{ reports=reports.filter(x=>x.id!==b.dataset.del); rpsave(); renderReports(panel); })));
@@ -3424,7 +3448,8 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 /* V81 CH 배너: 첫 줄 전체▾·진행·초기화, 아래 칩 두 줄 */
 .timer .chrow{flex-basis:100%;display:flex;align-items:center;gap:10px}
 .timer .chrow .prog{margin:0;font-size:14px}
-.timer .chrow #tmReset{margin-left:auto}
+.timer .chrow .prog{margin-left:auto}
+.timer .chrow #tmReset{border:1px solid var(--line);min-height:40px}
 .ilbar .ilrow #ilReset{border:1px solid var(--line)}
 .timer .jump{flex-basis:100%}
 .ilbar .ilrow{flex-basis:100%;display:flex;align-items:center;gap:8px}
