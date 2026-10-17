@@ -43,8 +43,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '2.1'
-APP_VERSION = 'V76'
+VERSION = '2.2'
+APP_VERSION = 'V77'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -81,6 +81,8 @@ def load_conf():
         'ai_api_key': '',               # Claude API 키(sk-ant-…). 비우면 AI 도우미는 자료 발췌형으로 답함
         'ai_model': 'claude-sonnet-5-5',
         'ai_daily_limit': 300,          # 하루 AI 답변 최대 횟수(비용 상한). 0이면 무제한
+        'ai_assist_model': 'claude-haiku-5-5',   # AI 도우미 전용 모델(가장 저렴). 보고서는 ai_model
+        'ai_code': '5081',              # AI 도우미 입장코드. 비우면 코드 없이 사용
         'allowed_origins': ['https://kwonyujin119.github.io'],   # 이 서버에 접속을 허용할 외부 앱 주소(github.io)
         'app_url': 'https://kwonyujin119.github.io/test/',       # 교육생에게 줄 앱 주소(뒤에 ?srv=서버주소 가 붙음)
     }
@@ -764,8 +766,21 @@ class H(BaseHTTPRequestHandler):
         """AI 도우미: 메뉴 자료 본문에서 근거를 찾아 답한다. 로그인 없이 쓰되 IP별·하루 횟수 제한."""
         j = self.body_json(8000)
         qtext = re.sub(r'\s+', ' ', str(j.get('q') or '')).strip()[:300]
+        need = norm_code(CONF.get('ai_code'))
+        if need:   # AI 도우미 입장코드(서버에서 확인, 틀리면 IP별로 잠금)
+            ip, now = self.ip(), time.time()
+            with FAILS_LOCK:
+                lst = [t for t in FAILS.get('ai:' + ip, []) if now - t < LOGIN_WINDOW]
+                FAILS['ai:' + ip] = lst
+            if len(lst) >= LOGIN_FAILS:
+                return self.send(429, {'ok': False, 'code': 'locked', 'error': '여러 번 틀려 10분간 잠겼습니다'}, log=False)
+            if not secrets.compare_digest(norm_code(j.get('code'))[:40].encode('utf-8'), need.encode('utf-8')):
+                if j.get('code'):
+                    with FAILS_LOCK:
+                        FAILS.setdefault('ai:' + ip, []).append(now)
+                return self.send(403, {'ok': False, 'code': 'need_code', 'error': '입장코드'}, log=False)
         if len(qtext) < 2:
-            raise ValueError('질문을 입력하세요')
+            raise ValueError('질문을 입력하세요')   # 앱은 빈 질문으로 입장코드만 확인한다(AI 호출 없음)
         hist = j.get('history') if isinstance(j.get('history'), list) else []
         terms, hits = DOCS_IDX.search(qtext, limit=10)
         hits = focus_hits(hits)[:7]
@@ -1676,18 +1691,18 @@ def ask_llm(question, hits, history):
             msgs.append({'role': 'user', 'content': turn['q'][:300]})
             msgs.append({'role': 'assistant', 'content': turn['a'][:900]})
     msgs.append({'role': 'user', 'content': f'<자료>\n{ctx}\n</자료>\n\n질문: {question}'})
-    text, why, _code = call_llm(AI_SYS, msgs, 3000, 'low')
+    text, why, _code = call_llm(AI_SYS, msgs, 3000, 'low', CONF.get('ai_assist_model') or 'claude-haiku-5-5')
     return text, why
 
 
-def call_llm(system, msgs, max_tokens, effort=''):
+def call_llm(system, msgs, max_tokens, effort='', model=''):
     """Claude API 한 번 호출. (본문, 실패 사유, 오류 코드). 성공이면 사유·코드는 빈 문자열.
     최신 모델은 답하기 전에 생각(thinking)부터 하므로 max_tokens를 넉넉히 주고 effort로 생각 깊이를 정한다.
     안전 정책 거절(refusal)이 나면 다른 모델로 이어 받도록 server-side fallback을 켠다. 이전 모델·프록시 주소처럼
     이 옵션을 받지 않는 곳(400)이면 옵션을 빼고 한 번 더 부른다."""
     import urllib.request, urllib.error, ssl
     url = CONF.get('ai_api_url') or 'https://api.anthropic.com/v1/messages'
-    base = {'model': CONF.get('ai_model') or 'claude-sonnet-5-5', 'max_tokens': max_tokens, 'system': system, 'messages': msgs}
+    base = {'model': model or CONF.get('ai_model') or 'claude-sonnet-5-5', 'max_tokens': max_tokens, 'system': system, 'messages': msgs}
     extra, hdr = {}, {}
     if effort:
         extra['output_config'] = {'effort': effort}
@@ -1992,7 +2007,7 @@ def main():
         f'관리자 코드: {CONF["admin_code"]}   ← 본인만 (입장 화면 "관리자 입장"에 입력, 대화 비우기 가능)',
         f'47망(디브리핑룸): 매주 월 04시 오래된 대화 {int(float(CONF.get("weekly_trim_ratio") or 0) * 100)}% 정리 (최근 대화 유지)',
         f'메뉴 자료 폴더: {LIB}',
-        ('AI 도우미:   Claude 연결 (' + str(CONF.get('ai_model')) + f', 하루 {CONF.get("ai_daily_limit") or "무제한"}회)') if CONF.get('ai_api_key')
+        ('AI 도우미:   Claude 연결 (도우미 ' + str(CONF.get('ai_assist_model')) + ' · 보고서 ' + str(CONF.get('ai_model')) + f', 하루 {CONF.get("ai_daily_limit") or "무제한"}회' + (', 입장코드 사용' if CONF.get('ai_code') else '') + ')') if CONF.get('ai_api_key')
         else 'AI 도우미:   자료 발췌형 (자연어 답변은 config.json의 ai_api_key에 Claude API 키 입력)',
     ])
     threading.Thread(target=index_loop, daemon=True).start()
