@@ -2215,12 +2215,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 7의 가로획 위 모서리(1시) = 47망, 8시→6시 사선 아래 모서리(7시) = 디브리핑룸, 나머지 4칸 = S·A·CH·IL(읽으면 SACHIL).
   // 칸은 SVG 다각형(틈·둥근 모서리)이라 보이는 모양 그대로 눌린다. 좌표는 화면 비율(0~1)
   const HZ={
-    pts:{P12:[.50,0], R2:[1,.36], L4:[0,.52], R7:[1,.45], L8:[0,.64], B6:[.50,1], V1:[.42,.36], V2:[.33,.58], TL:[0,0], TR:[1,0], BR:[1,1], BL:[0,1]},
+    pts:{P12:[.40,0], R2:[1,.42], L4:[0,.54], R7:[1,.48], L8:[0,.62], B6:[.60,1], V1:[.36,.40], V2:[.27,.64], TL:[0,0], TR:[1,0], BR:[1,1], BL:[0,1]},
     X:{},
     reg:{search:['TL','P12','L4'], ai:['P12','R2','R7','L4'], chat:['P12','TR','R2'], board:['L4','R7','B6','L8'], log:['R7','BR','B6'], debrief:['L8','B6','BL']},
     // 한 번에 그은 획: 12시 ↙ 꺾어 → 가로획(4·7 공유) ↙ 6시  +  4의 세로획(칸 경계 아님)
-    strokes:[['P12','L4','R7','B6'],['V1','V2']],
-    lab:{search:[.15,.12], ai:[.60,.27], board:[.55,.63], log:[.82,.92]}};
+    strokes:[['P12','L4','R7','B6'],['V1','V2']]};
   function renderHub(panel){
     const corner=h=>h.go==='chat'
       ? `<span class="hz-k tr" data-k="chat" aria-hidden="true"><span class="r1"><b>${h.t}</b><span class="ic">${h.ic}</span></span><span class="hd">${h.d}</span></span>`
@@ -2263,7 +2262,28 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     Object.entries(HZ.reg).forEach(([k,names])=>{ const el=h.querySelector(`[data-p="${k}"]`); if(el) el.setAttribute('d',hzPath(names.map(n=>pt[n]),gap,rad)); });
     HZ.strokes.forEach((names,i)=>{ const el=h.querySelector(`[data-s="${i}"]`); if(el) el.setAttribute('d',hzStroke(names.map(n=>pt[n]),W<600?26:40)); });
     h.querySelector('.hz-svg').setAttribute('viewBox',`0 0 ${W} ${H}`);
-    Object.entries(HZ.lab).forEach(([k,[x,y]])=>{ const el=h.querySelector(`[data-l="${k}"]`); if(el){ el.style.left=(x*W)+'px'; el.style.top=(y*H)+'px'; } });
+    // S·A·CH·IL 글자 블록: 칸 안에서 경계·획으로부터 가장 넉넉한 자리(화면마다 다시 계산 → 어느 기기에서도 균형)
+    const segD=(p,A,B)=>{ const dx=B[0]-A[0], dy=B[1]-A[1], L=dx*dx+dy*dy||1; let t=((p[0]-A[0])*dx+(p[1]-A[1])*dy)/L; t=Math.max(0,Math.min(1,t)); return Math.hypot(p[0]-A[0]-t*dx, p[1]-A[1]-t*dy); };
+    const strokeSegs=[]; HZ.strokes.forEach(n=>{ for(let i=0;i<n.length-1;i++) strokeSegs.push([pt[n[i]],pt[n[i+1]]]); });
+    const place=(k,el)=>{
+      const poly=HZ.reg[k].map(n=>pt[n]), n=poly.length, cx=poly.reduce((s,p)=>s+p[0],0)/n, cy=poly.reduce((s,p)=>s+p[1],0)/n;
+      const edges=poly.map((p,i)=>{ const q=poly[(i+1)%n]; let nx=-(q[1]-p[1]), ny=q[0]-p[0]; const L=Math.hypot(nx,ny)||1; nx/=L; ny/=L; if((cx-p[0])*nx+(cy-p[1])*ny<0){ nx=-nx; ny=-ny; } return [p,nx,ny]; });
+      const inside=q=>Math.min(...edges.map(([p,nx,ny])=>(q[0]-p[0])*nx+(q[1]-p[1])*ny));   // 칸 안쪽 거리(음수면 밖)
+      const bw=el.offsetWidth/2, bh=el.offsetHeight/2;
+      const xs=poly.map(p=>p[0]), ys=poly.map(p=>p[1]), x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys);
+      let best=null, bs=-1e9;
+      for(let i=1;i<28;i++) for(let j=1;j<28;j++){
+        const c=[x0+(x1-x0)*i/28, y0+(y1-y0)*j/28];
+        const pts4=[[c[0]-bw,c[1]-bh],[c[0]+bw,c[1]-bh],[c[0]-bw,c[1]+bh],[c[0]+bw,c[1]+bh],[c[0],c[1]-bh],[c[0],c[1]+bh],[c[0]-bw,c[1]],[c[0]+bw,c[1]]];
+        let sc=Math.min(...pts4.map(inside));
+        strokeSegs.forEach(([A,B])=>{ sc=Math.min(sc, ...pts4.map(q=>segD(q,A,B)), segD(c,A,B)-Math.max(bw,bh)); });
+        sc-=Math.hypot(c[0]-cx,c[1]-cy)*0.04;   // 비슷하면 칸 가운데 쪽
+        if(sc>bs){ bs=sc; best=c; }
+      }
+      if(best){ el.style.left=best[0]+'px'; el.style.top=best[1]+'px'; }
+      return bs;
+    };
+    ['search','ai','board','log'].forEach(k=>{ const el=h.querySelector(`[data-l="${k}"]`); if(!el) return; el.classList.remove('sm'); if(place(k,el)<6){ el.classList.add('sm'); place(k,el); } });   // 안 들어가면 한 단계 작게
     // 모서리 칸(47망·디브리핑룸): 글은 직각 모서리 쪽에 붙이고, 빗변을 넘으면 설명 글씨를 줄이거나 뺀다
     const hb=h.getBoundingClientRect(), pad=gap+12;
     const side=(A,B,p)=>((B[0]-A[0])*(p[1]-A[1])-(B[1]-A[1])*(p[0]-A[0]))/Math.hypot(B[0]-A[0],B[1]-A[1]);
@@ -3045,6 +3065,7 @@ body.hubview footer{display:none}
 .hz-l .sg-CH,.hz-l .sg-IL{height:42px}
 .hz-l b{font-size:15px;font-weight:800;color:var(--fg);letter-spacing:-.005em}
 .hz-l[data-l="search"] b,.hz-l[data-l="log"] b{font-size:13.5px}
+.hz-l.sm .sg{height:34px!important} .hz-l.sm b{font-size:12px!important}
 .hz-k{position:absolute;display:flex;flex-direction:column;gap:3px;pointer-events:none;color:var(--fg);white-space:nowrap;--fs:1}
 .hz-k.tr{top:18px;right:18px;align-items:flex-end;text-align:right}
 .hz-k.bl{bottom:18px;left:18px;align-items:flex-start;text-align:left}
@@ -3054,7 +3075,7 @@ body.hubview footer{display:none}
 .hz-k .ic svg{width:70%;height:70%}
 .hz-k b{font-size:calc(20px*var(--fs));font-weight:800;line-height:1.15}
 .hz-k .hd{font-size:calc(11px*var(--fs));line-height:1.4;font-weight:600;color:#4a3d00;letter-spacing:-.02em}
-.hz-k.s1 .hd{font-size:calc(10px*var(--fs))}
+.hz-k.s1 .hd{font-size:calc(9.5px*var(--fs));letter-spacing:-.04em}
 .hz-k.s2 .hd{display:none}
 @media (min-width:600px){ .hz-l .sg{height:68px} .hz-l[data-l="search"] .sg{height:56px} .hz-l .sg-CH,.hz-l .sg-IL{height:58px} .hz-l b{font-size:19px} .hz-l[data-l="search"] b,.hz-l[data-l="log"] b{font-size:17px} .hz-k.tr{top:24px;right:26px} .hz-k.bl{bottom:24px;left:26px} }
 @media (max-height:680px){ .hz-l .sg{height:38px} .hz-l[data-l="search"] .sg{height:30px} .hz-l .sg-CH,.hz-l .sg-IL{height:32px} .hz-l b{font-size:13px} .hz-l[data-l="search"] b,.hz-l[data-l="log"] b{font-size:12px} .hz-l{gap:3px} .hz-k .ic{width:30px;height:30px} .hz-k b{font-size:17px} }
