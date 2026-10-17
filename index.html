@@ -176,7 +176,11 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .phases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 /* 상황 박스 — 화재·인명 (역할 공통) */
 .situ{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.il-situ{margin:0 0 16px}
+.il-situ{margin:12px 0 16px}
+.ilbar .ilt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ilbar .ilt b{font-size:17px;color:var(--navy)}
+.ilbar .ilt span{font-size:12px;color:var(--muted)}
+#sec-reps{scroll-margin-top:120px}
 .il-h{margin:4px 4px 8px;font-size:15px;font-weight:800}
 .situ .phase{border-color:var(--line);box-shadow:inset 0 3px 0 var(--navy)}
 .situ .st{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
@@ -705,7 +709,7 @@ footer b{color:var(--muted);font-weight:600}
   <div class="grip" aria-hidden="true"></div>
   <header><h2 id="sheetTitle"><i class="sg sg-MENU" role="img" aria-label="메뉴"></i></h2><button type="button" class="close" id="sheetClose" aria-label="닫기">×</button></header>
   <div class="sheet-grid" id="sheetGrid"></div>
-  <div class="foot"><span id="sheetFoot">자료 12개 섹션</span><button type="button" class="inst-menu" id="instMenu" hidden>앱 설치</button><a href="#login">교관 로그인</a></div>
+  <div class="foot"><span id="sheetFoot">자료 12개 섹션</span><button type="button" class="inst-menu" id="instMenu" hidden>앱 설치</button><a href="#login">교수 로그인</a></div>
 </section>
 
 <div class="report" id="report" role="dialog" aria-modal="true" aria-labelledby="repTitle" hidden>
@@ -999,7 +1003,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const ROOMS_R=['chat','debrief'];   // 채팅방 화면: chat=47망, debrief=디브리핑룸
   // ---------- 끌어서 넘기기 (손가락·마우스) ----------
   // 순서: 47망 → S → A → CH → IL → 메뉴. 오른쪽→왼쪽으로 끌면 다음, 왼쪽→오른쪽으로 끌면 이전.
-  // 메뉴 안의 항목 화면(SOP 등)·교관 로그인은 '메뉴' 자리로 본다.
+  // 메뉴 안의 항목 화면(SOP 등)·교수 로그인은 '메뉴' 자리로 본다.
   const SEQ=['hub','search','ai','board','log','menu'];   // 첫 화면(6개 박스) → S → A → CH → IL → 메뉴. 47망·디브리핑룸은 첫 화면 자리
   const SEQ_NAME={hub:'첫 화면',search:'S 검색',ai:'A AI 도우미',board:'CH 체크리스트',log:'IL 사고보고서',menu:'메뉴'};
   const seqPos=()=>sheet.classList.contains('open') ? 5 : (ROOMS_R.includes(state.route) ? 0 : SEQ.indexOf(state.route)>=0 ? SEQ.indexOf(state.route) : 5);
@@ -1218,7 +1222,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     else if(r==='hub') renderHub(panel);
     else if(r==='chat') renderChat(panel,'net');
     else if(r==='debrief') renderChat(panel,'deb');
-    else if(r==='login') renderPrep(panel,{slug:'login',title:'교관 로그인',desc:'교관·심의자 계정으로 기수 등록, 콘텐츠 승인, 채점, 심의를 수행하는 화면입니다.'});
+    else if(r==='login') renderProf(panel);
     else renderPrep(panel, SECTIONS.find(s=>s.slug===r));
   }
 
@@ -1312,6 +1316,76 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       </div>`;
   }
 
+  // ---------- 교수 로그인(V79): 관리자 코드로 들어와 메뉴 자료 올리기·지우기, 질의응답 답변 ----------
+  // 교수 토큰은 대화방 대화명(SRVTOK)과 따로 둔다 — 교수로 들어와도 47망 대화명이 바뀌지 않게
+  const profKey=()=>'sachil_prof:'+(SRVBASE||location.origin);   // SRVBASE는 아래에서 정해지므로 쓸 때 계산
+  const PROF={_t:null, ok:false, checked:false, get tok(){ if(this._t===null){ try{ this._t=localStorage.getItem(profKey())||''; }catch(_){ this._t=''; } } return this._t; }};
+  const setProf=t=>{ PROF._t=t||''; PROF.ok=!!t; try{ if(t) localStorage.setItem(profKey(),t); else localStorage.removeItem(profKey()); }catch(_){ } };
+  const isProf=()=>PROF.ok;
+  async function checkProf(){
+    if(!PROF.tok||!SRV.on){ PROF.ok=false; PROF.checked=true; return false; }
+    const r=await api('/api/me',{tok:PROF.tok}); PROF.checked=true;
+    PROF.ok=!!(r.ok&&r.j.user&&r.j.user.role==='admin'); if(r.ok&&!PROF.ok) setProf('');
+    return PROF.ok;
+  }
+  function renderProf(panel){
+    const draw=()=>{
+      if(isProf()){
+        panel.innerHTML=`<div class="dbwrap"><section class="card create prof">
+            <span class="eyebrow">교수 로그인</span>
+            <h2>교수로 로그인되어 있습니다</h2>
+            <ul class="prof-do"><li>메뉴의 각 섹션에서 <b>자료 올리기</b>·<b>지우기</b></li><li><b>주요 질의응답</b>에서 질문에 답변·삭제</li></ul>
+            <div class="acts"><button type="button" class="btn ghost" id="profOut">로그아웃</button><button type="button" class="btn primary" id="profMenu">메뉴 열기</button></div>
+          </section></div>`;
+        $('#profOut').addEventListener('click',async()=>{ await api('/api/logout',{json:{},tok:PROF.tok}); setProf(''); draw(); });
+        $('#profMenu').addEventListener('click',()=>{ const b=$('#menuBtn'); if(b) b.click(); });
+        return;
+      }
+      panel.innerHTML=`<div class="dbwrap"><form class="card create prof" id="profForm" autocomplete="off">
+          <span class="eyebrow">교수 로그인</span>
+          <div class="row"><label for="profCode">관리자 코드</label><input id="profCode" type="password" maxlength="40" required enterkeyhint="go" autocomplete="off"></div>
+          ${SRV.on?'':'<p class="note">서버에 연결되어야 로그인할 수 있습니다.</p>'}
+          <p class="note err" id="profErr" role="alert" hidden></p>
+          <div class="acts"><button type="button" class="btn ghost" id="profHome">첫 화면으로</button><button type="submit" class="btn primary" id="profGo" ${SRV.on?'':'disabled'}>로그인</button></div>
+        </form></div>`;
+      $('#profHome').addEventListener('click',goHome);
+      $('#profForm').addEventListener('submit',async e=>{
+        e.preventDefault(); const code=$('#profCode').value.trim(), err=$('#profErr'), btn=$('#profGo'); if(!code) return;
+        btn.disabled=true; err.hidden=true;
+        const r=await api('/api/login',{json:{name:'교수',code},tok:''}); btn.disabled=false;
+        if(r.ok&&r.j.user&&r.j.user.role==='admin'){ setProf(r.j.token||'cookie'); if(!r.j.token) PROF.ok=true; toast('교수로 로그인했습니다'); draw(); return; }
+        err.textContent=r.ok?'관리자 코드가 아닙니다':(r.j.error||'로그인하지 못했습니다'); err.hidden=false; $('#profCode').select();
+      });
+    };
+    draw();
+    if(!PROF.checked&&PROF.tok) checkProf().then(()=>{ if(state.route==='login') draw(); });
+  }
+  // 교수: 섹션 자료 올리기·지우기
+  function profLibBar(slug){ return isProf()&&SRV.on?`<div class="prof-up"><label class="btn primary"><input type="file" id="libUp" multiple hidden>자료 올리기</label><span class="pu-st" id="libUpSt" aria-live="polite"></span></div>`:''; }
+  async function profUpload(slug,files,done){
+    const st=$('#libUpSt'); let ok=0;
+    for(let i=0;i<files.length;i++){ const f=files[i]; if(st) st.textContent=`올리는 중 ${i+1}/${files.length} · ${f.name}`;
+      const r=await api(`/api/lib/${slug}/upload`,{body:f,headers:{'Content-Type':f.type||'application/octet-stream','X-Filename':encodeURIComponent(f.name)},tok:PROF.tok});
+      if(r.ok){ ok++; if(SRV.lib) SRV.lib[slug]=r.j.files; } else toast(`${f.name}: ${r.j.error||'올리지 못했습니다'}`); }
+    if(st) st.textContent=''; if(ok) toast(`${ok}개 올림 · 본문 검색·AI 반영은 1분쯤 걸립니다`); done();
+  }
+  // ---------- 주요 질의응답(V79): 누구나 질문, 교수가 답변 ----------
+  function qnaHtml(items){
+    const prof=isProf();
+    return `<section class="qna" id="qna"><h4>질문하기</h4>
+      <form class="qna-ask" id="qnaForm" autocomplete="off">
+        <input id="qnaName" maxlength="12" placeholder="이름(비우면 익명)" aria-label="이름">
+        <textarea id="qnaQ" maxlength="500" rows="3" placeholder="궁금한 점을 적어 주세요" aria-label="질문" required></textarea>
+        <button type="submit" class="btn primary" ${SRV.on?'':'disabled'}>질문 올리기</button>
+      </form>
+      ${SRV.on?'':'<p class="none">서버에 연결되면 질문을 올리고 볼 수 있습니다.</p>'}
+      <h4>질문 ${items?items.length:0}</h4>
+      <ul class="qna-list">${(items||[]).map(it=>`<li data-qid="${it.id}">
+          <div class="qq"><b>Q</b><p>${esc(it.q)}</p><small>${esc(it.name)} · ${esc(fmtDate(it.ts))}</small></div>
+          ${it.a?`<div class="qa"><b>A</b><p>${esc(it.a)}</p><small>교수 답변 · ${esc(fmtDate(it.a_ts))}</small></div>`:'<div class="qa wait"><small>답변 대기</small></div>'}
+          ${prof?`<div class="qna-adm"><textarea maxlength="2000" rows="2" data-ans placeholder="답변 입력">${esc(it.a)}</textarea><button type="button" class="btn primary" data-save>답변 저장</button><button type="button" class="btn ghost" data-qdel>삭제</button></div>`:''}
+        </li>`).join('')}</ul></section>`;
+  }
   function renderLibSection(panel,s){
     const gen=SRV.gen;
     const art = s.icon ? `<img class="big" src="${s.icon}" alt="">` : '';
@@ -1328,13 +1402,29 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
             : files.length?`<h4>자료 ${files.length}</h4>${files.map(f=>libRow(s.slug,f)).join('')}${SRV.libErr?'<p class="none"><b>서버 연결 끊김 — 마지막으로 받은 목록입니다</b> <button type="button" class="btn ghost" id="libRetry">다시 시도</button></p>':''}`
             : `<p class="none">${SRV.libErr&&AS.offline?`<img class="st-illo" src="${AS.offline}" alt="">`:''}${SRV.libErr?'서버 연결이 끊겨 자료 목록을 확인하지 못했습니다. <button type="button" class="btn ghost" id="libRetry">다시 시도</button>':'아직 올라온 자료가 없습니다.'}</p>`}
         </div>
+        ${profLibBar(s.slug)}
+        ${s.slug==='faq'?qnaHtml(qItems):''}
         <div class="links">
           <a class="btn" href="#search">검색으로 돌아가기</a>
           <a class="btn ghost" href="#board">체크리스트 열기</a>
         </div>
       </div>`;
+      bindExtra();
     };
-    const go=()=>{ draw(); thumbsIn(panel); loadLib().then(()=>{ if(SRV.gen!==gen) return; draw(); thumbsIn(panel); const b=$('#libRetry'); if(b) b.addEventListener('click',go); }); };
+    let qItems=null;
+    const bindExtra=()=>{
+      const up=$('#libUp'); if(up) up.addEventListener('change',()=>{ const fs=[...up.files]; up.value=''; if(fs.length) profUpload(s.slug,fs,()=>{ if(SRV.gen===gen){ draw(); thumbsIn(panel); } }); });
+      if(isProf()) panel.querySelectorAll('.lib .libfile').forEach(a=>{ const nm=decodeURIComponent((a.getAttribute('href')||'').split('/').pop().split('?')[0]); const del=document.createElement('button'); del.type='button'; del.className='btn ghost lib-del'; del.textContent='지우기';
+        a.after(del); del.addEventListener('click',()=>arm(del,'정말 지우기',async()=>{ const r=await api(`/api/lib/${s.slug}/${encodeURIComponent(nm)}`,{method:'DELETE',tok:PROF.tok}); if(r.ok){ if(SRV.lib) SRV.lib[s.slug]=r.j.files; draw(); thumbsIn(panel); toast('지웠습니다(서버 data\\trash에 보관)'); } else toast(r.j.error||'지우지 못했습니다'); })); });
+      const qf=$('#qnaForm'); if(qf) qf.addEventListener('submit',async e=>{ e.preventDefault(); const qv=$('#qnaQ').value.trim(); if(qv.length<2) return; const btn=qf.querySelector('button'); btn.disabled=true;
+        const r=await api('/api/qna',{json:{q:qv,name:$('#qnaName').value.trim()}}); btn.disabled=false;
+        if(r.ok){ qItems=r.j.items; toast('질문을 올렸습니다'); draw(); } else toast(r.j.error||'올리지 못했습니다'); });
+      panel.querySelectorAll('.qna-list [data-save]').forEach(b=>b.addEventListener('click',async()=>{ const li=b.closest('li'), a=li.querySelector('[data-ans]').value.trim(); b.disabled=true;
+        const r=await api(`/api/qna/${li.dataset.qid}/answer`,{json:{a},tok:PROF.tok}); b.disabled=false; if(r.ok){ qItems=r.j.items; toast('답변을 저장했습니다'); draw(); } else toast(r.j.error||'저장하지 못했습니다'); }));
+      panel.querySelectorAll('.qna-list [data-qdel]').forEach(b=>b.addEventListener('click',()=>arm(b,'정말 삭제',async()=>{ const li=b.closest('li'); const r=await api(`/api/qna/${li.dataset.qid}`,{method:'DELETE',tok:PROF.tok}); if(r.ok){ qItems=r.j.items; draw(); } else toast(r.j.error||'삭제하지 못했습니다'); })));
+    };
+    const loadQna=async()=>{ if(s.slug!=='faq'||!SRV.on) return; const r=await api('/api/qna'); if(SRV.gen!==gen) return; if(r.ok){ qItems=r.j.items; draw(); thumbsIn(panel); } };
+    const go=()=>{ draw(); thumbsIn(panel); loadLib().then(()=>{ if(SRV.gen!==gen) return; draw(); thumbsIn(panel); const b=$('#libRetry'); if(b) b.addEventListener('click',go); }); loadQna(); if(PROF.tok&&!PROF.checked) checkProf().then(()=>{ if(SRV.gen===gen&&isProf()) draw(); }); };
     go();
   }
 
@@ -1366,7 +1456,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     (r||window).scrollBy({top:dy,behavior:'smooth'});
   }
   function syncJump(){
-    if(state.route!=='board' || Date.now()<jumpLock) return;
+    if((state.route!=='board'&&state.route!=='log') || Date.now()<jumpLock) return;
     const nav=$('#jump'); if(!nav) return;
     const off=jumpOffset()+12; let cur='';
     nav.querySelectorAll('button').forEach(b=>{ const t=document.getElementById(b.dataset.j); if(t && t.getBoundingClientRect().top<=off) cur=b.dataset.j; });
@@ -1914,14 +2004,19 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     panel.innerHTML=`
       <div class="panel-head">
         <div><span class="eyebrow">IL · Incident Log</span><h2 style="margin-top:4px">사고보고서</h2></div>
-        <button type="button" class="btn primary" id="mkReport">보고서 만들기</button>
+      </div>
+      <div class="card timer ilbar" id="timerBar">
+        <div class="ilt"><b>현장 기록</b><span>${SITU.filter(b=>situStatus(b).cls).length}/${SITU.length} 입력</span></div>
+        <div class="btns"><button type="button" class="btn primary" id="mkReport">보고서 만들기</button></div>
+        <div class="jrow"><nav class="jump" id="jump" aria-label="항목 바로가기"><div class="jl">${SITU.map(b=>{const st=situStatus(b); return `<button type="button" data-j="sec-${b.id}"><i class="d ${st.cls}" aria-hidden="true"></i>${esc(b.name.replace(/\s+/g,''))}</button>`;}).join('')}<button type="button" data-j="sec-reps">작성된 보고서 <span class="c">${reports.length}</span></button></div></nav></div>
       </div>
       <div class="il-situ">${situHtml()}</div>
-      <h3 class="il-h">작성된 보고서</h3>
+      <h3 class="il-h" id="sec-reps">작성된 보고서</h3>
       <div class="card replist">${rows || `<div class="rep-empty">${AS.ilEmpty?`<img src="${AS.ilEmpty}" alt="">`:''}<p>아직 보고서가 없습니다. 위 현장 기록과 <b>CH 체크리스트</b>를 채우고 <b>보고서 만들기</b>를 누르면 여기에 쌓입니다.</p><a class="btn" href="#board">체크리스트 열기</a></div>`}</div>
       <p class="hint-row" style="margin:10px 4px 0;font-size:12px;color:var(--muted-2)">보고서는 이 기기에만 저장됩니다 · ${reports.length}건 (최대 ${MAX_REPORTS}건)${storageFull?' · <b>저장 공간 부족</b>':''}</p>`;
     panel.querySelectorAll('[data-rep]').forEach(b=>b.addEventListener('click',()=>{ const r=reports.find(x=>x.id===b.dataset.rep); if(r) openReport(r); }));
     $('#mkReport').addEventListener('click',newReport);
+    bindJump(panel);
     bindSitu(panel,()=>{ const y=(scrollRoot()||document.scrollingElement).scrollTop; renderReports(panel); (scrollRoot()||document.scrollingElement).scrollTop=y; });
     panel.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>arm(b,'정말 삭제',()=>{ reports=reports.filter(x=>x.id!==b.dataset.del); rpsave(); renderReports(panel); })));
   }
@@ -2260,7 +2355,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     X:{},
     reg:{search:['TL','A1','M1','LM'], ai:['A1','A2','M2','M1'], chat:['A2','TR','RM','M2'], debrief:['LM','M1','B1','BL'], board:['M1','M2','B2','B1'], log:['M2','RM','BR','B2']},
     strokes:[['A1','M1','M2','B2'],['V1','V2']],
-    lab:{search:[.14,.26], ai:[.52,.31], board:[.48,.69], log:[.86,.74]}};   // 글자 자리도 화면 중심 점대칭
+    lab:{search:[.14,.26], ai:[.52,.31], board:[.48,.69], log:[.86,.74], chat:[.84,.23], debrief:[.16,.77]}};   // 글자 자리도 화면 중심 점대칭
   function renderHub(panel){
     const corner=h=>h.go==='chat'
       ? `<span class="hz-k tr" data-k="chat" aria-hidden="true"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd w">지휘·작전망으로 어려운 내용<br>47망으로 전달하세요</span><span class="hd n">지휘·작전망으로<br>어려운 내용<br>47망으로<br>전달하세요</span></span>`
@@ -2342,7 +2437,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const el=h.querySelector(`[data-k="${k}"]`); if(!el) return; const poly=HZ.reg[k].map(n=>pt[n]);
       const fits=()=>[...el.querySelectorAll('.ic,b,.hd')].filter(c=>c.offsetParent).every(c=>{ const rc=c.getBoundingClientRect(); return [[rc.left,rc.top],[rc.right,rc.top],[rc.left,rc.bottom],[rc.right,rc.bottom]].every(([x,y])=>inPoly(poly,[x-hb.left,y-hb.top],gap+6)); });
       el.style.setProperty('--fs', W<600?'1':'1.2');
-      for(const c of ['', 'nar', 'nar s1', 'nar s1 s2']){ el.classList.remove('nar','s1','s2'); if(c) c.split(' ').forEach(x=>el.classList.add(x)); if(fits()) break; }
+      // 정한 자리(47망 1시·디브리핑룸 7시, 화면 중심 점대칭)에 가운데 정렬로 두고, 안 들어가면 줄바꿈→작게, 그래도 안 되면 칸 안 가장 넉넉한 자리
+      let ok=false;
+      for(const c of ['', 'nar', 'nar s1', 'nar s1 s2']){ el.classList.remove('nar','s1','s2'); if(c) c.split(' ').forEach(x=>el.classList.add(x)); place(k,el,false); if(fits()){ ok=true; break; } }
+      if(!ok) for(const c of ['nar', 'nar s1', 'nar s1 s2']){ el.classList.remove('nar','s1','s2'); c.split(' ').forEach(x=>el.classList.add(x)); place(k,el,true); if(fits()) break; }
     });
     if(!h._ro && window.ResizeObserver){ h._ro=new ResizeObserver(()=>{ if(h.isConnected) requestAnimationFrame(fitHub); }); h._ro.observe(h); }   // 늦게 적용되는 스타일·회전·폴드 펼침에도 다시 맞춤
   }
@@ -2387,7 +2485,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   async function api(path, opt){
     opt=opt||{};
     const init={method:opt.method||((opt.json!==undefined||opt.body)?'POST':'GET'), credentials:SRVBASE?'omit':'same-origin', headers:{'X-SACHIL':'1'}};
-    if(SRVBASE&&SRVTOK) init.headers['Authorization']='Bearer '+SRVTOK;
+    const tk=opt.tok!==undefined?opt.tok:SRVTOK;   // 교수 기능은 교수 토큰으로(대화방 대화명과 따로)
+    if(SRVBASE&&tk) init.headers['Authorization']='Bearer '+tk;
     if(opt.json!==undefined){ init.headers['Content-Type']='application/json'; init.body=JSON.stringify(opt.json); }
     else if(opt.body){ init.body=opt.body; Object.assign(init.headers, opt.headers||{}); }
     if(opt.signal) init.signal=opt.signal;
@@ -2787,7 +2886,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.roomDb=r.j.room_debrief||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
       await loadLib();
       if(ROOMS_R.includes(state.route)){ if(DB.agreed){ SRV.notice='서버에 연결되어 공유 대화방으로 바뀌었습니다.'+(wasLocal?' 방금 쓴 내용은 이 기기에만 남습니다.':''); DB.enter=true; } render(); }
-      else if(SECTIONS.some(x=>x.slug===state.route) || (state.route==='search'&&state.query.trim()) || (state.route==='ai'&&!chat.typing)) render();
+      else if(SECTIONS.some(x=>x.slug===state.route) || state.route==='login' || (state.route==='search'&&state.query.trim()) || (state.route==='ai'&&!chat.typing)) render();
       return;
     }
     if(r.status===0 && !r.aborted && attempt<3){ await sleep([5000,15000,30000][attempt]); return detectServer(attempt+1); }
@@ -3099,6 +3198,32 @@ body.hubview #panel{padding-bottom:0}   /* 첫 화면은 6칸이 같은 기능 �
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
 </script>
+<style id="prof-css">
+/* 교수 로그인·자료 올리기·질의응답 (V79) */
+.prof h2{margin:6px 0 10px;font-size:18px}
+.prof-do{margin:0 0 6px;padding-left:18px;line-height:1.7;font-size:14px}
+.prof-up{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0 4px}
+.prof-up label{cursor:pointer}
+.prof-up .pu-st{font-size:12.5px;color:var(--muted)}
+.lib-del{margin:-2px 0 8px auto;display:block;min-height:32px;font-size:12.5px}
+.qna{margin-top:18px;text-align:left}
+.qna h4{margin:14px 0 8px}
+.qna-ask{display:grid;gap:8px}
+.qna-ask input,.qna-ask textarea,.qna-adm textarea{width:100%;font:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);box-sizing:border-box;resize:vertical}
+.qna-ask .btn{justify-self:end}
+.qna-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.qna-list li{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--surface)}
+.qna-list .qq,.qna-list .qa{display:grid;grid-template-columns:24px 1fr;gap:2px 8px}
+.qna-list .qq b,.qna-list .qa b{grid-row:span 2;display:grid;place-items:center;width:24px;height:24px;border-radius:7px;font-size:13px}
+.qna-list .qq b{background:var(--navy-soft);color:var(--navy)}
+.qna-list .qa b{background:var(--ember);color:var(--navy)}
+.qna-list p{margin:0;white-space:pre-wrap;font-size:14.5px;line-height:1.55}
+.qna-list small{color:var(--muted);font-size:12px}
+.qna-list .qa{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.qna-list .qa.wait{display:block}
+.qna-adm{display:grid;grid-template-columns:1fr auto auto;gap:6px;margin-top:10px;align-items:start}
+@media (max-width:599px){ .qna-adm{grid-template-columns:1fr 1fr} .qna-adm textarea{grid-column:1/-1} }
+</style>
 <style id="hub-z-css">
 /* V72 첫 화면 — 칸막이가 손글씨 '47'. 색은 기존 그대로: 칸=흰 바탕·회색 테두리, 47망·디브리핑룸=심벌 옐로, 획=인천 오션 */
 .hub.hz{position:relative;display:block;max-width:760px;margin:4px auto 0}
@@ -3120,24 +3245,22 @@ body.hubview #panel{padding-bottom:0}   /* 첫 화면은 6칸이 같은 기능 �
 .hz-l b{font-size:15px;font-weight:800;color:var(--fg);letter-spacing:-.005em}
 .hz-l[data-l="search"] b,.hz-l[data-l="log"] b{font-size:13.5px}
 .hz-l.sm .sg{height:34px!important} .hz-l.sm b{font-size:12px!important}
-.hz-k{position:absolute;display:flex;flex-direction:column;gap:3px;pointer-events:none;color:var(--fg);white-space:nowrap;--fs:1}
-.hz-k.tr{top:16px;right:16px;align-items:flex-end;text-align:right}
-.hz-k.bl{bottom:16px;left:16px;align-items:flex-start;text-align:left}
+.hz-k{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;pointer-events:none;color:var(--fg);white-space:nowrap;--fs:1}   /* V79: 칸 안 가운데(아이콘 > 이름 > 설명) */
 .hz-k .r1{display:flex;align-items:center;gap:8px}
-.hz-k .ic{display:grid;place-items:center;width:calc(38px*var(--fs));height:calc(38px*var(--fs));border-radius:11px;background:#fff;overflow:hidden;box-shadow:0 2px 6px rgba(36,78,162,.15)}
+.hz-k .ic{display:grid;place-items:center;width:calc(46px*var(--fs));height:calc(46px*var(--fs));margin-bottom:2px;border-radius:11px;background:#fff;overflow:hidden;box-shadow:0 2px 6px rgba(36,78,162,.15)}
 .hz-k .ic img{width:100%;height:100%;display:block}
 .hz-k .ic svg{width:70%;height:70%}
-.hz-k b{font-size:calc(20px*var(--fs));font-weight:800;line-height:1.15}
-.hz-k .hd{font-size:calc(11px*var(--fs));line-height:1.4;font-weight:600;color:#4a3d00;letter-spacing:-.02em}
+.hz-k b{font-size:calc(21px*var(--fs));font-weight:800;line-height:1.15}
+.hz-k .hd{font-size:calc(11.5px*var(--fs));line-height:1.4;font-weight:600;color:#4a3d00;letter-spacing:-.02em}
 .hz-k .hd.n{display:none}
 .hz-k.nar .hd.w{display:none}
 .hz-k.nar .hd.n{display:block}
 .hz-k.s1 b{font-size:calc(17px*var(--fs))}
-.hz-k.s1 .ic{width:calc(32px*var(--fs));height:calc(32px*var(--fs))}
-.hz-k.s1 .hd{font-size:calc(10.5px*var(--fs))}
+.hz-k.s1 .ic{width:calc(38px*var(--fs));height:calc(38px*var(--fs))}
+.hz-k.s1 .hd{font-size:calc(11px*var(--fs))}
 .hz-k.s2 b{font-size:15px}
-.hz-k.s2 .ic{width:26px;height:26px}
-.hz-k.s2 .hd{font-size:10px;line-height:1.3}
+.hz-k.s2 .ic{width:32px;height:32px}
+.hz-k.s2 .hd{font-size:10.5px;line-height:1.3}
 @media (min-width:600px){ .hz-l .sg{height:68px} .hz-l[data-l="search"] .sg{height:56px} .hz-l .sg-CH,.hz-l .sg-IL{height:58px} .hz-l b{font-size:19px} .hz-l[data-l="search"] b,.hz-l[data-l="log"] b{font-size:17px} .hz-k.tr{top:24px;right:26px} .hz-k.bl{bottom:24px;left:26px} }
 @media (max-height:680px){ .hz-l .sg{height:38px} .hz-l[data-l="search"] .sg{height:30px} .hz-l .sg-CH,.hz-l .sg-IL{height:32px} .hz-l b{font-size:13px} .hz-l[data-l="search"] b,.hz-l[data-l="log"] b{font-size:12px} .hz-l{gap:3px} .hz-k .ic{width:30px;height:30px} .hz-k b{font-size:17px} }
 </style>
