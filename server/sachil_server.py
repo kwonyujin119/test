@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '2.4'
-APP_VERSION = 'V87'
+VERSION = '2.5'
+APP_VERSION = 'V88'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -61,6 +61,14 @@ for _slug, _dir in SECTIONS:
 
 
 # ---------------------------------------------------------------- 설정
+def admin_hash(code):
+    code = re.sub(r'[\s\-]', '', str(code or '')).lower()
+    return hashlib.pbkdf2_hmac('sha256', code.encode('utf-8'), b'sachil47-admin', 200000).hex()
+
+
+ADMIN_HASH_DEFAULT = '8f10e3c36e2248787d879a69c83a7b9407a567a10d06a6223ff70aafa93217a2'
+
+
 def load_conf():
     conf = {}
     if os.path.exists(CONF_PATH):
@@ -72,7 +80,7 @@ def load_conf():
     changed = False
     defaults = {
         'access_code': ''.join(secrets.choice('0123456789') for _ in range(8)),
-        'admin_code': secrets.token_urlsafe(9),
+        'admin_code_hash': ADMIN_HASH_DEFAULT,   # 관리자(교수) 코드는 해시로만 저장(V88). 바꾸기: --set-admin-code 새코드
         'port': 4747,
         'retention_days': 90,
         'require_code': False,
@@ -89,6 +97,10 @@ def load_conf():
         'allowed_origins': ['https://kwonyujin119.github.io'],   # 이 서버에 접속을 허용할 외부 앱 주소(github.io)
         'app_url': 'https://kwonyujin119.github.io/test/',       # 교육생에게 줄 앱 주소(뒤에 ?srv=서버주소 가 붙음)
     }
+    # V88: 관리자 코드 교체 — 예전 평문 admin_code는 지우고 새 코드(해시)로 바꾼다(한 번만)
+    if 'admin_code_hash' not in conf:
+        conf.pop('admin_code', None)
+        changed = True
     for k, v in defaults.items():
         if k not in conf:
             conf[k] = v
@@ -115,6 +127,13 @@ def load_conf():
 
 CONF = load_conf()
 norm_code = lambda s: re.sub(r'[\s\-]', '', str(s or ''))
+
+
+def is_admin_code(code):
+    if CONF.get('admin_code') and secrets.compare_digest(norm_code(code).encode(), norm_code(CONF['admin_code']).encode()):
+        return True   # config.json에 admin_code(평문)를 직접 적어 둔 경우도 받아 준다
+    h = str(CONF.get('admin_code_hash') or '')
+    return bool(h) and secrets.compare_digest(admin_hash(code), h)
 
 
 # ---------------------------------------------------------------- DB
@@ -537,17 +556,19 @@ class H(BaseHTTPRequestHandler):
         return self.headers.get('X-Forwarded-Proto') == 'https' or bool(self.headers.get('CF-Connecting-IP'))
 
     def get_user(self):
-        c = self.headers.get('Cookie', '')
-        m = re.search(r'(?:^|;\s*)sachil=([A-Za-z0-9_\-]{20,})', c)
-        tok = m.group(1) if m else None
-        if not tok:   # github.io 같은 외부 앱은 쿠키 대신 토큰을 헤더(또는 사진 주소의 ?t=)로 보낸다
-            a = re.fullmatch(r'Bearer ([A-Za-z0-9_\-]{20,})', (self.headers.get('Authorization') or '').strip())
-            if a:
-                tok = a.group(1)
-            else:
-                t = urllib.parse.parse_qs(self.path.partition('?')[2]).get('t', [''])[0]
-                if re.fullmatch(r'[A-Za-z0-9_\-]{20,}', t):
-                    tok = t
+        # 토큰(헤더 → 사진 주소의 ?t=)이 먼저, 없으면 쿠키. V88: 47망·디브리핑룸이 대화명(토큰)을 따로 쓰므로
+        # 같은 주소로 열어도 방별 토큰이 쿠키 하나보다 앞선다
+        tok = None
+        a = re.fullmatch(r'Bearer ([A-Za-z0-9_\-]{20,})', (self.headers.get('Authorization') or '').strip())
+        if a:
+            tok = a.group(1)
+        else:
+            t = urllib.parse.parse_qs(self.path.partition('?')[2]).get('t', [''])[0]
+            if re.fullmatch(r'[A-Za-z0-9_\-]{20,}', t):
+                tok = t
+        if not tok:
+            m = re.search(r'(?:^|;\s*)sachil=([A-Za-z0-9_\-]{20,})', self.headers.get('Cookie', ''))
+            tok = m.group(1) if m else None
         if not tok:
             return None
         r = q('SELECT id,name,role,seen FROM sessions WHERE token=?', (th(tok),), one=True)
@@ -1104,9 +1125,9 @@ class H(BaseHTTPRequestHandler):
             return self.err(400, '대화명을 입력하세요')
         role = None
         if code:
-            if secrets.compare_digest(code, norm_code(CONF['admin_code'])):
+            if is_admin_code(code):
                 role = 'admin'
-            elif secrets.compare_digest(code, norm_code(CONF['access_code'])):
+            elif secrets.compare_digest(code.encode(), norm_code(CONF['access_code']).encode()):
                 role = 'user'
         elif not CONF.get('require_code'):
             role = 'user'
@@ -1130,9 +1151,7 @@ class H(BaseHTTPRequestHandler):
                 (th(token), name, role, now, now, ip), commit=True)
         self.user = {'id': sid, 'name': name, 'role': role}
         cookie = f'sachil={token}; Path=/; Max-Age={SESSION_DAYS * 86400}; HttpOnly; SameSite=Strict' + ('; Secure' if self.secure() else '')
-        out = {'ok': True, 'user': self.user}
-        if self.cors_origin():   # 외부 앱(github.io)은 쿠키를 못 쓰므로 토큰을 직접 넘긴다
-            out['token'] = token
+        out = {'ok': True, 'user': self.user, 'token': token}   # 앱이 방별로 토큰을 따로 보관(V88)
         return self.send(200, out, extra={'Set-Cookie': cookie})
 
     # --- 익명 표시: 디브리핑룸 안에서 처음 글을 쓴 순서대로 '참여자 1, 2…' (이름은 화면에 내보내지 않음)
@@ -2143,6 +2162,18 @@ def run_tunnel(port, named):
 
 
 def main():
+    if '--set-admin-code' in sys.argv:
+        i = sys.argv.index('--set-admin-code')
+        new = norm_code(' '.join(sys.argv[i + 1:]))
+        if len(new) < 6:
+            print('관리자 코드는 6자 이상으로 정하세요.')
+            sys.exit(1)
+        CONF['admin_code_hash'] = admin_hash(new)
+        CONF.pop('admin_code', None)
+        with open(CONF_PATH, 'w', encoding='utf-8') as f:
+            json.dump(CONF, f, ensure_ascii=False, indent=2)
+        print('관리자 코드 변경 완료 (config.json에는 해시로만 저장)')
+        return
     if '--set-token' in sys.argv:
         i = sys.argv.index('--set-token')
         raw = ' '.join(sys.argv[i + 1:])
@@ -2205,7 +2236,7 @@ def main():
         f'같은 망:     http://{lan_ip()}:{port}',
         ('입장 방식:   대화명만 (config.json의 require_code를 true로 바꾸면 입장 코드도 필요)' if not CONF.get('require_code')
          else f'입장 코드:   {CONF["access_code"]}   ← 교육생에게 알려 줄 코드'),
-        f'관리자 코드: {CONF["admin_code"]}   ← 본인만 (입장 화면 "관리자 입장"에 입력, 대화 비우기 가능)',
+        '관리자 코드: ********   ← 본인만 (관리자 입장·교수 로그인. 바꾸기: --set-admin-code 새코드)',
         f'47망(디브리핑룸): 매주 월 04시 오래된 대화 {int(float(CONF.get("weekly_trim_ratio") or 0) * 100)}% 정리 (최근 대화 유지)',
         f'메뉴 자료 폴더: {LIB}',
         ('AI 도우미:   Claude 연결 (도우미 ' + str(CONF.get('ai_assist_model')) + ' · 보고서 ' + str(CONF.get('ai_model')) + f', 하루 {CONF.get("ai_daily_limit") or "무제한"}회' + (', 입장코드 사용' if CONF.get('ai_code') else '') + ')') if CONF.get('ai_api_key')
