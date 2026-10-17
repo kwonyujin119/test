@@ -44,7 +44,7 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '3.6'
+VERSION = '3.7'
 APP_VERSION = 'V101'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
@@ -92,7 +92,10 @@ def load_conf():
         'ai_api_key': '',               # Claude API 키(sk-ant-…). 비우면 AI 도우미는 자료 발췌형으로 답함
         'gemini_api_key': '',           # Google AI Studio API 키(AIza…) — V96. gemini-key-setup.bat으로 넣음
         'gemini_model': 'gemini-flash-latest',   # Gemini 모델 이름(AI Studio에 나온 이름으로 바꿀 수 있음)
-        'ai_provider': 'auto',          # auto(키 있는 쪽, 둘 다면 gemini) | gemini | claude
+        'ai_provider': 'auto',
+        'auto_update': True,            # V102: 서버 파일을 GitHub에서 스스로 받아 다시 켬(접속자 없을 때). false면 끔
+        'update_check_hours': 2,        # 새 버전 확인 간격(시간)
+        'update_url': 'https://raw.githubusercontent.com/kwonyujin119/test/main/server/sachil_server.py',          # auto(키 있는 쪽, 둘 다면 gemini) | gemini | claude
         'ai_model': 'claude-sonnet-5-5',
         'ai_daily_limit': 50,           # 하루 AI 답변 최대 횟수(비용 상한, 교수 로그인은 제외). 0이면 무제한
         'ai_assist_model': 'claude-haiku-5-5',   # AI 도우미 전용 모델(가장 저렴). 보고서는 ai_model
@@ -2089,7 +2092,21 @@ def ai_ready():
     return bool(ai_provider())
 
 
+AI_BUSY = [0]   # 지금 AI 호출 중인 수(자동 업데이트가 이때는 기다린다)
+AI_BUSY_LOCK = threading.Lock()
+
+
 def call_llm(system, msgs, max_tokens, effort='', model=''):
+    with AI_BUSY_LOCK:
+        AI_BUSY[0] += 1
+    try:
+        return _call_llm(system, msgs, max_tokens, effort, model)
+    finally:
+        with AI_BUSY_LOCK:
+            AI_BUSY[0] -= 1
+
+
+def _call_llm(system, msgs, max_tokens, effort='', model=''):
     """설정된 AI 회사로 호출. (본문, 실패 사유, 오류 코드).
     V101: 일시 오류(바쁨·분당 한도 429·연결 끊김)는 2초 뒤 한 번 더 시도하고, 그래도 안 되면 다른 회사 키가 있으면 그쪽으로."""
     prov = ai_provider()
@@ -2338,6 +2355,116 @@ def app_link(url):
     return ['', '교육생 공유 링크 (github.io 앱 + 이 서버 채팅):', base + ('&' if '?' in base else '?') + 'srv=' + urllib.parse.quote(str(url).rstrip('/'), safe=':/')]
 
 
+TUNNEL_PROC = [None]
+UPD_LOG = None
+
+
+def upd_log(msg):
+    """자동 업데이트 기록: 서버 창 + data/update.log(나중에 왜 다시 켜졌는지 확인용)."""
+    line = f'{datetime.datetime.now().isoformat(timespec="seconds")} {msg}'
+    print('[업데이트]', msg, flush=True)
+    try:
+        with open(os.path.join(DATA, 'update.log'), 'a', encoding='utf-8') as f:
+            f.write(line + '\n')
+    except OSError:
+        pass
+
+
+def ver_tuple(v):
+    return tuple(int(x) for x in re.findall(r'\d+', str(v))[:4]) or (0,)
+
+
+def fetch_new_server():
+    """GitHub의 서버 파일을 받아 지금보다 새 버전이고 정상이면 (버전, 내용)을 돌려준다."""
+    import urllib.request
+    url = str(CONF.get('update_url') or '')
+    if not url.startswith('https://'):
+        return None
+    req = urllib.request.Request(url + ('&' if '?' in url else '?') + 't=' + str(int(time.time())), headers={'Cache-Control': 'no-cache'})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        src = r.read(5_000_000).decode('utf-8')
+    m = re.search(r"^VERSION = '([0-9.]+)'", src, re.M)
+    if not m:
+        raise ValueError('받은 파일에 VERSION이 없음')
+    new = m.group(1)
+    if ver_tuple(new) <= ver_tuple(VERSION) or new in (CONF.get('update_skip') or []):
+        return None
+    if len(src) < 50_000 or 'def main()' not in src or 'ThreadingHTTPServer' not in src:
+        raise ValueError('받은 파일이 서버 파일 같지 않음')
+    compile(src, 'sachil_server.py', 'exec')   # 문법 오류가 있으면 여기서 막는다
+    return new, src
+
+
+def room_idle():
+    now = time.time()
+    with PRESENCE_LOCK:
+        busy = any(now - t <= ONLINE_SEC for t in PRESENCE.values())
+    return not busy and not AI_BUSY[0]
+
+
+def auto_update_loop():
+    """V102: 2시간(update_check_hours)마다 새 서버 파일을 확인 → 검사 → 접속자 없을 때 교체하고 종료(75).
+    start-domain.bat가 75를 받으면 바로 다시 켜고, 새 파일이 곧바로 죽으면 이전 파일(.bak)로 되돌린다."""
+    me = os.path.abspath(__file__)
+    flag = os.path.join(DATA, 'update_verify.flag')
+    # 1) 이번 실행이 업데이트 직후라면: 1분 버티면 성공으로 보고 표시를 지운다
+    if os.path.exists(flag):
+        time.sleep(60)
+        try:
+            os.remove(flag)
+        except OSError:
+            pass
+        upd_log(f'서버 {VERSION}로 업데이트 완료(정상 동작 확인)')
+    rb = os.path.join(DATA, 'update_rolled_back.flag')
+    if os.path.exists(rb):   # bat이 되돌렸으면 그 버전은 다시 받지 않는다
+        try:
+            bad = open(rb, encoding='utf-8', errors='replace').read().strip()
+            os.remove(rb)
+            if bad:
+                CONF.setdefault('update_skip', []).append(bad)
+                with open(CONF_PATH, 'w', encoding='utf-8') as f:
+                    json.dump(CONF, f, ensure_ascii=False, indent=2)
+                upd_log(f'서버 {bad}가 바로 멈춰 이전 파일로 되돌렸습니다 — 이 버전은 건너뜀')
+        except OSError:
+            pass
+    if os.environ.get('SACHIL_LOOP') != '1':   # 다시 켜 줄 새 start-domain.bat로 켠 게 아니면 바꾸지 않는다(꺼진 채로 남지 않게)
+        if CONF.get('auto_update'):
+            upd_log('start-domain.bat가 옛 버전이라 자동 업데이트를 쉽니다 — 업데이트 묶음의 start-domain.bat로 덮어쓰세요')
+        return
+    time.sleep(120)
+    while True:
+        if CONF.get('auto_update'):
+            try:
+                got = fetch_new_server()
+                if got:
+                    new, src = got
+                    upd_log(f'새 버전 {new} 받음 — 접속자가 없을 때 교체합니다')
+                    while not room_idle():
+                        time.sleep(60)
+                    shutil.copy2(me, me + '.bak')
+                    with open(me + '.new', 'w', encoding='utf-8', newline='') as f:
+                        f.write(src)
+                    os.replace(me + '.new', me)
+                    with open(flag, 'w', encoding='utf-8') as f:
+                        f.write(new)
+                    upd_log(f'{VERSION} → {new} 교체, 서버를 다시 켭니다')
+                    p = TUNNEL_PROC[0]
+                    if p and p.poll() is None:
+                        try:
+                            p.terminate()
+                            p.wait(timeout=10)
+                        except Exception:
+                            pass
+                    os._exit(75)
+            except Exception as e:
+                upd_log(f'확인 실패(다음에 다시): {str(e)[:100]}')
+        try:
+            hrs = float(CONF.get('update_check_hours') or 2)
+        except (TypeError, ValueError):
+            hrs = 2
+        time.sleep(max(0.25, hrs) * 3600)
+
+
 def run_tunnel(port, named):
     exe = find_cloudflared()
     if not exe:
@@ -2368,6 +2495,7 @@ def run_tunnel(port, named):
         print(f'[터널] 시작 중… ({attempt}/3{", TCP 방식" if attempt > 1 else ""})', flush=True)
         try:
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='replace')
+            TUNNEL_PROC[0] = p   # 자동 업데이트로 다시 켤 때 이전 터널을 정리하려고 기억
         except OSError as e:
             print('[터널] cloudflared.exe를 실행할 수 없습니다:', e, flush=True)
             print('[터널] 파일이 손상됐거나 보안 프로그램이 막은 것입니다. cloudflared.exe를 지우고 start.bat을 다시 실행하거나, 수동으로 내려받으세요.', flush=True)
@@ -2510,10 +2638,12 @@ def main():
         '관리자 코드: ********   ← 본인만 (관리자 입장·교수 로그인. 바꾸기: --set-admin-code 새코드)',
         f'47망(디브리핑룸): 매주 월 04시 오래된 대화 {int(float(CONF.get("weekly_trim_ratio") or 0) * 100)}% 정리 (최근 대화 유지)',
         f'메뉴 자료 폴더: {LIB}',
+        (f'자동 업데이트: {CONF.get("update_check_hours") or 2}시간마다 확인, 접속자 없을 때 교체 (끄기: config.json의 auto_update를 false)' if CONF.get('auto_update') else '자동 업데이트: 꺼짐'),
         (f'AI 도우미:   {AI_NAMES[ai_provider()]} 연결 (' + (f'모델 {CONF.get("gemini_model")}' if ai_provider() == 'gemini' else f'도우미 {CONF.get("ai_assist_model")} · 보고서 {CONF.get("ai_model")}') + f', 하루 {CONF.get("ai_daily_limit") or "무제한"}회' + (', 입장코드 사용' if CONF.get('ai_code') else '') + ')') if ai_ready()
         else 'AI 도우미:   자료 발췌형 (자연어 답변은 gemini-key-setup.bat으로 Gemini API 키 입력)',
     ])
     threading.Thread(target=index_loop, daemon=True).start()
+    threading.Thread(target=auto_update_loop, daemon=True).start()
     if '--tunnel' in sys.argv or '--named' in sys.argv:
         threading.Thread(target=run_tunnel, args=(port, '--named' in sys.argv), daemon=True).start()
     try:
