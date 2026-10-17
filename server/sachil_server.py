@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '4.1'
-APP_VERSION = 'V104'
+VERSION = '4.2'
+APP_VERSION = 'V105'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -969,7 +969,9 @@ class H(BaseHTTPRequestHandler):
                     'models': {'gemini': CONF.get('gemini_model'), 'groq': CONF.get('groq_model'), 'claude': CONF.get('ai_assist_model')},
                     'today': AI_DAY.get('n', 0) if AI_DAY.get('d') == time.strftime('%Y-%m-%d') else 0,
                     'limit': int(CONF.get('ai_daily_limit') or 0), 'version': VERSION,
-                    'auto_update': bool(CONF.get('auto_update')) and os.environ.get('SACHIL_LOOP') == '1'}
+                    'auto_update': bool(CONF.get('auto_update')) and os.environ.get('SACHIL_LOOP') == '1',
+                    'started': SERVER_START, 'upd_next': UPD_STATE['next'], 'upd_last': UPD_STATE['last'], 'upd_result': UPD_STATE['result'],
+                    'upd_pending': UPD_STATE['pending'], 'upd_done': last_update_done()[0], 'now': time.time()}
         if act == 'status':
             return self.send(200, status(), log=False)
         if act == 'update':   # V104: 교수 화면에서 '서버 업데이트 지금 확인'
@@ -2604,6 +2606,21 @@ def room_idle():
 
 
 UPDATE_NOW = threading.Event()
+SERVER_START = time.time()
+UPD_STATE = {'next': 0, 'last': 0, 'result': '', 'pending': ''}   # V105: 교수 화면에 보여 줄 자동 업데이트 상태
+
+
+def last_update_done():
+    """update.log에서 마지막 '업데이트 완료' 시각·문구."""
+    try:
+        with open(os.path.join(DATA, 'update.log'), encoding='utf-8', errors='replace') as f:
+            lines = [x.strip() for x in f.readlines()[-200:] if '업데이트 완료' in x]
+        if lines:
+            ts, _, msg = lines[-1].partition(' ')
+            return ts, msg
+    except OSError:
+        pass
+    return '', ''
 
 
 def auto_update_loop():
@@ -2635,14 +2652,18 @@ def auto_update_loop():
         if CONF.get('auto_update'):
             upd_log('start-domain.bat가 옛 버전이라 자동 업데이트를 쉽니다 — 업데이트 묶음의 start-domain.bat로 덮어쓰세요')
         return
+    UPD_STATE['next'] = time.time() + 120
     UPDATE_NOW.wait(120)
     while True:
         UPDATE_NOW.clear()
         if CONF.get('auto_update'):
             try:
+                UPD_STATE['last'] = time.time()
                 got = fetch_new_server()
+                UPD_STATE['result'] = '새 버전 없음' if not got else ''
                 if got:
                     new, src = got
+                    UPD_STATE['result'] = UPD_STATE['pending'] = new
                     upd_log(f'새 버전 {new} 받음 — 접속자가 없을 때 교체합니다')
                     while not room_idle():
                         time.sleep(60)
@@ -2662,11 +2683,13 @@ def auto_update_loop():
                             pass
                     os._exit(75)
             except Exception as e:
+                UPD_STATE['result'] = '확인 실패(인터넷 확인)'
                 upd_log(f'확인 실패(다음에 다시): {str(e)[:100]}')
         try:
             hrs = float(CONF.get('update_check_hours') or 2)
         except (TypeError, ValueError):
             hrs = 2
+        UPD_STATE['next'] = time.time() + max(0.25, hrs) * 3600
         UPDATE_NOW.wait(max(0.25, hrs) * 3600)   # 교수 화면의 '지금 확인'을 누르면 바로 깸(V104)
 
 

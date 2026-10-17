@@ -735,7 +735,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v104</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v105</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -852,8 +852,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V104', SRV_VER='4.1';
+  const APP_VER='V105', SRV_VER='4.2';
   const UPDATES=[
+    {v:'V105', d:'2026-10-18', t:['교수 화면(AI 키 관리)에 서버 상태: 마지막으로 켜진 시각·동작 시간, 마지막 자동 업데이트, 다음 업데이트 확인 예정 시각(교수 로그인 때만 보임)']},
     {v:'V104', d:'2026-10-17', t:['AI 키 관리: 서버가 아직 옛 버전이어도 키 입력 가능 — 이 휴대폰에 잠시 맡겨 두었다가 서버가 업데이트되면 자동으로 넣음(3일 보관)','교수 화면에 ‘서버 업데이트 지금 확인’ 버튼(자동 업데이트를 켠 서버 4.1부터)']},
     {v:'V103', d:'2026-10-17', t:['교수 로그인 화면에 ‘AI 키 관리’: 휴대폰에서 Gemini·Groq·Claude 키를 넣고 바로 시험(실패하면 이전 키 유지), 연결 상태·오늘 사용 횟수 보기 — PC에서 bat 파일을 실행하지 않아도 됨']},
     {v:'V102', d:'2026-10-17', t:['AI 도우미: 같은 질문(띄어쓰기·물음표만 다른 것 포함)은 서버에 저장된 답을 바로 보여 줌 — AI 사용량·하루 한도를 쓰지 않음(3일 보관, 메뉴 자료가 바뀌면 새로 답함)']},
@@ -1466,7 +1467,23 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const order=j.order||[];
     return `<ul class="aikl">${['gemini','groq','claude'].map(p=>`<li><b>${AI_NM[p]}</b><span>${j.keys[p]?`연결됨 ${esc(j.keys[p])}${j.provider===p?' · <em>지금 사용</em>':order.includes(p)?' · 예비':''}`:'없음'}</span>${j.keys[p]?`<button type="button" class="btn ghost aidel" data-del="${p}">지우기</button>`:''}</li>`).join('')}</ul>
       <p class="note">오늘 AI 답변 ${j.today}회${j.limit?` / 하루 ${j.limit}회(교수 사용 제외)`:''} · 서버 ${esc(j.version||'')}</p>
+      ${srvStateHtml(j)}
       ${j.auto_update?'<button type="button" class="btn ghost" id="srvUpd">서버 업데이트 지금 확인</button>':''}`;
+  }
+  // 서버 상태(V105, 교수 화면만): 켜진(다시 켜진) 시각·마지막 업데이트·다음 업데이트 확인 예정
+  function srvStateHtml(j){
+    if(!j.started) return '';
+    const off=(Date.now()/1000)-(j.now||Date.now()/1000);   // 서버와 이 기기의 시계 차이 보정
+    const at=t=>{ if(!t) return '—'; const d=new Date((t+off)*1000), tdy=new Date().toDateString()===d.toDateString(); return `${tdy?'오늘':`${d.getMonth()+1}/${d.getDate()}`} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+    const dur=sec=>{ sec=Math.max(0,Math.round(sec)); const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60); return h>=24?`${Math.floor(h/24)}일 ${h%24}시간`:h?`${h}시간 ${m}분`:`${m}분`; };
+    const up=(j.now||0)-j.started, left=j.upd_next?(j.upd_next-(j.now||0)):0;
+    const done=j.upd_done?j.upd_done.replace('T',' ').slice(5,16):'';
+    return `<dl class="srvst">
+      <dt>마지막으로 켜진 시각</dt><dd>${at(j.started)} <span>(${dur(up)}째 동작 중)</span></dd>
+      <dt>마지막 자동 업데이트</dt><dd>${done?esc(done):'기록 없음'}</dd>
+      <dt>다음 업데이트 확인</dt><dd>${!j.auto_update?'자동 업데이트 꺼짐':j.upd_pending?`새 버전 ${esc(j.upd_pending)} 받음 — <b>접속자가 없을 때 바로</b> 다시 켜짐`:j.upd_next?`${at(j.upd_next)} <span>(${dur(left)} 뒤)</span>`:'곧 확인'}</dd>
+      ${j.upd_last?`<dt>마지막 확인</dt><dd>${at(j.upd_last)} · ${esc(j.upd_result||'')}</dd>`:''}
+    </dl><p class="note">서버는 새 버전이 있을 때만 다시 켜집니다(몇 초). 새 버전이 없으면 확인만 하고 그대로 동작합니다.</p>`;
   }
   // 서버가 아직 키 관리 기능을 모르면(옛 서버): 키를 이 휴대폰에 잠시 맡겨 두었다가, 서버가 업데이트되면 자동으로 넣는다(V104)
   const AIK_PEND='sachil_aikey_pending';
@@ -3563,6 +3580,8 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .aikl li b{min-width:58px}.aikl li span{flex:1;color:var(--muted)}.aikl li em{font-style:normal;color:var(--navy);font-weight:700}
 .aikl .aidel{min-height:32px;padding:0 10px;font-size:12.5px}
 #srvUpd{margin-top:4px;min-height:38px}
+.srvst{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:10px 0 4px;padding:10px 12px;border-radius:10px;background:var(--navy-soft);font-size:13.5px}
+.srvst dt{color:var(--muted);font-weight:600}.srvst dd{margin:0;color:var(--fg)}.srvst dd span{color:var(--muted);font-size:12.5px}
 .aikeys select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 10px;font:inherit;background:var(--surface);color:var(--fg)}
 .prof-do{margin:0 0 6px;padding-left:18px;line-height:1.7;font-size:14px}
 .prof-up{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0 4px}
