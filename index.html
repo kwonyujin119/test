@@ -647,6 +647,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <div class="app">
 <header class="top">
+  <div class="profbar" id="profBar" hidden><span><b>교수 모드</b> · 자료 올리기·질의응답 답변·보고서 편집</span><button type="button" id="profLogout">로그아웃</button></div>
   <div class="wrap">
     <div class="top-left">
     <a class="brand" href="#hub" aria-label="SACHIL 지휘역량강화 플랫폼 첫 화면으로">
@@ -690,7 +691,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v86</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v87</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -807,8 +808,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V86', SRV_VER='2.4';
+  const APP_VER='V87', SRV_VER='2.4';
   const UPDATES=[
+    {v:'V87', d:'2026-10-17', t:['교수로 로그인하면 맨 위에 남색 ‘교수 모드’ 띠와 로그아웃 버튼이 보여요','첫 화면 Search는 47망과, Incident Log는 디브리핑룸과 같은 높이로']},
     {v:'V86', d:'2026-10-17', t:['메뉴 자료 PDF 미리보기를 첫 쪽 그림으로 바로 보여 줘요 — 빙글빙글 로딩 표시 없음','미리보기 그림은 교수가 메뉴를 한 번 열면 자동으로 만들어져 모두에게 보여요(서버 2.4)']},
     {v:'V85', d:'2026-10-17', t:['메뉴 ‘관련법령’에 법제처 국가법령정보센터 바로가기: 소방기본법·재난안전법·긴급구조대응활동 규칙·119구조구급법·화재조사법 등 법률·시행령·시행규칙을 누르면 현행 법령으로 바로 이동']},
     {v:'V84', d:'2026-10-17', t:['설치된 앱(PC 작업표시줄·폰 홈 화면) 아이콘이 새 시그니처 아이콘으로 바뀌도록 아이콘 주소를 새로 고침','PC 서버로 연 앱도 같은 새 아이콘·노랑 테마 사용']},
@@ -1330,13 +1332,16 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 교수 토큰은 대화방 대화명(SRVTOK)과 따로 둔다 — 교수로 들어와도 47망 대화명이 바뀌지 않게
   const profKey=()=>'sachil_prof:'+(SRVBASE||location.origin);   // SRVBASE는 아래에서 정해지므로 쓸 때 계산
   const PROF={_t:null, ok:false, checked:false, get tok(){ if(this._t===null){ try{ this._t=localStorage.getItem(profKey())||''; }catch(_){ this._t=''; } } return this._t; }};
-  const setProf=t=>{ PROF._t=t||''; PROF.ok=!!t; try{ if(t) localStorage.setItem(profKey(),t); else localStorage.removeItem(profKey()); }catch(_){ } };
+  const setProf=t=>{ PROF._t=t||''; PROF.ok=!!t; try{ if(t) localStorage.setItem(profKey(),t); else localStorage.removeItem(profKey()); }catch(_){ } setTimeout(()=>syncProfUI(),0); };
   const isProf=()=>PROF.ok;
+  { const lb=document.getElementById('profLogout'); if(lb) lb.addEventListener('click',()=>profLogout()); }
+  function syncProfUI(){ const on=isProf(); document.body.classList.toggle('prof',on); const b=document.getElementById('profBar'); if(b) b.hidden=!on; }
+  async function profLogout(){ try{ await api('/api/logout',{json:{},tok:PROF.tok}); }catch(_){ } setProf(''); syncProfUI(); toast('교수 모드에서 로그아웃했습니다'); render(); }
   async function checkProf(){
     if(!PROF.tok||!SRV.on){ PROF.ok=false; PROF.checked=true; return false; }
     const r=await api('/api/me',{tok:PROF.tok}); PROF.checked=true;
     PROF.ok=!!(r.ok&&r.j.user&&r.j.user.role==='admin'); if(r.ok&&!PROF.ok) setProf('');
-    return PROF.ok;
+    syncProfUI(); return PROF.ok;
   }
   function renderProf(panel){
     const draw=()=>{
@@ -1347,7 +1352,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
             <ul class="prof-do"><li>메뉴의 각 섹션에서 <b>자료 올리기</b>·<b>지우기</b></li><li><b>주요 질의응답</b>에서 질문에 답변·삭제</li></ul>
             <div class="acts"><button type="button" class="btn ghost" id="profOut">로그아웃</button><button type="button" class="btn primary" id="profMenu">메뉴 열기</button></div>
           </section></div>`;
-        $('#profOut').addEventListener('click',async()=>{ await api('/api/logout',{json:{},tok:PROF.tok}); setProf(''); draw(); });
+        $('#profOut').addEventListener('click',profLogout);
         $('#profMenu').addEventListener('click',()=>{ const b=$('#menuBtn'); if(b) b.click(); });
         return;
       }
@@ -2487,7 +2492,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           }
           pick=best; if(best&&best.m>=M) break;
         }
-        if(pick){ ec.style.left=pick.p[0]+'px'; ec.style.top=pick.p[1]+'px'; ed.style.left=(W-pick.p[0])+'px'; ed.style.top=(H-pick.p[1])+'px'; }
+        if(pick){ ec.style.left=pick.p[0]+'px'; ec.style.top=pick.p[1]+'px'; ed.style.left=(W-pick.p[0])+'px'; ed.style.top=(H-pick.p[1])+'px';
+          // S는 47망과, IL은 디브리핑룸과 같은 높이(가운데 줄 맞춤, V87). 칸 안에 안 들어가면 원래 자리 유지
+          const keep={s:HZ.lab.search, l:HZ.lab.log};
+          HZ.lab.search=[keep.s[0], pick.p[1]/H]; HZ.lab.log=[keep.l[0], 1-pick.p[1]/H];
+          [['search'],['log']].forEach(([k])=>{ const el=h.querySelector(`[data-l="${k}"]`); if(!el) return; el.classList.remove('sm'); if(place(k,el,false)>0) return; el.classList.add('sm'); if(place(k,el,false)>0) return; el.classList.remove('sm'); place(k,el,true); });
+          HZ.lab.search=keep.s; HZ.lab.log=keep.l; }
       }
     }
     if(!h._ro && window.ResizeObserver){ h._ro=new ResizeObserver(()=>{ if(h.isConnected) requestAnimationFrame(fitHub); }); h._ro.observe(h); }   // 늦게 적용되는 스타일·회전·폴드 펼침에도 다시 맞춤
@@ -2934,6 +2944,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       SRV.probing=false; SRV.on=true; SRV.me=r.j.user||null;
       if(r.j.ai && !CAP.sample){ CAP.sample=serverSample; CAP.ready=true; syncRepUI(); }   // 보고서 AI: Claude 화면 밖에서는 SACHIL 서버(AI 키)로 작성
       SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.roomDb=r.j.room_debrief||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
+      if(PROF.tok) checkProf();   // 교수로 로그인해 둔 기기면 교수 표시줄
       await loadLib();
       if(ROOMS_R.includes(state.route)){ if(DB.agreed){ SRV.notice='서버에 연결되어 공유 대화방으로 바뀌었습니다.'+(wasLocal?' 방금 쓴 내용은 이 기기에만 남습니다.':''); DB.enter=true; } render(); }
       else if(SECTIONS.some(x=>x.slug===state.route) || state.route==='login' || (state.route==='search'&&state.query.trim()) || (state.route==='ai'&&!chat.typing)) render();
@@ -3262,6 +3273,14 @@ body.hubview #panel{padding-bottom:0}
 .laws .lk{display:flex;gap:6px;flex-wrap:wrap}
 .laws .lk .btn{min-height:36px;padding:0 12px;font-size:13px}
 .laws .lk .btn.ghost{border:1px solid var(--navy);color:var(--navy);background:var(--surface)}
+
+/* 교수 모드 표시(V87): 헤더 위 남색 띠 + 로그아웃 */
+.profbar{display:flex;align-items:center;justify-content:center;gap:10px;padding:5px 12px;background:var(--navy);color:#fff;font-size:12.5px;line-height:1.3}
+.profbar[hidden]{display:none}
+.profbar b{color:var(--ember)}
+.profbar button{border:1px solid rgba(255,255,255,.6);background:transparent;color:#fff;border-radius:999px;font:inherit;font-weight:700;font-size:12px;min-height:28px;padding:0 10px;cursor:pointer}
+body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
+@media (max-width:380px){ .profbar span{font-size:11.5px} .profbar span:after{content:''} }
 /* 교수 로그인·자료 올리기·질의응답 (V79) */
 /* V81 CH 배너: 첫 줄 전체▾·진행·초기화, 아래 칩 두 줄 */
 .timer .chrow{flex-basis:100%;display:flex;align-items:center;gap:10px}
