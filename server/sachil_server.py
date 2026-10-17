@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '3.0'
-APP_VERSION = 'V94'
+VERSION = '3.1'
+APP_VERSION = 'V95'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -1510,8 +1510,13 @@ SYN = {
 _JUNK = re.compile('[\ue000-\uf8ff\ufffd\u1100-\u11ff\ua960-\ua97f\ud7b0-\ud7ff\u2e80-\u2fdf\ua000-\ua6ff\U000f0000-\U0010ffff\x00-\x08\x0b\x0c\x0e-\x1f\x7f]')
 
 
+# 휴대전화 번호(010-1234-5678, 줄바꿈으로 갈린 것 포함)는 검색·AI에 앞자리만 보인다(V95)
+_MOBILE = re.compile(r'(?<!\d)(01[016789])\s*-\s*(?:\d\s*){3,4}-\s*\d(?:\s*\d){3}(?!\d)')
+
+
 def clean_glyph(t):
     t = _JUNK.sub(' ', t or '')
+    t = _MOBILE.sub(lambda m: m.group(1) + '-****-****', t)
     return re.sub(r'[ \t]{2,}', ' ', t)
 
 
