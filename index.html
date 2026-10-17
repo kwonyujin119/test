@@ -2210,18 +2210,30 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {go:'log', k:'IL', t:'Incident Log', d:'만든 보고서 모아 보기·작성'}
   ];
   const sigK=k=>['S','A','CH','IL'].includes(k)?`<i class="sg sg-${k}" role="img" aria-label="${k}"></i>`:k;   // 시그니처 심벌
-  // 첫 화면(V71): 사용자 스케치 — 번개(지그재그) 선이 화면을 4칸으로 나눠 S·A / CH·IL(읽으면 SACHIL),
-  // 47망·디브리핑룸은 둥근 버튼. 칸은 SVG 다각형(모서리 둥글게, 칸 사이 틈)으로 그려 그 모양대로 눌린다.
-  // 꼭짓점·글자 위치는 화면 비율(0~1). P1 위 → P2 왼쪽 → P3 오른쪽 → P4 아래
-  const HZ={P1:[.52,0], P2:[0,.60], P3:[1,.32], P4:[.48,1],
-    lab:{search:[.17,.21], ai:[.33,.40], board:[.55,.56], log:[.83,.80]}};
+  // 첫 화면(V72): 칸막이 선이 손글씨 '47' — 왼쪽 '4'(↙ 내리긋고 → 가로획), 오른쪽 '7'(12시→2시 가로획, 이어 ↙ 내리긋기).
+  // 7의 가로획 위 모서리(1시) = 47망, 8시→6시 사선 아래 모서리(7시) = 디브리핑룸, 나머지 4칸 = S·A·CH·IL(읽으면 SACHIL).
+  // 칸은 SVG 다각형(틈·둥근 모서리)이라 보이는 모양 그대로 눌린다. 좌표는 화면 비율(0~1)
+  const HZ={
+    pts:{T4:[.36,0], L4:[0,.50], T7:[.50,0], R7:[1,.36], B7:[.64,1], L8:[0,.64], B6:[.50,1], TL:[0,0], TR:[1,0], BR:[1,1], BL:[0,1], E4:[1,.44]},
+    X:{X:['L4','E4','R7','B7']},   // X = 선분 L4–E4와 R7–B7의 교점
+    reg:{search:['TL','T4','L4'], ai:['T4','T7','R7','X','L4'], chat:['T7','TR','R7'], board:['L4','X','B7','B6','L8'], log:['R7','BR','B7'], debrief:['L8','B6','BL']},
+    strokes:[['T4','L4','X'],['T7','R7','B7']],
+    lab:{search:[.12,.15], ai:[.47,.27], board:[.50,.70], log:[.86,.86]}};
   function renderHub(panel){
-    const cell=h=>h.y
-      ? `<a class="hz-c" href="#${h.go}" data-hub="${h.go}" data-c="${h.go}" aria-label="${h.t}"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd">${h.d}</span></a>`
-      : `<span class="hz-l" data-l="${h.go}" aria-hidden="true">${sigK(h.k)}<b>${h.t}</b></span>`;
-    panel.innerHTML=`<nav class="hub hz" aria-label="SACHIL:47 첫 화면"><svg class="hz-svg" xmlns="http://www.w3.org/2000/svg">${HUB.filter(h=>!h.y).map(h=>`<a href="#${h.go}" data-hub="${h.go}" aria-label="${h.t}"><path class="hz-p" data-p="${h.go}"/></a>`).join('')}</svg>${HUB.map(cell).join('')}</nav>`;
+    const corner=h=>h.go==='chat'
+      ? `<span class="hz-k tr" data-k="chat" aria-hidden="true"><span class="r1"><b>${h.t}</b><span class="ic">${h.ic}</span></span><span class="hd">${h.d}</span></span>`
+      : `<span class="hz-k bl" data-k="debrief" aria-hidden="true"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd">${h.d}</span></span>`;
+    const cell=h=>h.y?corner(h):`<span class="hz-l" data-l="${h.go}" aria-hidden="true">${sigK(h.k)}<b>${h.t}</b></span>`;
+    panel.innerHTML=`<nav class="hub hz" aria-label="SACHIL:47 첫 화면"><svg class="hz-svg" xmlns="http://www.w3.org/2000/svg">${HUB.map(h=>`<a href="#${h.go}" data-hub="${h.go}" aria-label="${h.t}"><path class="hz-p${h.y?' y':''}" data-p="${h.go}"/></a>`).join('')}${HZ.strokes.map((_,i)=>`<path class="hz-47" data-s="${i}"/>`).join('')}</svg>${HUB.map(cell).join('')}</nav>`;
     panel.querySelectorAll('[data-hub]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const t=a.dataset.hub; if(t==='search'){ q.value=''; syncClear(); go('search',''); } else go(t); rootScrollTo(0); }));
     fitHub();
+  }
+  // 꺾인 선(획)을 꼭짓점에서 살짝 둥글게 — 손글씨 느낌
+  function hzStroke(pts,r){
+    let d='M'+pts[0].map(v=>v.toFixed(1)).join(' ');
+    for(let i=1;i<pts.length-1;i++){ const a=pts[i-1], c=pts[i], b=pts[i+1], la=Math.hypot(a[0]-c[0],a[1]-c[1]), lb=Math.hypot(b[0]-c[0],b[1]-c[1]), rr=Math.min(r,la/2,lb/2);
+      d+='L'+(c[0]+(a[0]-c[0])/la*rr).toFixed(1)+' '+(c[1]+(a[1]-c[1])/la*rr).toFixed(1)+'Q'+c[0].toFixed(1)+' '+c[1].toFixed(1)+' '+(c[0]+(b[0]-c[0])/lb*rr).toFixed(1)+' '+(c[1]+(b[1]-c[1])/lb*rr).toFixed(1); }
+    return d+'L'+pts[pts.length-1].map(v=>v.toFixed(1)).join(' ');
   }
   // 볼록 다각형을 안쪽으로 d만큼 줄이고(칸 사이 틈), 모서리를 r로 둥글린 SVG 경로
   function hzPath(pts,d,r){
@@ -2242,24 +2254,25 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const avail=Math.round(bottom-h.getBoundingClientRect().top-12);
     h.style.height=Math.max(420, Math.min(avail, 720))+'px';
     if(!h.classList.contains('hz')) return;
-    const W=h.clientWidth, H=h.clientHeight, P=k=>[HZ[k][0]*W, HZ[k][1]*H];
-    const R={search:[[0,0],P('P1'),P('P2')], ai:[P('P1'),[W,0],P('P3'),P('P2')], board:[P('P2'),P('P3'),P('P4'),[0,H]], log:[P('P3'),[W,H],P('P4')]};
-    const gap=W<600?5:7, rad=W<600?18:22;
-    Object.keys(R).forEach(k=>{ const el=h.querySelector(`[data-p="${k}"]`); if(el) el.setAttribute('d',hzPath(R[k],gap,rad)); });
-    const svg=h.querySelector('.hz-svg'); svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    const W=h.clientWidth, H=h.clientHeight;
+    const P=k=>[HZ.pts[k][0]*W, HZ.pts[k][1]*H], pt={}; Object.keys(HZ.pts).forEach(k=>{ pt[k]=P(k); });
+    Object.entries(HZ.X).forEach(([k,[a1,a2,b1,b2]])=>{ const A=pt[a1], B=pt[a2], C=pt[b1], D=pt[b2], d1=[B[0]-A[0],B[1]-A[1]], d2=[D[0]-C[0],D[1]-C[1]], den=d1[0]*d2[1]-d1[1]*d2[0]; const t=den?((C[0]-A[0])*d2[1]-(C[1]-A[1])*d2[0])/den:0; pt[k]=[A[0]+d1[0]*t, A[1]+d1[1]*t]; });
+    const gap=W<600?6:8, rad=W<600?16:22;
+    Object.entries(HZ.reg).forEach(([k,names])=>{ const el=h.querySelector(`[data-p="${k}"]`); if(el) el.setAttribute('d',hzPath(names.map(n=>pt[n]),gap,rad)); });
+    HZ.strokes.forEach((names,i)=>{ const el=h.querySelector(`[data-s="${i}"]`); if(el) el.setAttribute('d',hzStroke(names.map(n=>pt[n]),W<600?26:40)); });
+    h.querySelector('.hz-svg').setAttribute('viewBox',`0 0 ${W} ${H}`);
     Object.entries(HZ.lab).forEach(([k,[x,y]])=>{ const el=h.querySelector(`[data-l="${k}"]`); if(el){ el.style.left=(x*W)+'px'; el.style.top=(y*H)+'px'; } });
-    // 둥근 버튼: 47망은 오른쪽 위, 디브리핑룸은 왼쪽 아래(가로·세로 중 짧은 쪽 기준 크기)
-    const m=Math.round(W<600?6:10), g2=gap*2+4;
-    const dist=(cx,cy,A,B)=>Math.abs((B[0]-A[0])*(A[1]-cy)-(A[0]-cx)*(B[1]-A[1]))/Math.hypot(B[0]-A[0],B[1]-A[1]);
-    let D=Math.round(Math.min(W*0.5, H*0.29, 220));
-    for(;D>110;D-=2){ const r=D/2, a=[W-m-r, m+r], b=[m+r, H-m-r];   // 둥근 버튼이 번개 선을 넘지 않을 때까지 줄임
-      if(dist(a[0],a[1],P('P1'),P('P2'))>=r+g2 && dist(a[0],a[1],P('P2'),P('P3'))>=r+g2 && dist(b[0],b[1],P('P3'),P('P4'))>=r+g2 && dist(b[0],b[1],P('P2'),P('P3'))>=r+g2) break; }
-    h.style.setProperty('--cd',D+'px');
-    const c47=h.querySelector('[data-c="chat"]'), cdb=h.querySelector('[data-c="debrief"]');
-    if(c47){ c47.style.left=(W-D-m)+'px'; c47.style.top=m+'px'; }
-    if(cdb){ cdb.style.left=m+'px'; cdb.style.top=(H-D-m)+'px'; }
-    h.classList.toggle('hz-sm', D<148);
-    if(!h._ro && window.ResizeObserver){ h._ro=new ResizeObserver(()=>{ if(h.isConnected) requestAnimationFrame(fitHub); }); h._ro.observe(h); }   // 늦게 적용되는 스타일·회전·폴드 펼침에도 다시 맞춤   // 작은 버튼이면 설명 글씨 생략
+    // 모서리 칸(47망·디브리핑룸): 글은 직각 모서리 쪽에 붙이고, 빗변을 넘으면 설명 글씨를 줄이거나 뺀다
+    const hb=h.getBoundingClientRect(), pad=gap+12;
+    const side=(A,B,p)=>((B[0]-A[0])*(p[1]-A[1])-(B[1]-A[1])*(p[0]-A[0]))/Math.hypot(B[0]-A[0],B[1]-A[1]);
+    [['chat',pt[HZ.reg.chat[0]],pt[HZ.reg.chat[2]],pt[HZ.reg.chat[1]],r=>[r.left-hb.left, r.bottom-hb.top]],['debrief',pt[HZ.reg.debrief[0]],pt[HZ.reg.debrief[1]],pt[HZ.reg.debrief[2]],r=>[r.right-hb.left, r.top-hb.top]]].forEach(([k,A,B,corner,inner])=>{
+      const el=h.querySelector(`[data-k="${k}"]`); if(!el) return;
+      el.classList.remove('s1','s2'); el.style.setProperty('--fs', W<600?'1':'1.2');
+      const want=Math.sign(side(A,B,corner));
+      const fits=()=>[...el.querySelectorAll('.r1,.ic,b,.hd')].every(c=>{ const rc=c.getBoundingClientRect(); if(!rc.width) return true; return side(A,B,inner(rc))*want>=8; });
+      if(!fits()){ el.classList.add('s1'); if(!fits()){ el.classList.add('s2'); } }
+    });
+    if(!h._ro && window.ResizeObserver){ h._ro=new ResizeObserver(()=>{ if(h.isConnected) requestAnimationFrame(fitHub); }); h._ro.observe(h); }   // 늦게 적용되는 스타일·회전·폴드 펼침에도 다시 맞춤
   }
   window.addEventListener('resize',()=>{ if(state.route==='hub') fitHub(); });
   // ---------- 47망·디브리핑룸 ----------
@@ -3013,30 +3026,36 @@ body.hubview footer{display:none}
 })();
 </script>
 <style id="hub-z-css">
-/* V71 첫 화면 — 스케치 구성(지그재그 4칸 + 둥근 버튼 2개). 색은 기존 그대로: 칸=흰 바탕·회색 테두리, 버튼=심벌 옐로 */
+/* V72 첫 화면 — 칸막이가 손글씨 '47'. 색은 기존 그대로: 칸=흰 바탕·회색 테두리, 47망·디브리핑룸=심벌 옐로, 획=인천 오션 */
 .hub.hz{position:relative;display:block;max-width:760px;margin:4px auto 0}
 .hz-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .hz-svg a{cursor:pointer;outline:none}
 .hz-p{fill:var(--surface);stroke:var(--line);stroke-width:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.06));transition:stroke .12s,fill .12s}
+.hz-p.y{fill:var(--ember);stroke:var(--ember)}
 .hz-svg a:hover .hz-p{stroke:var(--navy)}
 .hz-svg a:focus-visible .hz-p{stroke:var(--navy);stroke-width:3}
 .hz-svg a:active .hz-p{fill:var(--navy-soft)}
+.hz-svg a:active .hz-p.y{fill:#f0c400}
+.hz-47{fill:none;stroke:var(--navy);stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;opacity:.92}
 .hz-l{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;white-space:nowrap;text-align:center}
-.hz-l .sg{height:52px}
-.hz-l .sg-CH,.hz-l .sg-IL{height:44px}
+.hz-l .sg{height:50px}
+.hz-l[data-l="search"] .sg{height:38px}
+.hz-l .sg-CH,.hz-l .sg-IL{height:42px}
 .hz-l b{font-size:15px;font-weight:800;color:var(--fg);letter-spacing:-.005em}
-.hz-c{position:absolute;width:var(--cd);height:var(--cd);border-radius:50%;background:var(--ember);color:var(--fg);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px;text-decoration:none;box-shadow:0 6px 18px rgba(36,78,162,.18);z-index:1;transition:transform .12s}
-.hz-c:active{transform:scale(.97)}
-.hz-c:focus-visible{outline:3px solid var(--navy);outline-offset:3px}
-.hz-c .ic{display:grid;place-items:center;width:calc(var(--cd)*.26);height:calc(var(--cd)*.26);border-radius:28%;background:#fff;overflow:hidden;margin-bottom:2px}
-.hz-c .ic img{width:100%;height:100%;display:block}
-.hz-c .ic svg{width:66%;height:66%}
-.hz-c b{font-size:calc(var(--cd)*.11);font-weight:800;line-height:1.15}
-.hz-c .hd{font-size:max(10px,calc(var(--cd)*.062));line-height:1.4;font-weight:600;color:#4a3d00;letter-spacing:-.02em}
-.hz-sm .hz-c .hd{display:none}
-.hz-sm .hz-c b{font-size:16px}
-@media (min-width:600px){ .hz-l .sg{height:70px} .hz-l .sg-CH,.hz-l .sg-IL{height:60px} .hz-l b{font-size:19px} }
-@media (max-height:680px){ .hz-l .sg{height:40px} .hz-l .sg-CH,.hz-l .sg-IL{height:34px} .hz-l b{font-size:13.5px} .hz-l{gap:3px} }
+.hz-l[data-l="search"] b,.hz-l[data-l="log"] b{font-size:13.5px}
+.hz-k{position:absolute;display:flex;flex-direction:column;gap:3px;pointer-events:none;color:var(--fg);white-space:nowrap;--fs:1}
+.hz-k.tr{top:18px;right:18px;align-items:flex-end;text-align:right}
+.hz-k.bl{bottom:18px;left:18px;align-items:flex-start;text-align:left}
+.hz-k .r1{display:flex;align-items:center;gap:8px}
+.hz-k .ic{display:grid;place-items:center;width:calc(38px*var(--fs));height:calc(38px*var(--fs));border-radius:11px;background:#fff;overflow:hidden;box-shadow:0 2px 6px rgba(36,78,162,.15)}
+.hz-k .ic img{width:100%;height:100%;display:block}
+.hz-k .ic svg{width:70%;height:70%}
+.hz-k b{font-size:calc(20px*var(--fs));font-weight:800;line-height:1.15}
+.hz-k .hd{font-size:calc(11px*var(--fs));line-height:1.4;font-weight:600;color:#4a3d00;letter-spacing:-.02em}
+.hz-k.s1 .hd{font-size:calc(10px*var(--fs))}
+.hz-k.s2 .hd{display:none}
+@media (min-width:600px){ .hz-l .sg{height:68px} .hz-l[data-l="search"] .sg{height:56px} .hz-l .sg-CH,.hz-l .sg-IL{height:58px} .hz-l b{font-size:19px} .hz-l[data-l="search"] b,.hz-l[data-l="log"] b{font-size:17px} .hz-k.tr{top:24px;right:26px} .hz-k.bl{bottom:24px;left:26px} }
+@media (max-height:680px){ .hz-l .sg{height:38px} .hz-l[data-l="search"] .sg{height:30px} .hz-l .sg-CH,.hz-l .sg-IL{height:32px} .hz-l b{font-size:13px} .hz-l[data-l="search"] b,.hz-l[data-l="log"] b{font-size:12px} .hz-l{gap:3px} .hz-k .ic{width:30px;height:30px} .hz-k b{font-size:17px} }
 </style>
 <style id="install-css">
 /* 앱 설치 묻기(V64): 처음 접속에 한 번, 아래에서 올라오는 시트로 묻는다. 메뉴의 '앱 설치'로는 언제든 */
