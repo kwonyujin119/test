@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '3.4'
-APP_VERSION = 'V97'
+VERSION = '3.5'
+APP_VERSION = 'V98'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -2008,25 +2008,50 @@ def ai_allowed(ip, prof=False):
 def ask_llm(question, hits, history):
     import urllib.request, urllib.error, ssl
     ctx = '\n\n'.join(f'[{i + 1}] {re.sub(r"[.]pdf$", "", h["name"], flags=re.I)} {h["page"]}쪽{" · " + h["art"] if h.get("art") else ""}\n{h.get("ctx") or h["text"]}' for i, h in enumerate(hits))
+    msgs = history_msgs(history)
+    msgs.append({'role': 'user', 'content': f'<자료>\n{ctx}\n</자료>\n\n질문: {question}\n(답 순서: 결론 → 설명 → 현장에서 → 근거)'})
+    text, why, _code = call_llm(AI_SYS, msgs, 3000, 'low', CONF.get('ai_assist_model') or 'claude-haiku-5-5')
+    return order_answer(text), why
+
+
+_ANS_LB = re.compile(r'^\s*(?:\*\*)?(?:\[(결론|근거 부족|근거|설명|현장에서|확인할 점)\].*|(결론|근거 부족|근거|설명|현장에서|확인할 점)(?:\*\*)?\s*(?:[:：].*)?)$')
+_ANS_ORD = ['결론', '설명', '현장에서', '확인할 점', '근거', '근거 부족']
+
+
+def order_answer(text):
+    """AI 답을 결론 → 설명 → 현장에서 → 근거 → 근거 부족 순으로 다시 줄 세운다(V98).
+    모델이 지시와 다른 순서로 쓰거나, 이전 대화의 옛 형식을 따라 할 때를 바로잡는다."""
+    pre, sec, cur = [], {}, None
+    for line in (text or '').split('\n'):
+        m = _ANS_LB.match(line) if line.strip() else None
+        if m:
+            cur = m.group(1) or m.group(2)
+            sec.setdefault(cur, []).append(line)
+        elif cur:
+            sec[cur].append(line)
+        else:
+            pre.append(line)
+    if not sec:
+        return text
+    out = pre + [x for k in _ANS_ORD if k in sec for x in sec[k]]
+    return '\n'.join(out).strip()
+
+
+def history_msgs(history):
+    """이전 대화 2턴. 옛 답은 새 순서로 고쳐 넣어 모델이 옛 형식을 따라 하지 않게 한다."""
     msgs = []
     for turn in history[-2:]:
         if isinstance(turn, dict) and isinstance(turn.get('q'), str) and isinstance(turn.get('a'), str):
             msgs.append({'role': 'user', 'content': turn['q'][:300]})
-            msgs.append({'role': 'assistant', 'content': turn['a'][:900]})
-    msgs.append({'role': 'user', 'content': f'<자료>\n{ctx}\n</자료>\n\n질문: {question}'})
-    text, why, _code = call_llm(AI_SYS, msgs, 3000, 'low', CONF.get('ai_assist_model') or 'claude-haiku-5-5')
-    return text, why
+            msgs.append({'role': 'assistant', 'content': order_answer(turn['a'])[:900]})
+    return msgs
 
 
 def ask_general(question, history):
-    msgs = []
-    for turn in history[-2:]:
-        if isinstance(turn, dict) and isinstance(turn.get('q'), str) and isinstance(turn.get('a'), str):
-            msgs.append({'role': 'user', 'content': turn['q'][:300]})
-            msgs.append({'role': 'assistant', 'content': turn['a'][:900]})
+    msgs = history_msgs(history)
     msgs.append({'role': 'user', 'content': f'질문: {question}'})
     text, why, _code = call_llm(AI_GEN_SYS, msgs, 2000, 'low', CONF.get('ai_assist_model') or 'claude-haiku-5-5')
-    return text, why
+    return order_answer(text), why
 
 
 AI_NAMES = {'gemini': 'Gemini', 'claude': 'Claude'}

@@ -732,7 +732,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v97</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v98</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -849,8 +849,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V97', SRV_VER='3.4';
+  const APP_VER='V98', SRV_VER='3.5';
   const UPDATES=[
+    {v:'V98', d:'2026-10-17', t:['AI 도우미 답이 이전 순서(결론 → 근거 → 설명)로 나오던 문제 수정: AI가 어떤 순서로 쓰든 결론 → 설명 → 현장에서 → 근거로 다시 정렬(이미 저장된 대화도)']},
     {v:'V97', d:'2026-10-17', t:['AI 도우미 답 순서: 결론 → 설명 → 현장에서 → 근거','메뉴 자료에 없는 내용도 AI가 일반 지식으로 짧게 설명 — ‘근거 부족’ 표시를 붙여 자료 근거 답과 구분']},
     {v:'V96', d:'2026-10-17', t:['AI 도우미·AI 보고서를 Google Gemini API 키(aistudio.google.com)로도 쓸 수 있게 — 서버 PC에서 gemini-key-setup.bat으로 키 입력','AI 도우미 위쪽에 연결된 AI 이름(Gemini/Claude) 표시']},
     {v:'V95', d:'2026-10-17', t:['메뉴 자료의 휴대전화 번호는 검색·AI 도우미에 ‘010-****-****’로만 보이게(서버 보호)','긴급구조대응계획(안) PDF의 휴대전화 번호 뒷자리를 가린 파일로 교체']},
@@ -2141,11 +2142,23 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const srcHref=s=>libHref(s.slug,{name:s.name});
   // PDF에서 뽑은 글에 섞인 깨진 기호(□) 지우기(V94) — 예전 서버 답·이 기기에 저장된 대화에도 적용
   const deGlyph=t=>String(t||'').replace(/[\uE000-\uF8FF\uFFFD\u1100-\u11FF\uA960-\uA97F\uD7B0-\uD7FF\u2E80-\u2FDF\uA000-\uA6FF]|[\uDB80-\uDBFF][\uDC00-\uDFFF]/g,' ').replace(/[ \t]{2,}/g,' ');
+  // 이름표 줄: '결론: …', '[결론] …', '**결론:** …', '근거'(혼자) — '근거로 보면'처럼 문장 첫 낱말은 이름표로 보지 않는다
+  const ANS_K='(결론|근거 부족|근거|설명|현장에서|확인할 점)';
+  const ANS_LB1=new RegExp('^\\s*(?:\\*\\*)?\\['+ANS_K+'\\](?:\\*\\*)?\\s*[:：]?\\s*(.*)$');                          // [결론] …
+  const ANS_LB2=new RegExp('^\\s*(?:\\*\\*)?'+ANS_K+'(?:\\*\\*)?\\s*(?:[:：]\\s*(?:\\*\\*)?\\s*(.*?)\\s*(?:\\*\\*)?\\s*$|$)');   // 결론: … / 근거
+  const ansLb=l=>l.match(ANS_LB1)||l.match(ANS_LB2);
+  const ANS_ORD=['결론','설명','현장에서','확인할 점','근거','근거 부족'];
+  function orderAns(lines){
+    const pre=[], sec=new Map(); let cur=null;
+    lines.forEach(l=>{ const lb=ansLb(l); if(lb){ cur=lb[1]; if(!sec.has(cur)) sec.set(cur,[]); sec.get(cur).push(l); } else if(cur) sec.get(cur).push(l); else pre.push(l); });
+    if(!sec.size) return lines;
+    return pre.concat(...ANS_ORD.filter(k=>sec.has(k)).map(k=>sec.get(k)));
+  }
   function botTextHtml(m){
     const ref=l=>l.replace(/\[근거 부족\]/g,'<span class="nb">근거 부족</span>').replace(/\[(\d{1,2})\]/g,(x,n)=>{ const sc=m.src&&m.src[Number(n)-1]; return sc?`<a class="ref" href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}" aria-label="근거 ${n}: ${esc(pdfName(sc.name))} ${sc.page}쪽">${n}</a>`:x; });
-    // V92 답 형식: 결론 → 근거(- 줄) → 설명 → 현장에서. 이름표는 굵게, 근거 줄은 들여쓴 목록으로
-    return esc(deGlyph(m.text)).split('\n').filter(l=>l.trim()).map(l=>{
-      const lb=l.match(/^\s*\[?(결론|근거 부족|근거|설명|현장에서|확인할 점)\]?\s*[:：]?\s*(.*)$/);
+    // V98 답 형식: 결론 → 설명 → 현장에서 → 근거(- 줄) → 근거 부족. AI가 다른 순서로 써도(이전 대화를 따라 하는 경우 등) 여기서 다시 줄 세운다
+    return orderAns(esc(deGlyph(m.text)).split('\n').filter(l=>l.trim())).map(l=>{
+      const lb=ansLb(l);
       if(lb) return `<p class="ab ab-${lb[1]==='결론'?'k':lb[1]==='근거 부족'?'w':lb[1]==='근거'?'g':'x'}"><b class="lbl">${lb[1]}</b>${lb[2]?' '+ref(lb[2]):''}</p>`;
       const li=l.match(/^\s*[-•·]\s+(.*)$/);
       return li?`<p class="ali">${ref(li[1])}</p>`:`<p>${ref(l)}</p>`;
