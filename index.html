@@ -689,7 +689,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v80</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v81</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -806,8 +806,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V80', SRV_VER='2.3';
+  const APP_VER='V81', SRV_VER='2.3';
   const UPDATES=[
+    {v:'V81', d:'2026-10-17', t:['사용법(?) 설명을 하나씩 나눔: 1 SACHIL:47 → 2 47 시그니처 아이콘(47망) → 3 디브리핑룸 → 메뉴 → S·A·CH·IL','첫 화면에서 사용법을 볼 때는 하단 탭을 잠깐 띄워 설명','CH: 시각·시작·경과를 빼고 첫 줄에 전체·진행·초기화, 단계 칩은 두 줄(첫 체크 때 경과 시간이 자동으로 흐름)','IL: 배너 첫 줄에 초기화 · 작성된 보고서 · 보고서 만들기(누르면 바로 보고서)']},
     {v:'V80', d:'2026-10-17', t:['첫 화면 손글씨 47의 ‘7’에 시그니처처럼 짧은 가로획을 넣었어요','Search·Incident Log 글자 자리를 가로획과 겹치지 않게 다시 맞춤']},
     {v:'V79', d:'2026-10-17', t:['IL에도 위쪽에 고정되는 바로가기 배너(발생개요·화재원인·인명피해·재산피해·작성된 보고서)와 보고서 만들기 버튼','메뉴의 ‘교관 로그인’ → ‘교수 로그인’: 교수는 메뉴 각 섹션에 자료를 직접 올리고 지울 수 있어요(지운 파일은 서버에 보관)','주요 질의응답: 누구나 질문을 올리고, 교수가 답변','첫 화면 47망·디브리핑룸: 심벌·이름·설명을 칸 가운데로, 두 칸이 화면 중심을 기준으로 마주 보게(점대칭)','보안 보강: 보고서 AI도 같은 입장코드, 코드 맞히기 시도 전체 제한, 질문 도배 제한']},
     {v:'V78', d:'2026-10-17', t:['첫 화면에서는 아래 탭을 숨겼어요(6칸이 같은 기능) — 그만큼 칸이 커졌어요','다른 화면의 아래 탭은 그대로, 로고를 누르면 첫 화면으로']},
@@ -1531,22 +1532,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     panel.innerHTML=`
       <div class="rolecard">
         ${illo?`<img src="${illo}" alt="">`:''}
-        <div class="txt"><span class="eyebrow">CH · CHecklist</span><h2>현장지휘 체크리스트</h2><p>출동부터 지휘소 운영까지 12단계와 시각 기록. 항목은 초안 예시이며 교관 승인 후 확정됩니다.</p></div>
+        <div class="txt"><span class="eyebrow">CH · CHecklist</span><h2>현장지휘 체크리스트</h2><p>출동부터 지휘소 운영까지 12단계와 시각 기록. 체크하면 시각이 자동으로 남습니다. 항목은 초안 예시이며 교수 승인 후 확정됩니다.</p></div>
       </div>
       <div class="board">
         <div class="card timer ${state.timer.running?'live':''}" id="timerBar">
-          <div class="tclock">
-            <span class="tline"><span class="t" id="tm" aria-live="off" aria-label="현재 시각">${clock(new Date())}</span><span class="prog" aria-label="진행">${done}/${total}</span></span>
-            <span class="tmeta"><span class="el ${state.timer.running?'live':''}" aria-label="경과 시간">경과 <b id="tmEl">${hhmmss(elapsed())}</b></span></span>
-          </div>
-          <div class="btns">
-            <button type="button" class="btn ${state.timer.running?'':'accent'}" id="tmToggle">${state.timer.running?'정지':'시작'}</button>
-            <button type="button" class="btn ghost" id="tmReset">초기화</button>
-          </div>
-          <div class="jrow"><button type="button" class="jall" id="jumpAll" aria-expanded="${jumpOpen}" aria-controls="jgrid">${jumpOpen?'닫기 ▴':'전체 ▾'}</button>
+          <div class="chrow"><button type="button" class="jall" id="jumpAll" aria-expanded="${jumpOpen}" aria-controls="jgrid">${jumpOpen?'닫기 ▴':'전체 ▾'}</button><span class="prog" aria-label="진행">${done}/${total}</span><button type="button" class="btn ghost" id="tmReset">초기화</button></div>
           <nav class="jump" id="jump" aria-label="항목 바로가기">
-            <div class="jl">${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}">${pi+1} ${esc(p.name)} <span class="c">${d}/${p.items.length}</span></button>`;}).join('')}<button type="button" data-j="sec-log">시각 기록</button></div>
-          </nav></div>
+            <div class="jl">${phases.slice(0,6).map((p,k)=>{const pi=k, d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}">${pi+1} ${esc(p.name)} <span class="c">${d}/${p.items.length}</span></button>`;}).join('')}</div>
+            <div class="jl">${phases.slice(6).map((p,k)=>{const pi=k+6, d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}">${pi+1} ${esc(p.name)} <span class="c">${d}/${p.items.length}</span></button>`;}).join('')}<button type="button" data-j="sec-log">시각 기록</button></div>
+          </nav>
           <div class="jgrid" id="jgrid" ${jumpOpen?'':'hidden'} aria-label="전체 항목">
             <p class="jg-h">12단계 · ${done}/${total}</p>
             <div class="jg">${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}"><b>${pi+1}</b><span class="n">${esc(p.name)}</span><span class="c">${d}/${p.items.length}</span><i class="bar" style="--p:${Math.round(d/p.items.length*100)}%" aria-hidden="true"></i></button>`;}).join('')}</div>
@@ -1571,19 +1565,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 
     panel.querySelectorAll('.item input[data-k]').forEach(cb=>cb.addEventListener('change',()=>{
       const k=cb.dataset.k;
-      if(cb.checked){ checks[k]=clock(new Date()); const [pi,ii]=k.split('-').map(Number); addLog(phases[pi].items[ii]+' ✔'); }
+      if(cb.checked){ if(!state.timer.running&&!state.timer.acc){ state.timer.start=Date.now(); state.timer.running=true; addLog('체크리스트 시작'); if(!state.situ.fields.dt){ state.situ.fields.dt=localDT(new Date()); addLog('[발생개요] 사고일시 자동 입력 '+showDT(state.situ.fields.dt)); } }   // 시작 버튼 없이 첫 체크 때 경과 시간이 흐름(보고서용)
+        checks[k]=clock(new Date()); const [pi,ii]=k.split('-').map(Number); addLog(phases[pi].items[ii]+' ✔'); }
       else delete checks[k];
       save(); renderBoard(panel);
     }));
-    $('#tmToggle').addEventListener('click',()=>{
-      if(state.timer.running){ state.timer.acc=elapsed(); state.timer.running=false; }
-      else { state.timer.start=Date.now(); state.timer.running=true; if(!state.timer.acc) addLog('체크리스트 시작'); if(!state.situ.fields.dt){ state.situ.fields.dt=localDT(new Date()); addLog('[발생개요] 사고일시 자동 입력 '+showDT(state.situ.fields.dt)); } startTick(); }
-      save(); renderBoard(panel);
-    });
     $('#tmReset').addEventListener('click',()=>{
       const btn=$('#tmReset');
       if(btn.dataset.arm!=='1'){ btn.dataset.arm='1'; btn.textContent='정말 초기화'; btn.classList.add('accent'); setTimeout(()=>{ if(btn.isConnected){ btn.dataset.arm=''; btn.textContent='초기화'; btn.classList.remove('accent'); } },2500); return; }
-      state.timer={running:false,start:0,acc:0}; state.checks={}; state.situ={inv:{},text:{},fields:{}}; state.log=[]; save(); renderBoard(panel);
+      state.timer={running:false,start:0,acc:0}; state.checks={}; state.log=[]; save(); renderBoard(panel);   // 현장 기록(발생개요 등)은 IL의 초기화로
     });
     $('#logForm').addEventListener('submit',e=>{ e.preventDefault(); const v=$('#logText').value.trim(); if(!v) return; addLog(v); save(); $('#logText').value=''; renderLog(); });
     $('#copyLog').addEventListener('click',async()=>{
@@ -2008,9 +1998,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <div><span class="eyebrow">IL · Incident Log</span><h2 style="margin-top:4px">사고보고서</h2></div>
       </div>
       <div class="card timer ilbar" id="timerBar">
-        <div class="ilt"><b>현장 기록</b><span>${SITU.filter(b=>situStatus(b).cls).length}/${SITU.length} 입력</span></div>
-        <div class="btns"><button type="button" class="btn primary" id="mkReport">보고서 만들기</button></div>
-        <div class="jrow"><nav class="jump" id="jump" aria-label="항목 바로가기"><div class="jl">${SITU.map(b=>{const st=situStatus(b); return `<button type="button" data-j="sec-${b.id}"><i class="d ${st.cls}" aria-hidden="true"></i>${esc(b.name.replace(/\s+/g,''))}</button>`;}).join('')}<button type="button" data-j="sec-reps">작성된 보고서 <span class="c">${reports.length}</span></button></div></nav></div>
+        <div class="ilrow"><button type="button" class="btn ghost" id="ilReset">초기화</button><button type="button" class="reps" data-j="sec-reps" id="ilReps">작성된 보고서 <span class="c">${reports.length}</span></button><button type="button" class="btn primary" id="mkReport">보고서 만들기</button></div>
+        <nav class="jump" id="jump" aria-label="항목 바로가기"><div class="jl">${SITU.map(b=>{const st=situStatus(b); return `<button type="button" data-j="sec-${b.id}"><i class="d ${st.cls}" aria-hidden="true"></i>${esc(b.name.replace(/\s+/g,''))}</button>`;}).join('')}</div></nav>
       </div>
       <div class="il-situ">${situHtml()}</div>
       <h3 class="il-h" id="sec-reps">작성된 보고서</h3>
@@ -2018,6 +2007,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       <p class="hint-row" style="margin:10px 4px 0;font-size:12px;color:var(--muted-2)">보고서는 이 기기에만 저장됩니다 · ${reports.length}건 (최대 ${MAX_REPORTS}건)${storageFull?' · <b>저장 공간 부족</b>':''}</p>`;
     panel.querySelectorAll('[data-rep]').forEach(b=>b.addEventListener('click',()=>{ const r=reports.find(x=>x.id===b.dataset.rep); if(r) openReport(r); }));
     $('#mkReport').addEventListener('click',newReport);
+    $('#ilReps').addEventListener('click',()=>jumpTo('sec-reps'));
+    $('#ilReset').addEventListener('click',()=>{ const b=$('#ilReset'); arm(b,'정말 초기화',()=>{ state.situ={inv:{},text:{},fields:{}}; addLog('[현장 기록] 초기화'); save(); renderReports(panel); toast('현장 기록을 비웠습니다(작성된 보고서는 그대로)'); }); });
     bindJump(panel);
     bindSitu(panel,()=>{ const y=(scrollRoot()||document.scrollingElement).scrollTop; renderReports(panel); (scrollRoot()||document.scrollingElement).scrollTop=y; });
     panel.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>arm(b,'정말 삭제',()=>{ reports=reports.filter(x=>x.id!==b.dataset.del); rpsave(); renderReports(panel); })));
@@ -3104,7 +3095,9 @@ body.chatview .panel{padding-bottom:6px}
 /* 첫 화면 6개 박스 — 2열 3줄, 화면 높이에 맞춰 균형 있게 */
 body.hubview footer{display:none}
 body.hubview .tabbar{display:none!important}
-body.hubview #panel{padding-bottom:0}   /* 첫 화면은 6칸이 같은 기능 — 하단 탭 숨김(V78). 다른 화면은 높이 고정 그대로 */
+body.hubview #panel{padding-bottom:0}
+@media (max-width:599px){ body.hubview.touring .tabbar{display:block!important;position:fixed;left:0;right:0;bottom:0;z-index:31;box-shadow:0 -10px 28px rgba(0,0,0,.22);animation:tbUp .22s ease-out} }   /* ? 사용법을 볼 때만 첫 화면에 하단 탭을 띄움 */
+@keyframes tbUp{from{transform:translateY(100%)}to{transform:none}}   /* 첫 화면은 6칸이 같은 기능 — 하단 탭 숨김(V78). 다른 화면은 높이 고정 그대로 */
 .hub{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,1fr);gap:12px;max-width:760px;margin:4px auto 0}
 .hub-box{display:flex;flex-direction:column;justify-content:flex-end;gap:4px;padding:16px;border-radius:20px;background:var(--surface);border:1px solid var(--line);color:var(--fg);text-decoration:none;box-shadow:0 2px 10px rgba(0,0,0,.05);min-height:0;overflow:hidden;position:relative;transition:transform .12s ease,border-color .12s ease}
 .hub-box:hover{border-color:var(--navy)}
@@ -3217,6 +3210,18 @@ body.hubview #panel{padding-bottom:0}   /* 첫 화면은 6칸이 같은 기능 �
 </script>
 <style id="prof-css">
 /* 교수 로그인·자료 올리기·질의응답 (V79) */
+/* V81 CH 배너: 첫 줄 전체▾·진행·초기화, 아래 칩 두 줄 */
+.timer .chrow{flex-basis:100%;display:flex;align-items:center;gap:10px}
+.timer .chrow .prog{margin:0;font-size:14px}
+.timer .chrow #tmReset{margin-left:auto}
+.ilbar .ilrow #ilReset{border:1px solid var(--line)}
+.timer .jump{flex-basis:100%}
+.ilbar .ilrow{flex-basis:100%;display:flex;align-items:center;gap:8px}
+.ilbar .ilrow .btn{min-height:40px}
+.ilbar .ilrow .reps{margin-left:auto;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font:inherit;font-size:13px;font-weight:700;color:var(--fg);cursor:pointer}
+.ilbar .ilrow .reps .c{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--navy);color:#fff;font-size:11.5px;display:inline-grid;place-items:center}
+.ilbar .ilrow #mkReport{margin-left:0}
+
 .prof h2{margin:6px 0 10px;font-size:18px}
 .prof-do{margin:0 0 6px;padding-left:18px;line-height:1.7;font-size:14px}
 .prof-up{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0 4px}
@@ -3414,9 +3419,13 @@ body.hubview #panel{padding-bottom:0}   /* 첫 화면은 6칸이 같은 기능 �
   const vis=el=>{ if(!el) return false; const r=el.getBoundingClientRect(); return r.width>0&&r.height>0&&getComputedStyle(el).visibility!=='hidden'; };
   const pick=(...sels)=>{ for(const s of sels){ const el=document.querySelector(s); if(vis(el)) return el; } return null; };   // 폰은 아래 탭바, PC는 위쪽 메뉴
   const STEPS=[
-    {k:'47', t:'SACHIL:47 · 47망', get:()=>[pick('.brand'),pick('#chatBtn')],
-     d:['<b>SACHIL:47</b> 로고를 누르면 언제든 <b>첫 화면(6개 박스)</b>으로 돌아옵니다. 47망·디브리핑룸·S·A·CH·IL로 바로 들어갈 수 있어요.','<b>47 말풍선</b>은 47망입니다. 대화명만 보이는 익명 채팅으로 사진·PDF를 나누고, 지금 접속 수와 안 읽은 수가 보입니다. 메시지를 길게 누르면 답장·복사·공유·저장. 디브리핑룸은 첫 화면에서 들어갑니다.'],
+    {k:'SACHIL', t:'SACHIL:47', get:()=>[pick('.brand')],
+     d:['<b>SACHIL:47</b> 로고를 누르면 어느 화면에서든 <b>첫 화면</b>으로 돌아옵니다.','첫 화면의 칸을 누르면 47망·디브리핑룸·S·A·CH·IL로 바로 들어갑니다.']},
+    {k:'47', t:'47 시그니처 아이콘 · 47망', get:()=>[pick('#chatBtn')],
+     d:['<b>47 말풍선</b>은 47망입니다. 지휘·작전망으로 전하기 어려운 내용을 대화명만 보이는 익명 채팅으로 나눕니다.','사진·PDF를 올리고, 지금 접속 수와 안 읽은 수가 보입니다. 메시지를 길게 누르면 답장·복사·공유.'],
      n:'실명·소속·계급과 개인정보는 쓰지 마세요.'},
+    {k:'DB', t:'디브리핑룸', get:()=>[pick('#dbBtn')],
+     d:['현장에 참여했던 대원은 <b>익명으로 개선사항을 도출</b>하고, 지휘관은 의견을 들어 <b>지휘역량을 강화</b>합니다.']},
     {k:'메뉴', t:'메뉴', get:()=>[pick('#menuBtn')],
      d:['교육일정·SOP·긴급구조대응계획·RIT 등 <b>12개 섹션 자료</b>를 엽니다. PDF는 앱 안에서 바로 볼 수 있어요. 맨 끝 <b>업데이트 내역</b>에서 버전별 바뀐 점을 봅니다.','<b>앱 설치</b>(홈 화면 바로가기)와 교관 로그인도 여기 있습니다.']},
     {k:'S', t:'검색', get:()=>[pick('.tabbar [data-go="search"]','#navSearch')],
@@ -3456,9 +3465,9 @@ body.hubview #panel{padding-bottom:0}   /* 첫 화면은 6칸이 같은 기능 �
   function show(k){ i=Math.max(0,Math.min(STEPS.length-1,k)); place(); }
   function open(){
     const sh=document.querySelector('.sheet.open'); if(sh){ const c=document.getElementById('sheetClose'); if(c) c.click(); }
-    last=document.activeElement; tour.hidden=false; if(appEl) appEl.inert=true; if(bar) bar.inert=true; show(0);
+    last=document.activeElement; document.body.classList.add('touring'); tour.hidden=false; if(appEl) appEl.inert=true; if(bar) bar.inert=true; show(0);   // touring: 첫 화면에서도 하단 탭을 띄워 설명
   }
-  function close(){ if(tour.hidden) return; tour.hidden=true; if(appEl) appEl.inert=false; if(bar) bar.inert=false; if(last&&last.isConnected&&last.focus) last.focus(); }
+  function close(){ if(tour.hidden) return; tour.hidden=true; document.body.classList.remove('touring'); if(appEl) appEl.inert=false; if(bar) bar.inert=false; if(last&&last.isConnected&&last.focus) last.focus(); }
   const next=()=>{ if(i>=STEPS.length-1) close(); else show(i+1); };
   btn.addEventListener('click',open);
   tour.addEventListener('click',e=>{
