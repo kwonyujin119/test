@@ -44,7 +44,7 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '3.8'
+VERSION = '3.9'
 APP_VERSION = 'V102'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
@@ -92,11 +92,13 @@ def load_conf():
         'ai_api_key': '',               # Claude API 키(sk-ant-…). 비우면 AI 도우미는 자료 발췌형으로 답함
         'gemini_api_key': '',           # Google AI Studio API 키(AIza…) — V96. gemini-key-setup.bat으로 넣음
         'gemini_model': 'gemini-flash-latest',   # Gemini 모델 이름(AI Studio에 나온 이름으로 바꿀 수 있음)
-        'ai_provider': 'auto',
+        'ai_provider': 'auto',          # auto(키 있는 쪽: gemini → groq → claude) | gemini | groq | claude
+        'groq_api_key': '',             # V103: Groq API 키(gsk_…) — Gemini 한도가 차면 예비로. groq-key-setup.bat으로 넣음
+        'groq_model': 'openai/gpt-oss-120b',     # Groq 모델 이름(console.groq.com의 Models에 나온 이름). 안 되면 예비 모델을 차례로 시도
         'ai_cache_days': 3,             # V102: 같은 질문의 AI 답을 이 기간 저장해 다시 씀(AI 호출·한도 안 씀). 0이면 끔
         'auto_update': True,            # V102: 서버 파일을 GitHub에서 스스로 받아 다시 켬(접속자 없을 때). false면 끔
         'update_check_hours': 2,        # 새 버전 확인 간격(시간)
-        'update_url': 'https://raw.githubusercontent.com/kwonyujin119/test/main/server/sachil_server.py',          # auto(키 있는 쪽, 둘 다면 gemini) | gemini | claude
+        'update_url': 'https://raw.githubusercontent.com/kwonyujin119/test/main/server/sachil_server.py',
         'ai_model': 'claude-sonnet-5-5',
         'ai_daily_limit': 50,           # 하루 AI 답변 최대 횟수(비용 상한, 교수 로그인은 제외). 0이면 무제한
         'ai_assist_model': 'claude-haiku-5-5',   # AI 도우미 전용 모델(가장 저렴). 보고서는 ai_model
@@ -2139,16 +2141,21 @@ def ask_general(question, history):
     return order_answer(text), why
 
 
-AI_NAMES = {'gemini': 'Gemini', 'claude': 'Claude'}
+AI_NAMES = {'gemini': 'Gemini', 'groq': 'Groq', 'claude': 'Claude'}
+AI_KEYS = {'gemini': 'gemini_api_key', 'groq': 'groq_api_key', 'claude': 'ai_api_key'}
+
+
+def ai_has():
+    return [p for p in ('gemini', 'groq', 'claude') if CONF.get(AI_KEYS[p])]
 
 
 def ai_provider():
-    """지금 쓸 AI 회사. 키가 없으면 ''(자료 발췌형)."""
+    """지금 먼저 쓸 AI 회사. 키가 없으면 ''(자료 발췌형)."""
     want = str(CONF.get('ai_provider') or 'auto').lower()
-    has = {'gemini': bool(CONF.get('gemini_api_key')), 'claude': bool(CONF.get('ai_api_key'))}
-    if want in has:
-        return want if has[want] else ''
-    return 'gemini' if has['gemini'] else ('claude' if has['claude'] else '')
+    has = ai_has()
+    if want in AI_KEYS:
+        return want if want in has else ''
+    return has[0] if has else ''
 
 
 def ai_ready():
@@ -2172,20 +2179,88 @@ def call_llm(system, msgs, max_tokens, effort='', model=''):
 def _call_llm(system, msgs, max_tokens, effort='', model=''):
     """설정된 AI 회사로 호출. (본문, 실패 사유, 오류 코드).
     V101: 일시 오류(바쁨·분당 한도 429·연결 끊김)는 2초 뒤 한 번 더 시도하고, 그래도 안 되면 다른 회사 키가 있으면 그쪽으로."""
+    # V103: 먼저 쓸 회사가 실패(한도 초과 등)하면 키가 있는 다른 회사(gemini → groq → claude 순)로 넘긴다
     prov = ai_provider()
-    call = (lambda: call_gemini(system, msgs, max_tokens)) if prov == 'gemini' else (lambda: call_claude(system, msgs, max_tokens, effort, model))
-    text, why, code = call()
-    if not text and code in ('rate_limited', 'upstream_error') and '키' not in why and '모델' not in why and 'model' not in why:
+    if not prov:
+        return '', 'AI 키 미연결', 'not_granted'
+    def call(p):
+        if p == 'gemini':
+            return call_gemini(system, msgs, max_tokens)
+        if p == 'groq':
+            return call_groq(system, msgs, max_tokens)
+        return call_claude(system, msgs, max_tokens, effort, model)
+    text, why, code = call(prov)
+    if not text and code in ('rate_limited', 'upstream_error') and '키' not in why and '모델' not in why and 'model' not in why and '한도' not in why:
         time.sleep(2)
-        text, why2, code = call()
+        text, why2, code = call(prov)
         why = why2 or why
     if not text and code != 'refusal':
-        other = 'claude' if prov == 'gemini' else 'gemini'
-        if CONF.get('ai_api_key' if other == 'claude' else 'gemini_api_key'):
-            t2, w2, c2 = call_claude(system, msgs, max_tokens, effort, model) if other == 'claude' else call_gemini(system, msgs, max_tokens)
+        for other in [p for p in ai_has() if p != prov]:
+            t2, w2, c2 = call(other)
             if t2:
+                print(f'[AI] {AI_NAMES[prov]} 실패({why}) → {AI_NAMES[other]}가 대신 답함', flush=True)
                 return t2, '', ''
     return text, why, code
+
+
+GROQ_FALLBACK_MODELS = ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'qwen/qwen3-32b', 'openai/gpt-oss-20b']
+GROQ_OK_MODEL = [None]   # 이번 실행에서 실제로 된 모델(이름이 바뀌어 404가 나면 예비 모델로)
+
+
+def call_groq(system, msgs, max_tokens):
+    """Groq API(OpenAI 호환 chat/completions) 호출. 설정 모델이 없어졌으면(404·decommissioned) 예비 모델을 차례로 시도."""
+    import urllib.request, urllib.error, ssl
+    url = (CONF.get('groq_api_url') or 'https://api.groq.com/openai/v1').rstrip('/') + '/chat/completions'
+    want = re.sub(r'[^A-Za-z0-9./\-_:]', '', str(CONF.get('groq_model') or '')) or GROQ_FALLBACK_MODELS[0]
+    models = [m for m in ([GROQ_OK_MODEL[0]] if GROQ_OK_MODEL[0] else []) + [want] + GROQ_FALLBACK_MODELS if m]
+    seen, code, why = set(), 'upstream_error', ''
+    for model in models:
+        if model in seen:
+            continue
+        seen.add(model)
+        body = {'model': model, 'max_tokens': max(int(max_tokens), 4096), 'temperature': 0.3,
+                'messages': [{'role': 'system', 'content': system}] + [{'role': m['role'], 'content': m['content']} for m in msgs]}
+        req = urllib.request.Request(url, data=json.dumps(body).encode('utf-8'), method='POST',
+                                     headers={'Authorization': 'Bearer ' + CONF.get('groq_api_key', ''), 'content-type': 'application/json',
+                                              'User-Agent': 'SACHIL47-server'})
+        try:
+            with urllib.request.urlopen(req, timeout=120) as r:
+                j = json.loads(r.read().decode('utf-8'))
+            ch = (j.get('choices') or [{}])[0]
+            text = re.sub(r'<think>.*?</think>', '', str((ch.get('message') or {}).get('content') or ''), flags=re.S).strip()
+            if not text:
+                return '', ('AI 답변이 길이 한도에서 끊겼습니다' if ch.get('finish_reason') == 'length' else 'AI가 내용을 내지 않았습니다'), 'empty_completion'
+            GROQ_OK_MODEL[0] = model
+            return text, '', ''
+        except urllib.error.HTTPError as e:
+            try:
+                err = json.loads(e.read().decode('utf-8')).get('error') or {}
+            except Exception:
+                err = {}
+            msg = json.dumps(err, ensure_ascii=False)
+            if e.code == 404 or 'model_not_found' in msg or 'decommissioned' in msg:
+                why = f'groq_model 이름({model})을 확인하세요'
+                continue   # 다음 예비 모델로
+            if e.code == 401 or 'invalid_api_key' in msg:
+                why = 'Groq API 키가 틀렸습니다'
+            elif e.code == 403:
+                why = 'Groq API 키 권한이 없습니다(망에서 막혔을 수도)'
+            elif e.code == 429:
+                why, code = 'Groq 무료 사용 한도 초과(잠시 뒤 다시)', 'rate_limited'
+            elif e.code in (500, 502, 503):
+                why, code = 'Groq 서버가 바쁩니다', 'rate_limited'
+            else:
+                why = f'Groq 요청 오류 {e.code} ' + str(err.get('message') or '')[:60]
+            break
+        except ssl.SSLError:
+            why = '인증서 오류(망의 HTTPS 검사 장비가 막음)'
+            break
+        except Exception as e:
+            why = 'AI 서버에 연결하지 못했어요(인터넷·방화벽 확인)'
+            print('[AI] Groq 연결 오류:', str(e)[:120], flush=True)
+            break
+    print('[AI]', why, flush=True)
+    return '', why, code
 
 
 def call_gemini(system, msgs, max_tokens):
@@ -2624,6 +2699,31 @@ def main():
             json.dump(CONF, f, ensure_ascii=False, indent=2)
         print('터널 토큰 저장 완료 (' + m.group(0)[:10] + '…)')
         return
+    if '--set-groq-key' in sys.argv or ('--set-gemini-key' in sys.argv and 'gsk_' in ' '.join(sys.argv)):
+        # gemini-key-setup.bat에 Groq 키(gsk_…)를 붙여 넣어도 Groq 키로 저장(bat을 새로 받지 않아도 되게)
+        flag = '--set-groq-key' if '--set-groq-key' in sys.argv else '--set-gemini-key'
+        raw = ' '.join(sys.argv[sys.argv.index(flag) + 1:])
+        m = re.search(r'gsk_[0-9A-Za-z_\-]{20,}', raw)
+        if not m:
+            print('Groq API 키를 찾지 못했습니다. console.groq.com의 API Keys에서 만든 gsk_ 로 시작하는 키를 붙여 넣으세요.')
+            sys.exit(1)
+        CONF['groq_api_key'] = m.group(0)
+        with open(CONF_PATH, 'w', encoding='utf-8') as f:
+            json.dump(CONF, f, ensure_ascii=False, indent=2)
+        print('Groq 키 저장 완료 (' + m.group(0)[:8] + '…' + m.group(0)[-4:] + '). 연결을 시험합니다…')
+        text, why, _c = call_groq('짧게 답한다.', [{'role': 'user', 'content': '연결 확인입니다. "연결됨"이라고만 답하세요.'}], 1000)
+        if text:
+            print('시험 성공: AI 응답 =', text[:40], '· 모델', GROQ_OK_MODEL[0])
+            print('이제 Gemini 한도가 차거나 오류가 나면 Groq가 대신 답합니다' + (' (Gemini 키가 없어 지금은 Groq가 먼저 답함).' if not CONF.get('gemini_api_key') else '.'))
+            if GROQ_OK_MODEL[0] and GROQ_OK_MODEL[0] != CONF.get('groq_model'):
+                CONF['groq_model'] = GROQ_OK_MODEL[0]
+                with open(CONF_PATH, 'w', encoding='utf-8') as f:
+                    json.dump(CONF, f, ensure_ascii=False, indent=2)
+        else:
+            print('시험 실패:', why)
+            print('키는 저장했습니다. 키를 다시 복사했는지 console.groq.com에서 확인하세요.')
+            sys.exit(2)
+        return
     if '--set-gemini-key' in sys.argv:
         i = sys.argv.index('--set-gemini-key')
         raw = ' '.join(sys.argv[i + 1:])
@@ -2702,7 +2802,8 @@ def main():
         f'47망(디브리핑룸): 매주 월 04시 오래된 대화 {int(float(CONF.get("weekly_trim_ratio") or 0) * 100)}% 정리 (최근 대화 유지)',
         f'메뉴 자료 폴더: {LIB}',
         (f'자동 업데이트: {CONF.get("update_check_hours") or 2}시간마다 확인, 접속자 없을 때 교체 (끄기: config.json의 auto_update를 false)' if CONF.get('auto_update') else '자동 업데이트: 꺼짐'),
-        (f'AI 도우미:   {AI_NAMES[ai_provider()]} 연결 (' + (f'모델 {CONF.get("gemini_model")}' if ai_provider() == 'gemini' else f'도우미 {CONF.get("ai_assist_model")} · 보고서 {CONF.get("ai_model")}') + f', 하루 {CONF.get("ai_daily_limit") or "무제한"}회' + (', 입장코드 사용' if CONF.get('ai_code') else '') + ')') if ai_ready()
+        (f'AI 도우미:   {AI_NAMES[ai_provider()]} 연결 (' + (f'모델 {CONF.get("gemini_model")}' if ai_provider() == 'gemini' else f'모델 {CONF.get("groq_model")}' if ai_provider() == 'groq' else f'도우미 {CONF.get("ai_assist_model")} · 보고서 {CONF.get("ai_model")}') + f', 하루 {CONF.get("ai_daily_limit") or "무제한"}회' + (', 입장코드 사용' if CONF.get('ai_code') else '') + ')'
+         + (' · 예비: ' + '·'.join(AI_NAMES[p] for p in ai_has() if p != ai_provider()) if len(ai_has()) > 1 else '')) if ai_ready()
         else 'AI 도우미:   자료 발췌형 (자연어 답변은 gemini-key-setup.bat으로 Gemini API 키 입력)',
     ])
     threading.Thread(target=index_loop, daemon=True).start()
