@@ -44,7 +44,7 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.zip': ('application/zip', False),
 }
 VERSION = '2.3'
-APP_VERSION = 'V83'
+APP_VERSION = 'V84'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -300,12 +300,12 @@ def cleanup():
 
 # ---------------------------------------------------------------- 앱 HTML
 ICON_SVG = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><rect width="1024" height="1024" rx="200" fill="#FFC400"/><g transform="translate(512 512) scale(1.12) translate(-512 -512)"><ellipse cx="512" cy="486" rx="340" ry="286" fill="#FFFFFF"/><path d="M 300 690 C 290 760 250 812 196 846 C 300 838 384 800 430 752 Z" fill="#FFFFFF"/><g transform="translate(303.2,629.0) scale(0.36242,-0.36242)"><path d="M335 0H501V186H583V321H501V745H281L22 309V186H335ZM335 321H192L277 468C298 510 318 553 337 596H341C339 548 335 477 335 430ZM748 0H927C940 291 958 432 1130 636V745H620V596H940C800 402 762 245 748 0Z" fill="#111111"/></g></g></svg>'''
-MANIFEST = json.dumps({
-    'name': 'SACHIL:47 지휘역량강화 플랫폼', 'short_name': 'SACHIL', 'start_url': '/#chat', 'scope': '/',
-    'display': 'standalone', 'background_color': '#F6F6F6', 'theme_color': '#FFC400', 'lang': 'ko',
-    'icons': [{'src': '/static/icon-192.png?v=26', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any'},
-              {'src': '/static/icon-512.png?v=26', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any'},
-              {'src': '/static/icon-maskable-512.png?v=26', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'}],
+MANIFEST = json.dumps({   # V84: 새 시그니처 아이콘(github.io)·노랑 테마 — 예전 static 아이콘을 쓰지 않게
+    'name': 'SACHIL:47 지휘역량강화 플랫폼', 'short_name': 'SACHIL:47', 'start_url': '/#hub', 'scope': '/',
+    'display': 'standalone', 'background_color': '#FDD000', 'theme_color': '#FDD000', 'lang': 'ko',
+    'icons': [{'src': 'https://kwonyujin119.github.io/test/icons/icon-192.png?v=84', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any'},
+              {'src': 'https://kwonyujin119.github.io/test/icons/icon-512.png?v=84', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any'},
+              {'src': 'https://kwonyujin119.github.io/test/icons/icon-maskable-512.png?v=84', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'}],
 }, ensure_ascii=False)
 
 
