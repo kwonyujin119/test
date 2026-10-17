@@ -21,6 +21,7 @@ from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 BASE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(BASE, 'data')
 FILES = os.path.join(DATA, 'files')
+THUMBS = os.path.join(DATA, 'thumbs')   # 메뉴 PDF 첫 쪽 미리보기 그림(V86, 교수 화면이 만들어 올림)
 CONF_PATH = os.path.join(DATA, 'config.json')
 APP_PATH = os.path.join(BASE, 'sachil.html')
 LOG_PATH = os.path.join(DATA, 'access.log')
@@ -43,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '2.3'
-APP_VERSION = 'V85'
+VERSION = '2.4'
+APP_VERSION = 'V86'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -622,6 +623,12 @@ class H(BaseHTTPRequestHandler):
                                                  'snippet': snippet(h['text'], h['hit'] or terms)} for h in hits]}, log=False)
             if path == '/api/index':
                 return self.send(200, {'ok': True, 'status': DOCS_IDX.status()}, log=False)
+            m = re.fullmatch(r'/lib-thumb/([0-9a-f]{24})\.jpg', path)
+            if m:
+                fp = os.path.join(THUMBS, m.group(1) + '.jpg')
+                if not os.path.exists(fp):
+                    return self.err(404, '그림이 없습니다')
+                return self.send_file(fp, 'image/jpeg', 'inline', 'public, max-age=604800, immutable')   # 이름에 파일 버전이 들어 있어 오래 저장해도 됨
             m = re.fullmatch(r'/lib/([a-z\-]+)/([^/]+)', path)
             if m:
                 return self.lib_get(m.group(1), urllib.parse.unquote(m.group(2)))
@@ -691,6 +698,9 @@ class H(BaseHTTPRequestHandler):
             m = re.fullmatch(r'/api/lib/([a-z\-]{2,20})/upload', path)
             if m:
                 return self.lib_upload(m.group(1))
+            m = re.fullmatch(r'/api/lib/([a-z\-]{2,20})/thumb', path)
+            if m:
+                return self.lib_thumb(m.group(1), urllib.parse.parse_qs(qs))
             m = re.fullmatch(r'/api/qna/(\d{1,12})/answer', path)
             if m:
                 return self.qna_answer(int(m.group(1)))
@@ -762,6 +772,10 @@ class H(BaseHTTPRequestHandler):
 
     # --- 메뉴 자료 (폴더에 넣은 파일을 그대로 보여 준다)
     @staticmethod
+    def thumb_key(slug, name, size, mtime):
+        return hashlib.sha1(f'{slug}/{name}/{size}/{int(mtime)}'.encode('utf-8')).hexdigest()[:24]
+
+    @staticmethod
     def lib_files(slug):
         d = os.path.join(LIB, SEC_DIR[slug])
         out = []
@@ -777,7 +791,17 @@ class H(BaseHTTPRequestHandler):
             if not os.path.realpath(fp).startswith(os.path.realpath(d) + os.sep):
                 continue
             stt = os.stat(fp)
-            out.append({'name': n, 'size': stt.st_size, 'mtime': stt.st_mtime, 'ext': ext[1:], 'inline': LIB_TYPES[ext][1]})
+            row = {'name': n, 'size': stt.st_size, 'mtime': stt.st_mtime, 'ext': ext[1:], 'inline': LIB_TYPES[ext][1]}
+            if ext == '.pdf':   # 첫 쪽 그림이 있으면 그 이름(파일이 바뀌면 이름도 바뀜)
+                tk = H.thumb_key(slug, n, stt.st_size, stt.st_mtime)
+                if os.path.exists(os.path.join(THUMBS, tk + '.jpg')):
+                    row['thumb'] = tk
+                    try:
+                        with open(os.path.join(THUMBS, tk + '.json'), encoding='utf-8') as f:
+                            row['pages'] = int(json.load(f).get('pages') or 0)
+                    except Exception:
+                        pass
+            out.append(row)
         out.sort(key=lambda x: x['name'])
         return out
 
@@ -912,6 +936,36 @@ class H(BaseHTTPRequestHandler):
                 os.remove(tmp)
         print(f'[자료] 교수 업로드: {SEC_DIR[slug]}/{name} ({n // 1024}KB)', flush=True)
         return self.send(200, {'ok': True, 'files': self.lib_files(slug)})
+
+    def lib_thumb(self, slug, args):
+        """교수 화면이 그린 PDF 첫 쪽(JPEG)을 받아 저장 → 모든 사용자가 로딩 없이 그림으로 본다."""
+        if self.user['role'] != 'admin':
+            return self.err(403, '교수(관리자)만 올릴 수 있습니다')
+        if slug not in SEC_DIR:
+            return self.err(404, '없는 메뉴입니다')
+        name = (args.get('n') or [''])[0]
+        f = {x['name']: x for x in self.lib_files(slug)}.get(name)
+        if not f or f['ext'] != 'pdf':
+            return self.err(404, '파일이 없습니다')
+        n = self.clen()
+        if n <= 0 or n > 400 * 1024:
+            self.close_connection = True
+            return self.err(413, '미리보기 그림이 너무 큽니다')
+        data = self.rfile.read(n)
+        self._body_read = True
+        if not data.startswith(b'\xff\xd8\xff'):
+            return self.err(415, 'JPEG만 받습니다')
+        os.makedirs(THUMBS, exist_ok=True)
+        tk = self.thumb_key(slug, name, f['size'], f['mtime'])
+        with open(os.path.join(THUMBS, tk + '.jpg'), 'wb') as fo:
+            fo.write(data)
+        try:
+            pages = max(0, min(100000, int((args.get('p') or ['0'])[0])))
+        except ValueError:
+            pages = 0
+        with open(os.path.join(THUMBS, tk + '.json'), 'w', encoding='utf-8') as fo:
+            json.dump({'pages': pages, 'name': name}, fo, ensure_ascii=False)
+        return self.send(200, {'ok': True, 'thumb': tk, 'pages': pages})
 
     def lib_delete(self, slug, name):
         if self.user['role'] != 'admin':
