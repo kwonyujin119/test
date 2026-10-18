@@ -156,7 +156,7 @@ body.home .panel{display:none}
 body.compact:not(.nosearch) .panel{padding-top:8px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
 .panel-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 16px;margin-bottom:14px}
-.panel-head h2{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em;overflow-wrap:anywhere}
+.panel-head h2{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .panel-head .sub{color:var(--muted);font-size:13px}
 .eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .eyebrow::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--navy)}
@@ -167,6 +167,9 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .hitp .snip mark,.hitp .t mark{background:#FFF1B8;color:inherit;padding:0 1px;border-radius:2px}
 .srch-note{font-size:12.5px;color:var(--muted);margin:8px 2px 0}
 .srch-more{margin-top:10px}
+#srchLaw .ico{font-size:11px;letter-spacing:-.02em;white-space:nowrap;min-width:52px}
+.composer textarea::placeholder{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.sheet-lock,html.sheet-lock body{overflow:hidden}
 .bldc{padding:12px 14px}
 .bldc .t{margin:0 0 8px;font-size:15px}
 .bldc .t small{color:var(--muted);font-weight:500;margin-left:4px}
@@ -444,6 +447,15 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .sheet h2{margin:0;font-size:16px;font-weight:700}
 .sheet .close{border:0;background:transparent;width:var(--tap);height:var(--tap);border-radius:50%;font-size:22px;color:var(--muted)}
 .sheet-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.sheet-sep{grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:6px 2px 0;color:var(--muted);font-size:11.5px;font-weight:700;letter-spacing:.04em}
+.sheet-sep::before,.sheet-sep::after{content:"";flex:1;height:1px;background:var(--line)}
+.sheet-sep::before{flex:0 0 10px}
+.ct{margin:14px 0 0}.ct h4{margin:12px 0 6px}.ct .ctf{width:100%;min-height:40px;border:1px solid var(--line);border-radius:10px;padding:0 10px;font:inherit;font-size:14px;background:var(--surface);color:var(--fg);box-sizing:border-box}
+.ctl{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;margin:6px 0 0}
+.ctl a{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:46px;padding:6px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);text-decoration:none;font-size:14px}
+.ctl a b{flex:none;font-family:var(--mono);font-size:13px;color:#067647}.ctl a b::before{content:"📞 "}
+.ctl a span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ct .note{font-size:12px;color:var(--muted);margin:8px 0 0}
 .sheet-grid a{display:flex;align-items:center;gap:10px;padding:10px 10px;border:1px solid var(--line);border-radius:12px;min-height:56px;background:var(--surface-2)}
 .sheet-grid a .ab{flex:none;width:34px;height:34px;border-radius:9px;background:var(--navy-soft);color:var(--navy);display:grid;place-items:center;font-size:11px;font-weight:700}
 .sheet-grid a .tt{font-size:14px;font-weight:600;color:var(--fg);min-width:0;overflow-wrap:anywhere;line-height:1.3}
@@ -584,7 +596,8 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .msg.other .col .bub{max-width:100%;border-bottom-left-radius:6px}
 .msg.other .who{font-size:12px;font-weight:600;color:var(--muted);padding-left:2px}
 .note.err{color:#B42318;font-weight:600}
-.dbwrap{max-width:560px;width:100%;margin:8px auto 0;display:grid;gap:12px}
+.dbwrap{max-width:560px;width:100%;margin:8px auto 0;display:grid;grid-template-columns:minmax(0,1fr);gap:12px}   /* V154: 360px 화면에서 입력칸이 카드를 밀어내지 않게 */
+.kform input{min-width:0}
 .consent{padding:24px 20px;display:grid;gap:12px}
 .consent .art{display:block;width:240px;max-width:60%;height:auto;margin:0 auto 4px}
 .st-ic{display:block;width:56px;height:56px;margin:0 auto}
@@ -845,7 +858,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v153</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v154</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -865,7 +878,7 @@ footer b{color:var(--muted);font-weight:600}
   <div class="grip" aria-hidden="true"></div>
   <header><h2 id="sheetTitle"><i class="sg sg-MENU" role="img" aria-label="메뉴"></i></h2><button type="button" class="close" id="sheetClose" aria-label="닫기">×</button></header>
   <div class="sheet-grid" id="sheetGrid"></div>
-  <div class="foot"><span id="sheetFoot">자료 12개 섹션</span><button type="button" class="inst-menu" id="instMenu" hidden>앱 설치</button><a href="#login" id="profLink">교수 로그인</a></div>
+  <div class="foot"><span id="sheetFoot">자료 14개 섹션</span><button type="button" class="inst-menu" id="instMenu" hidden>앱 설치</button><a href="#login" id="profLink">교수 로그인</a></div>
 </section>
 
 <div class="report" id="report" role="dialog" aria-modal="true" aria-labelledby="repTitle" hidden>
@@ -1265,9 +1278,9 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .timer .chrow #tmReset{border:1px solid var(--line);min-height:40px}
 .ilbar .ilrow #ilReset{border:1px solid var(--line)}
 .timer .jump{flex-basis:100%}
-.ilbar .ilrow{flex-basis:100%;display:flex;align-items:center;gap:8px}
+.ilbar .ilrow{flex-basis:100%;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .ilbar .ilrow .btn{min-height:40px}
-.ilbar .ilrow .reps{margin-left:auto;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font:inherit;font-size:13px;font-weight:700;color:var(--fg);cursor:pointer}
+.ilbar .ilrow .reps{white-space:nowrap;margin-left:auto;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font:inherit;font-size:13px;font-weight:700;color:var(--fg);cursor:pointer}
 .ilbar .ilrow .reps .c{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--navy);color:#fff;font-size:11.5px;display:inline-grid;place-items:center}
 .ilbar .ilrow #mkReport{margin-left:0}
 
@@ -1561,6 +1574,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {slug:'mci',           ab:'다수', title:'다수사상자', desc:'다수사상자 사고 분류·이송 체계와 현장 응급의료소', kw:'다수사상자 MCI 중증도 분류 트리아지 이송 응급의료소 구급 START'},
     {slug:'drone',         ab:'드론', title:'드론전술', desc:'현장 드론 운용 절차와 영상의 지휘 활용', kw:'드론 무인기 영상 열화상 운용 조종 전술 정찰 비행'},
     {slug:'cases',         ab:'사례', title:'대형화재사례', desc:'대형화재 사례 분석과 지휘 판단의 교훈', kw:'사례 대형화재 분석 교훈 복기 공장 창고 샌드위치패널 물류'},
+    {slug:'hazmat',        ab:'위험', title:'위험물', desc:'위험물 류별 성질·지정수량과 화재 시 대응 요령', kw:'위험물 류별 지정수량 인화성 액체 유류 가스 화학물질 MSDS 제조소 저장소 취급소 금수성 자연발화'},
+    {slug:'fobj',          ab:'특정', title:'특정소방대상물', desc:'특정소방대상물 분류와 소방시설 설치 기준', kw:'특정소방대상물 소방대상물 용도 분류 소방시설 설치 기준 근린생활 판매 업무 숙박 노유자 의료 공동주택 복합건축물'},
     {slug:'signature',     ab:'SIG',  title:'SACHIL 시그니처', desc:'SACHIL 심벌·로고·시그니처 컬러', kw:'시그니처 심벌 로고 브랜드 컬러 색상 SACHIL 47 아이콘 디자인', local:true},
     {slug:'bangjae',       ab:'방재', title:'SACHIL방재실', desc:'교수 전용 · 메뉴 자료·AI 키·지도 키·서버 관리', kw:'', local:true, prof:true},
     {slug:'updates',       ab:'내역', title:'업데이트 내역', desc:'버전별 개선·업데이트 기록', kw:'업데이트 버전 내역 변경 개선 보강 패치 기록 새 기능', local:true}
@@ -1593,11 +1608,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {sec:'ictc-eval', type:'안내', title:'실기평가표 항목과 배점', hint:'작성 예정'}
   ];
   const AS = (typeof ICTC_ASSETS==='object' && ICTC_ASSETS) || {sections:[],phases:[]};
-  SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
+  { const ORD=['ictc-schedule','ictc-eval','faq','law','sop','ersp','rit','water','safety','mci','drone','cases'];   // V154: 그림은 처음 12개 순서대로 — 섹션이 늘어도 이름으로 맞춘다
+    SECTIONS.forEach(s=>{ const i=ORD.indexOf(s.slug); s.icon = i>=0 ? (AS.sections[i]||'') : ''; }); }
+  { const svg=b=>'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'+b+'</svg>');
+    const hz=SECTIONS.find(x=>x.slug==='hazmat'), fo=SECTIONS.find(x=>x.slug==='fobj');
+    if(hz) hz.icon=svg('<rect x="10" y="10" width="44" height="44" rx="6" transform="rotate(45 32 32)" fill="#FDD000" stroke="#1F2A44" stroke-width="3"/><path d="M32 18c5 7 9 11 9 17a9 9 0 0 1-18 0c0-4 2-6 4-9 1 3 2 4 4 5-1-5 0-9 1-13z" fill="#D92D20"/>');
+    if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V153', SRV_VER='7.9';
+  const APP_VER='V154', SRV_VER='8.0';
   const UPDATES=[
+    {v:'V154', d:'2026-10-18', t:['메뉴에 위험물·특정소방대상물 추가, 구분선으로 나눔 — 위(교육일정·평가일정·질의응답·관련법령) / 현장 대응 / 아래(시그니처·방재실·업데이트 내역)','긴급구조대응계획에 원클릭 전화 연결 — 응원협정 대상·긴급구조 관련기관을 첨부 PDF에서 뽑아 누르면 바로 전화(휴대전화 번호는 빼고 대표번호만), 기관 이름으로 찾기, 교수는 목록 고치기','방재실 공공데이터포털 [다시 시험]이 4개 API(건축물대장·소방용수시설·위험물정보·상수도시설정보)를 모두 시험 — 요청주소를 모르는 API는 서버가 공공데이터포털에서 찾아 시험','‘○○에 관한 법률’·‘○○법 시행령’ 이름을 제대로 알아봐 엉뚱한 조문을 근거로 쓰던 문제 고침','‘요양병원·지하주차장·진입로 2곳’처럼 일반 낱말을 건물·주소로 잘못 읽던 문제 고침','카카오 지도 불러오기가 막히면 AI 입력이 멈추던 문제, 답을 기다리는 동안 보낸 글이 사라지던 문제 고침','작은 휴대폰(360px)에서 대화명·로그인·방재실 서버·AI 화면이 잘리던 문제, 사고보고서 버튼 줄이 넘치던 문제 고침','소화전 창 Esc로 닫기·자료가 없는 지역(세종·전북) 조회·조회 횟수 제한 등 안정성 보강']},
     {v:'V153', d:'2026-10-18', t:['주소 대신 건물 이름(예: ○○아파트·○○병원·○○빌딩)으로 검색하거나 AI에게 물어도 카카오 장소 검색으로 주소를 찾아 건축물대장·소방용수시설을 함께 씀','AI 법령 답변의 근거 목록에 법제처 행정규칙(고시·화재안전기준)·자치법규(조례) 원문 링크도 붙임']},
     {v:'V152', d:'2026-10-18', t:['주소가 든 AI 질문에서 건축물대장·소방용수시설을 받아 놓고도 일반론만 답하던 문제 고침 — 그 건물의 층수·구조·비상용 승강기와 가까운 소화전 거리를 결론·설명에 꼭 쓰게 함','조회한 공공데이터(건축물대장·소방용수시설)는 답에 인용되지 않아도 근거 목록에 항상 보여 줌']},
     {v:'V151', d:'2026-10-18', t:['AI 도우미에 주소가 든 질문(예: 구월동 1138 화재 시 진입 방법은?)을 하면 그 자리에서 건축물대장·소방용수시설을 조회해, 층수·구조·비상용 승강기·가까운 소화전 거리를 근거로 자연스럽게 답함 — 근거 목록에 ‘공공데이터 · 지도’로 표시','검색에서 문장 속 주소도 알아봄(주소 부분만 골라 조회)','47망 → 소화전에 [소방청 자료]/[T맵] 버튼 — 소방청 전국소방용수시설표준데이터로 둘레 소화전·급수탑을 찾아 지도에 표시(공공데이터포털 키가 있으면 소방청 자료가 기본)',
@@ -1862,7 +1883,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 
   // ---------- 메뉴 시트 (12개 섹션) ----------
   const sheetGrid=$('#sheetGrid');
+  const SHEET_SEP={sop:'현장 대응', signature:'SACHIL'};   // V154: 위(일정·평가·질의응답·법령) / 가운데(현장 자료) / 아래(시그니처·방재실·업데이트) 구분선
   SECTIONS.forEach(s=>{
+    if(SHEET_SEP[s.slug]){ const d=document.createElement('div'); d.className='sheet-sep'; d.setAttribute('role','separator'); d.innerHTML=`<span>${esc(SHEET_SEP[s.slug])}</span>`; sheetGrid.appendChild(d); }
     const g=document.createElement('a'); g.href='#'+s.slug; g.dataset.slug=s.slug;
     g.innerHTML=`<span class="ab">${s.icon?`<img class="ico-img" src="${s.icon}" alt="">`:esc(s.ab)}</span><span class="tt">${esc(s.title)}<span class="dd">${esc(s.desc)}</span></span>`;
     if(s.prof){ g.hidden=true; g.classList.add('profonly'); g.addEventListener('click',e=>{ e.preventDefault(); closeSheet(); openBangjae(); }); }   // V108: 교수 로그인 때만 보이고, 화면 이동 없이 떠 있는 창으로
@@ -1873,8 +1896,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const sheet=$('#sheet'), sheetBack=$('#sheetBack');
   let lastFocus=null;
   const appEl=document.querySelector('.app'), tabbarEl=document.querySelector('.tabbar');
-  function openSheet(){ if(sheet.classList.contains('open')) return; lastFocus=document.activeElement; sheet.classList.add('open'); sheetBack.classList.add('open'); sheet.setAttribute('aria-hidden','false'); appEl.inert=true; tabbarEl.inert=true; $('#menuBtn').setAttribute('aria-expanded','true'); setTimeout(()=>$('#sheetClose').focus(),60); }
-  function closeSheet(){ if(!sheet.classList.contains('open')) return; sheet.classList.remove('open'); sheetBack.classList.remove('open'); sheet.setAttribute('aria-hidden','true'); appEl.inert=false; tabbarEl.inert=false; $('#menuBtn').setAttribute('aria-expanded','false'); syncTabbar(); if(lastFocus && lastFocus.focus) lastFocus.focus(); }
+  function openSheet(){ if(sheet.classList.contains('open')) return; lastFocus=document.activeElement; sheet.classList.add('open'); sheetBack.classList.add('open'); sheet.setAttribute('aria-hidden','false'); appEl.inert=true; tabbarEl.inert=true; document.documentElement.classList.add('sheet-lock'); $('#menuBtn').setAttribute('aria-expanded','true'); setTimeout(()=>$('#sheetClose').focus(),60); }
+  function closeSheet(){ if(!sheet.classList.contains('open')) return; sheet.classList.remove('open'); sheetBack.classList.remove('open'); sheet.setAttribute('aria-hidden','true'); appEl.inert=false; tabbarEl.inert=false; document.documentElement.classList.remove('sheet-lock'); $('#menuBtn').setAttribute('aria-expanded','false'); syncTabbar(); if(lastFocus && lastFocus.focus) lastFocus.focus(); }
   sheet.addEventListener('keydown',e=>{ if(e.key!=='Tab') return; const f=[...sheet.querySelectorAll('a,button,[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null); if(!f.length) return; const first=f[0], last=f[f.length-1]; if(e.shiftKey&&document.activeElement===first){ e.preventDefault(); last.focus(); } else if(!e.shiftKey&&document.activeElement===last){ e.preventDefault(); first.focus(); } });
   sheetBack.addEventListener('click',closeSheet); $('#sheetClose').addEventListener('click',closeSheet);
 
@@ -2128,20 +2151,21 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // V89: Search는 '찾기'(원문 위치), AI는 '풀기'(상황 적용·요약). 입력 모양으로 서로 안내하고 버튼으로 잇는다(자동으로 넘기지 않음 — AI는 입장코드·하루 한도)
   const isSentence=t=>{ t=String(t||'').trim(); return t.split(/\s+/).length>=4 || /[?？]$/.test(t) || /(나요|까요|할까|인가요|인지|는지|하나요|되나요|어떻게|무엇|뭔가요|왜|언제|알려줘|알려 줘|설명해)/.test(t); };
   // V150: 건축물대장 — '건축물대장'이라고 쓰거나 주소(…동 12, …로 34)처럼 보이면 검색 위쪽에 건축물 현황
-  const BLD_ADDR=/[가-힣\d](?:동|리|가|로|길)\s*(?:산\s*)?\d{1,5}(?:-\d{1,5})?(?![\d가-힣])/;
   // V151: 문장 속에서 주소 부분만(예: '인천 남동구 구월동 1138 건물 화재 시 진입은?' → '인천 남동구 구월동 1138')
-  const ADDR_RE=/((?:(?:서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주)[가-힣]*\s+|[가-힣]+(?:시|군|구)\s+)*[가-힣\d]+(?:동|리|가|로|길)\s*(?:산\s*)?\d{1,5}(?:-\d{1,5})?)(?!\d|\s*(?:단계|층|명|대|개|분|초|회|차|번째|호|급|km|m\b|%))/;
-  const bldAddrOf=t=>{ const m=String(t||'').match(ADDR_RE); return m?m[1].trim():''; };
+  const ADDR_RE=/(?:^|[^가-힣\d])((?:(?:서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주)[가-힣]*\s+|(?!(?:발생|도착|출동|화재|진입|진압|대피|구조|필요|비상|출입|입|사고|작업|점검|훈련)(?:시|구)\s)[가-힣]{1,5}(?:시|군|구)\s+)*([가-힣\d]+(?:동|리|가|로|길))\s*(?:\d{1,4}번?길\s*)?(?:산\s*)?\d{1,5}(?:-\d{1,5})?)(?![\d.]|\s*(?:단계|층|명|대|개|분|초|회|차|번째|호|급|km|m\b|%)|(?:곳|팀|건|점|번(?!지)|년|개월|일(?!대)|시간|시|미터|센티|킬로|cm|mm|kg|배|세|살|톤|평))/g;
+  const ADDR_STOP=/^(?:출동|이동|활동|가동|작동|연동|기동|발동|행동|운동|구동|변동|자동|수동|협동|합동|진동|유동|추가|평가|증가|참가|휴가|단가|부가|거리|처리|관리|수리|정리|조리|분리|무리|대리|원리|심리|통로|진입로|도로|소방도로|경로|회로|선로|퇴로|대피로|피난로|진로|수로|항로|활로|우회로|차로|골목길|진입길)$/;   /* V154: '출동 3팀'·'진입로 2곳'은 주소가 아님 */
+  const bldAddrOf=t=>{ for(const m of String(t||'').matchAll(ADDR_RE)) if(!ADDR_STOP.test(m[2])) return m[1].trim(); return ''; };
   // V153: 주소 대신 건물 이름(○○아파트·○○병원·○○빌딩…)으로 물어도 — 카카오 장소 검색으로 주소를 찾아 같은 조회
-  const PLACE_RE=/([가-힣A-Za-z0-9]{2,20}(?:아파트|빌딩|타워|센터|병원|의원|초등학교|중학교|고등학교|대학교|학교|시장|공장|호텔|모텔|마트|백화점|소방서|경찰서|청사|구청|시청|플라자|오피스텔|요양원|요양병원|교회|성당|창고|주차장|터미널|쇼핑몰|체육관|도서관|박물관|발전소))(?![가-힣])/;
-  const placeOf=t=>{ const m=String(t||'').replace(/건축물\s*대장/g,' ').match(PLACE_RE); return m?m[1]:''; };
+  const PLACE_RE=/(([가-힣A-Za-z0-9]{2,20}?)(?:아파트|빌딩|타워|센터|병원|의원|의료원|초등학교|중학교|고등학교|대학교|학교|시장|공장|호텔|모텔|마트|백화점|소방서|경찰서|청사|구청|시청|플라자|오피스텔|요양원|요양병원|교회|성당|창고|주차장|터미널|쇼핑몰|체육관|도서관|박물관|발전소))(?![가-힣])/g;
+  const PLACE_GEN=/^(?:\d+|고층|초고층|저층|노후|대형|중형|소형|지하|물류|냉동|냉장|전통|재래|공동|일반|요양|종합|현장지휘|현장|지휘|안전|119안전|119|상황|종합상황|해당|인근|주변|근처|관할|다중이용|주상복합|복합|산업|공공|민간|임대|신축|위험물|화학|인접|각|모든|여러|대피|임시|응급|비상|기계식|자주식|옥외|옥내|무인|소규모|대규모)$/;   /* V154: '요양병원·지하주차장'처럼 일반 낱말은 건물 이름이 아님 */
+  const placeOf=t=>{ for(const m of String(t||'').replace(/건축물\s*대장/g,' ').matchAll(PLACE_RE)) if(!PLACE_GEN.test(m[2])) return m[1]; return ''; };
   const bldQuery=t=>{ t=String(t||'').trim(); const ex=/건축물\s*대장|건축물\s*조회/.test(t); const a0=bldAddrOf(t), p0=a0?'':placeOf(t); const a=a0||t.replace(/건축물\s*대장|건축물\s*조회|건축물|조회|정보/g,' ').replace(/\s+/g,' ').trim(); return (ex||a0||p0)&&a.length>=2?{a,ex,place:p0}:null; };
   // 주소(또는 건물 이름) → 카카오 주소 결과 하나. 이름은 장소 이름에 그 낱말이 실제로 들어 있을 때만(엉뚱한 곳 방지), 인천 것을 먼저
   async function geoHit(a,place){
     const geo=q=>Promise.race([new Promise(ok=>new kakao.maps.services.Geocoder().addressSearch(q,(r2,s2)=>ok(s2===kakao.maps.services.Status.OK?r2:[]))),sleep(5000).then(()=>[])]);
     const ok=r=>(r||[]).find(x=>x.address&&/^\d{10}$/.test(x.address.b_code||'')&&x.address.main_address_no);
     if(!place){ const h=ok(await geo(a)); return h?{hit:h,label:''}:null; }
-    const res=await Promise.race([new Promise(r=>new kakao.maps.services.Places().keywordSearch(place,(x,st)=>r(st===kakao.maps.services.Status.OK?x:[]))),sleep(5000).then(()=>[])]);
+    const res=await Promise.race([new Promise(r=>new kakao.maps.services.Places().keywordSearch(((a.split(place)[0].trim().split(/\s+/).pop()||'').match(/^[가-힣]{2,6}$/)?a.split(place)[0].trim().split(/\s+/).pop()+' ':'')+place,(x,st)=>r(st===kakao.maps.services.Status.OK?x:[]))),sleep(5000).then(()=>[])]);
     const key=place.replace(/\s/g,''), c=(res||[]).filter(x=>String(x.place_name||'').replace(/\s/g,'').includes(key)&&x.address_name);
     const pl=c.find(x=>/^인천/.test(x.address_name))||c[0]; if(!pl) return null;
     const h=ok(await geo(pl.address_name)); return h?{hit:h,label:String(pl.place_name).slice(0,30)}:null; }
@@ -2149,7 +2173,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   async function geoFor(t){
     if(!SRV.on||!SRV.bld||!SRV.kakao) return null; const a=bldAddrOf(t), pl=a?'':placeOf(t); if(!a&&!pl) return null;
     try{ await loadKakao(SRV.kakao); }catch(_){ return null; }
-    const g=await geoHit(a,pl); if(!g) return null; const h=g.hit, A=h.address;
+    const g=await geoHit(a||t,pl); if(!g) return null; const h=g.hit, A=h.address;
     return {b:A.b_code,bun:A.main_address_no,ji:A.sub_address_no||'0',mt:A.mountain_yn==='Y'?'1':'0',sd:A.region_1depth_name||'',sg:A.region_2depth_name||'',lat:h.y,lng:h.x,addr:((g.label?g.label+' ':'')+A.address_name).slice(0,60)}; }
   const bldRow=x=>{ const f=(v,u)=>v&&v!=='0'?esc(v)+(u||''):'', num=v=>{ const n=parseFloat(v); return Number.isFinite(n)&&n>0?n.toLocaleString('ko-KR',{maximumFractionDigits:2}):''; };
     const apr=/^\d{8}$/.test(x.apr)?`${x.apr.slice(0,4)}.${x.apr.slice(4,6)}.${x.apr.slice(6)}`:esc(x.apr||'');
@@ -2187,7 +2211,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(tok!==SEARCHGEN||document.getElementById('srchLaw')!==el||!x.ok||!x.j||!x.j.ok) return;
     const rows=x.j.rows||[]; if(!rows.length) return;
     const ord=['law','admrul','ordin'];
-    el.innerHTML='<div class="group-title">법령 원문 · 법제처</div><div class="results">'+rows.slice().sort((a,b)=>ord.indexOf(a.t)-ord.indexOf(b.t)).map(r=>`<a class="card result" href="${esc(r.url)}" target="_blank" rel="noopener">
+    el.innerHTML='<div class="group-title">법령 원문 · 법제처</div><div class="results">'+rows.slice().sort((a,b)=>ord.indexOf(a.t)-ord.indexOf(b.t)).map(r=>`<a class="card result" href="${/^https:\/\/(?:www\.)?law\.go\.kr\//.test(String(r.url||''))?esc(r.url):'https://www.law.go.kr/'}" target="_blank" rel="noopener">
         <span class="ico">${esc(r.t==='law'?(/시행령$/.test(r.name)?'시행령':/시행규칙$/.test(r.name)?'시행규칙':r.kind||'법령'):LAW_T[r.t])}</span>
         <span class="body"><p class="t">${esc(r.name)}${r.art?` <span class="art">${esc(r.art)}</span>`:''}</p><p class="d">${esc([r.t==='law'?'':r.kind,r.org,r.eff?'시행 '+r.eff:''].filter(Boolean).join(' · '))}</p></span>
         <span class="arrow">→</span></a>`).join('')+'</div>'+(x.j.skip&&x.j.skip.length?`<p class="srch-note">${esc(x.j.skip.join('·'))} 검색은 법제처 OPEN API 신청 화면에서 해당 활용 API를 체크하면 함께 나옵니다</p>`:'<p class="srch-note">누르면 법제처 국가법령정보센터의 현행 원문이 열립니다</p>'); }
@@ -2274,11 +2298,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     });
   }
 
-  const LIB_DIR={ 'ictc-schedule':'01_ICTC 교육일정','ictc-eval':'02_ICTC 평가일정','faq':'03_주요 질의응답','law':'04_관련법령','sop':'05_SOP-현장지휘론','ersp':'06_긴급구조대응계획','rit':'07_RIT','water':'08_무중단급수체계','safety':'09_안전관리','mci':'10_다수사상자','drone':'11_드론전술','cases':'12_대형화재사례' };
+  const LIB_DIR={ 'ictc-schedule':'01_ICTC 교육일정','ictc-eval':'02_ICTC 평가일정','faq':'03_주요 질의응답','law':'04_관련법령','sop':'05_SOP-현장지휘론','ersp':'06_긴급구조대응계획','rit':'07_RIT','water':'08_무중단급수체계','safety':'09_안전관리','mci':'10_다수사상자','drone':'11_드론전술','cases':'12_대형화재사례','hazmat':'13_위험물','fobj':'14_특정소방대상물' };
   const fmtDate=ts=>{ const d=new Date(ts*1000); return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`; };
   const libHref=(slug,f)=>SRV.on?SURL(`/lib/${slug}/${encodeURIComponent(f.name)}`):`lib/${slug}/${encodeURIComponent(f.name)}`;
   const libRow=(slug,f)=>`<a class="libfile" href="${libHref(slug,f)}" ${f.inline?'target="_blank" rel="noopener"':'download'}${f.ext==='pdf'?` data-pdfv="${esc(f.name)}"`:''}>${f.ext==='pdf'?(f.thumb?`<span class="thumb" aria-hidden="true"><img src="${esc(SURL('/lib-thumb/'+f.thumb+'.jpg'))}" alt="" loading="lazy" decoding="async"><span class="ext">PDF</span></span>`:`<span class="thumb" data-thumb="${esc(libHref(slug,f))}" data-slug="${esc(slug)}" data-tname="${esc(f.name)}" aria-hidden="true"><span class="ext">PDF</span></span>`):`<span class="ext">${esc(f.ext)}</span>`}<span class="nm"><b>${esc(f.name.replace(/\.[^.]+$/,'')).replace(/([_\-.])/g,'$1<wbr>')}</b><small>${fmtSize(f.size)} · ${fmtDate(f.mtime)}${f.pages?` · ${f.pages}쪽`:''}</small></span><span class="go">${f.inline?'열기':'받기'}</span></a>`;
-  function syncSheetFoot(){ const el=$('#sheetFoot'); if(!el) return; if(!SRV.lib){ el.textContent=`자료 12개 섹션 · ${APP_VER}`; return; } const n=SECTIONS.filter(x=>!x.local&&(SRV.lib[x.slug]||[]).length).length; el.textContent=(n?`자료 있는 섹션 ${n}/12`:'아직 올라온 자료 없음')+` · ${APP_VER}`; }
+  function syncSheetFoot(){ const el=$('#sheetFoot'); if(!el) return; const T=SECTIONS.filter(x=>!x.local).length; if(!SRV.lib){ el.textContent=`자료 ${T}개 섹션 · ${APP_VER}`; return; } const n=SECTIONS.filter(x=>!x.local&&(SRV.lib[x.slug]||[]).length).length; el.textContent=(n?`자료 있는 섹션 ${n}/${T}`:'아직 올라온 자료 없음')+` · ${APP_VER}`; }
   async function loadLib(){ const r=await api('/api/lib'); if(r.ok&&r.j.lib){ SRV.lib=r.j.lib; SRV.libErr=false; syncSheetFoot(); return true; }
     if(!SRV.on){ try{ const x=await fetch('lib/index.json',{cache:'no-cache'}); if(x.ok){ const j=await x.json(); if(j&&j.lib){ SRV.lib=j.lib; SRV.libStatic=true; SRV.libErr=false; syncSheetFoot(); return true; } } }catch(_){ } }
     SRV.libErr=true; return false; }
@@ -2442,7 +2466,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {k:'claude', n:'Claude', pane:'AI', d:'유료(선택) — console.anthropic.com', ph:'sk-ant-…로 시작하는 키', has:j=>j.keys&&j.keys.claude, save:v=>({action:'set',provider:'claude',key:v}), del:{action:'delete',provider:'claude'}, test:true},
     {k:'law', n:'법제처 OPEN API', pane:'AI', d:'법령 질문에 현행 조문 원문을 근거로 — law.go.kr 마이페이지 → API인증키관리의 ‘현재 API인증키(OC)’', ph:'API인증키(OC)', has:j=>j.law, save:v=>({action:'law',oc:v}), del:{action:'law',oc:''}, test:true, need:j=>'law' in j},
     {k:'bld', n:'공공데이터포털 인증키', pane:'AI', d:'검색창에 주소를 넣으면 건축물대장(용도·구조·층수·연면적)과 가까운 소방용수시설 — data.go.kr 마이페이지 → 데이터활용 → Open API → 활용신청 현황의 일반 인증키(Decoding). 키 하나로 승인받은 API 모두에 쓰입니다', ph:'일반 인증키(Decoding)', has:j=>j.bld, save:v=>({action:'bld',key:v}), del:{action:'bld',key:''}, test:true, need:j=>'bld' in j,
-      more:j=>{ const p=j.pub||{}, ks=Object.keys(p); return `<ul class="kapi">${(ks.length?ks:['건축물대장','소방용수시설']).map(k=>{ const v=p[k]; return `<li class="${v?(v[0]?'ok':'bad'):''}"><b>${esc(k)}</b> ${v?(v[0]?'✅ 연결':'❌ '+esc(v[1])):'— 아직 시험 전'}${v&&v[0]&&v[1]?` <small>${esc(v[1])}</small>`:''}</li>`; }).join('')}</ul>${'pub' in j?'<button type="button" class="btn ghost sm" data-ka="retest">다시 시험</button>':''}`; }},
+      more:j=>{ const p=j.pub||{}, ks=Object.keys(p); return `<ul class="kapi">${(ks.length?ks:['건축물대장','소방용수시설','위험물정보(소방청)','상수도시설정보(수자원공사)']).map(k=>{ const v=p[k]; return `<li class="${v?(v[0]?'ok':'bad'):''}"><b>${esc(k)}</b> ${v?(v[0]?'✅ 연결':'❌ '+esc(v[1])):'— 아직 시험 전'}${v&&v[0]&&v[1]?` <small>${esc(v[1])}</small>`:''}</li>`; }).join('')}</ul>${'pub' in j?'<button type="button" class="btn ghost sm" data-ka="retest">다시 시험</button>':''}`; }},
     {k:'kakao', n:'카카오맵', pane:'Map', d:'47망 DS 지도 — developers.kakao.com의 JavaScript 키(32자)', ph:'JavaScript 키 32자', has:j=>j.kakao, save:v=>({action:'kakao',key:v}), del:{action:'kakao',key:''}},
     {k:'tmap', n:'T맵', pane:'Map', d:'47망 소화전 — openapi.sk.com의 App Key', ph:'App Key', has:j=>j.tmap, save:v=>({action:'tmap',key:v}), del:{action:'tmap',key:''}}];
   const KMSG={}, KOPEN={}; let KJ=null;
@@ -2627,6 +2651,27 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     });
   }
   // 교수: 섹션 자료 올리기·지우기
+  // V154: 긴급구조대응계획 — 응원협정 대상·긴급구조 관련기관 원클릭 전화(첨부 PDF에서 뽑은 대표번호, 교수가 고칠 수 있음)
+  const CT={g:null, manual:false, at:0, q:'', edit:false};
+  function ctHtml(){
+    if(!SRV.on) return '<div class="ct"><p class="note">전화 연결 목록은 서버(47망)에 연결됐을 때 보입니다</p></div>';
+    if(!CT.g) return '<div class="ct" id="ctBox"><p class="note">전화 목록을 불러오는 중…</p></div>';
+    const q=CT.q.trim().replace(/\s+/g,''), f=x=>!q||(x.name+x.tel).replace(/\s+/g,'').includes(q);
+    const body=CT.g.length?CT.g.map(g=>{ const it=g.items.filter(f); return `<h4>${esc(g.title)} <small>${it.length}</small></h4>${it.length?`<div class="ctl">${it.map(x=>`<a href="tel:${esc(x.tel.replace(/[^0-9]/g,''))}"><span>${esc(x.name)}</span><b>${esc(x.tel)}</b></a>`).join('')}</div>`:'<p class="note">찾는 기관이 없습니다</p>'}`; }).join('')
+      :'<p class="note">첨부 PDF에서 응원협정 대상·긴급구조 관련기관 전화번호를 찾지 못했습니다'+(isProf()?' — 아래 [목록 고치기]로 직접 넣을 수 있어요':'')+'</p>';
+    const ed=isProf()?(CT.edit?`<div class="ct-ed"><p class="note">한 줄에 하나씩 <b>구분|기관명|번호</b> (예: 응원협정 대상|부천소방서 상황실|032-000-0000). 휴대전화 번호는 넣지 마세요(누구나 보는 화면). 비우고 저장하면 PDF 자동 목록으로 돌아갑니다.</p><textarea id="ctText" rows="10" style="width:100%;box-sizing:border-box;font:13px var(--mono)"></textarea><div class="kact" style="margin-top:6px"><button type="button" class="btn primary sm" data-ct="save">저장</button><button type="button" class="btn ghost sm" data-ct="auto">PDF 자동 목록 불러오기</button><button type="button" class="btn ghost sm" data-ct="cancel">닫기</button></div></div>`
+      :`<div class="kact" style="margin-top:8px"><button type="button" class="btn ghost sm" data-ct="edit">목록 고치기</button></div>`):'';
+    return `<div class="ct" id="ctBox"><h3 style="margin:0">원클릭 전화 연결</h3><input class="ctf" id="ctQ" type="search" placeholder="기관 이름·번호로 찾기" value="${esc(CT.q)}" aria-label="기관 찾기">${body}<p class="note">${CT.manual?'교수가 정리한 목록':'첨부 PDF에서 자동으로 뽑은 대표번호(휴대전화 제외) — 번호가 틀릴 수 있어요'}. 누르면 전화가 걸립니다.</p>${ed}</div>`; }
+  async function ctLoad(force){ if(!SRV.on||(!force&&CT.g&&Date.now()-CT.at<60000)) return false; const r=await api('/api/contacts'); if(r.ok&&r.j&&r.j.ok){ CT.g=r.j.groups||[]; CT.manual=!!r.j.manual; CT.at=Date.now(); return true; } if(!CT.g) CT.g=[]; CT.at=Date.now(); return true; }
+  function ctBind(panel,redraw){
+    const box=panel.querySelector('#ctBox'); if(!box) return;
+    if(!CT.g||Date.now()-CT.at>60000) ctLoad().then(ch=>{ if(ch) redraw(); });
+    const qi=box.querySelector('#ctQ'); if(qi) qi.addEventListener('input',()=>{ CT.q=qi.value; const pos=qi.selectionStart; redraw(); const n=document.getElementById('ctQ'); if(n){ n.focus(); try{ n.setSelectionRange(pos,pos); }catch(_){ } } });
+    box.addEventListener('click',async e=>{ const b=e.target.closest('[data-ct]'); if(!b) return; const a=b.dataset.ct, ta=box.querySelector('#ctText');
+      if(a==='edit'){ CT.edit=true; redraw(); const t=document.getElementById('ctText'); if(t) t.value=(CT.g||[]).flatMap(g=>g.items.map(x=>`${g.title}|${x.name}|${x.tel}`)).join('\n'); return; }
+      if(a==='cancel'){ CT.edit=false; redraw(); return; }
+      if(a==='auto'){ const r=await api('/api/admin/ai',{json:{action:'contacts',auto:true},tok:PROF.tok}); if(ta) ta.value=(r.j&&r.j.text)||''; toast(r.ok?'PDF에서 뽑은 목록을 불러왔습니다 — 고친 뒤 저장하세요':'불러오지 못했습니다'); return; }
+      if(a==='save'){ b.disabled=true; const r=await api('/api/admin/ai',{json:{action:'contacts',text:ta?ta.value:''},tok:PROF.tok}); b.disabled=false; if(r.ok&&r.j&&r.j.ok!==false){ toast(r.j.msg||'저장했습니다'); CT.edit=false; await ctLoad(true); redraw(); } else toast((r.j&&r.j.error)||'저장하지 못했습니다(서버 업데이트가 필요할 수 있음)'); } }); }
   function profLibBar(slug){ return isProf()&&SRV.on?`<div class="prof-up"><label class="btn primary"><input type="file" id="libUp" multiple hidden>자료 올리기</label><span class="pu-st" id="libUpSt" aria-live="polite"></span></div>`:''; }
   async function profUpload(slug,files,done){
     const st=$('#libUpSt'); let ok=0;
@@ -2685,6 +2730,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
             : files.length?`<h4>자료 ${files.length}</h4>${files.map(f=>libRow(s.slug,f)).join('')}${SRV.libErr?'<p class="none"><b>서버 연결 끊김 — 마지막으로 받은 목록입니다</b> <button type="button" class="btn ghost" id="libRetry">다시 시도</button></p>':''}`
             : `<p class="none">${SRV.libErr&&AS.offline?`<img class="st-illo" src="${AS.offline}" alt="">`:''}${SRV.libErr?'서버 연결이 끊겨 자료 목록을 확인하지 못했습니다. <button type="button" class="btn ghost" id="libRetry">다시 시도</button>':'아직 올라온 자료가 없습니다.'}</p>`}
         </div>
+        ${s.slug==='ersp'?ctHtml():''}
         ${profLibBar(s.slug)}
         ${s.slug==='faq'?qnaHtml(qItems):''}
         <div class="links">
@@ -2696,6 +2742,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     };
     let qItems=null;
     const bindExtra=()=>{
+      if(s.slug==='ersp') ctBind(panel,()=>{ if(SRV.gen===gen) draw(); });
       const up=$('#libUp'); if(up) up.addEventListener('change',()=>{ const fs=[...up.files]; up.value=''; if(fs.length) profUpload(s.slug,fs,()=>{ if(SRV.gen===gen){ draw(); thumbsIn(panel); } }); });
       if(isProf()) panel.querySelectorAll('.lib .libfile').forEach(a=>{ const nm=decodeURIComponent((a.getAttribute('href')||'').split('/').pop().split('?')[0]); const del=document.createElement('button'); del.type='button'; del.className='btn ghost lib-del'; del.textContent='지우기';
         a.after(del); del.addEventListener('click',()=>arm(del,'정말 지우기',async()=>{ const r=await api(`/api/lib/${s.slug}/${encodeURIComponent(nm)}`,{method:'DELETE',tok:PROF.tok}); if(r.ok){ if(SRV.lib) SRV.lib[s.slug]=r.j.files; draw(); thumbsIn(panel); toast('지웠습니다(서버 data\\trash에 보관)'); } else toast(r.j.error||'지우지 못했습니다'); })); });
@@ -3612,7 +3659,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(has('체크리스트','상황판','타이머') && /열|보여|가자|시작|어디/.test(lq)) return answer(v);
     return null;
   }
-  const srcHref=s=>s.url||libHref(s.slug,{name:s.name});
+  const srcHref=s=>s.url||(s.slug==='law'?'https://www.law.go.kr/':s.slug==='pub'?'https://map.kakao.com/':libHref(s.slug,{name:s.name}));
   const srcPg=s=>s.slug==='law'?'법제처 원문':s.slug==='pub'?'공공데이터 · 지도':`${s.page}쪽`, srcPdf=s=>s.slug==='law'||s.slug==='pub'?'':` data-pdfv="${esc(s.name)}" data-page="${s.page}"`;   /* V151: pub = 공공데이터포털 실시간 조회 */   // V144: 법령 원문은 법제처로
   // PDF에서 뽑은 글에 섞인 깨진 기호(□) 지우기(V94) — 예전 서버 답·이 기기에 저장된 대화에도 적용
   const deGlyph=t=>String(t||'').replace(/[\uE000-\uF8FF\uFFFD\u1100-\u11FF\uA960-\uA97F\uD7B0-\uD7FF\u2E80-\u2FDF\uA000-\uA6FF]|[\uDB80-\uDBFF][\uDC00-\uDFFF]/g,' ').replace(/[ \t]{2,}/g,' ');
@@ -3652,9 +3699,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const q=qRaw.trim(), lq=q.toLowerCase();
     const has=(...ws)=>ws.some(w=>lq.includes(w));
     if(has('안녕','하이','hello','반가')) return {text:'안녕하세요. SACHIL AI 도우미입니다. SOP·법령·절차 문서를 찾아 드리고, 체크리스트와 사고보고서로 안내합니다. 아래 추천 질문을 눌러 보셔도 됩니다.'};
-    if(has('도움','사용법','뭐 할 수','뭘 할 수','기능')) return {text:'SACHIL은 이름이 곧 화면입니다.\nS 검색 — SOP·법령·절차·사례를 찾습니다.\nA AI 도우미 — 지금 보시는 화면.\nCH 체크리스트 — 출동부터 지휘소 운영까지 12단계, 경과 타이머.\nIL 사고보고서 — 발생개요·화재 원인·인명·재산 피해를 적고 보고서 만들기.\n47망·디브리핑룸(익명 의견·사진·PDF 공유)과 메뉴(12개 섹션)는 오른쪽 위 심벌에 있습니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
+    if(has('도움','사용법','뭐 할 수','뭘 할 수','기능')) return {text:'SACHIL은 이름이 곧 화면입니다.\nS 검색 — SOP·법령·절차·사례를 찾습니다.\nA AI 도우미 — 지금 보시는 화면.\nCH 체크리스트 — 출동부터 지휘소 운영까지 12단계, 경과 타이머.\nIL 사고보고서 — 발생개요·화재 원인·인명·재산 피해를 적고 보고서 만들기.\n47망·디브리핑룸(익명 의견·사진·PDF 공유)과 메뉴(14개 섹션)는 오른쪽 위 심벌에 있습니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
     if(has('보고서','리포트','report')) return {text:'체크리스트 화면의 "보고서 작성"을 누르면 체크한 항목·화재 원인·인명 피해·재산 피해·시각 기록으로 보고서 초안이 바로 만들어지고 AI 작성본이 이어서 나옵니다. 만든 보고서는 IL 사고보고서 탭에 모이며, 두 본문 모두 직접 고칠 수 있습니다. 교관 확인 전 자료입니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
-    if(has('상황판','체크리스트','타이머')) return {text:'체크리스트로 안내합니다. 시작을 누르면 경과 시간과 체크 시각이 기록되고, 사고일시가 자동으로 채워집니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'}]};
+    if(has('상황판','체크리스트','타이머')) return {text:'체크리스트로 안내합니다. 첫 항목을 체크하면 경과 시간이 자동으로 시작되고, 체크한 시각이 남으며 사고일시가 자동으로 채워집니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'}]};
     if(has('차이','범위','역할') && has('선착대장','지휘대장')) return {text:'초안 기준 역할 경계입니다. 확정 기준은 교관 승인 후 반영됩니다.\n· 선착대장 — 도착 보고, 초기 상황판단, 선착대 전술(진입·배연·용수), 대원 안전, 지휘권 이양 준비까지.\n· 지휘대장 — 지휘권 인수, 상황 재평가, 대응단계 판단·건의, 자원 요청·배치, 안전관리, 지휘소 운영, 통제단 전환 직전까지.\n· 통제단장 — 이 플랫폼 범위 밖(중앙소방학교).', cards:[{title:'SOP-현장지휘론',slug:'sop',type:'섹션'}]};
     if(has('이의신청','평가 일정','평가일정','재평가')) return {text:'평가·이의신청 일정은 아직 준비 중입니다. 열리면 ICTC 평가일정에서 기수별로 확인할 수 있습니다.', cards:[{title:'ICTC 평가일정',slug:'ictc-eval',type:'섹션'},{title:'실기평가 이의신청은 언제까지 가능한가',slug:'faq',type:'Q&A'}]};
     if(has('교육 일정','교육일정','입교','기수')) return {text:'교육 일정은 준비 중입니다. ICTC 교육일정 섹션에 기수별 시간표가 올라갑니다.', cards:[{title:'ICTC 교육일정',slug:'ictc-schedule',type:'섹션'}]};
@@ -3978,25 +4025,27 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(chat.msgs.length) scrollEndOf(panel);
     if(chatPrefill){ const inp=$('#chatText'); if(inp){ inp.value=chatPrefill; if(window.innerWidth>=600) inp.focus(); } chatPrefill=''; }
     const send=(text,att)=>{
-      const v=String(text||'').trim(); att=att||[]; if((!v&&!att.length)||chat.typing) return;
+      const v=String(text||'').trim(); att=att||[]; if(!v&&!att.length) return;
+      if(chat.typing){ const ti=$('#chatText'); if(ti&&!ti.value) ti.value=v; if(att.length){ pending=att.concat(pending); renderPending(); } toast('앞 질문의 답을 기다리는 중입니다'); return; }   // V154: 기다리는 동안 보낸 글을 지우지 않음
       push('me',v,[],att); chat.typing=true; renderBotRoom(panel,room);
       if(SRV.on && v && !localIntent(v)){
         const hist=[]; for(let i=chat.msgs.length-2;i>0&&hist.length<2;i--){ const b=chat.msgs[i], u=chat.msgs[i-1]; if(b.who==='bot'&&(b.mode==='ai'||b.mode==='general')&&u.who==='me'&&u.text) hist.unshift({q:u.text,a:b.text}); }
         const g0=chat.gen||0;
-        geoFor(v).then(geo=>api('/api/ask',{json:{q:v,history:hist,code:aiCode(),...(geo?{geo}:{})}, ...(isProf()?{tok:PROF.tok}:{})})).then(r=>{
+        Promise.race([geoFor(v).catch(()=>null),sleep(6000).then(()=>null)]).then(geo=>api('/api/ask',{json:{q:v,history:hist,code:aiCode(),...(geo?{geo}:{})}, ...(isProf()?{tok:PROF.tok}:{})})).then(r=>{
           if((chat.gen||0)!==g0) return;   // 그사이 '대화 비우기' — 이전 질문의 답은 버림
           chat.typing=false;
           if(r.status===403&&r.j&&r.j.code==='need_code'){ chat.msgs.pop(); csave(); setAiCode(''); SRV.aiGate=true; if(chat.room==='bot'&&state.route==='ai') aiGate(panel,room); return; }   // 코드가 바뀜 → 다시 입력
           if(r.ok&&r.j.ok){ push('bot',String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.cached=!!r.j.cached; m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,art:String(x.art||'').slice(0,60),snip:String(x.snippet||'').slice(0,180),url:/^https:\/\/(?:www\.law\.go\.kr|map\.kakao\.com)\//.test(String(x.url||''))?String(x.url):''})); csave(); }
           else push('bot', r.status===0?'서버에 연결할 수 없습니다. 잠시 뒤 다시 물어보세요.':(r.j.error||'답변을 만들지 못했습니다.'),[]);
           if(chat.room==='bot'&&state.route==='ai'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp&&window.innerWidth>=600) inp.focus(); }
-        });
+        }).catch(()=>{ if((chat.gen||0)!==g0) return; chat.typing=false; push('bot','답변을 만들지 못했습니다. 다시 물어보세요.',[]); if(chat.room==='bot'&&state.route==='ai') renderBotRoom(panel,room); });
         return;
       }
       const delay=window.matchMedia('(prefers-reduced-motion: reduce)').matches?80:520;
       setTimeout(()=>{ const a = v ? answer(v) : {text:`${att.length}개 파일을 받았습니다 (${att.map(x=>x.kind==='image'?'사진':'PDF').join(', ')}). 사진·PDF 내용 분석은 AI 연결 후 가능합니다. 지금은 이 기기에 보관만 합니다.`}; chat.typing=false; push('bot',a.text,a.cards); if(chat.room==='bot'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp && window.innerWidth>=600) inp.focus(); } },delay);
     };
     bindComposer(send);
+    if(SRV.on&&SRV.bld&&SRV.kakao) loadKakao(SRV.kakao).catch(()=>{});   // V154: 주소 질문이 빨리 가도록 미리 불러 둠
     { const ti=$('#chatText'), kh=$('#kwHint'); if(ti&&kh){ const sync=()=>{ kh.hidden=!isKeyword(ti.value); if(window.__fitConvo) window.__fitConvo(); }; ti.addEventListener('input',sync); $('#kwGo').addEventListener('click',()=>toSearch(ti.value)); } }
     panel.querySelectorAll('.to-srch').forEach(b=>b.addEventListener('click',()=>toSearch(b.dataset.srch)));
     { const qb=$('#quick');
@@ -4022,7 +4071,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {go:'debrief', k:'DB', y:true, t:'디브리핑룸', d:'익명으로 개선사항 도출<br>의견 청취로 지휘역량 강화', ic:'<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 7.5C4 5.6 5.6 4 7.5 4h9C18.4 4 20 5.6 20 7.5v5c0 1.9-1.6 3.5-3.5 3.5H10l-4 3.5V16C4.9 15.6 4 14.2 4 12.5v-5Z" fill="#fff" stroke="#244EA2" stroke-width="2" stroke-linejoin="round"/><path d="M22 10.5c1.2.4 2 1.6 2 2.9v4.1c0 1.4-.9 2.6-2 3v3l-3.4-2.9H13c-1.3 0-2.4-.7-3-1.8" fill="none" stroke="#244EA2" stroke-width="2" stroke-linejoin="round"/></svg>'},
     {go:'search', k:'S', t:'Search', d:'SOP·법령·교재·사례 찾기'},
     {go:'ai', k:'A', t:'AI assistant', d:'자료를 근거로 대화하듯 답변'},
-    {go:'board', k:'CH', t:'CHecklist', d:'현재 시각·12단계 지휘 체크'},
+    {go:'board', k:'CH', t:'CHecklist', d:'12단계 지휘 체크·경과 시간'},
     {go:'log', k:'IL', t:'Incident Log', d:'만든 보고서 모아 보기·작성'}
   ];
   const sigK=k=>['S','A','CH','IL'].includes(k)?`<i class="sg sg-${k}" role="img" aria-label="${k}"></i>`:k;   // 시그니처 심벌
@@ -4170,6 +4219,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const v=localStorage.getItem('sachil_srv')||'';
     // 예전 임시 터널 주소(재시작마다 바뀜)는 버리고 고정 주소로 붙는다
     if(v && !/\.trycloudflare\.com$/i.test(v)) return v===location.origin?'':v;
+    if(/^(?:localhost|127\.\d+\.\d+\.\d+|\d+\.\d+\.\d+\.\d+|\[[0-9a-f:]+\])$/i.test(location.hostname)&&location.protocol==='http:') return '';   // V154: 서버 PC·같은 망에서 연 앱은 그 서버를 그대로(새로 고침해도)
     return DEFAULT_SRV===location.origin?'':DEFAULT_SRV;
   }catch(_){ return DEFAULT_SRV===location.origin?'':DEFAULT_SRV; } })();
   const TOKS={}; try{ TOKS['']=localStorage.getItem('sachil_tok:'+SRVBASE)||''; TOKS[':deb']=localStorage.getItem('sachil_tok:'+SRVBASE+':deb')||''; }catch(_){ }
@@ -4340,10 +4390,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function loadKakao(key){
     if(window.kakao&&kakao.maps&&kakao.maps.LatLng) return Promise.resolve();
     if(MAPS.p) return MAPS.p;
-    MAPS.p=new Promise((ok,no)=>{ const s=document.createElement('script');
+    MAPS.p=new Promise((ok,no)=>{ const s=document.createElement('script'); let done=false, tm=0;   /* V154: 12초 안에 안 되면 포기(막힌 망에서 영영 기다리지 않게) */
+      const fin=e=>{ if(done) return; done=true; clearTimeout(tm); if(!e){ ok(); return; } MAPS.p=null; if(e.message==='load') s.remove(); no(e); };
+      tm=setTimeout(()=>fin(new Error('timeout')),12000);
       s.src='https://dapi.kakao.com/v2/maps/sdk.js?appkey='+encodeURIComponent(key)+'&autoload=false&libraries=services';
-      s.onload=()=>{ try{ kakao.maps.load(()=>ok()); }catch(e){ MAPS.p=null; no(e); } };
-      s.onerror=()=>{ MAPS.p=null; s.remove(); no(new Error('load')); }; document.head.appendChild(s); });
+      s.onload=()=>{ try{ kakao.maps.load(()=>fin()); }catch(e){ fin(e); } };
+      s.onerror=()=>fin(new Error('load')); document.head.appendChild(s); });
     return MAPS.p;
   }
   const mapEl=document.createElement('div'); mapEl.className='mapov'; mapEl.id='mapov'; mapEl.hidden=true; mapEl.setAttribute('role','dialog'); mapEl.setAttribute('aria-modal','true'); mapEl.setAttribute('aria-label','DS 현장 지도');
@@ -4671,12 +4723,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const fires=HYD.fires.map((b,i)=>`<button type="button" class="hb${b===HYD.base?' on':''}" data-b="${i}">${flame(FST[b.st||''].c,'flm hbf')} ${esc(b.name)}${b.st?' '+FST[b.st].n:''}</button>`).join('');
     hq('.hbase').innerHTML=(fires||'<button type="button" class="hb" data-b="none">🔥 화재</button>')
       +`<button type="button" class="hb${HYD.base&&HYD.base.k==='me'?' on':''}" data-b="me">◎ 내 위치</button>`
-      +(SRV.bld?`<span class="hsrc" role="group" aria-label="소화전 자료"><button type="button" class="hb${hydSrc()==='pub'?' on':''}" data-src="pub" aria-pressed="${hydSrc()==='pub'}">소방청 자료</button><button type="button" class="hb${hydSrc()==='tmap'?' on':''}" data-src="tmap" aria-pressed="${hydSrc()==='tmap'}">T맵</button></span>`:'')
+      +(SRV.bld&&SRV.kakao?`<span class="hsrc" role="group" aria-label="소화전 자료"><button type="button" class="hb${hydSrc()==='pub'?' on':''}" data-src="pub" aria-pressed="${hydSrc()==='pub'}">소방청 자료</button><button type="button" class="hb${hydSrc()==='tmap'?' on':''}" data-src="tmap" aria-pressed="${hydSrc()==='tmap'}">T맵</button></span>`:'')
       +'<span class="hgo-w"><select class="hrad" aria-label="찾을 반경"><option value="300">300m</option><option value="500" selected>500m</option><option value="1000">1km</option><option value="2000">2km</option></select><button type="button" class="hgo">소화전 검색</button></span>';
     const sel=hq('.hrad'); if(sel) sel.value=String(HYD.rad||500);
   }
   // V151: 소화전 자료 고르기 — 소방청(전국소방용수시설표준데이터, 공공데이터포털 키가 있을 때 기본) / T맵(장소 검색)
-  const hydSrc=()=>SRV.bld&&HYD.src!=='tmap'?'pub':'tmap';
+  const hydSrc=()=>SRV.bld&&SRV.kakao&&HYD.src!=='tmap'?'pub':'tmap';
   async function pubHydSearch(c,rm){
     let sd='', sg='';
     if(SRV.kakao){ try{ await loadKakao(SRV.kakao); const r=await Promise.race([new Promise(ok=>new kakao.maps.services.Geocoder().coord2RegionCode(c.lng,c.lat,(r2,s2)=>ok(s2===kakao.maps.services.Status.OK?r2:[]))),sleep(4000).then(()=>[])]);
@@ -4723,6 +4775,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     HYD.list=list.map(p=>Object.assign(p,{m:distM(ref,p), dir:D8[Math.round(bearing(ref,p)/45)%8]})).filter(p=>p.m<=rm).sort((x,y)=>x.m-y.m).slice(0,60);
     hydDraw();
     if(!HYD.list.length) toast('소화전을 찾지 못했습니다 — 위 안내 줄을 확인하세요');
+    else { const te=document.getElementById('toast'); if(te) te.classList.remove('on'); }   // V154: 앞 검색의 '못 찾음' 알림을 지움
     if(hydSrc()==='pub'){ hmsg(HYD.list.length?`${ref.name} 기준 ${fmtM(rm)} 안 소방용수시설 ${HYD.list.length}곳(소방청 자료) — 목록을 누르면 지도에서 보입니다`:`${ref.name} 기준 ${fmtM(rm)} 안에 소방청 자료의 소방용수시설이 없습니다 — 반경을 넓히거나 T맵 자료로 바꿔 보세요 [${HYD.diag||'-'}]`); return; }
     hmsg(HYD.list.length?`${ref.name} 기준 ${fmtM(rm)} 안 소화전 ${HYD.list.length}곳 — 목록을 누르면 지도에서 보입니다`:`${ref.name} 기준 ${fmtM(rm)} 안에서 T맵에 등록된 소화전을 찾지 못했습니다 — 반경을 넓혀 보세요 [T맵 응답: ${HYD.diag||'-'} · 기준 ${ref.lat.toFixed(4)},${ref.lng.toFixed(4)}]`);
   }
@@ -4771,7 +4824,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     HYD.key=SRV.tmap||tmPend(); HYD.list=[]; HYD.fires=[]; HYD.base=null; HYD.ref=null; hq('.hlist').innerHTML=''; hq('.hbase').innerHTML=''; hq('.hres').hidden=true; hq('.mbox').hidden=false;
     hydDraw(); hydMarkBase();   // V138: 지난번 소화전·기준 핀이 지도에 남지 않게
     { const n=hydEl.querySelector('.hnote'); if(n) n.remove(); }
-    if(!HYD.key){ hmsg(`T맵 키가 아직 없습니다. ${isProf()?'메뉴 → <b>SACHIL방재실</b> → <b>T맵 키</b>에 App Key를 넣어 주세요.':'교수에게 T맵 키 설정을 요청하세요.'}`,true); return; }
+    if(!HYD.key&&hydSrc()!=='pub'){ hmsg(`T맵 키가 아직 없습니다. ${isProf()?'메뉴 → <b>SACHIL방재실</b> → <b>T맵 키</b>에 App Key를 넣어 주세요.':'교수에게 T맵 키 설정을 요청하세요.'}`,true); return; }
     hmsg('화재 위치를 불러오는 중…');
     const r=await api(`/api/rooms/${rid}/map`); if(hydEl.hidden) return;
     const it=(r.ok&&r.j&&r.j.items)||{}, fs=FIREK.filter(k=>it[k]&&Number.isFinite(+it[k].lat));
@@ -4943,6 +4996,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     document.body.appendChild(pop);
     const PK={items:[], sel:[], urls:[]};
     const closePop=()=>{ if(pop.hidden) return; pop.hidden=true; plus.setAttribute('aria-expanded','false'); PK.urls.forEach(u=>URL.revokeObjectURL(u)); PK.urls=[]; };
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!pop.hidden&&!e.isComposing){ e.stopPropagation(); closePop(); plus.focus(); } },true);   // V154: Esc로 닫기
     const pkFile=async it=>{ if(it.file) return it.file; const bl=await (await fetch(it.src)).blob(); return new File([bl], it.name||'사진.jpg', {type:bl.type||'image/jpeg'}); };
     async function pkSend(files,caption){   // 고른 사진(편집본 포함)을 첨부로 넣고 바로 보낸다
       closePop(); if(!files.length||!addPendingFiles) return;
@@ -4984,7 +5038,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       pop.querySelector('.go').addEventListener('click',async()=>{ const b=pop.querySelector('.go'); b.disabled=true; b.textContent='준비 중…';
         try{ const fs=await Promise.all(PK.sel.map(i=>pkFile(PK.items[i]))); pkSend(fs,''); }catch(_){ toast('사진을 가져오지 못했습니다'); pkPaint(); } });
       pop.querySelector('[data-x]').addEventListener('click',closePop);
-      pop.hidden=false; plus.setAttribute('aria-expanded','true');
+      pop.hidden=false; plus.setAttribute('aria-expanded','true'); setTimeout(()=>{ const f=pop.querySelector('button,[href],input'); if(f&&!pop.hidden) f.focus(); },30);   // V154: 열리면 안으로 초점
     }
     // 편집 화면: 위 ← · N 전송 · 고르기 동그라미 / 가운데 사진 / 아래 설명 입력 · 자르기 · 그리기
     function openEditor(list,start,on0,urls){
@@ -5353,14 +5407,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {k:'DB', t:'디브리핑룸', get:()=>[pick('#dbBtn')],
      d:['현장에 참여했던 대원은 <b>익명으로 개선사항을 도출</b>하고, 지휘관은 의견을 들어 <b>지휘역량을 강화</b>합니다.']},
     {k:'메뉴', t:'메뉴', get:()=>[pick('#menuBtn')],
-     d:['교육일정·SOP·긴급구조대응계획·RIT 등 <b>12개 섹션 자료</b>를 엽니다. PDF는 앱 안에서 바로 볼 수 있어요. 맨 끝 <b>업데이트 내역</b>에서 버전별 바뀐 점을 봅니다.','<b>앱 설치</b>(홈 화면 바로가기)와 교관 로그인도 여기 있습니다.']},
+     d:['교육일정·SOP·긴급구조대응계획·RIT 등 <b>14개 섹션 자료</b>를 엽니다. PDF는 앱 안에서 바로 볼 수 있어요. 맨 끝 <b>업데이트 내역</b>에서 버전별 바뀐 점을 봅니다.','<b>앱 설치</b>(홈 화면 바로가기)와 교관 로그인도 여기 있습니다.']},
     {k:'S', t:'검색', get:()=>[pick('.tabbar [data-go="search"]','#navSearch')],
      d:['SOP·법령·교재·사례를 <b>낱말로 찾습니다</b>.','결과를 누르면 PDF의 해당 쪽이 바로 열립니다.']},
     {k:'A', t:'AI 도우미', get:()=>[pick('.tabbar [data-go="ai"]','.top-nav [data-route="ai"]')],
      d:['메뉴에 올린 자료를 근거로 <b>사람이 말하듯</b> 답합니다.','답변 속 [1] 같은 번호를 누르면 근거가 된 원문 쪽이 열립니다.'],
      n:'AI 답변은 학습용입니다. 중요한 내용은 원문으로 확인하세요.'},
     {k:'CH', t:'체크리스트', get:()=>[pick('.tabbar [data-go="board"]','.top-nav [data-route="board"]')],
-     d:['위에는 <b>현재 시각과 경과 시간</b>, 아래에는 출동부터 지휘소 운영까지 <b>12단계 체크</b>가 있습니다.','<b>시작</b>을 누르면 경과 시간이 흐르고, 체크한 항목은 시각이 자동으로 남습니다. ‘전체 ▾’로 모든 항목을 한눈에.']},
+     d:['출동부터 지휘소 운영까지 <b>12단계 체크</b>가 있습니다.','<b>첫 항목을 체크하면</b> 경과 시간이 자동으로 흐르고, 체크한 항목은 시각이 자동으로 남습니다. ‘전체 ▾’로 모든 항목을 한눈에.']},
     {k:'IL', t:'사고보고서', get:()=>[pick('.tabbar [data-go="log"]','.top-nav [data-route="log"]')],
      d:['<b>발생개요·화재 원인·인명 피해·재산 피해</b>를 적고 <b>보고서 만들기</b>를 누르면 체크리스트 기록과 합쳐 보고서가 나옵니다.','만든 보고서는 아래에 모여 고치기, AI로 작성, 복사·저장·공유를 할 수 있어요.'],
      n:'화면을 좌우로 밀면 옆 탭으로 넘어갑니다.'}

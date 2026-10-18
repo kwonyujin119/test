@@ -32,6 +32,7 @@ SECTIONS = [  # (앱 slug, 폴더 이름)
     ('law', '04_관련법령'), ('sop', '05_SOP-현장지휘론'), ('ersp', '06_긴급구조대응계획'),
     ('rit', '07_RIT'), ('water', '08_무중단급수체계'), ('safety', '09_안전관리'),
     ('mci', '10_다수사상자'), ('drone', '11_드론전술'), ('cases', '12_대형화재사례'),
+    ('hazmat', '13_위험물'), ('fobj', '14_특정소방대상물'),   # V154
 ]
 SEC_DIR = dict(SECTIONS)
 LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
@@ -44,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '7.9'
-APP_VERSION = 'V153'
+VERSION = '8.0'
+APP_VERSION = 'V154'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -754,6 +755,8 @@ class H(BaseHTTPRequestHandler):
                     return self.send(200, {'ok': False, 'error': '공공데이터포털 인증키가 아직 없습니다 — 메뉴 → SACHIL방재실 → 서버·AI에서 등록'}, log=False)
                 if len(a['b']) != 10 or not a['bun']:
                     return self.err(400, '주소(번지)를 찾지 못했습니다')
+                if not pub_allowed(self.ip()):
+                    return self.send(429, {'ok': False, 'error': '조회가 너무 잦습니다. 잠시 뒤 다시 해 보세요'}, log=False)
                 try:
                     rows = bld_lookup(a['b'], a['bun'], a['ji'] or '0', a['mt'] == '1')
                 except Exception as e:
@@ -763,6 +766,10 @@ class H(BaseHTTPRequestHandler):
                 qtext = (args.get('q') or [''])[0][:200]
                 if not CONF.get('law_oc'):
                     return self.send(200, {'ok': False, 'off': True}, log=False)
+                if not (law_wanted(qtext) or _LAW_ANY.search(qtext)):
+                    return self.send(200, {'ok': True, 'rows': []}, log=False)
+                if not pub_allowed(self.ip()):
+                    return self.send(429, {'ok': False, 'error': '조회가 너무 잦습니다. 잠시 뒤 다시 해 보세요'}, log=False)
                 return self.send(200, dict(ok=True, **law_find(qtext)), log=False)
             if path == '/api/ffus':   # V150: 전국소방용수시설표준데이터 — 그 주소에서 가까운 소화전·급수탑·저수조
                 sd, sg = (args.get('sd') or [''])[0][:20], (args.get('sg') or [''])[0][:30]
@@ -772,6 +779,10 @@ class H(BaseHTTPRequestHandler):
                     return self.err(400, '좌표가 없습니다')
                 if not CONF.get('bld_key'):
                     return self.send(200, {'ok': False, 'error': '공공데이터포털 인증키가 아직 없습니다'}, log=False)
+                if not (sg or sd) or not (32 <= lat <= 39.6 and 124 <= lng <= 132):
+                    return self.err(400, '위치가 잘못됐습니다')
+                if not pub_allowed(self.ip()):
+                    return self.send(429, {'ok': False, 'error': '조회가 너무 잦습니다. 잠시 뒤 다시 해 보세요'}, log=False)
                 try:
                     rr = int(re.sub(r'[^0-9]', '', (args.get('r') or ['1000'])[0]) or 1000)
                     nn = int(re.sub(r'[^0-9]', '', (args.get('n') or ['8'])[0]) or 8)
@@ -779,6 +790,8 @@ class H(BaseHTTPRequestHandler):
                 except Exception as e:
                     return self.send(200, {'ok': False, 'error': str(e)[:200]}, log=False)
                 return self.send(200, {'ok': True, 'rows': rows}, log=False)
+            if path == '/api/contacts':   # V154: 긴급구조대응계획 — 응원협정 대상·긴급구조 관련기관 전화(교수가 고친 목록 > PDF에서 뽑은 목록)
+                return self.send(200, {'ok': True, 'manual': bool(str(CONF.get('contacts') or '').strip()), 'groups': contacts_groups()}, log=False)
             if path == '/api/index':
                 return self.send(200, {'ok': True, 'status': DOCS_IDX.status()}, log=False)
             m = re.fullmatch(r'/lib-thumb/([0-9a-f]{24})\.jpg', path)
@@ -1019,8 +1032,12 @@ class H(BaseHTTPRequestHandler):
         if ck and law_q:
             ck = 'law1:' + ck   # V147: 법령 질문은 법제처 연결 전에 저장된 답(PDF 근거)을 다시 쓰지 않는다
         geo = j.get('geo') if isinstance(j.get('geo'), dict) and CONF.get('bld_key') and ai_ready() else None
-        if ck and geo:
-            ck = 'pub2:' + time.strftime('%Y%m%d') + ':' + ck   # V151: 공공데이터 근거 답은 하루만 다시 씀(자료가 바뀜)
+        if geo and not pub_allowed(self.ip()):
+            geo = None
+        if ck and geo:   # V154: 위치도 저장 키에 넣는다(같은 문장이라도 다른 건물이면 다른 답)
+            gk = hashlib.sha1(json.dumps({k: str(geo.get(k) or '')[:60] for k in ('b', 'bun', 'ji', 'mt', 'sd', 'sg', 'lat', 'lng')},
+                                         sort_keys=True).encode()).hexdigest()[:10]
+            ck = 'pub2:' + time.strftime('%Y%m%d') + ':' + gk + ':' + ck   # V151: 공공데이터 근거 답은 하루만 다시 씀(자료가 바뀜)
         hit = ans_cache_get(ck)
         if hit:   # V102: 같은 질문(띄어쓰기·물음표만 다른 것 포함)은 저장된 답으로 — AI 호출·하루 한도를 쓰지 않는다
             return self.send(200, {'ok': True, 'mode': hit['mode'], 'note': '', 'answer': hit['answer'], 'sources': hit['sources'],
@@ -1041,9 +1058,12 @@ class H(BaseHTTPRequestHandler):
             try:
                 laws = law_lookup(qtext)
             except Exception as e:
+                ck = ''   # V154: 법령 조회가 실패한 답은 저장하지 않는다
                 print(f'[법제처] 조회 실패: {str(e)[:160]}', flush=True)
                 upd_log(f'법제처 조회 실패: {str(e)[:120]}')
         pubs = pub_hits(geo, qtext) if geo else []   # V151: 주소가 든 질문 — 건축물대장·소방용수시설을 그 자리에서 조회해 근거로
+        if geo and len(pubs) < 2:
+            ck = ''   # V154: 공공데이터 조회가 (일부) 실패한 답은 저장하지 않는다
         if laws and links:   # 조문을 콕 집어 물었으면 PDF 근거는 2개까지만(법령 원문이 먼저)
             hits = pubs + laws + hits[:2]
         else:
@@ -1280,19 +1300,30 @@ class H(BaseHTTPRequestHandler):
                 write_conf(CONF)
                 return self.send(200, dict(status(), msg='건축물대장 키를 지웠습니다'), log=False)
             res = pub_test(k)   # 공공데이터포털 인증키 하나로 건축물대장·소방용수시설 둘 다 — 각각 한 번씩 시험
+            eps = res.pop('_ep', {})
             txt = ' · '.join(f"{nm} {'✅' if v[0] else '❌ ' + v[1]}" for nm, v in res.items())
             if not any(v[0] for v in res.values()):
                 return self.send(200, dict(status(), ok=False, error=f'시험 실패 — {txt}'), log=False)
             CONF['bld_key'] = k
             CONF['pub_status'] = res
+            CONF['pub_ep'] = eps
             write_conf(CONF)
             BLD_CACHE.clear()
             FFUS_CACHE.clear()
             return self.send(200, dict(status(), msg='연결 완료 — ' + txt), log=False)
+        if act == 'contacts':   # V154: 교수 — 전화 목록 고치기('구분|기관명|번호' 한 줄씩). 빈 값이면 PDF 자동 목록으로
+            t = str(j.get('text') or '')[:20000]
+            if j.get('auto'):
+                return self.send(200, dict(status(), text=contacts_text(contacts_auto())), log=False)
+            CONF['contacts'] = t.strip()
+            write_conf(CONF)
+            return self.send(200, dict(status(), msg='전화 목록을 저장했습니다' if t.strip() else 'PDF에서 뽑은 자동 목록으로 되돌렸습니다'), log=False)
         if act == 'pubtest':   # V151: 등록된 공공데이터포털 키로 API마다 다시 시험(승인이 늦게 반영된 API 확인)
             if not CONF.get('bld_key'):
                 return self.send(200, dict(status(), ok=False, error='공공데이터포털 인증키가 없습니다'), log=False)
-            CONF['pub_status'] = pub_test(CONF['bld_key'])
+            res = pub_test(CONF['bld_key'])
+            CONF['pub_ep'] = res.pop('_ep', {})
+            CONF['pub_status'] = res
             write_conf(CONF)
             BLD_CACHE.clear()
             FFUS_CACHE.clear()
@@ -1958,6 +1989,72 @@ def clean_glyph(t):
     return re.sub(r'[ \t]{2,}', ' ', t)
 
 
+# ---- V154: 긴급구조대응계획 PDF에서 응원협정 대상·긴급구조 관련기관 전화번호 뽑기(휴대전화 010은 이미 가려져 빠진다)
+_TEL = re.compile(r'(?<![\d-])(0(?:2|[3-6][1-5]|70|80)|1[5-9]\d\d)\s?[-.)]\s?(\d{3,4})(?:\s?[-.]\s?(\d{4}))?(?![\d-])')
+CT_KEYS = (('응원협정 대상', re.compile(r'응원\s*협정|상호\s*응원|응원\s*대상')),
+           ('긴급구조 관련기관', re.compile(r'긴급구조\s*지원\s*기관|긴급구조\s*관련\s*기관|유관\s*기관|관계\s*기관|지원\s*기관')))
+
+
+def _tel_fmt(a, b, c):
+    if a.startswith('1') and not c:   # 1588-1234
+        return f'{a}-{b}'
+    return f'{a}-{b}-{c}' if c else ''
+
+
+def contacts_auto():
+    """→ [(구분, 기관명, 번호)] — 쪽마다 번호 앞의 글자를 기관명으로, 가장 가까운 앞쪽 제목(응원협정/관련기관)을 구분으로"""
+    with DOCS_IDX.lock:
+        pages = sorted((k, v) for k, v in DOCS_IDX.pagetext.items() if k[0] == 'ersp')
+    out, seen, cur, last_doc = [], set(), '', None
+    for (slug, name, page), text in pages:
+        if name != last_doc:
+            cur, last_doc = '', name
+        marks = sorted([(m.start(), m.end(), lab) for lab, rx in CT_KEYS for m in rx.finditer(text)])
+        prev_end = 0
+        for m in _TEL.finditer(text):
+            num = _tel_fmt(*m.groups())
+            st, prev_end0 = m.start(), prev_end
+            prev_end = m.end()
+            if not num or num in seen:
+                continue
+            prev = [(e, lab) for pos, e, lab in marks if pos < st]
+            grp = prev[-1][1] if prev else cur
+            if not grp:
+                continue
+            a0 = max(prev_end0, prev[-1][0] if prev else 0, st - 40)   # 바로 앞 번호·제목이 끝난 곳부터
+            seg = re.split(r'[\n|]|제\s?\d+\s?[장절]|(?:^|\s)\d{1,2}[.)]\s|(?:^|\s)[가-하][.)]\s|대상\s|기관\s|현황\s|연락처\s', text[a0:st])[-1]
+            nm = re.sub(r'^[\s\d.,·:()\-]+|[\s:()\-]+$', '', re.sub(r'(?:전화|연락처|TEL|Tel|tel|☎|대표|번호)\s*[:：]?', ' ', seg))
+            nm = re.sub(r'\s+', ' ', nm).strip()[-24:]
+            if len(re.sub(r'[^가-힣A-Za-z]', '', nm)) < 2:
+                continue
+            seen.add(num)
+            out.append((grp, nm, num))
+        if marks:
+            cur = marks[-1][2]
+    return out[:300]
+
+
+def contacts_text(rows):
+    return '\n'.join(f'{g}|{n}|{t}' for g, n, t in rows)
+
+
+def contacts_groups():
+    raw = str(CONF.get('contacts') or '').strip()
+    rows = []
+    if raw:
+        for line in raw.splitlines():
+            p = [x.strip() for x in line.split('|')]
+            if len(p) >= 3 and re.fullmatch(r'[0-9\-]{4,15}', p[2]) and not p[2].startswith('01'):
+                rows.append((p[0] or '기타', p[1][:40], p[2]))
+    else:
+        rows = contacts_auto()
+    groups = {}
+    for g, n, t in rows:
+        groups.setdefault(g[:20], []).append({'name': n, 'tel': t})
+    order = [lab for lab, _ in CT_KEYS]
+    return [{'title': g, 'items': groups[g]} for g in sorted(groups, key=lambda g: order.index(g) if g in order else 9)]
+
+
 def nrm(s):
     return _KEEP.sub('', unicodedata.normalize('NFKC', str(s)).lower())
 
@@ -2343,7 +2440,7 @@ def extract_answer(question, hits, terms):
     if block:
         hi, sg, items = block
         h = hits[hi]
-        head = [f'「{re.sub(r"[.]pdf$", "", h["name"], flags=re.I)}」 {h["page"]}쪽 [{hi + 1}]', f'■ {sg}'] + [f'• {x}' for x in items] + ['']
+        head = [f'「{re.sub(r"[.]pdf$", "", h["name"], flags=re.I)}」 {h.get("page") or 0}쪽 [{hi + 1}]', f'■ {sg}'] + [f'• {x}' for x in items] + ['']
     cand = []
     for hi, h in enumerate(hits[:6]):
         if block and hi == block[0]:
@@ -2434,6 +2531,30 @@ AI_GEN_SYS = ('너는 인천소방학교 지휘역량강화센터 학습 플랫�
               '소방·안전과 무관한 질문이면 한두 문장으로만 답하고 이 앱은 현장지휘 학습용이라고 짧게 알린다. 굵게·제목·표는 쓰지 않는다. 전체 150~450자.')
 
 
+PUB_LOCK = threading.Lock()
+PUB_HITS = {}
+PUB_DAY = {'d': '', 'n': 0}
+
+
+def pub_allowed(ip, lim=120, win=300):
+    """V154: 공개 조회(건축물대장·소방용수·법제처) — 같은 곳 5분 120번, 하루 전체 pub_daily_limit(기본 3000)번"""
+    now, today = time.time(), time.strftime('%Y-%m-%d')
+    with PUB_LOCK:
+        if PUB_DAY['d'] != today:
+            PUB_DAY.update(d=today, n=0)
+        lst = [t for t in PUB_HITS.get(ip, []) if now - t < win]
+        if len(lst) >= lim or PUB_DAY['n'] >= int(CONF.get('pub_daily_limit') or 3000):
+            PUB_HITS[ip] = lst
+            return False
+        lst.append(now)
+        PUB_HITS[ip] = lst
+        PUB_DAY['n'] += 1
+        if len(PUB_HITS) > 2000:
+            for k in [k for k, v in PUB_HITS.items() if not v or now - v[-1] > win]:
+                PUB_HITS.pop(k, None)
+    return True
+
+
 def ai_allowed(ip, prof=False):
     """prof=True(교수·관리자 로그인)면 하루 한도에서 제외(세지도 않음). 5분 연속 제한은 같이 적용."""
     lim_ip, lim_day = 90, (0 if prof else int(CONF.get('ai_daily_limit') or 0))   # 5분에 90번(교실 30명이 같은 주소), 비용은 하루 한도로 막음
@@ -2451,6 +2572,9 @@ def ai_allowed(ip, prof=False):
         AI_HITS[ip] = lst
         if not prof:
             AI_DAY['n'] += 1
+        if len(AI_HITS) > 2000:   # V154: 오래된 IP 정리
+            for k in [k for k, v in AI_HITS.items() if not v or now - v[-1] > 300]:
+                AI_HITS.pop(k, None)
     return True, ''
 
 
@@ -2459,21 +2583,36 @@ LAW_CACHE = {}   # MST → (받은 시각, 법령명, 시행일, [(조문 표시
 LAW_DEFAULT = ['소방기본법', '긴급구조대응활동 및 현장지휘에 관한 규칙', '재난 및 안전관리 기본법', '119구조ㆍ구급에 관한 법률',
                '화재의 예방 및 안전관리에 관한 법률', '소방시설 설치 및 관리에 관한 법률']
 _LAW_HINT = re.compile(r'(?<![방해기문어용요수편처])법|조문|조항|규칙|시행령|근거|의무|벌칙|과태료|처벌|권한|규정|위반|허가|신고|명령|책임|기준')
-_LAW_NAME = re.compile(r'([가-힣ㆍ·]{2,}(?:\s?[가-힣ㆍ·]+){0,6}?(?:에 관한 법률|에 관한 규칙|법률|시행령|시행규칙|규칙|법))')
+_LAW_NAME = re.compile(r'([가-힣ㆍ·0-9]{2,}(?:\s?[가-힣ㆍ·]+){0,6}?(?:에 관한 법률|에 관한 규칙|법률|시행령|시행규칙|규칙|법)(?:\s?시행(?:령|규칙))?)')
 _LAW_NOT = set('법률 규칙 시행령 시행규칙 방법 불법 위법 적법 편법 해법 기법 문법 어법 용법 요법 수법 대처법 진압법 처치법 구조법'.split())
 _LAW_STOP = set('무엇 무엇인가요 어떻게 어떤 언제 누가 있나요 하나요 되나요 인가요 경우 관련 대해 대한 알려 주세요 질문 내용 법령 법률 근거 조문 규정 기준'.split())
 
 
+def _law_clean(n):
+    """V154: '개정된 소방기본법' → '소방기본법', '현장 소방기본법 시행령' → '소방기본법 시행령'('…에 관한 법률'·'… 및 …'은 그대로)"""
+    n = n.strip()
+    if ' ' in n and not re.search(r'관한|및|ㆍ|의 |등에|시행(?:령|규칙)$', n):
+        n = n.split()[-1]
+    if re.search(r'시행(?:령|규칙)$', n) and not re.search(r'관한|및|ㆍ|의 ', n):
+        n = ' '.join(n.split()[-2:])
+    return n
+
+
 def _law_name_ok(n):
-    last = n.split()[-1] if n.split() else n
-    return len(n) >= 3 and n not in _LAW_NOT and last not in _LAW_NOT and not last.endswith(('방법', '기법', '요법', '수법', '용법', '문법', '어법', '해법', '편법', '처리법', '작성법'))
+    w = n.split()
+    last = w[-1] if w else n
+    if len(n) < 3 or n in _LAW_NOT:
+        return False
+    if len(w) > 1 and last in ('법률', '규칙', '시행령', '시행규칙'):   # V154: '…에 관한 법률'·'소방기본법 시행령'
+        return True
+    return last not in _LAW_NOT and not last.endswith(('방법', '기법', '요법', '수법', '용법', '문법', '어법', '해법', '편법', '처리법', '작성법'))
 
 
 def law_links(q):
     """V147: 질문 속 '○○법 제N조' → 법제처 원문 링크(API 없이 만든다). 조문 번호가 없으면 법령 첫 화면."""
     out = []
     for m in _LAW_NAME.finditer(q):
-        n = m.group(1).strip()
+        n = _law_clean(m.group(1))
         if not _law_name_ok(n) or any(o['name'] == n for o in out):
             continue
         rest = q[m.end():m.end() + 16]
@@ -2515,7 +2654,7 @@ def _bld_get(bcode, bun, ji, mt, k=None):
         w = str(e)
         if '401' in w or '403' in w:
             raise RuntimeError('인증키가 아직 쓰이지 않습니다 — 키가 맞는지(Decoding 키), 활용신청이 승인됐는지 확인하세요. 승인 직후면 1시간쯤 뒤 다시') from e
-        raise RuntimeError('건축물대장 서버 연결 실패 — ' + w.replace(k, '***')[:120]) from e
+        raise RuntimeError('건축물대장 서버 연결 실패 — ' + w.replace(k, '***').replace(urllib.parse.quote(k, safe=''), '***')[:120]) from e
     if t.lstrip().startswith('<'):
         m = re.search(r'<returnAuthMsg>([^<]+)', t) or re.search(r'<errMsg>([^<]+)', t)
         w = m.group(1) if m else t[:120]
@@ -2525,13 +2664,22 @@ def _bld_get(bcode, bun, ji, mt, k=None):
     j = json.loads(t)
     r = j.get('response') or {}
     h = r.get('header') or {}
-    if str(h.get('resultCode')) not in ('00', '0'):
+    code = str(h.get('resultCode'))
+    if code == '03':   # NODATA
+        return []
+    if code not in ('00', '0'):
         raise RuntimeError('건축물대장 응답: ' + str(h.get('resultMsg') or h)[:160])
-    it = ((r.get('body') or {}).get('items') or {})
-    it = it.get('item') if isinstance(it, dict) else []
-    it = [it] if isinstance(it, dict) else (it or [])
+    it = (r.get('body') or {}).get('items') or []
+    if isinstance(it, dict):
+        it = it.get('item') or []
+    it = [it] if isinstance(it, dict) else (it if isinstance(it, list) else [])
     out = [{b: str(x.get(a) if x.get(a) is not None else '').strip() for a, b in BLD_F} for x in it if isinstance(x, dict)]
-    out.sort(key=lambda x: (x['main'] != '주건축물', -float(x['area']) if re.fullmatch(r'[0-9.]+', x['area']) else 0))
+    def _ar(x):
+        try:
+            return -float(x['area'])
+        except ValueError:
+            return 0
+    out.sort(key=lambda x: (x['main'] != '주건축물', _ar(x)))
     return out
 
 
@@ -2541,9 +2689,13 @@ FFUS_SIDO = {'서울': '서울특별시', '부산': '부산광역시', '대구':
              '전북': '전북특별자치도', '전남': '전라남도', '경북': '경상북도', '경남': '경상남도', '제주': '제주특별자치도'}
 
 
+FFUS_URL = 'https://api.data.go.kr/openapi/tn_pubr_public_ffus_wtrcns_api'
+
+
 def _ffus_get(params, k=None):
     k = k or CONF.get('bld_key')
-    url = ('https://api.data.go.kr/openapi/tn_pubr_public_ffus_wtrcns_api?serviceKey=' + urllib.parse.quote(k, safe='')
+    base = ((CONF.get('pub_ep') or {}).get('소방용수시설') if isinstance(CONF.get('pub_ep'), dict) else '') or FFUS_URL   # V154: 상세 페이지에서 찾은 주소가 있으면 그것
+    url = (base + '?serviceKey=' + urllib.parse.quote(k, safe='')
            + '&type=json&pageNo=' + str(params.pop('pageNo', 1)) + '&' + urllib.parse.urlencode(params))
     try:
         t = fetch_text(url, 8_000_000, 30)
@@ -2551,7 +2703,7 @@ def _ffus_get(params, k=None):
         w = str(e)
         if '401' in w or '403' in w:
             raise RuntimeError('인증키가 아직 쓰이지 않습니다(활용신청 승인 직후면 1시간쯤 뒤 다시)') from e
-        raise RuntimeError('소방용수시설 서버 연결 실패 — ' + w.replace(k, '***')[:120]) from e
+        raise RuntimeError('소방용수시설 서버 연결 실패 — ' + w.replace(k, '***').replace(urllib.parse.quote(k, safe=''), '***')[:120]) from e
     if t.lstrip().startswith('<'):
         m = re.search(r'<returnAuthMsg>([^<]+)', t) or re.search(r'<resultMsg>([^<]+)', t) or re.search(r'<errMsg>([^<]+)', t)
         w = m.group(1) if m else t[:120]
@@ -2574,31 +2726,57 @@ def _ffus_get(params, k=None):
     return [x for x in it if isinstance(x, dict)], int(b.get('totalCount') or 0)
 
 
+FF_KEEP = ('ctprvnNm', 'latitude', 'longitude', 'fcltySeNm', 'fcltySe', 'fcltySeCode', 'fcltyNo', 'descLc', 'rdnmadr', 'lnmadr',
+           'prtcYn', 'waterPressr', 'installationYear', 'safeCnterNm', 'referenceDate')
+_SIDO_LONG = {'전라북도': '전북', '충청북도': '충북', '충청남도': '충남', '전라남도': '전남', '경상북도': '경북', '경상남도': '경남'}
+FFUS_LOCKS = {}
+
+
+def _sido(s):
+    """V154: 시도 이름 맞추기 — '전라북도'·'전북특별자치도'·'전북' → '전북'(충북/충남·경북/경남도 구분)"""
+    s = str(s or '').replace(' ', '')
+    for lg, sh in _SIDO_LONG.items():
+        if s.startswith(lg):
+            return sh
+    return s[:2]
+
+
 def _ffus_all(sd, sg):
-    rows, page = [], 1
-    while page <= 30:   # 1000건씩, 시군구 하나에 3만 건이면 충분
-        got, total = _ffus_get({'signguNm': sg, 'numOfRows': '1000', 'pageNo': page})
-        rows += got
-        if not got or len(rows) >= total:
+    base = {'numOfRows': '1000'}
+    if sg:
+        base['signguNm'] = sg
+    elif sd:
+        base['ctprvnNm'] = FFUS_SIDO.get(sd, sd)   # 세종처럼 시군구가 없는 곳
+    else:
+        return []
+    rows, page, t0 = [], 1, time.time()
+    while page <= 30 and time.time() - t0 < 60:   # 1000건씩, 1분 안에서
+        got, total = _ffus_get(dict(base, pageNo=page))
+        rows += [{k: x[k] for k in FF_KEEP if x.get(k) not in (None, '')} for x in got]   # 쓰는 항목만 남겨 메모리 절약
+        if not got or len(got) < 1000 or (total and len(rows) >= total):
             break
         page += 1
-    full = FFUS_SIDO.get(sd, sd)
-    return [x for x in rows if not sd or not x.get('ctprvnNm') or str(x.get('ctprvnNm')).startswith((sd, full[:2]))]
+    want = _sido(sd)
+    return [x for x in rows if not want or not x.get('ctprvnNm') or _sido(x['ctprvnNm']) == want]
 
 
 def ffus_near(sd, sg, lat, lng, n=8, within=1000):
     import math
-    key = (sd, sg)
-    c = FFUS_CACHE.get(key)
-    if c and time.time() - c[0] < 86400:
-        rows = c[1]
-    else:
-        rows = _ffus_all(sd, sg)
-        if not rows and ' ' in sg:   # '수원시 장안구'처럼 일반구가 있는 시 — 자료에는 구 이름만 있을 수도
-            rows = _ffus_all(sd, sg.split()[-1])
-        if len(FFUS_CACHE) > 30:
-            FFUS_CACHE.clear()
-        FFUS_CACHE[key] = (time.time(), rows)
+    key = (_sido(sd), sg)
+    with FFUS_LOCKS.setdefault(key, threading.Lock()):   # 같은 시군구를 여럿이 동시에 받지 않게
+        c = FFUS_CACHE.get(key)
+        if c and time.time() - c[0] < 86400:
+            rows = c[1]
+        else:
+            cands = [sg] + ([sg.split()[-1], sg.split()[0], sg.replace(' ', '')] if ' ' in sg else [])   # '수원시 장안구' → 장안구·수원시
+            rows = []
+            for cand in dict.fromkeys(cands):
+                rows = _ffus_all(sd, cand)
+                if rows:
+                    break
+            if len(FFUS_CACHE) > 30:
+                FFUS_CACHE.clear()
+            FFUS_CACHE[key] = (time.time(), rows)
     out = []
     for x in rows:
         try:
@@ -2614,7 +2792,7 @@ def ffus_near(sd, sg, lat, lng, n=8, within=1000):
                         'guard': str(x.get('prtcYn') or ''), 'pr': str(x.get('waterPressr') or ''), 'yr': str(x.get('installationYear') or ''),
                         'ctr': str(x.get('safeCnterNm') or ''), 'ref': str(x.get('referenceDate') or '')})
     out.sort(key=lambda r: r['d'])
-    return {'near': out[:n], 'total': len(rows)}
+    return {'near': out[:n], 'within': len(out), 'total': len(rows)}
 
 
 _LAW_ANY = re.compile(r'조례|고시|훈령|예규|지침|화재안전(?:성능|기술)?기준|NF[PT]C', re.I)
@@ -2661,13 +2839,15 @@ def law_find(q):
         return {'rows': []}
     names = []
     for m in _LAW_NAME.finditer(q):
-        n = re.sub(r'\s?(?:시행령|시행규칙)$', '', m.group(1).strip()) if not m.group(1).strip().endswith(('에 관한 규칙',)) else m.group(1).strip()
+        n = re.sub(r'\s?(?:시행령|시행규칙)$', '', _law_clean(m.group(1)))   # 법령 목록 검색은 본법 이름으로(시행령·시행규칙도 함께 나옴)
         if _law_name_ok(n) and n not in names:
             names.append(n)
     for m in re.finditer(r'([가-힣ㆍ·]{2,}(?:\s?[가-힣ㆍ·]+){0,5}?\s?(?:조례|고시|훈령|예규|지침|화재안전(?:성능|기술)?기준))', q):
         if m.group(1) not in names:
             names.append(m.group(1))
     if not names:   # 이름이 없으면 질문에서 낱말만(예: '소화기 설치 기준' → '소화기')
+        if not (_LAW_ANY.search(q) or re.search(r'법령|법률|조문|조항|시행령|시행규칙|벌칙|과태료|처벌', q)):
+            return {'rows': []}   # V154: '기준'·'근거'처럼 흔한 말만 있으면 법제처를 부르지 않는다
         toks = [t for t in re.findall(r'[가-힣A-Za-z0-9]{2,}', q) if t not in _LAW_STOP and t not in _LAW_NOT and not _LAW_HINT.fullmatch(t)]
         names = toks[:1]
     if not names:
@@ -2747,7 +2927,7 @@ def pub_hits(geo, q):
             r = ffus_near(g['sd'], g['sg'], lat, lng, n=6)
             near = r['near']
             if near:
-                text = f'반경 1,000m 안 {len(near)}곳(가까운 순):\n' + '\n'.join(
+                text = f"반경 1,000m 안 {r.get('within', len(near))}곳 중 가까운 {len(near)}곳:\n" + '\n'.join(
                     f"- {x['type'] or ('유형 ' + x['code'] if x['code'] else '소방용수')} {x['no']}: {x['d']}m · {x['at'] or x['addr']}"
                     + (f" · 보호틀 {x['guard']}" if x['guard'] else '') + (f" · 수압 {x['pr']}" if x['pr'] else '') for x in near)
             else:
@@ -2758,8 +2938,52 @@ def pub_hits(geo, q):
     return out
 
 
+PUB_DISCOVER = (('위험물정보(소방청)', '15061055'), ('상수도시설정보(수자원공사)', '15089952'))   # V154: 요청주소를 모르는 API — 서버 PC가 data.go.kr 상세 페이지에서 찾는다
+
+
+def _pub_try(url, k):
+    """V154: 요청주소 하나를 인증키로 1건만 불러 본다 → (성공, 설명)"""
+    u = url + ('&' if '?' in url else '?') + 'serviceKey=' + urllib.parse.quote(k, safe='') + '&pageNo=1&numOfRows=1&type=json&_type=json&resultType=json'
+    try:
+        t = fetch_text(u, 400_000, 20)
+    except Exception as e:
+        w = str(e).replace(k, '***').replace(urllib.parse.quote(k, safe=''), '***')
+        return False, ('인증키가 이 API에 아직 쓰이지 않음(승인 직후면 1시간 뒤)' if '401' in w or '403' in w else w[:120])
+    t2 = re.sub(r'\s+', ' ', t).replace(k, '***')
+    m = re.search(r'<returnAuthMsg>([^<]+)', t2)
+    if m:
+        return False, m.group(1)[:120]
+    code = re.search(r'"resultCode"\s*:\s*"?([0-9A-Za-z]+)', t2) or re.search(r'<resultCode>([^<]+)', t2)
+    msg = re.search(r'"resultMsg"\s*:\s*"([^"]*)', t2) or re.search(r'<resultMsg>([^<]+)', t2)
+    tot = re.search(r'"totalCount"\s*:\s*"?(\d+)', t2) or re.search(r'<totalCount>(\d+)', t2)
+    if code and code.group(1) in ('00', '0', '000', 'INFO-000'):
+        return True, f"{int(tot.group(1)):,}건 자료" if tot else '응답 정상'
+    return False, ((code.group(1) + ' ') if code else '') + (msg.group(1) if msg else t2[:100])
+
+
+def _pub_discover(pid, k):
+    """V154: data.go.kr 상세 페이지에서 apis.data.go.kr 요청주소 후보를 찾아 차례로 시험"""
+    try:
+        html = fetch_text(f'https://www.data.go.kr/data/{pid}/openapi.do', 3_000_000, 20)
+    except Exception as e:
+        return False, 'data.go.kr 상세 페이지를 열지 못함 — ' + str(e)[:80], ''
+    cands = list(dict.fromkeys(re.findall(r'https://apis?\.data\.go\.kr/[A-Za-z0-9_\-/]+[A-Za-z0-9_]', html)))[:8]
+    if not cands:
+        return False, '상세 페이지에서 요청주소를 찾지 못함', ''
+    last = (False, '', cands[0])
+    t0 = time.time()
+    for c in cands[:5]:
+        if time.time() - t0 > 40:
+            break
+        ok, w = _pub_try(c, k)
+        if ok:
+            return True, w, c
+        last = (False, w, c)
+    return last
+
+
 def pub_test(k):
-    """V151: 공공데이터포털 인증키 하나로 쓰는 API마다 시험 → {이름: [성공, 설명, 시각]}"""
+    """V151: 공공데이터포털 인증키 하나로 쓰는 API마다 시험 → {이름: [성공, 설명, 시각]}. V154: 요청주소를 모르는 API는 찾아서 시험"""
     res = {}
     for nm, fn in (('건축물대장', lambda: f"{len(_bld_get('1168010300', '12', '0', False, k))}건 조회"),   # 서울 강남구 개포동 12(공식 예제 주소)
                    ('소방용수시설', lambda: f"{_ffus_get({'numOfRows': '1'}, k)[1]:,}건 자료")):
@@ -2767,6 +2991,19 @@ def pub_test(k):
             res[nm] = [True, fn(), time.time()]
         except Exception as e:
             res[nm] = [False, str(e)[:160], time.time()]
+    eps = CONF.get('pub_ep') if isinstance(CONF.get('pub_ep'), dict) else {}
+    if not res['소방용수시설'][0]:   # 짐작한 주소가 틀렸으면 상세 페이지(표준데이터)에서 찾아 다시
+        ok, w, url = _pub_discover('15034538', k)
+        if ok:
+            eps['소방용수시설'] = url.split('?')[0]
+            res['소방용수시설'] = [True, w + ' · ' + re.sub(r'^https?://apis?\.data\.go\.kr', '', url), time.time()]
+    for nm, pid in PUB_DISCOVER:
+        ok, w, url = _pub_discover(pid, k)
+        if ok:
+            eps[nm] = url
+        short = re.sub(r'^https?://apis?\.data\.go\.kr', '', url)
+        res[nm] = [ok, (w + (f' · {short}' if short else ''))[:200], time.time()]
+    res['_ep'] = eps   # 저장은 부르는 쪽에서(성공했을 때만)
     return res
 
 
@@ -2839,6 +3076,8 @@ def law_articles(mst):
                     parts.append('    ' + str(mo.get('목내용') or ''))
         text = re.sub(r'[ \t]+', ' ', '\n'.join(x for x in parts if x.strip())).strip()
         arts.append((label, title, text))
+    if not arts:   # V154: 조문을 못 받았으면 하루 동안 빈 결과로 남기지 않는다
+        raise RuntimeError('법제처 조문을 받지 못함: ' + re.sub(r'\s+', ' ', json.dumps(j, ensure_ascii=False)).replace(str(CONF.get('law_oc') or '***'), '***')[:120])
     if len(LAW_CACHE) > 30:
         LAW_CACHE.clear()
     LAW_CACHE[mst] = (now, name, eff, arts)
@@ -2849,7 +3088,7 @@ def law_lookup(q, top=3):
     """질문 → [근거 hit]. 질문에 법령 이름이 있으면 그 법령, 없으면 소방 현장에 자주 쓰는 법령들에서 낱말이 많이 겹치는 조문."""
     names = []
     for m in _LAW_NAME.finditer(q):
-        n = m.group(1).strip()
+        n = _law_clean(m.group(1))
         if _law_name_ok(n) and n not in names:
             names.append(n)
     cands = names[:2] or LAW_DEFAULT
