@@ -845,7 +845,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v151</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v152</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1596,8 +1596,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V151', SRV_VER='7.7';
+  const APP_VER='V152', SRV_VER='7.8';
   const UPDATES=[
+    {v:'V152', d:'2026-10-18', t:['주소가 든 AI 질문에서 건축물대장·소방용수시설을 받아 놓고도 일반론만 답하던 문제 고침 — 그 건물의 층수·구조·비상용 승강기와 가까운 소화전 거리를 결론·설명에 꼭 쓰게 함','조회한 공공데이터(건축물대장·소방용수시설)는 답에 인용되지 않아도 근거 목록에 항상 보여 줌']},
     {v:'V151', d:'2026-10-18', t:['AI 도우미에 주소가 든 질문(예: 구월동 1138 화재 시 진입 방법은?)을 하면 그 자리에서 건축물대장·소방용수시설을 조회해, 층수·구조·비상용 승강기·가까운 소화전 거리를 근거로 자연스럽게 답함 — 근거 목록에 ‘공공데이터 · 지도’로 표시','검색에서 문장 속 주소도 알아봄(주소 부분만 골라 조회)','47망 → 소화전에 [소방청 자료]/[T맵] 버튼 — 소방청 전국소방용수시설표준데이터로 둘레 소화전·급수탑을 찾아 지도에 표시(공공데이터포털 키가 있으면 소방청 자료가 기본)',
       '방재실 공공데이터포털 인증키 카드에 API마다 연결 상태(✅/❌ 이유)와 [다시 시험] 버튼']},
     {v:'V150', d:'2026-10-18', t:['검색창에 주소(예: 구월동 1138, 정각로 29)나 ‘건축물대장 + 주소’를 넣으면 건축물대장의 용도·구조·층수·연면적·사용승인일·승강기를 검색 결과 맨 위에 보여 줌','건축물대장 아래에 그 주소에서 1km 안의 소방용수시설(소화전·급수탑 등)을 가까운 순으로 — 누르면 카카오맵에서 위치',
@@ -3629,7 +3630,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function botSrcHtml(m){
     if(!m.src||!m.src.length) return '';
     const cited=new Set([...String(m.text).matchAll(/\[(\d{1,2})\]/g)].map(x=>Number(x[1])-1));   // 본문에서 인용한 근거만 보인다
-    return `<div class="src-h">근거 자료</div><ol class="src" aria-label="근거 자료">${m.src.map((sc,i)=>(cited.size&&!cited.has(i))?'':`<li${sc.slug==='law'||sc.slug==='pub'?' class="law"':''}><a href="${esc(srcHref(sc))}" target="_blank" rel="noopener"${srcPdf(sc)}><b>[${i+1}]</b><em>${esc(pdfName(sc.name))}${sc.art?` · ${esc(sc.art)}`:''}</em><span>${srcPg(sc)}</span></a>${sc.snip?`<q class="snip">${esc(deGlyph(sc.snip))}</q>`:''}</li>`).join('')}</ol>`;
+    return `<div class="src-h">근거 자료</div><ol class="src" aria-label="근거 자료">${m.src.map((sc,i)=>(cited.size&&!cited.has(i)&&sc.slug!=='pub')?'':`<li${sc.slug==='law'||sc.slug==='pub'?' class="law"':''}><a href="${esc(srcHref(sc))}" target="_blank" rel="noopener"${srcPdf(sc)}><b>[${i+1}]</b><em>${esc(pdfName(sc.name))}${sc.art?` · ${esc(sc.art)}`:''}</em><span>${srcPg(sc)}</span></a>${sc.snip?`<q class="snip">${esc(deGlyph(sc.snip))}</q>`:''}</li>`).join('')}</ol>`;
   }
   const cacheTag=m=>m.cached?' · 같은 질문의 저장된 답':'';
   const botModeHtml=m=> m.mode==='ai' ? `<span class="mode">AI 도우미 · ${(m.src||[]).some(x=>x.slug==='law')?'법령 원문(법제처)·':''}메뉴 자료 근거 답변${cacheTag(m)} — 중요한 내용은 원문으로 확인하세요</span>`
