@@ -147,7 +147,7 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 @keyframes swl{from{transform:translateX(28px);opacity:.35}to{transform:none;opacity:1}}
 @keyframes swr{from{transform:translateX(-28px);opacity:.35}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){ .swipe-l,.swipe-r{animation:none} }
-.toast{position:fixed;left:50%;top:calc(var(--sat) + 72px);transform:translateX(-50%);z-index:60;background:var(--navy);color:#fff;font-size:13px;padding:10px 16px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.18);max-width:calc(100vw - 32px);text-align:center;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast{position:fixed;left:50%;top:calc(var(--sat) + 72px);transform:translateX(-50%);z-index:70;background:var(--navy);color:#fff;font-size:13px;padding:10px 16px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.18);max-width:calc(100vw - 32px);text-align:center;opacity:0;transition:opacity .25s;pointer-events:none}
 .toast.on{opacity:1;pointer-events:auto;touch-action:pan-y;cursor:grab}
 .toast.act.on{pointer-events:auto}
 .toast button{margin-left:10px;border:0;background:rgba(255,255,255,.18);color:#FFD400;font:inherit;font-weight:700;padding:4px 10px;border-radius:999px;cursor:pointer}
@@ -1345,7 +1345,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
   const APP_VER='V111', SRV_VER='4.5';
   const UPDATES=[
-    {v:'V111', d:'2026-10-18', t:['지도: 화재가 동시에 나면 화재대상을 3곳까지(화재대상1·2·3) — 지도를 열면 모든 화재대상이 보이게','지도: 표시를 누르면 가장 가까운 화재대상에서 방향·거리(예: 남서쪽 210m)','지도: 서버 연결이 끊기면 \'연결 끊김 — 몇 시 기준\' 안내와 표시를 흐리게','지도: 가운데 + 표시(새 표시가 뜰 자리)','첫 화면을 열 때 칸이 잠깐 검게 보이던 현상 고침','인터넷이 끊겨도 앱 화면이 열리게(체크리스트·보고서는 휴대폰에 저장돼 있음)','체크리스트: 실수로 체크를 풀면 \'되돌리기\'로 기록 시각까지 되살림','서버 4.5: 설정 파일 보호(망가져도 키를 지우지 않음)·첨부 하루 200MB 한도·창 두 개 동시 실행 막기 등 안정성 보강']},
+    {v:'V111', d:'2026-10-18', t:['지도: 화재가 동시에 나면 화재대상을 3곳까지(화재대상1·2·3) — 지도를 열면 모든 화재대상이 보이게','지도: 표시를 누르면 가장 가까운 화재대상에서 방향·거리(예: 남서쪽 210m)','지도: 서버 연결이 끊기면 \'연결 끊김 — 몇 시 기준\' 안내와 표시를 흐리게','지도: 가운데 + 표시(새 표시가 뜰 자리)','첫 화면을 열 때 칸이 잠깐 검게 보이던 현상 고침','인터넷이 끊겨도 앱 화면이 열리게(체크리스트·보고서는 휴대폰에 저장돼 있음)','체크리스트: 실수로 체크를 풀면 \'되돌리기\'로 기록 시각까지 되살림','AI 도우미: 앱을 다시 열어도 \'근거 없음\' 표시·근거 발췌가 그대로','지도: 회전·키보드가 올라와도 지도 크기가 맞게, 안내 메시지가 지도·방재실 위에 보이게','방재실: 카카오맵 키 빈칸 저장으로 지도가 꺼지던 문제 막음','서버 4.5: 설정 파일 보호(망가져도 키를 지우지 않음)·첨부 하루 200MB 한도·창 두 개 동시 실행 막기 등 안정성 보강']},
     {v:'V110', d:'2026-10-18', t:['지도 위쪽에 바로가기 버튼(🔥화재대상·CP현장지휘소·S차량대기소·전체) — 지도를 옮겨도 한 번 누르면 그 자리로 돌아옵니다']},
     {v:'V109', d:'2026-10-18', t:['지도 표시(화재대상·현장지휘소·차량대기소)를 아주 흐린 반투명으로 — 지도가 가려지지 않게, 🔥·CP·S 아이콘만 진하게']},
     {v:'V108', d:'2026-10-18', t:['메뉴에 ‘SACHIL방재실’(교수 로그인 때만 보임): 떠 있는 창에서 메뉴 자료 관리·AI 키·카카오맵 키·서버 상태','지도: + 표시 대신 버튼을 누르면 지도 가운데에 표시가 뜨고, 끌어서 옮기면 그 자리에 저장','지도 방면설정: 누를 때마다 A→B→C→D→E→F 하나씩','지도가 떠 있을 때 좌우로 끌어도 탭이 넘어가지 않게','떠 있는 안내 메시지는 좌우로 밀면 사라짐']},
@@ -1945,7 +1945,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   function closeBangjae(){ if(bjEl.hidden) return; bjEl.hidden=true; bjEl.querySelector('.bjbody').innerHTML=''; appEl.inert=false; tabbarEl.inert=false; if(bjLast&&bjLast.isConnected&&bjLast.focus) bjLast.focus(); }
   bjEl.querySelector('.bjx').addEventListener('click',closeBangjae);
-  bjEl.addEventListener('click',e=>{ if(e.target===bjEl) closeBangjae(); });
+  let bjDown=null; bjEl.addEventListener('pointerdown',e=>{ bjDown=e.target; });   // V111: 입력칸에서 끌다 바깥에서 놓아도 닫히지 않게
+  bjEl.addEventListener('click',e=>{ if(e.target===bjEl&&bjDown===bjEl) closeBangjae(); });
   document.addEventListener('keydown',e=>{ if(!bjEl.hidden&&e.key==='Escape') closeBangjae(); });
   window.__closeBj=closeBangjae;
   function renderProf(panel){
@@ -2059,7 +2060,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const x=await api('/api/admin/ai',{json:{action:'update'},tok:PROF.tok}); b.disabled=false;
       show(x.ok?(x.j.msg||x.j.error||''):(x.status===404?'이 서버는 지금 확인 기능이 없습니다 — 2시간마다 자동으로 확인합니다':(x.j.error||'요청하지 못했습니다')), !(x.ok&&x.j.ok)); });
     { const kf=$('#kakaoForm'); if(kf) kf.addEventListener('submit',async e=>{
-        e.preventDefault(); const v=$('#kakaoIn').value.trim(), b=$('#kakaoGo'); b.disabled=true;
+        e.preventDefault(); const v=$('#kakaoIn').value.trim(), b=$('#kakaoGo'); if(!v){ show('카카오 JavaScript 키를 붙여 넣으세요',true); return; }   // V111: 빈칸 저장이 모두의 지도 키를 지우지 않게
+        b.disabled=true;
         const x=await api('/api/admin/ai',{json:{action:'kakao',key:v},tok:PROF.tok}); b.disabled=false;
         const k=v.replace(/[^0-9a-f]/gi,'').toLowerCase();
         if(x.ok&&x.j.ok){ $('#kakaoIn').value=''; paint(x.j); show(x.j.msg||'저장했습니다'); SRV.kakao=/^[0-9a-f]{32}$/.test(k)?k:''; }
@@ -2817,7 +2819,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const quickHtml=()=>quickPick().map(t=>`<button type="button" data-q="${esc(t)}">${esc(t)}</button>`).join('');
   let quickT=null;
   const now=()=>{const d=new Date();return `${pad(d.getHours())}:${pad(d.getMinutes())}`;};
-  function cload(){ try{ const s=JSON.parse(localStorage.getItem(CKEY)||'null'); if(s&&Array.isArray(s.msgs)) chat.msgs=s.msgs.filter(m=>m&&(m.who==='bot'||m.who==='me')&&typeof m.text==='string').map(m=>({who:m.who,text:m.text.slice(0,4000),t:/^\d{2}:\d{2}$/.test(String(m.t))?m.t:'',mode:['ai','extract','none'].includes(m.mode)?m.mode:'',note:String(m.note||'').slice(0,120),src:Array.isArray(m.src)?m.src.filter(x=>x&&SECTIONS.some(z=>z.slug===x.slug)&&typeof x.name==='string'&&Number.isInteger(x.page)).slice(0,8).map(x=>({slug:x.slug,name:x.name.slice(0,200),page:x.page})):[],att:(Array.isArray(m.att)?m.att.filter(validAtt).map(cleanAtt):[]).slice(0,MAX_FILES),cards:Array.isArray(m.cards)?m.cards.filter(c=>c&&typeof c.title==='string'&&(['board','search','login','log','ai'].includes(c.slug)||SECTIONS.some(s=>s.slug===c.slug))).slice(0,8).map(c=>({title:c.title.slice(0,120),slug:c.slug,type:String(c.type||'').slice(0,8)})):[]})).slice(-100); }catch(_){ } }
+  function cload(){ try{ const s=JSON.parse(localStorage.getItem(CKEY)||'null'); if(s&&Array.isArray(s.msgs)) chat.msgs=s.msgs.filter(m=>m&&(m.who==='bot'||m.who==='me')&&typeof m.text==='string').map(m=>({who:m.who,text:m.text.slice(0,4000),t:/^\d{2}:\d{2}$/.test(String(m.t))?m.t:'',mode:['ai','extract','none','general'].includes(m.mode)?m.mode:'',cached:!!m.cached,note:String(m.note||'').slice(0,120),src:Array.isArray(m.src)?m.src.filter(x=>x&&SECTIONS.some(z=>z.slug===x.slug)&&typeof x.name==='string'&&Number.isInteger(x.page)).slice(0,8).map(x=>({slug:x.slug,name:x.name.slice(0,200),page:x.page,art:String(x.art||'').slice(0,40),snip:String(x.snip||'').slice(0,180)})):[],att:(Array.isArray(m.att)?m.att.filter(validAtt).map(cleanAtt):[]).slice(0,MAX_FILES),cards:Array.isArray(m.cards)?m.cards.filter(c=>c&&typeof c.title==='string'&&(['board','search','login','log','ai'].includes(c.slug)||SECTIONS.some(s=>s.slug===c.slug))).slice(0,8).map(c=>({title:c.title.slice(0,120),slug:c.slug,type:String(c.type||'').slice(0,8)})):[]})).slice(-100); }catch(_){ } }
   function csave(){ trySet(CKEY, JSON.stringify({msgs:chat.msgs.slice(-100)})); }
   function push(who,text,cards,att){ chat.msgs.push({who,text,t:now(),cards:cards||[],att:att||[]}); if(chat.msgs.length>100) chat.msgs.splice(0,chat.msgs.length-100); csave(); }
 
@@ -3343,7 +3345,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     // 예전 임시 터널 주소(재시작마다 바뀜)는 버리고 고정 주소로 붙는다
     if(v && !/\.trycloudflare\.com$/i.test(v)) return v===location.origin?'':v;
     return DEFAULT_SRV===location.origin?'':DEFAULT_SRV;
-  }catch(_){ return DEFAULT_SRV; } })();
+  }catch(_){ return DEFAULT_SRV===location.origin?'':DEFAULT_SRV; } })();
   const TOKS={}; try{ TOKS['']=localStorage.getItem('sachil_tok:'+SRVBASE)||''; TOKS[':deb']=localStorage.getItem('sachil_tok:'+SRVBASE+':deb')||''; }catch(_){ }
   let SRVTOK=TOKS['']||'';
   const setTok=t=>{ SRVTOK=TOKS[RK]=t||''; try{ if(SRVTOK) localStorage.setItem('sachil_tok:'+SRVBASE+RK,SRVTOK); else localStorage.removeItem('sachil_tok:'+SRVBASE+RK); }catch(_){ } };
@@ -3504,7 +3506,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       s.onerror=()=>{ MAPS.p=null; s.remove(); no(new Error('load')); }; document.head.appendChild(s); });
     return MAPS.p;
   }
-  const mapEl=document.createElement('div'); mapEl.className='mapov'; mapEl.id='mapov'; mapEl.hidden=true; mapEl.setAttribute('role','dialog'); mapEl.setAttribute('aria-label','현장 지도');
+  const mapEl=document.createElement('div'); mapEl.className='mapov'; mapEl.id='mapov'; mapEl.hidden=true; mapEl.setAttribute('role','dialog'); mapEl.setAttribute('aria-modal','true'); mapEl.setAttribute('aria-label','현장 지도');
   mapEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="지도 닫기">‹</button><b>현장 지도</b>
       <form class="msrch" autocomplete="off"><input type="search" placeholder="주소·장소 검색" aria-label="주소·장소 검색" enterkeyhint="search"><button type="submit" class="btn ghost">검색</button></form></div>
     <div class="mbox"><div class="kmap"></div><div class="mjump" aria-label="표시로 바로 가기" hidden></div><button type="button" class="mme" aria-label="내 위치로">◎</button></div>
@@ -3575,6 +3577,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       MAPS.drag=false; const p=ov.getPosition(); mapSave({kind:k, lat:p.getLat(), lng:p.getLng()},'move');
     };
     el.addEventListener('pointerup',end);
+    el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); mapInfo(k); } });
     el.addEventListener('pointercancel',e=>{ if(st&&st.moved) end(e); else { st=null; MAPS.drag=false; try{ MAPS.map.setDraggable(true); }catch(_){ } } });
   }
   function mapInfo(k){
@@ -3628,13 +3631,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   document.addEventListener('keydown',e=>{ if(!mapEl.hidden&&e.key==='Escape') closeMap(); });
   async function openMap(rid){
     if(!SRV.on){ toast('지도는 서버(47망)에 연결됐을 때 쓸 수 있습니다'); return; }
-    mapLast=document.activeElement; MAPS.rid=rid; mapEl.hidden=false; appEl.inert=true; tabbarEl.inert=true; mmsg('');
+    mapLast=document.activeElement; MAPS.rid=rid; mapEl.hidden=false; appEl.inert=true; tabbarEl.inert=true; mmsg(''); try{ mq('.mclose').focus({preventScroll:true}); }catch(_){ }
     if(!SRV.kakao && kkPend()) SRV.kakao=kkPend();   // 서버에 아직 없으면 이 휴대폰에 맡겨 둔 키로(V107)
-    if(!SRV.kakao){ mmsg(`카카오맵 키가 아직 없습니다. ${isProf()?'교수 화면 → AI 키 관리 → <b>카카오맵 키</b>에 JavaScript 키를 넣어 주세요.':'교수에게 카카오맵 키 설정을 요청하세요.'}`,true); return; }
+    if(!SRV.kakao){ mmsg(`카카오맵 키가 아직 없습니다. ${isProf()?'메뉴 → <b>SACHIL방재실</b> → <b>카카오맵 키</b>에 JavaScript 키를 넣어 주세요.':'교수에게 카카오맵 키 설정을 요청하세요.'}`,true); return; }
     try{ await loadKakao(SRV.kakao); }catch(_){ mmsg('카카오맵을 불러오지 못했습니다 — 인터넷 연결, 또는 카카오 개발자 사이트에 이 주소(도메인)가 등록됐는지 확인하세요'); return; }
     if(mapEl.hidden) return;
     if(!MAPS.map){ MAPS.map=new kakao.maps.Map(mq('.kmap'),{center:new kakao.maps.LatLng(37.4563,126.7052), level:5});   // 처음: 인천시청 부근
-      MAPS.map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT); }
+      MAPS.map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
+      if(window.ResizeObserver) new ResizeObserver(()=>{ if(MAPS.map&&!mapEl.hidden) MAPS.map.relayout(); }).observe(mq('.kmap')); }   // V111: 회전·키보드·안내 줄 바뀜에도 지도 크기 다시 맞춤
     MAPS.map.relayout(); MAPS.ts=-1; MAPS.drag=false; await mapLoad();
     { const it=MAPS.items||{}, fs=FIREK.filter(k=>it[k]);   // 화재대상이 여러 곳이면 모두 보이게
       if(fs.length>1){ const b=new kakao.maps.LatLngBounds(); fs.forEach(k=>b.extend(new kakao.maps.LatLng(it[k].lat,it[k].lng))); MAPS.map.setBounds(b,60,40,60,40); }
@@ -3920,7 +3924,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!lb.hidden){ if(e.key==='Escape') closeLightbox(); return; }
     if(!$('#report').hidden){ if(e.key==='Escape') closeReport(); return; }
     if(e.key==='Escape'){ if(sheet.classList.contains('open')){ closeSheet(); return; } if(document.activeElement===q){ q.value=''; syncClear(); go('search',''); } }
-    if(e.key==='/' && !/input|textarea|select/i.test(document.activeElement.tagName)){ e.preventDefault(); if(state.route!=='search'){ focusSearchAfter=true; go('search'); } else { q.focus(); q.select(); } }
+    if(e.key==='/' && !/input|textarea|select/i.test(document.activeElement.tagName) && !document.querySelector('#mapov:not([hidden]),#bjov:not([hidden])')){ e.preventDefault(); if(state.route!=='search'){ focusSearchAfter=true; go('search'); } else { q.focus(); q.select(); } }
   });
 
   // ---------- 시작 ----------
