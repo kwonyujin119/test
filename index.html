@@ -167,6 +167,13 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .hitp .snip mark,.hitp .t mark{background:#FFF1B8;color:inherit;padding:0 1px;border-radius:2px}
 .srch-note{font-size:12.5px;color:var(--muted);margin:8px 2px 0}
 .srch-more{margin-top:10px}
+.bldc{padding:12px 14px}
+.bldc .t{margin:0 0 8px;font-size:15px}
+.bldc .t small{color:var(--muted);font-weight:500;margin-left:4px}
+.bldg{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:13.5px}
+.bldg dt{color:var(--muted)}
+.bldg dd{margin:0;font-weight:600}
+.bldc .d{margin:8px 0 0;font-size:12.5px;color:var(--muted)}
 .menu-chips{display:flex;flex-wrap:wrap;gap:8px}
 .menu-chips a{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--navy);font-size:13.5px;font-weight:600}
 .menu-chips a img{width:20px;height:20px}
@@ -825,7 +832,7 @@ footer b{color:var(--muted);font-weight:600}
     <div class="search" id="searchBox">
       <form id="searchForm" role="search" autocomplete="off">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
-        <input id="q" type="search" placeholder="SOP, 법령, 전술, 사례… 무엇이든 검색" aria-label="검색어" enterkeyhint="search" inputmode="search">
+        <input id="q" type="search" placeholder="SOP, 법령, 전술, 사례, 건축물대장(주소)… 무엇이든 검색" aria-label="검색어" enterkeyhint="search" inputmode="search">
         <button type="button" class="clear" id="clearBtn" aria-label="지우기">×</button>
         <button type="submit" class="go" aria-label="Search"><img src="data:image/webp;base64,UklGRg4hAABXRUJQVlA4WAoAAAAQAAAA/AAAQQAAQUxQSHARAAAB8If/n2Kn/f89Z3ZPcEhxd3cI/qKCWw13d3dI3d3dBagLUvcWd3eXFxZoaAySszOzz+s685zZzSFp/40ICAKABI1iXh6ZQ0EEZB+AvATcdUBDlR4LP9t+7sxPtwKH/A7MdVyX5YfhOS7EINJg5BubU9GAR/P7xxw1y/MY0m/tsUsOS4yBEkIqJSQOAidfXw6UmPrRkgkF8/SHu5qxxbo+ueUaIvqeJ5VPwVNrgOfvcuMJjMHWKozn2ff1eCoM+fg0xoA8s4HEEwWA5euSgTlC5OAvjOfdVVZ18rdXEFEaz+yX2ucAy8el7hX0YqNXUtSBvPfhGlN+3LfpMYwQyg8DOfgsuPn3i3jhLbroDzbPaxdztX7p/3mqXmTBGMpmT+CBkiz/3l341CjSP1Iobw2fLLO2L54M+b6Sse8gff1YDXg+LuPNuof9wMlLGgYAKs7aHA6jhNE2Y89XD7SHfNyIQ6MsQ/V5+AQ4eUvDdF7yt95MVchnWfs+ntO5ku43Hz9lTsI2FEZZBQ7LK31zgNLTtmgFI4M2FPrs4o8P9qjCKInaxs7HuGcNnMADxRnLO303evY8ohQqqF8fEa/88VCnkmZbzvK5RdnVF4bey2oOTp6p9VyeE9heCYGI/p4XepYjPlW+b0vGzkuf9aWBGw1uHqkVHLlB962CMem/LWrB6TN723yN+wA9o7wFbt6wJhLnHSJ9B2JSvhheCQAg8Fk+xw2xNNpW0GF5oUXpu08jCmnXrFq9fDm4DHWprJj8j2OVUpWijTIbAs8DtXIPnA+oKaEQr/0wpgIxtDj8u4ALKyy48dcdF6uVvP9CgIqRepltX1iXWBuWfv9FcKNQGLhPr3dxGBSef0bXAtpfeutGFoD5V8FVSaUmpcSTiZxfbyty1EFdC9AwW2eW02JtrrJ/HdxKFIZwdAHnOn9J17WIQtn7vvLWjUTBsDzo+rJcC4Abl43MgfEW3IPXFRer1fvErl6FRDx8dxXNVhbPaKrDdLs4kMeIzZ6LOTBHysNxIgB3RUlatrsOu57YQvenoxSWmkJcO7QIgBNHGWZWCnnug66JlRMBeG7Ir3zLkOGtAyjjYTjhwHIDJ7ObgQMs9oi7/Hpge+5G9Cza1Ud/VXfSPr60s3b3frl2/fIHbsrFh7sAUKLns+vPp59fVgNY2Fr7xzZkYAzWt7REwYk4Ve09eWIH25gcGGHxIReAY2E6jzu2/Idav9pq4uO2ZNOJq7qHolO2owGr2wIPrckL3fHJWYO6c3UYD8O5xGmbNFFSCIlX6jNucqLxA5uyAjjBWaW/Tdzv4LoAFeZ+veHP5+oDjzO23xmU5peQWksAbu+bMc4dApwzFpL2sUcQpSdi4EnMuRWcMI4PQJ2HDyEhTymVjcuBh+DcwtOIygjKZuPb4FL/ZvBPHiHYE3i+HOWVCx+buMw63IXER1JoQOf2eH5cKPam7S2hULzX3KIFmdZtQas3lCvFGbReY3c7o/h3OcZC1Fp/mIUoLJLtX0oEZtPQeimOOWInX6h1hPfF5xxA9A1O5OBD4BI+97P0OAkAhh7XMXwdMs+qCzx+zVrvsWClRPy8pa7Rdy20Fyxdo2mHbr1797gxqXYph9phdmxytjFXxoR6OA3cwH46rlQBfrnCtArk4iaF9b4N8l49/0vHgWJzjtsjd0KtAkczscw5E/czQIPlFpKj+BS48drmYWq2iVUC8ZsOAJGI5ZQxUrHDyPve/WHLyb+v+Ugh5/LBX57vW8Kmz1yo/TsqYcirOV0vgBvgnbZerpdRwNmKfyACjOkh8jbJyzcufzrNyhMlZVRid4hMPRoUyoiSNQguvIceZXNGuYKPZKKw6YtvgcenMHgGfWEQi7irL0AECBSq3WPWa78dTUcTYtOgQSGB/z+ZCNyod05BTxnb8gnTubnLdjkANd4WBl+s8oQPQIKW3maP7EQKwsR4gtAxA/psDnLtpOdje3DAge4oDN4NaLOTkGxeuBKc+JSE5RZLEvHSNEJNgVrd573716kcRKS6zROxuVbKHDc9G8CD9YATkZ3toUdj1fhV0v1K0nXb1LY7QuHkKyZrpbSdK10qzwHKzdggtCxqBa2sHlzm6W1vNK7+jW4RFKkV00ArgxLHfDpC3PB84CLFR8CNy1P+BUbNIV19qwLU6jnt5Z+PZ1veFVL5YUHl4N7CLAbwOCpJy75OMNYnlEbxa3As2M57EIVlQVt0Bi4A+N+bKYh+YIAO8ewrvaqVAJh1FaW0+7SYduiDJOAa97xlb8hCXwZMCd4Ulz8O3G0r/pkP156LGlIf9l1la04mti9EOF9KuS0lvpkAzyAh18NzlRk3FOwNb2uBMKfz6HJDOCRuShz9R5iDJ+nj4akkINt+O6Kw2vgpn0xuU94FXRy40aZ5jTVjkiHxaFyOaRkUOatsvMqNlCkpyEuaNKtUq3sgAkswSvmBs6Hyr3T8ArPag2kU3XHYlBrhY8rdJX4xhc/fsDdY9RJ+RR8uBlAAeHIUPWWrbR5fFsDwRJhTcB/KIIIFokn5c3H5n0PzoEh46Hel2VhczRK+sk3PVMaW0SJR9YFxF9GjBKV1AofuLUlaWZiryHumIsyxaUS9bwaPU+Cm1gBuBKr+gkrY+vmuJwMg7hrZ++AhC85Cm5dmLIuc+JiWHBpaVUmu3r12cs2SB8b1alOveo2yk3KUufa8BvCsUcerXWp+hyjo151KApd8SaWXohYs4s9JALUybEOlFKmgZq8VAJc50PM8wRr6e20Pu0HjuNAg25wxC22/DbjgU3FfBTw+b0f2YjSEQrG/e/XIt89MuLlGITDhzmNmmyi+DMl0ZpTMuvsxz2jm4/KK4JBY1KIUy/btYepUgEJmyCMgPmUt3mQ9uRzmKfQsRv6BocTGt3pWbbejDKodHAWPUFIl3gJOnJyJ3pJqFw1CEP2KFLJP/f7qlJurRSyev5vAoOpSRIvpuIffZlFx6Rfp9EoPr87T+oADDDlgMdalxNV1tRTejjJQUPBgjk1bZPaMYRmD5005VbFx3F/U4qRTAm7+WqIMIP7C/GJQ7Zqi93Vxs6k53LQOA0Gm7Pn2+SmdaxU23Qd9FkRGW2jxJRTSLCcrNco09z+l9xE6/l+a0mShPuvRpicRH07QRtTbmdZtSgjE6IqOS5Q0qbvUAVxg3F0Wo9jE/t4MwLHa5k6/3xClrXg+Xnm4PDD2rHnvCU4cc8baJy/5befhIwf3bv754xfvGdO1YUlmf9fCaDZsr83tiuK+WkUO25aOMmqnxgIxFjt8b50ZDy/fBgDtPosi2uREIp55oimMQ0u50Jy6jktNHRDDzgVwma1WZNwOvRMqa6gn+noNgAivmKbo5r6V8bhnzLkRGpWyvxvgEbAhm20SJCV+Xw4+D1D0Ila7fH9JcCIArb/2raawhwfqQELfX3zr4bru+68xiQD9UZjmxuVmVD0/hzlGHbe1AMZtKqbqQ8cCchOERPlhU9Ca2bS1BA4I0TPj5ASXuyxUnM7qNZP+WIjAR4FhdsveQ3yWwyRrUcT2eaJyDAvQ4pMA90Hir44zeiuiskZkMe3DG/WY6qUZOOmntaFlpLklS3y/CLi2uFO7d/8JPLxC/KYdMTg4K0fvwt8ZdGDLHHscgIXecBjLRcZbucX7raMVEo/2BlYnQ0r72eGeOeWJL5b0mYfKKopSfVp9EREU+2y9Wg2ARdzC21GYRkEnPcGcVU2V0ijJtE/ibhYb/VdwcoLENd2MeIcL95j3YeAExmehUIO+d7/z7ervFhaOd5ojADR5PsWomZbxO6UhAb5Az2bqZ3x5RwJZujd+4Rm7qsVaT3nrgk1QzEwlrg9YXXjLYnj5/Y3ASKwHo0yO9WmEWZs8fjxAYun87o4YoR7GipzyJRnRvgTjbsRPy3S77/sTHlLYUjGeGAZQaNB3Ubs/5yFu7AKx0smX5hdd/HJsdYJJGPxHiKnxfUvgxIobDBHjVNcWcokQzVc/arwRKxEaey836ddoGCNUyWgr0+t3YTQKSu0ocC35yDf0enL1ZRIE0LaDDi19FtcEz6aPHkKtHa21/8/gxPoxPAOJG/uUpou40tw9sZq5euyioUzJNM2lPVoaOKvxj5JBXoALi8xl8wwUJBIz4ONL1r6V1ai/26JROVuPgtyPFmSchuSbTFtxgbgCUYuzoNTluGAI2dVnrhaIIqCW9ngZLSkcmhpWlfqnBtkH3K5LU7VUWCgkzYMU8dkcNISpP2hDgf1uiXd/bdjMDnxJLoFr9PgbTvqKYISyDd2CW23ZNRxopRQlZo6TAABFerywjUQcrI6q0tw/EIdVpt8vPXxlBlVs1tq1N2pS1eeavQicqclo8+QeQqRFG5056qvAlIItI0YKI9K3nhNneJwZAcKDxc2NFFajoNHAscnv7/IsWXemzKZdQkVxWfWt4bvH0CMDOB+rlR7ywQmSiC1UUI6ihzgmHsdXFUd/cZH69/Zpy3i1ARiC4cILGCWjPF6u0bDX96HN4In1julPVdiG0t4+Y2lngDXmCu0Ejt5OLhunuiqtobkzcPjN4AQiUoyd/POP3XLRV4YnCxZTm7m7URJiHq0xc1UK6VfaMJbczPTZucNADGpMXJlK0hyD7N/Ul2rbDvVceNtQkRlnBZLwvk0uc96tDcVSTcHQZO1NrgEAndC4/wn6bpKuPNS9mwN6x/fMmfJkANNx14wy8LGpUL8H1+oUm8M+lk2mTFo9bI/w79rRH16aVNVqX4QxQRLa3bc6KxCjPIV4KLmS/TzThXt9avkSDS6tU5P5emMAN+GQjCo64LSlPfWOkgAfGTa/1GFPBhXSlAwR6HOgl83btGGUltnuDsBgQ2hVSiVmnYVhJrEBy0QJTTDiseWLuldPIMMK88z4hU7Z2189gJZolt1uWj2iYNBRrgMdzGGqgPVw8Tkilw5MQ9ScVutnk9NlzqDQGfJH4AryDtyBniLlO/vJA+d/YTRMkuWOu2sBQKTECd9g1ABzAk3LytyEgmYMT385vWUB01XgYZ8VanfXT5fJuhEBCtJHvPxG+zDnpJz9hNEQSYF755Y1mMNh7rHs1L/ubm6mFDAon46KCEsSI1dfcgk8WZpx+4Cqn8GoIP5ZTGLIWjn1UkeuyXdhBgpa3gEX7JcfGE4iAfera++9sUjo3ExuWNuRplM+PY5UOwULuVozpbxxMht4VT2h54bEXOgQ//m4d8QmlwwK1CxLTGJz+yh4WpvLUfyEyAqHyjkyKqN+duugRcChHnHulaKN97/Ys5iRjsLhW59uQUeK2yaRSq8ITks998m4GvRZcFtL2kLhVtM/PqSMfkMI+b5HW4RPXeBQaxOZGkn0WObPEysHyaVDMVY6HsOol4OpZjQZFmIMon3BCR4RH/79eYl47fzGtyc1dW3pKBx+V7FLiWibAGIZK3aa2uIG/3Hviz0SybgDT7dtL1Tqcd+qk0h3YumHwBx/uZNrODMQ8hMZ+9s/+lsvbX5lYNUwGTOMB5JR6AtETOkM3CR88O97v4wp3XDOfYmGbVrULA5BSZYu3IXZ2kyYA27gPN5Of1hG+P/X4iSH9hsyUA6FOs56b1s62n6TFSysx1/rXjjXuU+apHJJHTs0uMFwQOIQn4de906tANxKCAPg4U16IjEBa4XxIr9hDJ4EN8Qc3LqDKIzDHwyrltu0VDbvqHEiImRg2FmQ5f1858Ihcp9yOTdO3I4jIWCSY9SGJ5hxnX4Qhm+RiR+92S0Uozjw1kNG9mkQoYs8NxMW+RRRUkEL02/Gn8lJxvKO09GyE99c7xC/MGXxT1gyZT2sBolLWuoCjMqwv1E58uGIKrnOZf5X+ImuE94ujk/S/V4VsJMazy79MK91QVNY/8vgpFIWD0uQXfzynw93K2UK638dLIn9o6SgbfHsd/d1LwNm+vp/IFTcgRT+3vrmhDZFwbRC/iuh5KNbjm9ctrh7Zepo/Jc+AwBWUDggeA8AANA2AJ0BKv0AQgA+PRqLQ6IhoRY4zeAgA8S2IjuQXfI9adhfqX45/kl8rNZ/rH3n/KroWT2d2uQz/AewX8z/7X+0/v/9AH6W/7P9WuwP/Ov+H6gP5X/cf2E91n0C/3D1AP7B/yPV9/6XsAf3T/k+wB+vfqw/7X9vPgT/bP9y/+/8gv9D/yP/19gD0APQA7Gn/AfjJ4Nf6TmAM5p/X7v30+AFcT7NDRvMC9j/qffs6jvgPoE/3ngi/Yf9b7AH8z/xvqn/2P7VebL6m9gP+d/2P0rP//7nP2v9kT9jG3H5cSlDbuns6/kLh9wBGFRX93i8No9RGX6+XhmN3ghV/RIyPXnQ18th2tlp3LezQB2pn3vA2OOvvQ2ptLx1Ksz9QT6dGdUeqvN3ekjRdclg2xN4vAvWJXYBton4G40VT0NbHZ2KWHWRCt0LrocVHf6KC4mz6ImTrV6QcCdeXEaS3hj43f6crXHy3lF+OR8kaoDBT36iM56zbRGUDyKxTKNyex6/emOnFMlpv20Lz0aqeeQxOYbmu/cp5oPsuaEVaoEq/c9TpPReMPXG5iQf+f5I7uGF3RjsFxuo2Dnjda8/LH7PAAD+/2AYSlIxNn/AKfTQrpuXQncYyqYtwqjq85jEKDQwVTRq7JdTDD91YYF5JXe4ah6tDd2O5t8C4J1pNnX4bgmQQONl6FbKEE67Ou7NTPjIPNO165rdWvV0L+zZLBvtpgHFsU0LyciTmskzL74hd9em/6KyCkUg6h+29gnjI1jkQwJ530OQhESkzw8bhGmq8Wp1e76Ma5tstWP/mgiz6h8Vl5CgmuEP9MgMm0aVpOG6aA6c8B4+x7WVZpf3Leb2AgDSlazepS4SvWu2fXKdEcidFbpSINrV78iuwryKqck395GKbuaxVNZvPK8+39V/mTkseN4+WrEgrcUfQg5+3CfcGuOf84c4JBkjgnjr0hUdAGgnu2ZPr2a0W1/9dSpobxjxhgiALniHCoqEiD4fC4a4zZ2AW0mfSrdAMNjLreePOhP94jMpy9xsZrW0eVC5zvYfDTJuX5juoJLS/u+36jFxsYEpnNSTa6ebYx95caRf9VP1+d4BhHZ/b/PUwrPFvSPucaWg0xiBtXT7PtFJcX1jWwC+b3p1v4QjdtrYusKlAWgMfigGYwW4QnQCfHKxxIkcGiQv7Sr+aTv3g5/9xwhYU+bxplfEVJ0q/rJwcP58j2MGOIkxVQUGwA8jIXTu1UUEy4MhN3op7AijBPLWrYGPT+ipi4B6QgEbvZ/a1Rt95T+6I4HkegSL7hbDWinkI2q2Ej4NBzrWLaAVM6UU+Q+rTS9iOr2gBLdbvke1p6/wy2xQhkPATB9yX6Q3hDjtWzxn1kU5xIk0gExHcSN6ZCazCyOIux2LrriJoDrlj0YB/AGvbXaoEqRU0+T1CEKq27DMC5sV8JLB58aC11jxu34s5fii9KeQrnA2Uokdm4wKDjpg9l8Y+LD6UiXdygtqStHTcJRJmE8E4j4msZk0osGKT8Olv7uN16sLkhpinO28bd59WCeAUafLWgvkRZnZynL1lfBkHYLMdmtktpF8x7MB41Kdn9RQ/ETqhYuJOrt+xYL49LMSoE1fLXOE3zver0C8R0A5vcoGCE1uM03VLPhRTAPGXrM1T5JAgEst2e4PBubzTeNBBWyvqqQGaie2MzVYCBKmbjwI3FiAaNMZlCVW0Ns2gN6NW8Qfrg39YmNA0x15sDqCo3W2gR/6o3Wi89FqpKBoythUvCsI/ma98EtgadJ8f/8zRhzp8+tSPQ3d/FH2D38oh5PLYsf6V+ZlPyWpa6RY1WI3FgbHjo2/I3SKQrPyJ8KitM+4H6iAL0u4Dns0vA38BmHU6/UjOzV2xGINCwJk3oTMVu4nhg8T2y5r4O9YK4Aks9DNKPt9KQ4FkBZ1RhEynGpbAhyiR3LS6vmeKNsJbhtsokZIc6+dsuhCA5SmXg9lk+KEkgef7m16Y4M0+s4A1icQjGsHXU/OzAXCnXo5U26tfwSOWPGVKuJvUTB7Rd5FoJ40goTrBWoFuBll1vFvkSW+Xan35hyI9TapYrKTED2pkm2FT8WGlb+ZnsGAjoL0fAw4MAWNZyNrRi68Z5htqul2xJ7LH2oLB9Wxy5o3sRpEnR0GF0WRtt4QS3sLUT57tY9Z/sp/kF+W9NJbNKL1Md8+UZi84e1yetH4jLduv64MjonLqFfRcRXs48AcHFjJoXIfUpPnSeQVMkLjaLJN8pDVihnobxRN+C5SGQYX/322TEqBhcrE2WVq2WqD/nSSeuVMLPjyxQZaKQiGaSYhgesx18a4rXQOuDYohY4owRlAG2Z50z2hu5fP9FY/Zy8Idx3SJlzsh58tlb+QwMuSFHF5lvjHHI+TE/ElOYQdhZLX5b74zL1JQ0mo0pvsk3/0TVvso1wcTXyKhHrjWo6T5Ok1vpJRhS1l0ABbybogrz4489CiRp6tOUaZhfQGOQqhzFD5ELW82VT+sK4a/5IL5/86MLBPyiwgEa3Dv8Z2C6s/zAggy0RCS+HnbXPZBJwOnJ+sdwdDmk1A9MAuQ4eBhMc4SDGzH9TC691h8LDe/OHvahbt98gqC4QnfdVXHIkYbNtOM9O7Ny+F8L+09ORTngkXaWH5b6s1tnMpqQgswxHokZLymMGPcHlfL38rkoT8VKsIWrh5zte9/qxjxj+JmoC78Jnwma+d2M5s89SSR9qHdnZnvLnqEFvyhevl3NX2LXMmPlWjCxMsKvyVHlg9nXi8Um8Md9vR/ai8d9v3JItv1DAsCmcmpKWUneT3/LbMDVgrMfOQzDv4E2OCtviNPqEL0XV+eYwzWja2iDka22BmUkkk2SdT4s1O5HVrDrRVzSmBIQM+t9GJzS7oImPJ3xzUUCPymhaFt2ncqNNVw1UzBLE4oM/0sTzTDS0H4TH1cC7kI0vOMz9UM96NVMtpM+XoIgs0GvdFGQQhZvQvplgXimVewy6dpdgzWfSkSGQuk1moy7mq7i7NrcgWRfrRuZq992H6qZyJpy/OAjEDt5czvLNfMC+JIF9g7Gp1wiutd3CmNeROHVDstbaBI2F1RDFmsbUD4aAQnQpXig7KfOWpzDvXn57or7yyZIgCpUD3vlddnqvUJcVAd0JCdRLPmONvO7icR4GsLMpbXEa1yfabny+xpXi2V/pzP+jHlV+GVRIjX5msPWWxWe6eUmguunQPZ0AAJKj7h96nqAAASphjSkLvg7NDq1U0ED7/bt6UaaEbaEorOnw+4HlKkprEJA+oW1ksEsXit15fWStDdsJD3msOeIxr/2Ia28bKLzesESoJfYKkFfwT7xEBFj+n8zqT2zDjmcyASHDBsiUJ8UvYBtIxiXUVG30H6KGoWr9g8zmGGkoAwpwxuYL4zPP1nUcpxE/24JYjNmrxXv5WI6FBKQ9bF1ei0qiyDqWi5V6RtRtjb+wzYzpDnrujtaHYchz4FGk9HWu5SPHHlxmEevG3Dbq3/XWlkXEo0F6jVonsdttKgoQRM572bDF0x3zkRxqbp5Lg9ZnOpFNHdptLn2R98sVqzT2gZbqoSAnLEL2n2w3ToGEvv6qirZcsYFPyU/7PSVeqxJDeW9XzB7k59mcaiKLqbqFkucPMFaPWWAr59ppaFVAWAzySXGfEl5LYYeh0XP80bl3KhgghmNe53eM4/icGGLFz479LKMgUpp6Ps9iYPkKliqtYo63QnFDSbN86DAIcPsvjh+Erf3WyjFT8Jn0HcPrzAnbXlqWc+2UVNJopfkjJMC96fzxqdqkhE1O6uYoDeqSmO9v+lyUmtKuJd7VLEVPj5y3qrJbO6XmRwfvSKnIELBNOMO1FOcQ8RCaMZDt82TqFUgbxx0vfplKZYjy+8aAOJuJMT9zYcJsyFHEAsayjEvFl5eB7X00XUvMydC6dJhhthS2KmNQrSXB4R0FUmuxxn1BBIlpaE2AiYcdqB/792DHME3bxWr0nFPqtf0oPESfbRM2ojtJptDQaPE1byEGAmlBa4SV+EU/hifHeOHRc5wUJi3nVQj2yf5UnNKQrmobHFOhJvuHQZ2VMl2D/ps1K8huTj6eaRRB3u3GzkKQQCaP4i7rRL31BtGnM9XW6LNvwOPl5HisyXluu88Ru6tLZvrZQqAbp53bxGCUXl4Nz6+0pRF+mmCR6cFZPLvYumdrQI27KO1uoaewUuVzeH2bR35At2sPvZHOPvt9mxxZo0jweA6jtCR/YgjJkWbahnWXOjcwEkaZ8CnawSGIuvgRowj6pxgUhWvb+JifFJWQyyLpa933lNnXxPVW01crVxYE1EZwtOMy/5ETK0HwL7rHu0LCVhZqnA3L2EWP7/QV+hHhSfzairrVovn+qsTdkR2A+hCwPZQqiOULkGjPq0IFft7RLO7UaAJTHY2x5XwivkyrQrPHCrBTS7BV+bCcAKZxhIhIjtVyB5v/cztOcwotZOWzDZmHMaqD5feBE3Plm1LA8xZA9neSYZgEZw6kltZdXZCTgbV8vATgIz7Z8X2JjFEehPgQosTRSPLAYkxuczgOFree3298ACweUG4P8jxw5WOf/VcS520xPBSnOCOMsrNlZpecfSj39aKjdqW4Pp/nj9l9WzVLq1SH3oVB2+voYyQWmE/TsYtmgxxy1FiLZ7foDSL57QVxAYHMTTklfA+cYGZKjf9fJPFEjsmMkzWsDGW6cFL3hoO4jlc22nR6gv7okraxSXGZFqiURypUNvhvsnZmZP4PXR2w35y4GnTUL1CP84WngdT2LasA+C/JJpGDZdzV0IdzIR00gg38lWsLaDT89DZSfyCXBNNzjK5jEyivGWihmJCj9N4Ym+A+EsAKXJFhsEL95uzp0M3icH+CfNMM5XS0ROyaFumSuywcgk6U5sLLrf9ToniJr7TkFXDoqAVaj+LD2A324qnLlfM0H1KUq4dpdTpTYwez8rGWACpnMdEmGNo9+ODFHTe5DnaEeG8y2IftKzXD8D9rpfXZIfzOR8p0Gcl9LvG1SyRnr3e5bt9pbqhF5mS57RRXLmw4Se4hJ5FsLzKCQHWgNsI0gLWB5OxY8aoPY+qy0unKx3hx/37jwWCrnPnXPZ7R1ezH4M0YooCNqiD5uGSK5gFcq/8EEWu6fAQEE7+etkXTHJ0ORr09nsPUYTbeXVwhlNmiATMSBuR13+I9h0iqTJy+7wx03cGrDaDlMGmCu8/7r34gce/s3GSB/tjkyh9pS0+ovLhxhoST0h78RvNXkw8fPdvP36vdvP3+EEAAAAAAAAAAAAAAAAAAAAA==" alt="" width="84" height="22" decoding="async"></button>
       </form>
@@ -838,7 +845,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v149</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v150</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1587,8 +1594,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V149', SRV_VER='7.5';
+  const APP_VER='V150', SRV_VER='7.6';
   const UPDATES=[
+    {v:'V150', d:'2026-10-18', t:['검색창에 주소(예: 구월동 1138, 정각로 29)나 ‘건축물대장 + 주소’를 넣으면 건축물대장의 용도·구조·층수·연면적·사용승인일·승강기를 검색 결과 맨 위에 보여 줌','건축물대장 아래에 그 주소에서 1km 안의 소방용수시설(소화전·급수탑 등)을 가까운 순으로 — 누르면 카카오맵에서 위치',
+      'SACHIL방재실 → 서버·AI에 ‘공공데이터포털 인증키’ 카드 추가 — 키 하나로 건축물대장·소방용수시설을 각각 시험해 보고 등록','검색에서 법령 관련 낱말(○○법·시행령·시행규칙·조례·고시·기준 등)을 찾으면 법제처의 법령·시행령·시행규칙·행정규칙·자치법규 원문 링크를 맨 위에 보여 줌(조문 번호까지 쓰면 그 조로 바로)',
+      '법제처 키를 새로 등록할 때 성공해도 오류가 나던 문제(V149) 고침']},
     {v:'V149', d:'2026-10-18', t:['법제처 키 안내를 바로잡음 — 이메일 앞부분이 아니라 법제처 마이페이지 ‘API인증키관리’에 보이는 인증키(OC)를 넣으면 됩니다','법제처 등록이 실패하면 법제처가 보낸 실제 이유(예: IP 미등록)를 카드에 그대로 보여 줌']},
     {v:'V148', d:'2026-10-18', t:['SACHIL방재실 키 화면을 카드로: Gemini·Groq·Claude·법제처·카카오맵·T맵마다 ‘✅ 등록 완료(끝 4자리)’면 [변경]·[지우기]만, ‘⚪ 미등록’이면 입력칸과 [등록]','[등록]을 누르면 카드 안에 ‘확인 중… 실제로 한 번 시험’ → ‘✅ 등록 완료 — 시험 통과’ 또는 ‘❌ 등록 안 됨 — 이유’가 그대로 남음(‘저장하고 시험’ 없앰)','서버 7.4']},
     {v:'V147', d:'2026-10-18', t:['AI 도우미: 질문에 ‘○○법 제N조’가 있으면 법제처 원문 링크를 근거에 늘 붙임(법제처 API가 실패해도)','법령 질문은 법제처 연결 전에 저장된 옛 답(PDF 근거)을 다시 쓰지 않음, 조문을 콕 집어 물으면 법령 원문을 먼저·PDF 근거는 2개까지','‘화재 진압 방법’처럼 ‘방법’을 법령 이름으로 잘못 보던 문제 고침 · 법제처 조회 실패는 서버 창에 바로 표시','서버 7.3']},
@@ -2111,6 +2121,64 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   let SEARCHGEN=0, autoAsk='';
   // V89: Search는 '찾기'(원문 위치), AI는 '풀기'(상황 적용·요약). 입력 모양으로 서로 안내하고 버튼으로 잇는다(자동으로 넘기지 않음 — AI는 입장코드·하루 한도)
   const isSentence=t=>{ t=String(t||'').trim(); return t.split(/\s+/).length>=4 || /[?？]$/.test(t) || /(나요|까요|할까|인가요|인지|는지|하나요|되나요|어떻게|무엇|뭔가요|왜|언제|알려줘|알려 줘|설명해)/.test(t); };
+  // V150: 건축물대장 — '건축물대장'이라고 쓰거나 주소(…동 12, …로 34)처럼 보이면 검색 위쪽에 건축물 현황
+  const BLD_ADDR=/[가-힣\d](?:동|리|가|로|길)\s*(?:산\s*)?\d{1,5}(?:-\d{1,5})?(?![\d가-힣])/;
+  const bldQuery=t=>{ t=String(t||'').trim(); const ex=/건축물\s*대장|건축물\s*조회/.test(t); const a=t.replace(/건축물\s*대장|건축물\s*조회|건축물|조회|정보/g,' ').replace(/\s+/g,' ').trim(); return (ex||BLD_ADDR.test(a))&&a.length>=2?{a,ex}:null; };
+  const bldRow=x=>{ const f=(v,u)=>v&&v!=='0'?esc(v)+(u||''):'', num=v=>{ const n=parseFloat(v); return Number.isFinite(n)&&n>0?n.toLocaleString('ko-KR',{maximumFractionDigits:2}):''; };
+    const apr=/^\d{8}$/.test(x.apr)?`${x.apr.slice(0,4)}.${x.apr.slice(4,6)}.${x.apr.slice(6)}`:esc(x.apr||'');
+    const it=[['주용도',[x.use,x.use2&&x.use2!==x.use?x.use2:''].filter(Boolean).map(esc).join(' · ')],['구조',[x.strct,x.strct2&&x.strct2!==x.strct?x.strct2:''].filter(Boolean).map(esc).join(' · ')],
+      ['층수',[x.up&&x.up!=='0'?'지상 '+esc(x.up)+'층':'',x.down&&x.down!=='0'?'지하 '+esc(x.down)+'층':''].filter(Boolean).join(' · ')],['높이',num(x.h)?num(x.h)+' m':''],
+      ['연면적',num(x.area)?num(x.area)+' ㎡':''],['건축면적',num(x.barea)?num(x.barea)+' ㎡':''],['사용승인',apr],
+      ['승강기',[x.elv&&x.elv!=='0'?'승용 '+esc(x.elv):'',x.eelv&&x.eelv!=='0'?'비상용 '+esc(x.eelv):''].filter(Boolean).join(' · ')],['세대·호',[f(x.hh,'세대'),f(x.ho,'호')].filter(Boolean).join(' · ')],['지붕',esc(x.roof||'')]].filter(r=>r[1]);
+    return `<div class="card bldc"><p class="t"><b>${esc([x.name,x.dong].filter(Boolean).join(' ')||'건물명 없음')}</b><small>${esc([x.main,x.kind].filter(Boolean).join(' · '))}</small></p><dl class="bldg">${it.map(r=>`<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}</dl><p class="d">${esc(x.road||x.addr||'')}</p></div>`; };
+  async function bldSearch(bq,tok){
+    const box=$('#srchBld'); if(!box) return; const live=()=>tok===SEARCHGEN&&document.getElementById('srchBld')===box;
+    const fail=t=>{ if(!live()) return; if(bq.ex) box.innerHTML=`<div class="group-title">건축물대장</div><p class="srch-note">${t}</p>`; else box.innerHTML=''; };
+    if(!SRV.on){ fail('건축물대장 조회는 서버(47망)에 연결됐을 때 됩니다'); return; }
+    if(!SRV.bld){ fail(isProf()?'공공데이터포털 인증키가 아직 없습니다 — 메뉴 → <b>SACHIL방재실</b> → 서버·AI → <b>공공데이터포털 인증키</b>에 등록하세요':'건축물대장 조회가 아직 설정되지 않았습니다(교수에게 요청)'); return; }
+    if(!SRV.kakao){ fail('주소를 찾으려면 카카오맵 키가 필요합니다(방재실 → 지도 키)'); return; }
+    try{ await loadKakao(SRV.kakao); }catch(_){ fail('주소 검색(카카오)을 불러오지 못했습니다'); return; }
+    const r=await new Promise(ok=>new kakao.maps.services.Geocoder().addressSearch(bq.a,(r2,s2)=>ok(s2===kakao.maps.services.Status.OK?r2:[])));
+    const hit=(r||[]).find(x=>x.address&&/^\d{10}$/.test(x.address.b_code||'')&&x.address.main_address_no);
+    if(!live()) return;
+    if(!hit){ fail('주소를 찾지 못했습니다 — 시·구·동과 번지(예: 구월동 1138) 또는 도로명과 건물번호(예: 정각로 29)로 검색하세요'); return; }
+    const A=hit.address;
+    box.innerHTML=`<div class="group-title">건축물대장 · ${esc(A.address_name)}</div><p class="srch-note">건축물대장을 찾는 중…</p>`;
+    box.insertAdjacentHTML('afterend','<div id="srchFfus"><div class="group-title">가까운 소방용수시설</div><p class="srch-note">찾는 중…</p></div>');
+    ffusSearch(A.region_1depth_name||'', A.region_2depth_name||'', +hit.y, +hit.x, tok);
+    const x=await api(`/api/bld?b=${A.b_code}&bun=${encodeURIComponent(A.main_address_no)}&ji=${encodeURIComponent(A.sub_address_no||'0')}&mt=${A.mountain_yn==='Y'?1:0}`);
+    if(!live()) return;
+    const head=`<div class="group-title">건축물대장 · ${esc(A.address_name)}</div>`;
+    if(!x.ok||!x.j||x.j.ok===false){ box.innerHTML=head+`<p class="srch-note">❌ ${esc((x.j&&x.j.error)||'서버에 연결하지 못했습니다(서버 업데이트가 필요할 수 있음)')}</p>`; return; }
+    const rows=x.j.rows||[];
+    if(!rows.length){ box.innerHTML=head+'<p class="srch-note">이 번지에 등록된 건축물대장(표제부)이 없습니다 — 빈 땅이거나, 큰 단지는 대표 번지가 다를 수 있습니다</p>'; return; }
+    box.innerHTML=head+`<div class="results">${rows.slice(0,3).map(bldRow).join('')}</div>${rows.length>3?`<div class="srch-more"><button type="button" class="btn ghost" id="bldMore">다른 동 ${rows.length-3}개 더 보기</button></div>`:''}<p class="srch-note">국토교통부 건축물대장(표제부) 기준 — 증축·용도 변경 등 실제와 다를 수 있습니다</p>`;
+    const mb=$('#bldMore'); if(mb) mb.addEventListener('click',()=>{ mb.parentNode.outerHTML=`<div class="results" style="margin-top:10px">${rows.slice(3).map(bldRow).join('')}</div>`; }); }
+  const LAW_T={law:'법령',admrul:'행정규칙',ordin:'자치법규'};
+  async function lawSearch(q,tok){
+    const el=$('#srchLaw'); if(!el) return;
+    const x=await api('/api/law?q='+encodeURIComponent(q));
+    if(tok!==SEARCHGEN||document.getElementById('srchLaw')!==el||!x.ok||!x.j||!x.j.ok) return;
+    const rows=x.j.rows||[]; if(!rows.length) return;
+    const ord=['law','admrul','ordin'];
+    el.innerHTML='<div class="group-title">법령 원문 · 법제처</div><div class="results">'+rows.slice().sort((a,b)=>ord.indexOf(a.t)-ord.indexOf(b.t)).map(r=>`<a class="card result" href="${esc(r.url)}" target="_blank" rel="noopener">
+        <span class="ico">${esc(r.t==='law'?(/시행령$/.test(r.name)?'시행령':/시행규칙$/.test(r.name)?'시행규칙':r.kind||'법령'):LAW_T[r.t])}</span>
+        <span class="body"><p class="t">${esc(r.name)}${r.art?` <span class="art">${esc(r.art)}</span>`:''}</p><p class="d">${esc([r.t==='law'?'':r.kind,r.org,r.eff?'시행 '+r.eff:''].filter(Boolean).join(' · '))}</p></span>
+        <span class="arrow">→</span></a>`).join('')+'</div>'+(x.j.skip&&x.j.skip.length?`<p class="srch-note">${esc(x.j.skip.join('·'))} 검색은 법제처 OPEN API 신청 화면에서 해당 활용 API를 체크하면 함께 나옵니다</p>`:'<p class="srch-note">누르면 법제처 국가법령정보센터의 현행 원문이 열립니다</p>'); }
+  const FFUS_T={};   // 시설유형 코드 → 이름(자료에 이름이 없을 때만 코드 그대로)
+  async function ffusSearch(sd,sg,lat,lng,tok){
+    const el=$('#srchFfus'); if(!el) return;
+    const x=await api(`/api/ffus?sd=${encodeURIComponent(sd)}&sg=${encodeURIComponent(sg)}&lat=${lat}&lng=${lng}`);
+    if(tok!==SEARCHGEN||document.getElementById('srchFfus')!==el) return;
+    const head='<div class="group-title">가까운 소방용수시설 · 반경 1,000m</div>';
+    if(!x.ok||!x.j||x.j.ok===false){ el.innerHTML=head+`<p class="srch-note">❌ ${esc((x.j&&x.j.error)||'서버에 연결하지 못했습니다(서버 업데이트가 필요할 수 있음)')}</p>`; return; }
+    const R=x.j.rows||{}, near=R.near||[];
+    if(!near.length){ el.innerHTML=head+`<p class="srch-note">${R.total?`반경 1,000m 안에 등록된 시설이 없습니다(${esc(sg)} 자료 ${R.total}건 중)`:`${esc(sd+' '+sg)} 소방용수시설 자료가 표준데이터에 없습니다 — 지자체가 아직 올리지 않았을 수 있습니다`}</p>`; return; }
+    const nm=r=>r.type||(r.code&&!/^\d+$/.test(r.code)?r.code:FFUS_T[r.code]||(r.code?'유형 '+r.code:'소방용수'));
+    el.innerHTML=head+`<div class="results">${near.map(r=>`<a class="card result" href="https://map.kakao.com/link/map/${encodeURIComponent(nm(r))},${r.lat},${r.lng}" target="_blank" rel="noopener">
+        <span class="ico">${r.d}m</span>
+        <span class="body"><p class="t">${esc(nm(r))}${r.no?` <span class="art">${esc(r.no)}</span>`:''}</p><p class="d">${esc([r.at||r.addr,r.guard?'보호틀 '+r.guard:'',r.pr?'수압 '+r.pr:'',r.ctr].filter(Boolean).join(' · '))}</p></span>
+        <span class="arrow">→</span></a>`).join('')}</div><p class="srch-note">전국소방용수시설표준데이터 기준${near[0].ref?' · 기준일 '+esc(near[0].ref):''} — 현장에서는 실제 위치·사용 가능 여부를 확인하세요</p>`; }
   const isKeyword=t=>{ t=String(t||'').trim(); return !!t && t.split(/\s+/).length<=2 && t.length<=14 && !isSentence(t); };
   function toSearch(t){ t=String(t||'').trim(); const qi=$('#q'); if(qi){ qi.value=t; qi.dispatchEvent(new Event('input')); } go('search',t); rootScrollTo(0); }
   const pdfName=n=>String(n).replace(/\.pdf$/i,'');
@@ -2127,7 +2195,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const mkHl=ts=>{ const list=[...new Set(ts.filter(Boolean))].sort((a,b)=>b.length-a.length); if(!list.length) return t=>esc(t); const re=new RegExp('('+list.map(rx).join('|')+')','ig'); return txt=>String(txt).split(re).map((p,i)=>i%2?'<mark>'+esc(p)+'</mark>':esc(p)).join(''); };
     const hl=mkHl(terms);
     let html=`<div class="panel-head" aria-live="polite"><h2>“${esc(q)}” 검색 결과</h2><span class="sub" id="srchSub">${SRV.on?'본문 검색 중…':''}</span></div>`;
-    if(isSentence(q)) html+=`<div class="xhint"><span>문장으로 물으셨네요. <b>AI 도우미</b>가 자료를 근거로 답을 정리해 드립니다.</span><a class="btn primary" href="#ai" data-ask-ai>AI에게 묻기</a></div>`;
+    const bq=bldQuery(q);
+    if(bq) html+='<div id="srchBld"><div class="group-title">건축물대장</div><p class="srch-note">주소를 찾는 중…</p></div>';
+    if(SRV.on) html+='<div id="srchLaw"></div>';   // V150: 법제처 원문 링크(법령 관련 검색일 때만 채워짐)
+    if(isSentence(q)&&!bq) html+=`<div class="xhint"><span>문장으로 물으셨네요. <b>AI 도우미</b>가 자료를 근거로 답을 정리해 드립니다.</span><a class="btn primary" href="#ai" data-ask-ai>AI에게 묻기</a></div>`;
     // 1) 자료 파일 — 파일 이름이 맞는 것(서버에 올린 실제 파일)
     if(fileHits.length){
       html+='<div class="group-title">자료 파일 · 이름 일치</div><div class="results">'+fileHits.map(({f,sec})=>`
@@ -2147,6 +2218,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     }
     panel.innerHTML=html;
     panel.querySelectorAll('[data-ask-ai]').forEach(a=>a.addEventListener('click',()=>{ autoAsk=q; }));
+    if(bq) bldSearch(bq,tok);
+    if(SRV.on) lawSearch(q,tok);
     const sub=$('#srchSub');
     const done=(n,st)=>{
       if(tok!==SEARCHGEN) return;
@@ -2342,6 +2415,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {k:'groq', n:'Groq (예비 AI)', pane:'AI', d:'Gemini 한도가 끝나면 대신 답함 — console.groq.com에서 무료 키', ph:'gsk_…로 시작하는 키', has:j=>j.keys&&j.keys.groq, save:v=>({action:'set',provider:'groq',key:v}), del:{action:'delete',provider:'groq'}, test:true},
     {k:'claude', n:'Claude', pane:'AI', d:'유료(선택) — console.anthropic.com', ph:'sk-ant-…로 시작하는 키', has:j=>j.keys&&j.keys.claude, save:v=>({action:'set',provider:'claude',key:v}), del:{action:'delete',provider:'claude'}, test:true},
     {k:'law', n:'법제처 OPEN API', pane:'AI', d:'법령 질문에 현행 조문 원문을 근거로 — law.go.kr 마이페이지 → API인증키관리의 ‘현재 API인증키(OC)’', ph:'API인증키(OC)', has:j=>j.law, save:v=>({action:'law',oc:v}), del:{action:'law',oc:''}, test:true, need:j=>'law' in j},
+    {k:'bld', n:'공공데이터포털 인증키', pane:'AI', d:'검색창에 주소를 넣으면 건축물대장(용도·구조·층수·연면적)과 가까운 소방용수시설 — data.go.kr 마이페이지 → 데이터활용 → Open API → 활용신청 현황의 일반 인증키(Decoding). 키 하나로 승인받은 API 모두에 쓰입니다', ph:'일반 인증키(Decoding)', has:j=>j.bld, save:v=>({action:'bld',key:v}), del:{action:'bld',key:''}, test:true, need:j=>'bld' in j},
     {k:'kakao', n:'카카오맵', pane:'Map', d:'47망 DS 지도 — developers.kakao.com의 JavaScript 키(32자)', ph:'JavaScript 키 32자', has:j=>j.kakao, save:v=>({action:'kakao',key:v}), del:{action:'kakao',key:''}},
     {k:'tmap', n:'T맵', pane:'Map', d:'47망 소화전 — openapi.sk.com의 App Key', ph:'App Key', has:j=>j.tmap, save:v=>({action:'tmap',key:v}), del:{action:'tmap',key:''}}];
   const KMSG={}, KOPEN={}; let KJ=null;
@@ -2352,7 +2426,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       <div class="kch"><b>${d.n}</b><span class="kst">${old?'서버 업데이트 필요':tail?`✅ 등록 완료 <small>${esc(String(tail))}${extra}</small>`:'⚪ 미등록'}</span></div>
       <p class="kdesc">${esc(d.d)}</p>
       ${tail&&!KOPEN[d.k]?`<div class="kact"><button type="button" class="btn ghost sm" data-ka="edit">변경</button><button type="button" class="btn ghost sm" data-ka="del">지우기</button></div>`:''}
-      ${open&&!old?`<form class="kform" data-k="${d.k}" autocomplete="off"><input type="${['gemini','groq','claude'].includes(d.k)?'password':'text'}" maxlength="300" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${esc(d.ph)}" aria-label="${esc(d.n)} 키"><button type="submit" class="btn primary sm">${tail?'바꾸기':'등록'}</button>${tail?'<button type="button" class="btn ghost sm" data-ka="cancel">취소</button>':''}</form>`:''}
+      ${open&&!old?`<form class="kform" data-k="${d.k}" autocomplete="off"><input type="${['gemini','groq','claude','bld'].includes(d.k)?'password':'text'}" maxlength="300" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${esc(d.ph)}" aria-label="${esc(d.n)} 키"><button type="submit" class="btn primary sm">${tail?'바꾸기':'등록'}</button>${tail?'<button type="button" class="btn ghost sm" data-ka="cancel">취소</button>':''}</form>`:''}
       ${m?`<p class="kmsg ${m.c}" role="status">${esc(m.t)}</p>`:''}</div>`; }
   function keyCardsPaint(j){ if(j) KJ=j; j=KJ; const a=document.getElementById('keyCardsAI'), b=document.getElementById('keyCardsMap'); if(!j||!j.keys){ if(a) a.innerHTML='<p class="note">서버 상태를 불러오지 못했습니다</p>'; return; }
     if(a) a.innerHTML=KEYDEF.filter(d=>d.pane==='AI').map(d=>keyCardHtml(d,j)).join('');
@@ -2364,7 +2438,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(a==='cancel'){ delete KOPEN[d.k]; keyCardsPaint(); return; }
       if(a==='del') arm(b,'정말 지우기',async()=>{ KMSG[d.k]={t:'지우는 중…',c:'busy'}; keyCardsPaint();
         const x=await api('/api/admin/ai',{json:d.del,tok:PROF.tok});
-        if(x.ok&&x.j&&x.j.ok!==false&&x.j.keys){ delete KOPEN[d.k]; KMSG[d.k]={t:'지웠습니다',c:''}; paint(x.j); if(d.k==='kakao') SRV.kakao=''; if(d.k==='tmap') SRV.tmap=''; }
+        if(x.ok&&x.j&&x.j.ok!==false&&x.j.keys){ delete KOPEN[d.k]; KMSG[d.k]={t:'지웠습니다',c:''}; paint(x.j); if(d.k==='kakao') SRV.kakao=''; if(d.k==='tmap') SRV.tmap=''; if(d.k==='bld') SRV.bld=false; }
         else { KMSG[d.k]={t:'❌ 지우지 못했습니다 — '+((x.j&&x.j.error)||'서버 연결 확인'),c:'bad'}; keyCardsPaint(); } }); });
     root.addEventListener('submit',async e=>{ const f=e.target.closest('.kform'); if(!f) return; e.preventDefault(); const d=KEYDEF.find(x=>x.k===f.dataset.k), inp=f.querySelector('input'), v=inp.value.trim(); if(!d) return;
       if(!v){ KMSG[d.k]={t:'키를 붙여 넣으세요',c:'bad'}; keyCardsPaint(); return; }
@@ -2372,7 +2446,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const x=await api('/api/admin/ai',{json:d.save(v),tok:PROF.tok});
       if(x.ok&&x.j&&x.j.ok!==false&&x.j.keys&&(!d.need||d.need(x.j))&&d.has(x.j)){ delete KOPEN[d.k];
         KMSG[d.k]={t:d.test?`✅ 등록 완료 — 시험 통과${x.j.msg?' · '+x.j.msg:''}`:`✅ 등록 완료${d.k==='kakao'?' — DS 지도를 열어 지도가 보이면 정상':d.k==='tmap'?' — 소화전을 열어 지도가 보이면 정상':''}`,c:'ok'};
-        if(d.k==='kakao') SRV.kakao=v.replace(/[^0-9a-f]/gi,'').toLowerCase(); if(d.k==='tmap') SRV.tmap=v.replace(/[^0-9A-Za-z]/g,''); paint(x.j); }
+        if(d.k==='kakao') SRV.kakao=v.replace(/[^0-9a-f]/gi,'').toLowerCase(); if(d.k==='tmap') SRV.tmap=v.replace(/[^0-9A-Za-z]/g,''); if(d.k==='bld') SRV.bld=true; paint(x.j); }
       else { KMSG[d.k]={t:'❌ 등록 안 됨 — '+((x.j&&x.j.error)||(x.ok&&x.j&&!d.has(x.j)?'서버가 이 키를 받지 않았습니다(서버 업데이트 필요할 수 있음)':'서버에 연결하지 못했습니다')),c:'bad'}; if(x.j&&x.j.keys) paint(x.j); else keyCardsPaint(); } }); }
   // V143: 방재실 탭(요약·서버·AI·지도 키·핀 문구·보고서·메뉴 자료) — 한 화면에 늘어놓지 않고 나눠서, 위쪽에 상태 요약
   const BJ_TABS=[['sum','요약'],['ai','서버·AI'],['map','지도 키'],['pin','핀 문구'],['rep','보고서'],['lib','메뉴 자료']], BJ_TAB_KEY='sachil_bj_tab';
@@ -2394,7 +2468,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!j){ el.innerHTML=ok('서버 상태를 불러오지 못했습니다','bad'); return; }
     el.innerHTML=[ok(`서버 <b>${esc(j.version||'?')}</b>`), j.bat_manual||j.bat_old?ok('자동 업데이트 <b>확인 필요</b>','bad'):ok(`자동 업데이트 <b>${j.auto_update?'켜짐':'꺼짐'}</b>`,j.auto_update?'good':''),
       ok(`AI <b>${j.provider?esc(AI_NM[j.provider]||j.provider):'없음'}</b>`,j.provider?'good':'bad'), ok(`오늘 AI <b>${j.today||0}${j.limit?'/'+j.limit:''}</b>`),
-      ok(`카카오맵 <b>${j.kakao?'등록':'없음'}</b>`,j.kakao?'good':'bad'), ok(`T맵 <b>${j.tmap?'등록':'없음'}</b>`,j.tmap?'good':'bad'), ok(`법제처 <b>${j.law?'연결':'없음'}</b>`,j.law?'good':''), ok(`자료 <b>${libN}/${libT}</b> 섹션`)].join(''); }
+      ok(`카카오맵 <b>${j.kakao?'등록':'없음'}</b>`,j.kakao?'good':'bad'), ok(`T맵 <b>${j.tmap?'등록':'없음'}</b>`,j.tmap?'good':'bad'), ok(`법제처 <b>${j.law?'연결':'없음'}</b>`,j.law?'good':''), ok(`공공데이터 <b>${j.bld?'연결':'없음'}</b>`,j.bld?'good':''), ok(`자료 <b>${libN}/${libT}</b> 섹션`)].join(''); }
   // V133: 교수 — 대화방 📌 핀 문구 고치기(서버 5.9부터)
   function pinEditBind(panel){
     rinfoSync(true).then(()=>panel.querySelectorAll('.pinf').forEach(f=>{ const k=f.dataset.kind, L=f.querySelector('textarea[id^="pinL"]'), M=f.querySelector('textarea[id^="pinM"]'); if(L&&L.value===L.defaultValue&&M.value===M.defaultValue&&document.activeElement!==L&&document.activeElement!==M){ L.value=ROOM_INFO[k].lead; M.value=ROOM_INFO[k].more.join('\n'); } }));   // V138: 다른 기기에서 고친 최신 문구로 채움
@@ -5083,7 +5157,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // ---------- 시작 ----------
   const mqNarrow=window.matchMedia('(max-width:599px)');
   const mqTiny=window.matchMedia('(max-width:380px)');
-  const setPh=()=>{ q.placeholder = mqTiny.matches ? 'SOP·법령·전술·사례' : mqNarrow.matches ? 'SOP · 법령 · 전술 · 사례 검색' : 'SOP, 법령, 전술, 사례… 무엇이든 검색'; };
+  const setPh=()=>{ q.placeholder = mqTiny.matches ? 'SOP·법령·건축물대장' : mqNarrow.matches ? 'SOP · 법령 · 사례 · 건축물대장(주소)' : 'SOP, 법령, 전술, 사례, 건축물대장(주소)… 무엇이든 검색'; };   /* V150 */
   if(mqTiny.addEventListener) mqTiny.addEventListener('change',setPh);
   setPh(); if(mqNarrow.addEventListener) mqNarrow.addEventListener('change',setPh);
   load(); cload(); rload(); rpload();
@@ -5100,7 +5174,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const wasLocal = ROOMS_R.includes(state.route) && !!chat.room;   // 파일 모드 방에 이미 들어가 있었음
       const wasWait=attempt>0&&!!(TOKS['']||TOKS[':deb']); SRV.probing=false; SRV.retry=false; SRV.on=true; SRV.me=r.j.user||null; SRV.ver=String(r.j.version||'');
       if(r.j.ai && !CAP.sample){ CAP.sample=serverSample; CAP.ready=true; syncRepUI(); }   // 보고서 AI: Claude 화면 밖에서는 SACHIL 서버(AI 키)로 작성
-      SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.roomDb=r.j.room_debrief||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.aiName=String(r.j.ai_name||'').slice(0,20); SRV.kakao=/^[0-9a-f]{32}$/.test(r.j.kakao||'')?r.j.kakao:''; SRV.tmap=/^[0-9A-Za-z]{20,64}$/.test(r.j.tmap||'')?r.j.tmap:''; SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
+      SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.roomDb=r.j.room_debrief||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.aiName=String(r.j.ai_name||'').slice(0,20); SRV.kakao=/^[0-9a-f]{32}$/.test(r.j.kakao||'')?r.j.kakao:''; SRV.tmap=/^[0-9A-Za-z]{20,64}$/.test(r.j.tmap||'')?r.j.tmap:''; SRV.bld=!!r.j.bld; SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
       if(PROF.tok) checkProf().then(ok=>{ if(ok&&state.route==='login') render(); });   // 교수로 로그인해 둔 기기면 교수 표시줄 · V143: 확인이 끝나면 교수 화면으로 다시 그림
       if(window.__rtplSync) window.__rtplSync();   // V125: 보고서 양식
       await loadLib();
