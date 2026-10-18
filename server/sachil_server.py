@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '7.8'
-APP_VERSION = 'V152'
+VERSION = '7.9'
+APP_VERSION = 'V153'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -1030,6 +1030,13 @@ class H(BaseHTTPRequestHandler):
         if hits and len(terms) >= 2 and ai_ready() and max(len(h['hit']) for h in hits) / len(terms) < 0.5:
             hits = []   # 질문 낱말을 절반도 못 맞힌 쪽뿐('차이' 같은 흔한 말만 겹침) → 근거 없음으로 보고 일반 설명(V97)
         laws, links = [], law_links(qtext)   # V147: 질문에 법령 이름이 있으면 법제처 원문 링크는 API 없이도 붙인다
+        rlinks = []
+        if CONF.get('law_oc') and (law_q or _LAW_ANY.search(qtext)):   # V153: 고시·화재안전기준(행정규칙)·조례(자치법규) 원문 링크도
+            try:
+                for r in [x for x in law_find(qtext).get('rows', []) if x.get('t') in ('admrul', 'ordin')][:3]:
+                    rlinks.append({'name': r['name'], 'art': r['kind'] or ('행정규칙' if r['t'] == 'admrul' else '자치법규'), 'url': r['url']})
+            except Exception as e:
+                print(f'[법제처] 행정규칙·자치법규 실패: {str(e)[:120]}', flush=True)
         if law_q and ai_ready():   # V144: 법령 질문이면 법제처에서 조문 원문을 찾아 근거로(앞에 둔다)
             try:
                 laws = law_lookup(qtext)
@@ -1045,7 +1052,7 @@ class H(BaseHTTPRequestHandler):
         sources = [({'slug': 'pub' if h.get('pub') else 'law', 'name': h['name'], 'page': 0, 'art': h.get('art') or '', 'url': h['url'], 'snippet': h['text'][:120]} if h.get('law') or h.get('pub') else
                     {'slug': h['slug'], 'name': h['name'], 'page': h['page'], 'art': h.get('art') or '', 'snippet': snippet(h['text'], h['hit'] or terms, 120)}) for h in hits]
         have = {x['url'] for x in sources if x.get('url')}
-        for lk in links:   # 원문을 못 받아 왔어도 법제처 원문 링크는 근거 목록 맨 끝에
+        for lk in links + rlinks:   # 원문을 못 받아 왔어도 법제처 원문 링크는 근거 목록 맨 끝에
             if lk['url'] not in have:
                 sources.append({'slug': 'law', 'name': lk['name'], 'page': 0, 'art': lk['art'], 'url': lk['url'], 'snippet': '법제처 국가법령정보센터 원문'})
         if not hits and ai_ready():   # 메뉴 자료에 근거가 없으면 AI 일반 지식으로 짧게([근거 부족] 표시)
@@ -1054,8 +1061,8 @@ class H(BaseHTTPRequestHandler):
                 ans, why = ask_general(qtext, hist)
                 if ans:
                     if not hist:
-                        ans_cache_put(ck, 'general', ans, [])
-                    return self.send(200, {'ok': True, 'mode': 'general', 'note': '', 'answer': ans, 'sources': [], 'status': st}, log=False)
+                        ans_cache_put(ck, 'general', ans, sources)
+                    return self.send(200, {'ok': True, 'mode': 'general', 'note': '', 'answer': ans, 'sources': sources, 'status': st}, log=False)   # V153: 법령 원문 링크는 남김
         if not hits:
             if st['pending'] or not st['ready']:
                 msg = f'자료를 읽는 중입니다(남은 파일 {st["pending"]}개). 1~2분 뒤 다시 물어보세요.'
