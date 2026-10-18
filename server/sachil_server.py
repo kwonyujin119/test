@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '7.5'
-APP_VERSION = 'V149'
+VERSION = '7.6'
+APP_VERSION = 'V150'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -748,6 +748,35 @@ class H(BaseHTTPRequestHandler):
                 return self.send(200, {'ok': True, 'terms': terms, 'status': DOCS_IDX.status(),
                                        'hits': [{'slug': h['slug'], 'name': h['name'], 'page': h['page'], 'art': h.get('art') or '',
                                                  'snippet': snippet(h['text'], h['hit'] or terms)} for h in hits]}, log=False)
+            if path == '/api/bld':   # V150: 건축물대장 표제부 — 앱이 카카오 주소 검색으로 구한 법정동코드·번지로
+                a = {k: re.sub(r'[^0-9]', '', (args.get(k) or [''])[0]) for k in ('b', 'bun', 'ji', 'mt')}
+                if not CONF.get('bld_key'):
+                    return self.send(200, {'ok': False, 'error': '공공데이터포털 인증키가 아직 없습니다 — 메뉴 → SACHIL방재실 → 서버·AI에서 등록'}, log=False)
+                if len(a['b']) != 10 or not a['bun']:
+                    return self.err(400, '주소(번지)를 찾지 못했습니다')
+                try:
+                    rows = bld_lookup(a['b'], a['bun'], a['ji'] or '0', a['mt'] == '1')
+                except Exception as e:
+                    return self.send(200, {'ok': False, 'error': str(e)[:200]}, log=False)
+                return self.send(200, {'ok': True, 'rows': rows}, log=False)
+            if path == '/api/law':   # V150: 검색 — 법령·시행령·시행규칙·자치법규·행정규칙 원문 링크(법제처)
+                qtext = (args.get('q') or [''])[0][:200]
+                if not CONF.get('law_oc'):
+                    return self.send(200, {'ok': False, 'off': True}, log=False)
+                return self.send(200, dict(ok=True, **law_find(qtext)), log=False)
+            if path == '/api/ffus':   # V150: 전국소방용수시설표준데이터 — 그 주소에서 가까운 소화전·급수탑·저수조
+                sd, sg = (args.get('sd') or [''])[0][:20], (args.get('sg') or [''])[0][:30]
+                try:
+                    lat, lng = float((args.get('lat') or ['x'])[0]), float((args.get('lng') or ['x'])[0])
+                except ValueError:
+                    return self.err(400, '좌표가 없습니다')
+                if not CONF.get('bld_key'):
+                    return self.send(200, {'ok': False, 'error': '공공데이터포털 인증키가 아직 없습니다'}, log=False)
+                try:
+                    rows = ffus_near(sd, sg, lat, lng)
+                except Exception as e:
+                    return self.send(200, {'ok': False, 'error': str(e)[:200]}, log=False)
+                return self.send(200, {'ok': True, 'rows': rows}, log=False)
             if path == '/api/index':
                 return self.send(200, {'ok': True, 'status': DOCS_IDX.status()}, log=False)
             m = re.fullmatch(r'/lib-thumb/([0-9a-f]{24})\.jpg', path)
@@ -771,6 +800,7 @@ class H(BaseHTTPRequestHandler):
                                        'retention_days': CONF.get('retention_days'), 'max_files': 10,
                                        'ai': ai_ready(), 'ai_name': AI_NAMES.get(ai_provider(), ''), 'index': DOCS_IDX.status(),
                                        'kakao': str(CONF.get('kakao_js_key') or ''), 'tmap': str(CONF.get('tmap_app_key') or ''),
+                                       'bld': bool(CONF.get('bld_key')),
                                        'ai_open': not norm_code(CONF.get('ai_code'))})
             if not self.user:
                 return self.err(401, '로그인이 필요합니다')
@@ -1168,6 +1198,7 @@ class H(BaseHTTPRequestHandler):
                     'kakao': ('…' + str(CONF.get('kakao_js_key'))[-4:]) if CONF.get('kakao_js_key') else '',
                     'tmap': ('…' + str(CONF.get('tmap_app_key'))[-4:]) if CONF.get('tmap_app_key') else '',
                     'law': (str(CONF.get('law_oc'))[:2] + '…') if CONF.get('law_oc') else '',   # V144: 법제처 OPEN API(OC) — 앞 2자만
+                    'bld': ('…' + str(CONF.get('bld_key'))[-4:]) if CONF.get('bld_key') else '',   # V150: 건축물대장(공공데이터포털 일반 인증키)
                     'started': SERVER_START, 'upd_next': UPD_STATE['next'], 'upd_last': UPD_STATE['last'], 'upd_result': UPD_STATE['result'],
                     'upd_pending': UPD_STATE['pending'], 'restart_next': UPD_STATE.get('restart_next') or 0, 'upd_done': last_update_done()[0], 'now': time.time()}
         if act == 'status':
@@ -1215,9 +1246,9 @@ class H(BaseHTTPRequestHandler):
                 got = law_search('소방기본법', oc)
             except Exception as e:
                 why = str(e)[:240]
-            if '검증' in why or 'IP' in why or 'ip' in why:
-                why += ' → 법제처 OPEN API 신청 화면 [수정]에서 서버장비 IP에 이 서버 PC의 공인 IP를 넣어 주세요'
-            return self.send(200, dict(status(), ok=False, error=f'법제처 시험 실패 — {why}'), log=False)
+                if '검증' in why or 'IP' in why or 'ip' in why:
+                    why += ' → 법제처 OPEN API 신청 화면 [수정]에서 서버장비 IP에 이 서버 PC의 공인 IP를 넣어 주세요'
+                return self.send(200, dict(status(), ok=False, error=f'법제처 시험 실패 — {why}'), log=False)
             if not got:
                 return self.send(200, dict(status(), ok=False, error='법제처가 결과를 주지 않았습니다 — API인증키(OC — 법제처 마이페이지 → API인증키관리)와, 신청 화면의 활용 API·도메인/IP를 확인하세요'), log=False)
             CONF['law_oc'] = oc
@@ -1225,6 +1256,30 @@ class H(BaseHTTPRequestHandler):
             LAW_CACHE.clear()
             LAW_SCACHE.clear()
             return self.send(200, dict(status(), msg=f'법제처 연결 완료 — 시험 검색 ‘소방기본법’ {len(got)}건'), log=False)
+        if act == 'bld':   # V150: 국토교통부 건축HUB 건축물대장 — data.go.kr 일반 인증키. 저장 전에 한 번 시험
+            k = str(j.get('key') or '').strip()
+            if '%' in k:
+                k = urllib.parse.unquote(k)   # Encoding 키를 넣어도 Decoding 키로
+            k = re.sub(r'[^0-9A-Za-z+/=]', '', k)[:200]
+            if not k:
+                CONF['bld_key'] = ''
+                write_conf(CONF)
+                return self.send(200, dict(status(), msg='건축물대장 키를 지웠습니다'), log=False)
+            res = []   # 공공데이터포털 인증키 하나로 건축물대장·소방용수시설 둘 다 — 각각 한 번씩 시험
+            for nm, fn in (('건축물대장', lambda: _bld_get('1168010300', '12', '0', False, k)),   # 서울 강남구 개포동 12(공식 예제 주소)
+                           ('소방용수시설', lambda: _ffus_get({'numOfRows': '1'}, k)[0])):
+                try:
+                    res.append((nm, True, f'{len(fn())}건'))
+                except Exception as e:
+                    res.append((nm, False, str(e)[:160]))
+            txt = ' · '.join(f"{nm} {'✅' if ok else '❌ ' + w}" for nm, ok, w in res)
+            if not any(ok for _, ok, _ in res):
+                return self.send(200, dict(status(), ok=False, error=f'시험 실패 — {txt}'), log=False)
+            CONF['bld_key'] = k
+            write_conf(CONF)
+            BLD_CACHE.clear()
+            FFUS_CACHE.clear()
+            return self.send(200, dict(status(), msg='연결 완료 — ' + txt), log=False)
         if act == 'tmap':   # V113: T맵 앱 키(SK open API) — 소화전 찾기에 씀
             k = re.sub(r'[^0-9A-Za-z]', '', str(j.get('key') or ''))
             if k and not (20 <= len(k) <= 64):
@@ -2406,6 +2461,227 @@ def law_links(q):
         url = 'https://www.law.go.kr/법령/' + urllib.parse.quote(n.replace(' ', '')) + ('/' + urllib.parse.quote(art) if art else '')
         out.append({'name': n, 'art': art, 'url': url})
     return out[:2]
+
+
+BLD_CACHE = {}   # (법정동코드, 번지) → (시각, 결과) — 같은 건물은 하루 동안 다시 묻지 않게(초당 호출 제한)
+BLD_F = (('bldNm', 'name'), ('dongNm', 'dong'), ('mainAtchGbCdNm', 'main'), ('regstrKindCdNm', 'kind'), ('mainPurpsCdNm', 'use'),
+         ('etcPurps', 'use2'), ('strctCdNm', 'strct'), ('etcStrct', 'strct2'), ('roofCdNm', 'roof'), ('grndFlrCnt', 'up'),
+         ('ugrndFlrCnt', 'down'), ('heit', 'h'), ('totArea', 'area'), ('archArea', 'barea'), ('platArea', 'parea'),
+         ('useAprDay', 'apr'), ('rideUseElvtCnt', 'elv'), ('emgenUseElvtCnt', 'eelv'), ('hhldCnt', 'hh'), ('hoCnt', 'ho'),
+         ('platPlc', 'addr'), ('newPlatPlc', 'road'))
+
+
+def bld_lookup(bcode, bun, ji, mt):
+    key = (bcode, bun, ji, mt)
+    c = BLD_CACHE.get(key)
+    if c and time.time() - c[0] < 86400:
+        return c[1]
+    rows = _bld_get(bcode, bun, ji, mt)
+    if len(BLD_CACHE) > 300:
+        BLD_CACHE.clear()
+    BLD_CACHE[key] = (time.time(), rows)
+    return rows
+
+
+def _bld_get(bcode, bun, ji, mt, k=None):
+    k = k or CONF.get('bld_key')
+    url = ('https://apis.data.go.kr/1613000/BldRgstHubService/getBrTitleInfo?serviceKey=' + urllib.parse.quote(k, safe='')
+           + f'&sigunguCd={bcode[:5]}&bjdongCd={bcode[5:]}&platGbCd={1 if mt else 0}&bun={int(bun):04d}&ji={int(ji or 0):04d}'
+           + '&_type=json&numOfRows=30&pageNo=1')
+    try:
+        t = fetch_text(url, 2_000_000, 20)
+    except Exception as e:
+        w = str(e)
+        if '401' in w or '403' in w:
+            raise RuntimeError('인증키가 아직 쓰이지 않습니다 — 키가 맞는지(Decoding 키), 활용신청이 승인됐는지 확인하세요. 승인 직후면 1시간쯤 뒤 다시') from e
+        raise RuntimeError('건축물대장 서버 연결 실패 — ' + w.replace(k, '***')[:120]) from e
+    if t.lstrip().startswith('<'):
+        m = re.search(r'<returnAuthMsg>([^<]+)', t) or re.search(r'<errMsg>([^<]+)', t)
+        w = m.group(1) if m else t[:120]
+        if 'NOT_REGISTERED' in w:
+            w = '인증키가 등록되지 않았습니다(승인 직후면 1시간쯤 뒤 다시, Decoding 키인지 확인)'
+        raise RuntimeError('건축물대장 응답: ' + re.sub(r'\s+', ' ', w).replace(k, '***')[:160])
+    j = json.loads(t)
+    r = j.get('response') or {}
+    h = r.get('header') or {}
+    if str(h.get('resultCode')) not in ('00', '0'):
+        raise RuntimeError('건축물대장 응답: ' + str(h.get('resultMsg') or h)[:160])
+    it = ((r.get('body') or {}).get('items') or {})
+    it = it.get('item') if isinstance(it, dict) else []
+    it = [it] if isinstance(it, dict) else (it or [])
+    out = [{b: str(x.get(a) if x.get(a) is not None else '').strip() for a, b in BLD_F} for x in it if isinstance(x, dict)]
+    out.sort(key=lambda x: (x['main'] != '주건축물', -float(x['area']) if re.fullmatch(r'[0-9.]+', x['area']) else 0))
+    return out
+
+
+FFUS_CACHE = {}   # (시도, 시군구) → (시각, 전체 목록) — 표준데이터는 반경 검색이 없어 시군구 단위로 한 번 받아 두고 거리 계산
+FFUS_SIDO = {'서울': '서울특별시', '부산': '부산광역시', '대구': '대구광역시', '인천': '인천광역시', '광주': '광주광역시', '대전': '대전광역시',
+             '울산': '울산광역시', '세종': '세종특별자치시', '경기': '경기도', '강원': '강원특별자치도', '충북': '충청북도', '충남': '충청남도',
+             '전북': '전북특별자치도', '전남': '전라남도', '경북': '경상북도', '경남': '경상남도', '제주': '제주특별자치도'}
+
+
+def _ffus_get(params, k=None):
+    k = k or CONF.get('bld_key')
+    url = ('https://api.data.go.kr/openapi/tn_pubr_public_ffus_wtrcns_api?serviceKey=' + urllib.parse.quote(k, safe='')
+           + '&type=json&pageNo=' + str(params.pop('pageNo', 1)) + '&' + urllib.parse.urlencode(params))
+    try:
+        t = fetch_text(url, 8_000_000, 30)
+    except Exception as e:
+        w = str(e)
+        if '401' in w or '403' in w:
+            raise RuntimeError('인증키가 아직 쓰이지 않습니다(활용신청 승인 직후면 1시간쯤 뒤 다시)') from e
+        raise RuntimeError('소방용수시설 서버 연결 실패 — ' + w.replace(k, '***')[:120]) from e
+    if t.lstrip().startswith('<'):
+        m = re.search(r'<returnAuthMsg>([^<]+)', t) or re.search(r'<resultMsg>([^<]+)', t) or re.search(r'<errMsg>([^<]+)', t)
+        w = m.group(1) if m else t[:120]
+        if 'NOT_REGISTERED' in w:
+            w = '인증키가 등록되지 않았습니다(승인 직후면 1시간쯤 뒤 다시)'
+        raise RuntimeError('소방용수시설 응답: ' + re.sub(r'\s+', ' ', w).replace(k, '***')[:160])
+    j = json.loads(t)
+    r = j.get('response') or {}
+    h = r.get('header') or {}
+    code = str(h.get('resultCode'))
+    if code == '03':   # NODATA_ERROR — 조건에 맞는 자료 없음
+        return [], 0
+    if code not in ('00', '0'):
+        raise RuntimeError('소방용수시설 응답: ' + str(h.get('resultMsg') or h)[:160])
+    b = r.get('body') or {}
+    it = b.get('items') or []
+    if isinstance(it, dict):
+        it = it.get('item') or []
+    it = [it] if isinstance(it, dict) else it
+    return [x for x in it if isinstance(x, dict)], int(b.get('totalCount') or 0)
+
+
+def _ffus_all(sd, sg):
+    rows, page = [], 1
+    while page <= 30:   # 1000건씩, 시군구 하나에 3만 건이면 충분
+        got, total = _ffus_get({'signguNm': sg, 'numOfRows': '1000', 'pageNo': page})
+        rows += got
+        if not got or len(rows) >= total:
+            break
+        page += 1
+    full = FFUS_SIDO.get(sd, sd)
+    return [x for x in rows if not sd or not x.get('ctprvnNm') or str(x.get('ctprvnNm')).startswith((sd, full[:2]))]
+
+
+def ffus_near(sd, sg, lat, lng, n=8, within=1000):
+    import math
+    key = (sd, sg)
+    c = FFUS_CACHE.get(key)
+    if c and time.time() - c[0] < 86400:
+        rows = c[1]
+    else:
+        rows = _ffus_all(sd, sg)
+        if not rows and ' ' in sg:   # '수원시 장안구'처럼 일반구가 있는 시 — 자료에는 구 이름만 있을 수도
+            rows = _ffus_all(sd, sg.split()[-1])
+        if len(FFUS_CACHE) > 30:
+            FFUS_CACHE.clear()
+        FFUS_CACHE[key] = (time.time(), rows)
+    out = []
+    for x in rows:
+        try:
+            y2, x2 = float(x.get('latitude')), float(x.get('longitude'))
+        except (TypeError, ValueError):
+            continue
+        d = 6371000 * 2 * math.asin(math.sqrt(math.sin(math.radians(y2 - lat) / 2) ** 2
+                                              + math.cos(math.radians(lat)) * math.cos(math.radians(y2)) * math.sin(math.radians(x2 - lng) / 2) ** 2))
+        if d <= within:
+            out.append({'d': round(d), 'lat': y2, 'lng': x2, 'type': str(x.get('fcltySeNm') or x.get('fcltySe') or ''),
+                        'code': str(x.get('fcltySeCode') or ''), 'no': str(x.get('fcltyNo') or ''),
+                        'at': str(x.get('descLc') or ''), 'addr': str(x.get('rdnmadr') or x.get('lnmadr') or ''),
+                        'guard': str(x.get('prtcYn') or ''), 'pr': str(x.get('waterPressr') or ''), 'yr': str(x.get('installationYear') or ''),
+                        'ctr': str(x.get('safeCnterNm') or ''), 'ref': str(x.get('referenceDate') or '')})
+    out.sort(key=lambda r: r['d'])
+    return {'near': out[:n], 'total': len(rows)}
+
+
+_LAW_ANY = re.compile(r'조례|고시|훈령|예규|지침|화재안전(?:성능|기술)?기준|NF[PT]C', re.I)
+_DRF = {'law': ('법령명한글', '법령구분명', '소관부처명', '법령'), 'ordin': ('자치법규명', '자치법규종류', '지자체기관명', '자치법규'),
+        'admrul': ('행정규칙명', '행정규칙종류', '소관부처명', '행정규칙')}
+
+
+def drf_search(target, query):
+    """법제처 목록 검색(target: law 법령·시행령·시행규칙 / ordin 자치법규 / admrul 행정규칙) → [{name, kind, org, eff, url}]. 하루 저장"""
+    oc = CONF.get('law_oc')
+    c = LAW_SCACHE.get((target, oc, query))
+    if c and time.time() - c[0] < 86400:
+        return c[1]
+    j = law_get('https://www.law.go.kr/DRF/lawSearch.do?OC=' + urllib.parse.quote(oc) + f'&target={target}&type=JSON&display=20&query=' + urllib.parse.quote(query))
+    root = next((v for k, v in j.items() if k.endswith('Search') and isinstance(v, dict)), None) if isinstance(j, dict) else None
+    if root is None:
+        msg = json.dumps(j, ensure_ascii=False) if not isinstance(j, str) else j
+        raise RuntimeError('법제처 응답: ' + re.sub(r'\s+', ' ', msg).replace(oc, '***')[:160])
+    fn, fk, fo, path = _DRF[target]
+    items = []
+    for v in root.values():
+        if isinstance(v, dict) and fn in v:
+            items = [v]
+        elif isinstance(v, list) and v and isinstance(v[0], dict) and fn in v[0]:
+            items = v
+    out = []
+    for x in items:
+        n = str(x.get(fn) or '').strip()
+        if not n:
+            continue
+        e = re.sub(r'[^0-9]', '', str(x.get('시행일자') or ''))
+        out.append({'name': n, 'kind': str(x.get(fk) or ''), 'org': str(x.get(fo) or ''), 'eff': f'{e[:4]}.{e[4:6]}.{e[6:8]}' if len(e) == 8 else '',
+                    'url': f'https://www.law.go.kr/{path}/' + urllib.parse.quote(n.replace(' ', ''))})
+    if len(LAW_SCACHE) > 200:
+        LAW_SCACHE.clear()
+    LAW_SCACHE[(target, oc, query)] = (time.time(), out)
+    return out
+
+
+def law_find(q):
+    """V150: 검색창 — 법령 관련 검색이면 법제처에서 법령·시행령·시행규칙·자치법규·행정규칙을 찾아 원문 링크로"""
+    q = re.sub(r'\s+', ' ', str(q or '')).strip()
+    if not q or not (law_wanted(q) or _LAW_ANY.search(q)):
+        return {'rows': []}
+    names = []
+    for m in _LAW_NAME.finditer(q):
+        n = re.sub(r'\s?(?:시행령|시행규칙)$', '', m.group(1).strip()) if not m.group(1).strip().endswith(('에 관한 규칙',)) else m.group(1).strip()
+        if _law_name_ok(n) and n not in names:
+            names.append(n)
+    for m in re.finditer(r'([가-힣ㆍ·]{2,}(?:\s?[가-힣ㆍ·]+){0,5}?\s?(?:조례|고시|훈령|예규|지침|화재안전(?:성능|기술)?기준))', q):
+        if m.group(1) not in names:
+            names.append(m.group(1))
+    if not names:   # 이름이 없으면 질문에서 낱말만(예: '소화기 설치 기준' → '소화기')
+        toks = [t for t in re.findall(r'[가-힣A-Za-z0-9]{2,}', q) if t not in _LAW_STOP and t not in _LAW_NOT and not _LAW_HINT.fullmatch(t)]
+        names = toks[:1]
+    if not names:
+        return {'rows': []}
+    jm = re.search(r'제\s?(\d+)\s?조(?:의\s?(\d+))?', q)
+    art = (f'제{jm.group(1)}조' + (f'의{jm.group(2)}' if jm.group(2) else '')) if jm else ''
+    rows, skip, seen = [], [], set()
+    for target, cap in (('law', 6), ('admrul', 3), ('ordin', 4)):
+        got = []
+        for n in names[:2]:
+            if target == 'ordin':   # '인천 화재예방 조례' → '화재예방 조례'로 찾고 인천 것을 앞에(조례 이름은 '인천광역시 …')
+                n = re.sub(r'^(?:' + '|'.join(FFUS_SIDO) + r')[가-힣]*\s+', '', n) or n
+            try:
+                got += drf_search(target, n)
+            except Exception as e:
+                print(f'  [법제처] 검색 {target} 실패: {e}', flush=True)
+                skip.append(_DRF[target][3])
+                break
+        base = names[0].replace(' ', '')
+        def rank(r):
+            nm = r['name'].replace(' ', '')
+            return (0 if nm == base else 1 if nm.startswith(base) else 2, 0 if '인천' in r['name'] + r['org'] else 1, len(nm))
+        got.sort(key=rank)
+        k = 0
+        for r in got:
+            if r['url'] in seen or k >= cap:
+                continue
+            seen.add(r['url'])
+            r = dict(r, t=target)
+            if target == 'law' and art and r['name'].replace(' ', '') == base:
+                r['url'] += '/' + urllib.parse.quote(art)
+                r['art'] = art
+            rows.append(r)
+            k += 1
+    return {'rows': rows, 'skip': sorted(set(skip)), 'q': names[:2]}
 
 
 def law_wanted(q):
