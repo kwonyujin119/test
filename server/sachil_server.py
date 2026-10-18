@@ -1136,6 +1136,7 @@ class H(BaseHTTPRequestHandler):
                     'limit': int(CONF.get('ai_daily_limit') or 0), 'version': VERSION,
                     'auto_update': bool(CONF.get('auto_update')) and os.environ.get('SACHIL_LOOP') == '1',
                     'bat_old': bool(CONF.get('auto_update')) and os.environ.get('SACHIL_LOOP') != '1',   # V138: 옛 bat로 켜 서버 자동 업데이트가 쉬는 중
+                    'bat_manual': bat_needs_manual(),   # V138: 자동 업데이트는 되지만 bat 자체는 한 번 손으로 바꿔야 함
                     'kakao': ('…' + str(CONF.get('kakao_js_key'))[-4:]) if CONF.get('kakao_js_key') else '',
                     'tmap': ('…' + str(CONF.get('tmap_app_key'))[-4:]) if CONF.get('tmap_app_key') else '',
                     'started': SERVER_START, 'upd_next': UPD_STATE['next'], 'upd_last': UPD_STATE['last'], 'upd_result': UPD_STATE['result'],
@@ -2983,6 +2984,23 @@ def auto_update_loop():
             UPD_STATE['next'] = 0
 
 
+def bat_needs_manual():
+    try:
+        p = os.path.join(BASE, 'start-domain.bat')
+        return os.path.exists(p) and os.environ.get('SACHIL_LOOP') == '1' and b'start-domain.new.bat' not in open(p, 'rb').read()
+    except OSError:
+        return False
+
+
+def mark_alive():
+    """V138: 10분 넘게 잘 돌았다는 표시 — start-domain.bat가 '연속 멈춤' 횟수를 다시 센다."""
+    try:
+        with open(os.path.join(DATA, 'alive.flag'), 'w', encoding='utf-8') as f:
+            f.write(VERSION)
+    except OSError:
+        pass
+
+
 def update_bat():
     """V138: start-domain.bat도 최신으로 — GitHub 것과 다르면 start-domain.new.bat로 받아 두고, bat이 다시 켤 때(75) 바꿔 끼운다."""
     url = str(CONF.get('update_url') or '')
@@ -2997,8 +3015,16 @@ def update_bat():
             return
         new = new.replace('\r\n', '\n').replace('\n', '\r\n')   # bat은 CRLF여야 goto가 바르게 동작
         cur = open(here, 'rb').read().decode('utf-8', 'replace')
+        nb = os.path.join(BASE, 'start-domain.new.bat')
         if cur.replace('\r\n', '\n').strip() == new.replace('\r\n', '\n').strip():
+            if os.path.exists(nb):   # 묵은(또는 덜 받은) 새 bat이 끼워지지 않게
+                try:
+                    os.remove(nb)
+                except OSError:
+                    pass
             return
+        if 'start-domain.new.bat' not in cur:   # V137 이하 bat은 스스로 바꿔 끼우지 못한다 — 한 번은 손으로
+            upd_log('start-domain.bat가 옛 버전입니다 — 서버 창을 닫고 업데이트 묶음의 start-domain.bat로 한 번 덮어쓰면, 그다음부터는 저절로 새것으로 바뀝니다')
         with open(os.path.join(BASE, 'start-domain.new.bat'), 'wb') as f:
             f.write(new.encode('utf-8'))
         upd_log('새 start-domain.bat를 받아 두었습니다 — 다시 켤 때 바꿔 끼웁니다')
@@ -3246,6 +3272,7 @@ def main():
     ])
     threading.Thread(target=index_loop, daemon=True).start()
     threading.Thread(target=auto_update_loop, daemon=True).start()
+    t_alive = threading.Timer(600, mark_alive); t_alive.daemon = True; t_alive.start()   # V138
     if '--tunnel' in sys.argv or '--named' in sys.argv:
         threading.Thread(target=run_tunnel, args=(port, '--named' in sys.argv), daemon=True).start()
     try:

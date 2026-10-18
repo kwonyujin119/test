@@ -26,6 +26,7 @@ rem 75 = the server downloaded a new version of itself: start again right away
 if "%RC%"=="75" (
   set /a FAILS=0
   rem V138: the server also downloaded a newer start-domain.bat - swap it in and start over with it
+  if exist start-domain.new.bat findstr /c:"SACHIL_LOOP=1" start-domain.new.bat >nul || del start-domain.new.bat
   if exist start-domain.new.bat (
     echo [update] Updating start-domain.bat ...
     start "" cmd /c "timeout /t 2 /nobreak >nul & move /y start-domain.new.bat start-domain.bat >nul & start "" start-domain.bat"
@@ -44,6 +45,11 @@ if exist data\update_verify.flag (
   )
 )
 rem V138: 0 = closed on purpose. Anything else = the server crashed: wait and start again (stop after 5 crashes in a row)
+rem data\alive.flag = the server ran 10 minutes fine before it stopped: count from 1 again
+if exist data\alive.flag (
+  set /a FAILS=0
+  del data\alive.flag
+)
 if not "%RC%"=="0" (
   set /a FAILS+=1
   call :retry
