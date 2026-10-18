@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '7.7'
-APP_VERSION = 'V151'
+VERSION = '7.8'
+APP_VERSION = 'V152'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -1020,7 +1020,7 @@ class H(BaseHTTPRequestHandler):
             ck = 'law1:' + ck   # V147: 법령 질문은 법제처 연결 전에 저장된 답(PDF 근거)을 다시 쓰지 않는다
         geo = j.get('geo') if isinstance(j.get('geo'), dict) and CONF.get('bld_key') and ai_ready() else None
         if ck and geo:
-            ck = 'pub1:' + time.strftime('%Y%m%d') + ':' + ck   # V151: 공공데이터 근거 답은 하루만 다시 씀(자료가 바뀜)
+            ck = 'pub2:' + time.strftime('%Y%m%d') + ':' + ck   # V151: 공공데이터 근거 답은 하루만 다시 씀(자료가 바뀜)
         hit = ans_cache_get(ck)
         if hit:   # V102: 같은 질문(띄어쓰기·물음표만 다른 것 포함)은 저장된 답으로 — AI 호출·하루 한도를 쓰지 않는다
             return self.send(200, {'ok': True, 'mode': hit['mode'], 'note': '', 'answer': hit['answer'], 'sources': hit['sources'],
@@ -2892,7 +2892,13 @@ def ask_llm(question, hits, history):
                          f'[{i + 1}] {h["name"]} {h["art"]} (법제처 국가법령정보, 시행 {h.get("eff") or "?"})\n{h["text"]}' if h.get('law') else
                          f'[{i + 1}] {re.sub(r"[.]pdf$", "", h["name"], flags=re.I)} {h["page"]}쪽{" · " + h["art"] if h.get("art") else ""}\n{h.get("ctx") or h["text"]}') for i, h in enumerate(hits))
     msgs = history_msgs(history)
-    msgs.append({'role': 'user', 'content': f'<자료>\n{ctx}\n</자료>\n\n질문: {question}\n(답 순서: 결론 → 설명 → 현장에서 → 근거)'})
+    pub = [f'[{i + 1}] {h["name"]}' for i, h in enumerate(hits) if h.get('pub')]
+    extra = ''
+    if pub:   # V152: 규칙 7번만으로는 SOP 일반론으로 흘러서 — 이 질문의 주소 자료를 바로 옆에 다시 짚는다
+        extra = (f'\n(중요: {", ".join(pub)}은 질문한 주소({hits[0]["art"]})를 방금 조회한 실제 자료다. 결론 첫 문장에 이 건물의 층수·지하층·구조·용도와 '
+                 '비상용 승강기 유무를, 설명이나 현장에서에 가장 가까운 소방용수시설의 종류·거리를 그 [번호]와 함께 반드시 쓰고, SOP 기준은 그 건물에 맞춰 적용해 말하라. '
+                 '자료가 "없음"이면 없다고 말하고 현장 확인을 권하라. 근거 줄에도 이 자료를 넣어라.)')
+    msgs.append({'role': 'user', 'content': f'<자료>\n{ctx}\n</자료>\n\n질문: {question}\n(답 순서: 결론 → 설명 → 현장에서 → 근거){extra}'})
     text, why, _code = call_llm(AI_SYS, msgs, 3000, 'low', CONF.get('ai_assist_model') or 'claude-haiku-5-5')
     return order_answer(text), why
 
