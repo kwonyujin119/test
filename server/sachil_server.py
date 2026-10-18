@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '5.1'
-APP_VERSION = 'V125'
+VERSION = '5.2'
+APP_VERSION = 'V126'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -120,6 +120,7 @@ def load_conf():
         'auto_restart': True,           # V113: 업데이트가 없어도 정기적으로 서버를 다시 켬(접속자 없을 때 우선, 30분 넘게 기다리면 그대로)
         'restart_hours': 2,             # 정기 재시작 간격(시간)
         'update_url': 'https://raw.githubusercontent.com/kwonyujin119/test/main/server/sachil_server.py',
+        'app_update_url': 'https://raw.githubusercontent.com/kwonyujin119/test/main/index.html',   # V126: 서버가 내보내는 앱 화면도 함께 최신으로
         'ai_model': 'claude-sonnet-5-5',
         'ai_daily_limit': 50,           # 하루 AI 답변 최대 횟수(비용 상한, 교수 로그인은 제외). 0이면 무제한
         'ai_assist_model': 'claude-haiku-5-5',   # AI 도우미 전용 모델(가장 저렴). 보고서는 ai_model
@@ -2772,6 +2773,40 @@ def fetch_new_server():
     return new, src
 
 
+def _app_ver(txt):
+    m = re.search(r"APP_VER='V(\d+)'", txt or '')
+    return int(m.group(1)) if m else 0
+
+
+def update_app_file():
+    """V126: 서버가 내보내는 앱 화면(sachil.html)도 GitHub의 index.html이 새 버전이면 바꾼다(서버를 다시 켤 필요 없음 — 파일 시각이 바뀌면 바로 새 화면)."""
+    import urllib.request
+    url = str(CONF.get('app_update_url') or '')
+    if not url.startswith('https://'):
+        return None
+    req = urllib.request.Request(url + ('&' if '?' in url else '?') + 't=' + str(int(time.time())), headers={'Cache-Control': 'no-cache'})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        src = r.read(12_000_000).decode('utf-8')
+    new = _app_ver(src)
+    try:
+        with open(APP_PATH, encoding='utf-8') as f:
+            cur = _app_ver(f.read())
+    except OSError:
+        cur = 0
+    if not new or new <= cur:
+        return None
+    if len(src) < 300_000 or '</script>' not in src or 'const SECTIONS' not in src:
+        raise ValueError('받은 앱 파일이 SACHIL 화면 같지 않음')
+    tmp = APP_PATH + '.new'
+    with open(tmp, 'w', encoding='utf-8', newline='') as f:
+        f.write(src)
+    if os.path.exists(APP_PATH):
+        shutil.copy2(APP_PATH, APP_PATH + '.bak')
+    os.replace(tmp, APP_PATH)
+    upd_log(f'앱 화면 V{cur} → V{new} 교체(서버는 그대로 동작)')
+    return new
+
+
 def room_idle():
     now = time.time()
     with PRESENCE_LOCK:
@@ -2824,6 +2859,12 @@ def auto_update_loop():
     if os.environ.get('SACHIL_LOOP') != '1':   # 다시 켜 줄 새 start-domain.bat로 켠 게 아니면 바꾸지 않는다(꺼진 채로 남지 않게)
         if CONF.get('auto_update'):
             upd_log('start-domain.bat가 옛 버전이라 자동 업데이트를 쉽니다 — 업데이트 묶음의 start-domain.bat로 덮어쓰세요')
+            while True:   # V126: 서버 파일은 못 바꿔도 앱 화면(sachil.html)은 다시 켜지 않고 바꿀 수 있다
+                time.sleep(300)
+                try:
+                    update_app_file()
+                except Exception as e:
+                    upd_log(f'앱 화면 확인 실패(다음에 다시): {str(e)[:100]}')
         return
     # V113: 새 버전은 5분(V120)마다 확인해 받으면 곧바로 교체(AI 답변 중이면 최대 90초 기다림).
     #       업데이트가 없을 때는 2시간마다 다시 켬 — 접속자 없을 때를 우선, 30분 기다려도 계속 있으면 그대로 다시 켬
@@ -2838,6 +2879,10 @@ def auto_update_loop():
     while True:
         UPDATE_NOW.clear()
         if CONF.get('auto_update') and time.time() >= UPD_STATE['next'] - 1:
+            try:
+                update_app_file()   # 앱 화면 먼저(실패해도 서버 확인은 계속)
+            except Exception as e:
+                upd_log(f'앱 화면 확인 실패(다음에 다시): {str(e)[:100]}')
             try:
                 UPD_STATE['last'] = time.time()
                 got = fetch_new_server()
