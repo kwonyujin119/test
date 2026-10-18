@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '7.0'
-APP_VERSION = 'V144'
+VERSION = '7.1'
+APP_VERSION = 'V145'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -2651,11 +2651,18 @@ def _call_llm(system, msgs, max_tokens, effort='', model=''):
         text, why2, code = call(prov)
         why = why2 or why
     if not text and code != 'refusal':
+        fails = [f'{AI_NAMES.get(prov, prov)}: {why or code}']
         for other in [p for p in ai_has() if p != prov]:
             t2, w2, c2 = call(other)
             if t2:
                 print(f'[AI] {AI_NAMES[prov]} 실패({why}) → {AI_NAMES[other]}가 대신 답함', flush=True)
                 return t2, '', ''
+            fails.append(f'{AI_NAMES.get(other, other)}: {w2 or c2}')
+        if len(fails) > 1:   # V145: 예비 회사도 실패했으면 회사마다 이유를 함께(예비가 왜 안 됐는지 보이게)
+            why = ' · '.join(x[:140] for x in fails)
+            print(f'[AI] 모두 실패 — {why}', flush=True)
+        elif not ai_has()[1:]:
+            why = f'{why} (예비 AI 키 없음 — 방재실 → 서버·AI에서 Groq 키를 넣으면 한도 초과 때 대신 답합니다)'
     return text, why, code
 
 
