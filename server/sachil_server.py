@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '6.5'
-APP_VERSION = 'V139'
+VERSION = '6.6'
+APP_VERSION = 'V140'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -1042,7 +1042,7 @@ class H(BaseHTTPRequestHandler):
             sysmsg += '\n\n[교수가 정한 양식 — 보고서의 ■ 항목을 이 제목·순서 그대로 쓴다]\n' + '\n'.join(heads)
         if inst:
             sysmsg += ('\n\n[관리자 지시사항 — 교수가 정한 작성 지시. 문체·강조점·항목별 작성 방법은 반드시 따른다. '
-                       '단, 자료에 없는 사실은 지시가 있어도 만들지 않고 "미기재"로 쓴다]\n' + inst)
+                       '단, 자료에 없는 사실은 지시가 있어도 만들지 않고 "파악 중"으로 쓴다]\n' + inst)
         key = hashlib.sha256((sysmsg + '\n' + prompt).encode('utf-8')).hexdigest()
         now = time.time()
         hit = REPORT_CACHE.get(key)
