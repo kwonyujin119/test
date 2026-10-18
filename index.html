@@ -735,7 +735,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v105</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v106</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -852,8 +852,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V105', SRV_VER='4.2';
+  const APP_VER='V106', SRV_VER='4.3';
   const UPDATES=[
+    {v:'V106', d:'2026-10-18', t:['47망 위쪽에 ‘지도’·‘소화전’ 버튼(소화전은 다음 업데이트)','지도(카카오맵): 가운데 + 를 맞추고 한 번 눌러 화재대상·현장지휘소·방면설정(A정면·B좌측·C후면·D우측)·차량대기소 표시 — 47망 참여자 모두 같은 지도, 5초마다 갱신, 주소·장소 검색, 내 위치','교수 화면에 카카오맵 키 입력']},
     {v:'V105', d:'2026-10-18', t:['교수 화면(AI 키 관리)에 서버 상태: 마지막으로 켜진 시각·동작 시간, 마지막 자동 업데이트, 다음 업데이트 확인 예정 시각(교수 로그인 때만 보임)']},
     {v:'V104', d:'2026-10-17', t:['AI 키 관리: 서버가 아직 옛 버전이어도 키 입력 가능 — 이 휴대폰에 잠시 맡겨 두었다가 서버가 업데이트되면 자동으로 넣음(3일 보관)','교수 화면에 ‘서버 업데이트 지금 확인’ 버튼(자동 업데이트를 켠 서버 4.1부터)']},
     {v:'V103', d:'2026-10-17', t:['교수 로그인 화면에 ‘AI 키 관리’: 휴대폰에서 Gemini·Groq·Claude 키를 넣고 바로 시험(실패하면 이전 키 유지), 연결 상태·오늘 사용 횟수 보기 — PC에서 bat 파일을 실행하지 않아도 됨']},
@@ -1235,6 +1236,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const act=document.getElementById('actSheet'); if(act){ act.remove(); return true; }
     const pop=document.getElementById('plusPop'); if(pop&&!pop.hidden){ pop.hidden=true; return true; }
     if(!lb.hidden){ closeLightbox(); return true; }
+    { const mo=document.getElementById('mapov'); if(mo&&!mo.hidden&&window.__closeMap){ window.__closeMap(); return true; } }
     if(!pv.hidden){ closePdf(true); return true; }
     if(!$('#report').hidden){ closeReport(true); return true; }
     if(sheet.classList.contains('open')){ closeSheet(); return true; }
@@ -1279,6 +1281,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function render(){
     const r=state.route;
     { const pvEl=document.getElementById('pdfv'); if(pvEl&&!pvEl.hidden) closePdf(true); }
+    if(window.__closeMap) window.__closeMap();
     if(SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } SRV.ctl=null; } SRV.gen++;
     pending=[];
     document.body.classList.toggle('compact', !(r==='search' && !state.query.trim()));
@@ -1435,6 +1438,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
               <div class="acts"><button type="submit" class="btn primary" id="aiKeyGo">저장하고 시험</button></div>
               <p class="note">키는 서버 PC에만 저장되고 다시 보여 주지 않습니다(끝 4자리만). 시험에 실패하면 이전 키를 그대로 둡니다. 키를 채팅·카카오톡에 붙이지 마세요.</p>
             </form>
+            <form id="kakaoForm" autocomplete="off" class="kkf">
+              <div class="row"><label for="kakaoIn">카카오맵 키 <small id="kakaoNow"></small></label><input id="kakaoIn" maxlength="64" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="developers.kakao.com의 JavaScript 키(32자)"></div>
+              <div class="acts"><button type="submit" class="btn" id="kakaoGo">카카오맵 키 저장</button></div>
+              <p class="note">47망 ‘지도’에 씁니다. 카카오 개발자 사이트의 앱 → 플랫폼 → Web 사이트 도메인에 <b>https://kwonyujin119.github.io</b> 와 <b>https://app.sachil47.com</b> 을 등록해야 지도가 열립니다.</p>
+            </form>
           </section></div>`;
         $('#profOut').addEventListener('click',profLogout);
         $('#profMenu').addEventListener('click',()=>{ const b=$('#menuBtn'); if(b) b.click(); });
@@ -1499,7 +1507,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   async function aiKeysBind(){
     const st=$('#aiStat'), f=$('#aiKeyForm'), msg=$('#aiKeyMsg'); if(!st||!f) return;
     const show=(t,bad)=>{ msg.hidden=!t; msg.textContent=t||''; msg.classList.toggle('err',!!bad); };
-    const paint=j=>{ st.innerHTML=aiStatHtml(j); st.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>arm(b,'정말 지우기',async()=>{
+    const paint=j=>{ st.innerHTML=aiStatHtml(j); { const kn=$('#kakaoNow'); if(kn) kn.textContent=j&&j.kakao?`(등록됨 ${j.kakao})`:'(없음)'; } st.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>arm(b,'정말 지우기',async()=>{
       const r=await api('/api/admin/ai',{json:{action:'delete',provider:b.dataset.del},tok:PROF.tok}); if(r.ok&&r.j.keys){ paint(r.j); show(r.j.msg||''); } else show(r.j.error||'지우지 못했습니다',true); }))); };
     const fl=await aiKeyFlush();
     const r=await api('/api/admin/ai',{json:{action:'status'},tok:PROF.tok});
@@ -1510,6 +1518,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     st.addEventListener('click',async e=>{ const b=e.target.closest('#srvUpd'); if(!b) return; b.disabled=true;
       const x=await api('/api/admin/ai',{json:{action:'update'},tok:PROF.tok}); b.disabled=false;
       show(x.ok?(x.j.msg||x.j.error||''):(x.status===404?'이 서버는 지금 확인 기능이 없습니다 — 2시간마다 자동으로 확인합니다':(x.j.error||'요청하지 못했습니다')), !(x.ok&&x.j.ok)); });
+    { const kf=$('#kakaoForm'); if(kf) kf.addEventListener('submit',async e=>{
+        e.preventDefault(); const v=$('#kakaoIn').value.trim(), b=$('#kakaoGo'); b.disabled=true;
+        const x=await api('/api/admin/ai',{json:{action:'kakao',key:v},tok:PROF.tok}); b.disabled=false;
+        if(x.ok&&x.j.ok){ $('#kakaoIn').value=''; paint(x.j); show(x.j.msg||'저장했습니다'); const k=v.replace(/[^0-9a-f]/gi,'').toLowerCase(); SRV.kakao=/^[0-9a-f]{32}$/.test(k)?k:''; }
+        else show(x.status===404||(x.j&&!x.j.keys&&!x.j.error)?'서버가 아직 이 기능을 모릅니다(서버 4.3 필요)':(x.j.error||'저장하지 못했습니다'),true);
+      }); }
     f.addEventListener('submit',async e=>{
       e.preventDefault(); const key=$('#aiKeyIn').value.trim(), prov=$('#aiProv').value, b=$('#aiKeyGo'); if(!key) return;
       b.disabled=true; show('시험하는 중… (최대 1분)');
@@ -2922,12 +2936,112 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     return `<div class="msg other" data-mid="${esc(m.id)}"><span class="av ini" aria-hidden="true">${esc((m.name||'?').replace('참여자 ','').slice(0,2))}</span><div class="col"><span class="who">${esc(m.name)}</span><div class="bub ${cls}">${body}</div></div>${t}</div>`;
   }
 
+  // ---------- 현장 지도(V106): 카카오맵 · 방마다 화재대상·현장지휘소·방면·차량대기소 하나씩(같은 방 참여자 모두 같은 지도) ----------
+  const MAPK={fire:{n:'화재대상',t:'🔥'}, icp:{n:'현장지휘소',t:'CP'}, sector:{n:'방면설정',t:'✛'}, staging:{n:'차량대기소',t:'S'}};
+  const SECT=[['A','정면'],['B','좌측'],['C','후면'],['D','우측']];   // 정면에서 시계 방향(건물을 바라볼 때 B가 왼쪽)
+  const MAPS={p:null, map:null, rid:0, items:{}, ts:0, ov:[], poll:null};
+  function loadKakao(key){
+    if(window.kakao&&kakao.maps&&kakao.maps.LatLng) return Promise.resolve();
+    if(MAPS.p) return MAPS.p;
+    MAPS.p=new Promise((ok,no)=>{ const s=document.createElement('script');
+      s.src='https://dapi.kakao.com/v2/maps/sdk.js?appkey='+encodeURIComponent(key)+'&autoload=false&libraries=services';
+      s.onload=()=>{ try{ kakao.maps.load(()=>ok()); }catch(e){ MAPS.p=null; no(e); } };
+      s.onerror=()=>{ MAPS.p=null; s.remove(); no(new Error('load')); }; document.head.appendChild(s); });
+    return MAPS.p;
+  }
+  const mapEl=document.createElement('div'); mapEl.className='mapov'; mapEl.id='mapov'; mapEl.hidden=true; mapEl.setAttribute('role','dialog'); mapEl.setAttribute('aria-label','현장 지도');
+  mapEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="지도 닫기">‹</button><b>현장 지도</b>
+      <form class="msrch" autocomplete="off"><input type="search" placeholder="주소·장소 검색" aria-label="주소·장소 검색" enterkeyhint="search"><button type="submit" class="btn ghost">검색</button></form></div>
+    <div class="mbox"><div class="kmap"></div><i class="cross" aria-hidden="true"></i><button type="button" class="mme" aria-label="내 위치로">◎</button></div>
+    <p class="mmsg" role="status"></p>
+    <div class="mtools">${Object.entries(MAPK).map(([k,v])=>`<button type="button" class="mt mt-${k}" data-mk="${k}"><i>${v.t}</i><span>${v.n}</span></button>`).join('')}</div>
+    <p class="mhint">지도를 움직여 가운데 <b>+</b>를 원하는 곳에 맞추고 버튼을 누르세요. <b>방면설정</b>은 화재대상에서 <b>정면(도로 쪽)</b>으로 + 를 옮긴 뒤 누르면 A정면·B좌측·C후면·D우측이 표시됩니다. 표시를 누르면 지울 수 있어요.</p>`;
+  document.body.appendChild(mapEl);
+  const mq=s=>mapEl.querySelector(s);
+  const mmsg=(t,html)=>{ const m=mq('.mmsg'); if(html) m.innerHTML=t; else m.textContent=t||''; };
+  const destPt=(lat,lng,deg,m)=>{ const r=deg*Math.PI/180; return [lat+m*Math.cos(r)/111320, lng+m*Math.sin(r)/(111320*Math.cos(lat*Math.PI/180))]; };
+  const bearing=(a,b)=>{ const dy=b.lat-a.lat, dx=(b.lng-a.lng)*Math.cos(a.lat*Math.PI/180); return ((Math.atan2(dx,dy)*180/Math.PI)+360)%360; };
+  const distM=(a,b)=>{ const dy=(b.lat-a.lat)*111320, dx=(b.lng-a.lng)*111320*Math.cos(a.lat*Math.PI/180); return Math.hypot(dx,dy); };
+  function mapDraw(){
+    if(!MAPS.map) return;
+    MAPS.ov.forEach(o=>o.setMap(null)); MAPS.ov=[];
+    const it=MAPS.items||{}, add=o=>{ o.setMap(MAPS.map); MAPS.ov.push(o); };
+    const pin=(k,lat,lng,label,cls)=>{ const el=document.createElement('button'); el.type='button'; el.className='mk mk-'+(cls||k); el.innerHTML=`<i>${esc(MAPK[k]?MAPK[k].t:'')}</i><span>${esc(label)}</span>`;
+      el.addEventListener('click',ev=>{ ev.stopPropagation(); mapInfo(k); });
+      add(new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(lat,lng), content:el, yAnchor:1.15, zIndex:3})); };
+    ['fire','icp','staging'].forEach(k=>{ const v=it[k]; if(v) pin(k,v.lat,v.lng,MAPK[k].n); });
+    const s=it.sector, f=it.fire;
+    if(s&&f){ SECT.forEach(([a,n],i)=>{ const [la,ln]=destPt(f.lat,f.lng,s.deg+i*90,55);
+        add(new kakao.maps.Polyline({path:[new kakao.maps.LatLng(f.lat,f.lng),new kakao.maps.LatLng(la,ln)], strokeWeight:3, strokeColor:i?'#7A5AF8':'#D92D20', strokeOpacity:.8, strokeStyle:i?'shortdash':'solid'}));
+        const el=document.createElement('button'); el.type='button'; el.className='mk mk-sec'+(i?'':' front'); el.innerHTML=`<i>${a}</i><span>${n}</span>`; el.addEventListener('click',ev=>{ ev.stopPropagation(); mapInfo('sector'); });
+        add(new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(la,ln), content:el, yAnchor:.5, zIndex:2})); }); }
+    mapEl.querySelectorAll('.mt').forEach(b=>b.classList.toggle('on',!!it[b.dataset.mk]));
+  }
+  function mapInfo(k){
+    const v=(MAPS.items||{})[k]; if(!v) return;
+    const d=new Date(v.ts*1000);
+    mmsg(`<b>${esc(MAPK[k].n)}</b> · ${esc(v.by||'')} · ${pad(d.getHours())}:${pad(d.getMinutes())} <button type="button" class="btn ghost" id="mkDel">지우기</button>`,true);
+    const b=$('#mkDel'); if(b) b.addEventListener('click',()=>arm(b,'정말 지우기',()=>mapSave({kind:k,clear:1})));
+  }
+  async function mapLoad(){
+    const r=await api(`/api/rooms/${MAPS.rid}/map`);
+    if(mapEl.hidden) return;
+    if(r.status===404&&!r.j.items){ mmsg('서버가 아직 지도 기능을 모릅니다 — 서버가 4.3으로 업데이트되면 함께 쓰는 지도가 됩니다'); return; }
+    if(r.ok&&r.j.ts!==MAPS.ts){ MAPS.items=r.j.items||{}; MAPS.ts=r.j.ts; mapDraw(); }
+  }
+  async function mapSave(body){
+    const r=await api(`/api/rooms/${MAPS.rid}/map`,{json:body});
+    if(r.ok&&r.j.ok){ MAPS.items=r.j.items||{}; MAPS.ts=r.j.ts; mapDraw(); const nm=MAPK[body.kind]?MAPK[body.kind].n:'표시', jo=((nm.charCodeAt(nm.length-1)-0xAC00)%28)?'을':'를';   // 받침에 따라 을/를
+      mmsg(body.clear?`${nm}${jo} 지웠습니다`:`${nm}${jo} 표시했습니다 — 47망 참여자 모두에게 보입니다`); }
+    else mmsg(r.status===404?'서버가 아직 지도 기능을 모릅니다(서버 4.3 필요)':(r.j.error||'저장하지 못했습니다'));
+  }
+  mapEl.querySelectorAll('.mt').forEach(b=>b.addEventListener('click',()=>{
+    if(!MAPS.map) return;
+    const k=b.dataset.mk, c=MAPS.map.getCenter(), ctr={lat:c.getLat(), lng:c.getLng()};
+    if(k==='sector'){
+      const f=(MAPS.items||{}).fire; if(!f){ mmsg('먼저 화재대상을 표시하세요'); return; }
+      const deg=distM(f,ctr)>8?bearing(f,ctr):180;   // + 가 화재대상 위에 있으면 남쪽을 정면으로
+      return mapSave({kind:'sector', lat:f.lat, lng:f.lng, deg});
+    }
+    mapSave({kind:k, lat:ctr.lat, lng:ctr.lng});
+  }));
+  mq('.msrch').addEventListener('submit',e=>{
+    e.preventDefault(); const v=mq('.msrch input').value.trim(); if(!v||!MAPS.map||!kakao.maps.services) return;
+    const go=(y,x)=>{ MAPS.map.setLevel(3); MAPS.map.setCenter(new kakao.maps.LatLng(y,x)); mmsg('찾은 곳으로 옮겼습니다 — + 위치를 확인하고 버튼을 누르세요'); mq('.msrch input').blur(); };
+    new kakao.maps.services.Places().keywordSearch(v,(res,st)=>{
+      if(st===kakao.maps.services.Status.OK&&res[0]) return go(res[0].y,res[0].x);
+      new kakao.maps.services.Geocoder().addressSearch(v,(r2,s2)=>{ if(s2===kakao.maps.services.Status.OK&&r2[0]) go(r2[0].y,r2[0].x); else mmsg('찾지 못했습니다 — 다른 낱말로 검색하세요'); });
+    });
+  });
+  mq('.mme').addEventListener('click',()=>{
+    if(!navigator.geolocation||!MAPS.map){ mmsg('이 기기에서 위치를 쓸 수 없습니다'); return; }
+    mmsg('내 위치를 찾는 중…');
+    navigator.geolocation.getCurrentPosition(p=>{ MAPS.map.setCenter(new kakao.maps.LatLng(p.coords.latitude,p.coords.longitude)); MAPS.map.setLevel(3); mmsg('내 위치로 옮겼습니다'); },()=>mmsg('위치 권한이 없거나 찾지 못했습니다'),{enableHighAccuracy:true,timeout:10000});
+  });
+  let mapLast=null;
+  function closeMap(){ if(mapEl.hidden) return; mapEl.hidden=true; clearInterval(MAPS.poll); appEl.inert=false; tabbarEl.inert=false; if(mapLast&&mapLast.isConnected&&mapLast.focus) mapLast.focus(); }
+  mq('.mclose').addEventListener('click',closeMap);
+  document.addEventListener('keydown',e=>{ if(!mapEl.hidden&&e.key==='Escape') closeMap(); });
+  async function openMap(rid){
+    if(!SRV.on){ toast('지도는 서버(47망)에 연결됐을 때 쓸 수 있습니다'); return; }
+    mapLast=document.activeElement; MAPS.rid=rid; mapEl.hidden=false; appEl.inert=true; tabbarEl.inert=true; mmsg('');
+    if(!SRV.kakao){ mmsg(`카카오맵 키가 아직 없습니다. ${isProf()?'교수 화면 → AI 키 관리 → <b>카카오맵 키</b>에 JavaScript 키를 넣어 주세요.':'교수에게 카카오맵 키 설정을 요청하세요.'}`,true); return; }
+    try{ await loadKakao(SRV.kakao); }catch(_){ mmsg('카카오맵을 불러오지 못했습니다 — 인터넷 연결, 또는 카카오 개발자 사이트에 이 주소(도메인)가 등록됐는지 확인하세요'); return; }
+    if(mapEl.hidden) return;
+    if(!MAPS.map){ MAPS.map=new kakao.maps.Map(mq('.kmap'),{center:new kakao.maps.LatLng(37.4563,126.7052), level:5});   // 처음: 인천시청 부근
+      MAPS.map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT); }
+    MAPS.map.relayout(); MAPS.ts=-1; await mapLoad();
+    const f=(MAPS.items||{}).fire; if(f) MAPS.map.setCenter(new kakao.maps.LatLng(f.lat,f.lng));
+    clearInterval(MAPS.poll); MAPS.poll=setInterval(()=>{ if(!mapEl.hidden&&!document.hidden) mapLoad(); },5000);   // 다른 참여자가 바꾼 표시를 5초마다 반영
+  }
+  window.__closeMap=closeMap;
+
   async function srvRoom(panel,kind){
     const gen=SRV.gen, rid=kind==='deb'?SRV.roomDb:SRV.room, title=ROOM_NAME[kind]||'47망';
     if(!rid){ panel.innerHTML=`<p class="convo-note">${kind==='deb'?'디브리핑룸은 서버 PC를 새 버전(V57)으로 업데이트하면 열립니다. 지금은 47망을 이용해 주세요.':'47망을 찾지 못했습니다. 서버를 다시 시작해 주세요.'}</p>`; return; }
     pending=[]; SRV.last=0; SRV.seen=new Set(); SRV.epoch=''; SRV.msgs=new Map(); SRV.rp=[]; SRV.rv=-1; SRV.readSent=0; SRV.lastDay=''; SRV.replyTo=null; SRV.dv=-1;
     const admin=SRV.me&&SRV.me.role==='admin';
-    panel.innerHTML=roomHead({id:'s'+rid,title,cnt:true},'',`<button type="button" class="btn ghost" id="dbRename">대화명 바꾸기</button>${admin?'<button type="button" class="btn ghost" id="dbClear">대화 비우기</button>':''}`)+`
+    panel.innerHTML=roomHead({id:'s'+rid,title,cnt:true},'',`${kind==='deb'?'':'<button type="button" class="btn ghost rtool" id="mapBtn">지도</button><button type="button" class="btn ghost rtool" id="hydBtn">소화전</button>'}<button type="button" class="btn ghost" id="dbRename">대화명 바꾸기</button>${admin?'<button type="button" class="btn ghost" id="dbClear">대화 비우기</button>':''}`)+`
       <div class="chat">
         <div class="card convo-card"><div class="convo" id="convo"><p class="convo-note" id="convoNote">불러오는 중…</p></div><button type="button" class="peek" id="peek" hidden></button></div>
         <div class="reply-bar" id="replyBar" hidden></div>
@@ -3146,6 +3260,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       sh.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); });
     }
     if(SRV.draft){ const d=SRV.draft; SRV.draft=null; const i=$('#chatText'); if(i&&d.text) i.value=d.text; if(d.att&&d.att.length){ pending=d.att.slice(0,MAX_FILES); renderPending(); } stat('다시 입장했습니다. 보내지 못한 내용을 되살렸습니다'); }
+    { const mb=$('#mapBtn'); if(mb) mb.addEventListener('click',()=>openMap(rid)); const hb=$('#hydBtn'); if(hb) hb.addEventListener('click',()=>toast('소화전 표시는 다음 업데이트에서 열립니다')); }
     $('#dbRename').addEventListener('click',async()=>{ const rb=$('#dbRename'); if(rb.dataset.arm!=='1'){ rb.dataset.arm='1'; rb.textContent='한 번 더 누르면 바꿈'; rb.classList.add('accent'); stat('대화명을 바꾸면 지금까지 쓴 글은 다른 사람 글처럼 보이고 지울 수 없게 됩니다'); setTimeout(()=>{ if(rb.isConnected){ rb.dataset.arm=''; rb.textContent='대화명 바꾸기'; rb.classList.remove('accent'); stat(''); } },3500); return; } if(SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } SRV.ctl=null; } SRV.gen++; await api('/api/logout',{json:{}}); setTok(''); SRV.me=null; toChat(); });
     const clr=$('#dbClear');
     if(clr) clr.addEventListener('click',async()=>{
@@ -3221,7 +3336,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const wasLocal = ROOMS_R.includes(state.route) && !!chat.room;   // 파일 모드 방에 이미 들어가 있었음
       SRV.probing=false; SRV.on=true; SRV.me=r.j.user||null;
       if(r.j.ai && !CAP.sample){ CAP.sample=serverSample; CAP.ready=true; syncRepUI(); }   // 보고서 AI: Claude 화면 밖에서는 SACHIL 서버(AI 키)로 작성
-      SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.roomDb=r.j.room_debrief||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.aiName=String(r.j.ai_name||'').slice(0,20); SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
+      SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.roomDb=r.j.room_debrief||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.aiName=String(r.j.ai_name||'').slice(0,20); SRV.kakao=/^[0-9a-f]{32}$/.test(r.j.kakao||'')?r.j.kakao:''; SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
       if(PROF.tok) checkProf();   // 교수로 로그인해 둔 기기면 교수 표시줄
       await loadLib();
       if(ROOMS_R.includes(state.route)){ if(DB.agreed){ SRV.notice='서버에 연결되어 공유 대화방으로 바뀌었습니다.'+(wasLocal?' 방금 쓴 내용은 이 기기에만 남습니다.':''); DB.enter=true; } render(); }
@@ -3580,6 +3695,32 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .aikl li b{min-width:58px}.aikl li span{flex:1;color:var(--muted)}.aikl li em{font-style:normal;color:var(--navy);font-weight:700}
 .aikl .aidel{min-height:32px;padding:0 10px;font-size:12.5px}
 #srvUpd{margin-top:4px;min-height:38px}
+.roomhead .rtool{padding:0 12px}
+.kkf{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+.kkf label small{font-weight:400;color:var(--muted)}
+.mapov{position:fixed;inset:0;z-index:62;background:var(--bg);display:flex;flex-direction:column;padding-top:var(--sat);padding-bottom:var(--sab)}
+.mapov .mh{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--surface)}
+.mapov .mclose{width:var(--tap);height:var(--tap);border:0;background:none;font-size:28px;color:var(--navy);line-height:1}
+.mapov .mh b{white-space:nowrap}
+.mapov .msrch{flex:1;display:flex;gap:6px;min-width:0}
+.mapov .msrch input{flex:1;min-width:0;min-height:40px;border:1px solid var(--line);border-radius:10px;padding:0 10px;font:inherit;background:var(--surface);color:var(--fg)}
+.mapov .mbox{position:relative;flex:1;min-height:200px}
+.mapov .kmap{position:absolute;inset:0;background:#e9edf3}
+.mapov .cross{position:absolute;left:50%;top:50%;width:28px;height:28px;margin:-14px 0 0 -14px;pointer-events:none;z-index:5}
+.mapov .cross::before,.mapov .cross::after{content:'';position:absolute;background:#D92D20;box-shadow:0 0 0 1.5px #fff}
+.mapov .cross::before{left:13px;top:0;width:2px;height:28px}.mapov .cross::after{top:13px;left:0;height:2px;width:28px}
+.mapov .mme{position:absolute;left:10px;bottom:10px;z-index:5;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:20px;color:var(--navy);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.mapov .mmsg{margin:0;padding:6px 12px;min-height:20px;font-size:13px;color:var(--fg);background:var(--surface)}
+.mapov .mmsg .btn{min-height:30px;padding:0 10px;font-size:12.5px;margin-left:6px}
+.mapov .mtools{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 10px;background:var(--surface)}
+.mapov .mt{display:grid;justify-items:center;gap:2px;min-height:58px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font:inherit;font-size:12.5px;font-weight:700;color:var(--fg)}
+.mapov .mt i{font-style:normal;font-size:16px;line-height:1.2}
+.mapov .mt.on{border-color:var(--navy);background:var(--navy-soft)}
+.mapov .mhint{margin:0;padding:0 12px 10px;font-size:12px;color:var(--muted);background:var(--surface)}
+.mk{display:inline-flex;align-items:center;gap:4px;padding:3px 9px 3px 4px;border-radius:999px;border:2px solid #fff;color:#fff;font:700 12px/1.2 system-ui,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.3);white-space:nowrap;cursor:pointer}
+.mk i{font-style:normal;display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.25);font-size:11px}
+.mk-fire{background:#D92D20}.mk-icp{background:#244EA2}.mk-staging{background:#079455}
+.mk-sec{background:#7A5AF8;padding:2px 8px 2px 3px;font-size:11px}.mk-sec.front{background:#D92D20}
 .srvst{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:10px 0 4px;padding:10px 12px;border-radius:10px;background:var(--navy-soft);font-size:13.5px}
 .srvst dt{color:var(--muted);font-weight:600}.srvst dd{margin:0;color:var(--fg)}.srvst dd span{color:var(--muted);font-size:12.5px}
 .aikeys select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 10px;font:inherit;background:var(--surface);color:var(--fg)}
