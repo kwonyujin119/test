@@ -862,7 +862,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v160</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v161</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1061,6 +1061,14 @@ body.chatview .panel{padding-bottom:6px}
 .bub .rq span{display:block;opacity:.75;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bub p.del{color:var(--muted);font-style:italic}
 .convo-card{position:relative}
+/* V161: 47망 대화창 오른쪽 위 — DS·소화전 큰 버튼(떠 있음) */
+.ctools{position:absolute;top:10px;right:12px;z-index:5;display:flex;gap:8px}
+.ctool{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:60px;height:60px;padding:0;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.96);box-shadow:0 4px 14px rgba(15,23,42,.16);font:inherit;font-size:12px;font-weight:800;color:var(--fg);cursor:pointer;transition:transform .12s,box-shadow .12s}
+.ctool:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(15,23,42,.2)}
+.ctool:active{transform:scale(.95)}
+.ctool .dssym,.ctool .hydsym{width:30px;height:30px}
+#mapBtn.ctool span{color:#2563EB}#hydBtn.ctool span{color:#B42318}
+.ctools ~ .convo{padding-top:80px}
 .peek{position:absolute;left:10px;right:10px;bottom:10px;z-index:2;display:flex;align-items:center;gap:8px;min-height:40px;padding:0 12px;border:0;border-radius:12px;background:rgba(25,25,25,.86);color:#fff;font:inherit;font-size:13px;text-align:left;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2)}
 .peek[hidden]{display:none}
 .peek b{flex:none;color:var(--ember)}
@@ -1646,8 +1654,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V160', SRV_VER='8.6';
+  const APP_VER='V161', SRV_VER='8.7';
   const UPDATES=[
+    {v:'V161', d:'2026-10-18', t:['47망: DS·소화전 버튼을 대화창 오른쪽 위로 옮기고 크게(그림+글자) — 메시지가 가리지 않게 위쪽 여백']},
     {v:'V160', d:'2026-10-18', t:['47망 소화전: 창을 닫았다 열어도 직전에 보던 지도 자리·기준 위치·찾은 소화전·안내 줄이 그대로(앱을 새로 열어도 12시간 유지)','47망 DS: 닫았다 열어도 직전 안내 줄까지 그대로(지도 자리·확대는 원래대로 유지)']},
     {v:'V159', d:'2026-10-18', t:['47망 소화전: [소방청 자료]/[T맵] 버튼을 없앰 — T맵 지도 위에서 늘 소방청 소방용수시설 자료로 찾고, 그 자료가 없는 곳만 T맵 등록 소화전으로 자동 대체(안내 줄에 표시)']},
     {v:'V158', d:'2026-10-18', t:['첫 화면 6칸 애니메이션 — 마우스를 올리면 칸이 살짝 떠오르고 글자·그림이 커지며 흔들림, 휴대폰은 손가락이 닿으면 눌렸다가 떼면 튀어 오름(동작 줄이기 설정이면 끔)']},
@@ -4945,9 +4954,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!rid){ panel.innerHTML=`<p class="convo-note">${kind==='deb'?'디브리핑룸은 서버 PC를 새 버전(V57)으로 업데이트하면 열립니다. 지금은 47망을 이용해 주세요.':'47망을 찾지 못했습니다. 서버를 다시 시작해 주세요.'}</p>`; return; }
     pending=[]; SRV.last=0; SRV.seen=new Set(); SRV.epoch=''; SRV.msgs=new Map(); SRV.rp=[]; SRV.rv=-1; SRV.readSent=0; SRV.lastDay=''; SRV.replyTo=null; SRV.dv=-1;
     const admin=SRV.me&&SRV.me.role==='admin';
-    panel.innerHTML=roomHead({id:'s'+rid,title,cnt:true},'',`${kind==='deb'?'':'<button type="button" class="btn ghost rtool dsb" id="mapBtn" title="DS(Disaster Site) — 현장 지도" aria-label="DS 현장 지도 열기"><svg class="dssym" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 6.2 9 4l6 2.2 5.5-2.2v13.8L15 20l-6-2.2-5.5 2.2z" fill="#EAF2FF" stroke="#2563EB" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 4v13.8M15 6.2V20" stroke="#2563EB" stroke-width="1.6"/><circle cx="12" cy="11.2" r="2.1" fill="#2563EB"/></svg><span>DS</span></button><button type="button" class="btn ghost rtool sym" id="hydBtn" title="소화전" aria-label="소화전"><svg class="hydsym" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2.5h6v2h.8a1.2 1.2 0 0 1 1.2 1.2V7.5H7V5.7a1.2 1.2 0 0 1 1.2-1.2H9z" fill="#D92D20"/><rect x="5.5" y="7.5" width="13" height="2.2" rx="1.1" fill="#B42318"/><path d="M8 9.7h8V19h1.6a1.1 1.1 0 0 1 0 2.2H6.4a1.1 1.1 0 0 1 0-2.2H8z" fill="#D92D20"/><rect x="3.6" y="11.6" width="4.6" height="3.4" rx="1.2" fill="#B42318"/><rect x="15.8" y="11.6" width="4.6" height="3.4" rx="1.2" fill="#B42318"/><circle cx="12" cy="14.3" r="1.7" fill="#fff"/></svg></button>'}<button type="button" class="btn ghost" id="dbRename">대화명 바꾸기</button>${admin?'<button type="button" class="btn ghost" id="dbClear">대화 비우기</button>':''}`)+`
+    panel.innerHTML=roomHead({id:'s'+rid,title,cnt:true},'',`<button type="button" class="btn ghost" id="dbRename">대화명 바꾸기</button>${admin?'<button type="button" class="btn ghost" id="dbClear">대화 비우기</button>':''}`)+`
       <div class="chat">
-        <div class="card convo-card"><div class="convo" id="convo"><p class="convo-note" id="convoNote">불러오는 중…</p></div><button type="button" class="peek" id="peek" hidden></button></div>
+        <div class="card convo-card">${kind==='deb'?'':'<div class="ctools" role="group" aria-label="현장 도구"><button type="button" class="ctool" id="mapBtn" title="DS(Disaster Site) — 현장 지도" aria-label="DS 현장 지도 열기"><svg class="dssym" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 6.2 9 4l6 2.2 5.5-2.2v13.8L15 20l-6-2.2-5.5 2.2z" fill="#EAF2FF" stroke="#2563EB" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 4v13.8M15 6.2V20" stroke="#2563EB" stroke-width="1.6"/><circle cx="12" cy="11.2" r="2.1" fill="#2563EB"/></svg><span>DS</span></button><button type="button" class="ctool" id="hydBtn" title="소화전" aria-label="소화전"><svg class="hydsym" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2.5h6v2h.8a1.2 1.2 0 0 1 1.2 1.2V7.5H7V5.7a1.2 1.2 0 0 1 1.2-1.2H9z" fill="#D92D20"/><rect x="5.5" y="7.5" width="13" height="2.2" rx="1.1" fill="#B42318"/><path d="M8 9.7h8V19h1.6a1.1 1.1 0 0 1 0 2.2H6.4a1.1 1.1 0 0 1 0-2.2H8z" fill="#D92D20"/><rect x="3.6" y="11.6" width="4.6" height="3.4" rx="1.2" fill="#B42318"/><rect x="15.8" y="11.6" width="4.6" height="3.4" rx="1.2" fill="#B42318"/><circle cx="12" cy="14.3" r="1.7" fill="#fff"/></svg><span>소화전</span></button></div>'}<div class="convo" id="convo"><p class="convo-note" id="convoNote">불러오는 중…</p></div><button type="button" class="peek" id="peek" hidden></button></div>
         <div class="reply-bar" id="replyBar" hidden></div>
         ${composerHtml('의견 입력')}
         <div class="chat-foot"><span id="srvStat" aria-live="polite">${srvFoot()}</span><span class="r"></span></div>
