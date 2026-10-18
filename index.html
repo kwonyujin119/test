@@ -812,7 +812,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v125</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v126</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1265,6 +1265,8 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .aikl .aidel{min-height:32px;padding:0 10px;font-size:12.5px}
 #srvUpd{margin-top:4px;min-height:38px}
 .roomhead .rtool{padding:0 12px}
+.roomhead .rtool.sym{padding:0 10px;display:inline-grid;place-items:center}.hydsym{width:24px;height:24px;display:block}
+.mapov .mtab.sym{padding:0 8px;display:inline-grid;place-items:center}
 .bjov{position:fixed;inset:0;z-index:61;background:rgba(10,14,30,.45);display:grid;place-items:end center;padding-top:calc(24px + var(--sat))}
 .bjov .bjbox{width:min(100%,640px);max-height:calc(100dvh - 24px - var(--sat));display:flex;flex-direction:column;background:var(--bg);border-radius:18px 18px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.25)}
 @media (min-width:700px){ .bjov{place-items:center} .bjov .bjbox{border-radius:18px;max-height:88dvh} }
@@ -1339,6 +1341,10 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .mk-icp i{background:#244EA2}.mk-staging i{background:#079455}
 .mk-fire i{background:#fff}
 .mk-sec{background:#7A5AF8;padding:2px 8px 2px 3px;font-size:11px}.mk-sec.front{background:#D92D20}
+/* V126: 방면도 다른 표시처럼 몸통은 아주 흐린 반투명, 글자 원만 진하게 */
+.mk-sec{background:rgba(122,90,248,.14);border:1px solid rgba(255,255,255,.55);box-shadow:none;color:#1a1a1a;text-shadow:0 0 2px #fff,0 0 2px #fff}
+.mk-sec.front{background:rgba(217,45,32,.14)}
+.mk-sec i{background:#7A5AF8;color:#fff;text-shadow:none;box-shadow:0 1px 4px rgba(0,0,0,.35)}.mk-sec.front i{background:#D92D20}
 .srvst{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:10px 0 4px;padding:10px 12px;border-radius:10px;background:var(--navy-soft);font-size:13.5px}
 .srvst dt{color:var(--muted);font-weight:600}.srvst dd{margin:0;color:var(--fg)}.srvst dd span{color:var(--muted);font-size:12.5px}
 .aikeys select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 10px;font:inherit;background:var(--surface);color:var(--fg)}
@@ -1521,8 +1527,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V125', SRV_VER='5.1';
+  const APP_VER='V126', SRV_VER='5.2';
   const UPDATES=[
+    {v:'V126', d:'2026-10-18', t:['47망 ‘지도’ 이름을 DS(Disaster Site)로','DS 방면설정: A방면 하나만 띄워도 아래 버튼 색이 켜짐 · 방면 표시도 다른 표시처럼 아주 흐린 반투명(글자 원만 진하게)','47망 ‘소화전’ 글자 대신 소화전 심벌','서버 5.2: 자동 업데이트 때 서버가 내보내는 앱 화면(app.sachil47.com)도 함께 최신으로 — 서버를 다시 켜지 않고 바로 바뀜']},
     {v:'V125', d:'2026-10-18', t:['보고서: 교수용 ‘양식 편집’ — 규칙 초안의 틀({발생개요}·{지휘활동} 같은 자리표시와 ■ 제목·순서)을 고쳐 저장하면 서버에 올라가 모든 기기의 새 보고서에 적용','AI 작성도 그 규칙 초안(양식)의 ■ 항목·순서를 그대로 따름','‘초안 편집’은 이 보고서 한 건만 고침(그대로 저장) · 교수 확인이 늦게 끝나도 편집 버튼이 보이게 고침','서버 5.1']},
     {v:'V124', d:'2026-10-18', t:['AI 도우미를 모두에게 공개 — 입장코드 없이 바로 질문(서버 5.0: 예전 기본 입장코드를 비움)','교수가 다시 입장코드를 걸면 첫 질문 때만 코드 화면이 뜸']},
     {v:'V123', d:'2026-10-18', t:['지도 검색: 후보가 여러 곳이면 바로 옮기지 않고 5곳까지(이름·주소) 띄워 한 번에 고르기 — 예: ‘인천소방학교’ → 강화 본교·제2캠퍼스·소방고','지도 표시를 누르면 그 표시 바로 위에 🗑·✕만 있는 작은 메뉴(정보는 아래 안내 줄에), 지도를 움직이면 닫힘','지도 화면 위 ‘소화전’ 탭, 소화전 화면 위 ‘지도’ 탭 — 한 번에 서로 오가기']},
@@ -3808,8 +3815,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       s.onerror=()=>{ MAPS.p=null; s.remove(); no(new Error('load')); }; document.head.appendChild(s); });
     return MAPS.p;
   }
-  const mapEl=document.createElement('div'); mapEl.className='mapov'; mapEl.id='mapov'; mapEl.hidden=true; mapEl.setAttribute('role','dialog'); mapEl.setAttribute('aria-modal','true'); mapEl.setAttribute('aria-label','현장 지도');
-  mapEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="지도 닫기">‹</button><b>현장 지도</b><button type="button" class="mtab" data-tab="hyd" aria-label="소화전으로">소화전</button>
+  const mapEl=document.createElement('div'); mapEl.className='mapov'; mapEl.id='mapov'; mapEl.hidden=true; mapEl.setAttribute('role','dialog'); mapEl.setAttribute('aria-modal','true'); mapEl.setAttribute('aria-label','DS 현장 지도');
+  mapEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="지도 닫기">‹</button><b>DS</b><button type="button" class="mtab sym" data-tab="hyd" aria-label="소화전으로" title="소화전"><svg class="hydsym" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2.5h6v2h.8a1.2 1.2 0 0 1 1.2 1.2V7.5H7V5.7a1.2 1.2 0 0 1 1.2-1.2H9z" fill="#D92D20"/><rect x="5.5" y="7.5" width="13" height="2.2" rx="1.1" fill="#B42318"/><path d="M8 9.7h8V19h1.6a1.1 1.1 0 0 1 0 2.2H6.4a1.1 1.1 0 0 1 0-2.2H8z" fill="#D92D20"/><rect x="3.6" y="11.6" width="4.6" height="3.4" rx="1.2" fill="#B42318"/><rect x="15.8" y="11.6" width="4.6" height="3.4" rx="1.2" fill="#B42318"/><circle cx="12" cy="14.3" r="1.7" fill="#fff"/></svg></button>
       <form class="msrch" autocomplete="off"><input type="search" placeholder="주소·장소 검색" aria-label="주소·장소 검색" enterkeyhint="search"><button type="submit" class="btn ghost">검색</button></form></div>
     <ul class="mres" hidden></ul><div class="mbox"><div class="kmap"></div><div class="mjump" aria-label="표시로 바로 가기" hidden></div><div class="msel" role="group" aria-label="고른 표시" hidden></div><button type="button" class="mme" aria-label="내 위치로">◎</button></div>
     <p class="mmsg" role="status"></p>
@@ -3835,7 +3842,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       ov.setMap(MAPS.map); MAPS.ov.push(ov); mapDragBind(el,ov,k);
     });
     mapEl.querySelectorAll('.mt').forEach(b=>{ const k=b.dataset.mk;
-      if(k==='sector'){ const nx=SECL.find(l=>!it['sec'+l]); b.querySelector('i').textContent=nx||'✓'; b.classList.toggle('on',!nx); }
+      if(k==='sector'){ const nx=SECL.find(l=>!it['sec'+l]); b.querySelector('i').textContent=nx||'✓'; b.classList.toggle('on',SECL.some(l=>it['sec'+l])); }   // V126: A방면 하나만 있어도 켜짐
       else if(k==='fire'){ const n=fireN(); b.classList.toggle('on',n>=FIREK.length); b.querySelector('span').textContent=n?(n>=FIREK.length?`화재대상 ${n}곳`:'화재대상 추가'):'화재대상'; }
       else b.classList.toggle('on',!!it[k]); });
     mapJumpDraw();
@@ -4048,7 +4055,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   const hydEl=document.createElement('div'); hydEl.className='mapov hydov'; hydEl.id='hydov'; hydEl.hidden=true;
   hydEl.setAttribute('role','dialog'); hydEl.setAttribute('aria-modal','true'); hydEl.setAttribute('aria-label','소화전');
-  hydEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="소화전 닫기">‹</button><b>소화전</b><button type="button" class="mtab" data-tab="map" aria-label="지도로">지도</button>
+  hydEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="소화전 닫기">‹</button><b>소화전</b><button type="button" class="mtab" data-tab="map" aria-label="DS 현장 지도로" title="DS(Disaster Site)">DS</button>
       <form class="msrch hsrch" autocomplete="off"><input type="search" placeholder="주소·장소 검색" aria-label="주소·장소 검색" enterkeyhint="search"><button type="submit" class="btn ghost">검색</button></form></div>
     <ul class="hres" hidden></ul>
     <div class="hbase" role="group" aria-label="기준 위치와 소화전 검색"></div>
@@ -4170,7 +4177,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!rid){ panel.innerHTML=`<p class="convo-note">${kind==='deb'?'디브리핑룸은 서버 PC를 새 버전(V57)으로 업데이트하면 열립니다. 지금은 47망을 이용해 주세요.':'47망을 찾지 못했습니다. 서버를 다시 시작해 주세요.'}</p>`; return; }
     pending=[]; SRV.last=0; SRV.seen=new Set(); SRV.epoch=''; SRV.msgs=new Map(); SRV.rp=[]; SRV.rv=-1; SRV.readSent=0; SRV.lastDay=''; SRV.replyTo=null; SRV.dv=-1;
     const admin=SRV.me&&SRV.me.role==='admin';
-    panel.innerHTML=roomHead({id:'s'+rid,title,cnt:true},'',`${kind==='deb'?'':'<button type="button" class="btn ghost rtool" id="mapBtn">지도</button><button type="button" class="btn ghost rtool" id="hydBtn">소화전</button>'}<button type="button" class="btn ghost" id="dbRename">대화명 바꾸기</button>${admin?'<button type="button" class="btn ghost" id="dbClear">대화 비우기</button>':''}`)+`
+    panel.innerHTML=roomHead({id:'s'+rid,title,cnt:true},'',`${kind==='deb'?'':'<button type="button" class="btn ghost rtool" id="mapBtn" title="DS(Disaster Site) — 현장 지도" aria-label="DS 현장 지도">DS</button><button type="button" class="btn ghost rtool sym" id="hydBtn" title="소화전" aria-label="소화전"><svg class="hydsym" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2.5h6v2h.8a1.2 1.2 0 0 1 1.2 1.2V7.5H7V5.7a1.2 1.2 0 0 1 1.2-1.2H9z" fill="#D92D20"/><rect x="5.5" y="7.5" width="13" height="2.2" rx="1.1" fill="#B42318"/><path d="M8 9.7h8V19h1.6a1.1 1.1 0 0 1 0 2.2H6.4a1.1 1.1 0 0 1 0-2.2H8z" fill="#D92D20"/><rect x="3.6" y="11.6" width="4.6" height="3.4" rx="1.2" fill="#B42318"/><rect x="15.8" y="11.6" width="4.6" height="3.4" rx="1.2" fill="#B42318"/><circle cx="12" cy="14.3" r="1.7" fill="#fff"/></svg></button>'}<button type="button" class="btn ghost" id="dbRename">대화명 바꾸기</button>${admin?'<button type="button" class="btn ghost" id="dbClear">대화 비우기</button>':''}`)+`
       <div class="chat">
         <div class="card convo-card"><div class="convo" id="convo"><p class="convo-note" id="convoNote">불러오는 중…</p></div><button type="button" class="peek" id="peek" hidden></button></div>
         <div class="reply-bar" id="replyBar" hidden></div>
