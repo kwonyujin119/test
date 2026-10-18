@@ -818,7 +818,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v135</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v136</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -852,7 +852,7 @@ footer b{color:var(--muted);font-weight:600}
         <button type="button" role="tab" id="repTabDraft" aria-selected="true">규칙 초안</button>
         <button type="button" role="tab" id="repTabAi" aria-selected="false" disabled>AI 작성본</button>
       </div>
-      <div class="right"><span class="rep-status" id="repStatus" aria-live="polite"></span><button type="button" class="btn ghost sm" id="repRegen" hidden>초안 새로 생성</button><button type="button" class="btn ghost sm" id="repTpl" hidden>양식 편집</button><button type="button" class="btn primary sm" id="repEdit" hidden>편집</button></div>
+      <div class="right"><span class="rep-status" id="repStatus" aria-live="polite"></span><button type="button" class="btn ghost sm" id="repRegen" hidden>초안 새로 생성</button><button type="button" class="btn ghost sm" id="repTpl" hidden>양식·지시사항</button><button type="button" class="btn primary sm" id="repEdit" hidden>편집</button></div>
     </div>
     <textarea class="rep-body" id="repBody" spellcheck="false" aria-label="보고서 본문"></textarea>
     <div class="rep-foot">
@@ -861,7 +861,7 @@ footer b{color:var(--muted);font-weight:600}
       <button type="button" class="btn" id="repCopy">복사</button>
       <button type="button" class="btn" id="repShare" hidden>PDF공유</button>
       <button type="button" class="btn" id="repSave">PDF받기</button>
-      <span class="note">만든 시점의 체크 항목·시각 기록 스냅샷으로 작성되어 IL 사고보고서에 저장됩니다. 본문 편집은 교수 로그인 후 ‘편집’(이 보고서), 규칙 초안의 틀은 ‘양식 편집’(모든 보고서·AI 작성 공통)으로 할 수 있습니다. AI에는 사실과 작성자가 고친 초안만 주고 새 사실을 추가하지 않도록 지시합니다. 평가 판정이 아닙니다.</span>
+      <span class="note">만든 시점의 체크 항목·시각 기록 스냅샷으로 작성되어 IL 사고보고서에 저장됩니다. 본문 편집은 교수 로그인 후 ‘편집’(이 보고서), 규칙 초안의 틀과 AI가 따를 지시는 ‘양식·지시사항’(모든 보고서·AI 작성 공통)으로 할 수 있습니다. AI에는 사실과 작성자가 고친 초안만 주고 새 사실을 추가하지 않도록 지시합니다. 평가 판정이 아닙니다.</span>
     </div>
   </div>
 </div>
@@ -1035,6 +1035,8 @@ body.chatview .panel{padding-bottom:6px}
 .tplov header{display:flex;align-items:center;justify-content:space-between}.tplov header b{font-size:17px}
 .tplov .close{width:40px;height:40px;border:0;background:none;font-size:26px;color:var(--muted)}
 .tplov .tnote{margin:0;font-size:12.5px;color:var(--muted)}
+.tplov .ttabs{align-self:flex-start}.tplov .tp-inst{display:flex;flex-direction:column;gap:8px;flex:1}.tplov .tp-inst[hidden]{display:none}
+.tplov .tin{flex:1;min-height:260px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:14px/1.6 var(--sans);background:var(--surface);color:var(--fg);resize:vertical}
 .tplov .tkeys{display:flex;flex-wrap:wrap;gap:5px}
 .tplov .tkeys button{min-height:30px;padding:0 9px;border:1px solid var(--navy-soft-2);border-radius:15px;background:var(--navy-soft);color:var(--navy);font:inherit;font-size:12.5px;font-weight:600}
 .tplov .tta,.tplov .tpre{flex:1;min-height:260px;margin:0;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:13.5px/1.6 var(--mono);white-space:pre-wrap;overflow:auto;background:var(--surface-2);color:var(--fg);resize:vertical}
@@ -1537,8 +1539,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V135', SRV_VER='6.1';
+  const APP_VER='V136', SRV_VER='6.2';
   const UPDATES=[
+    {v:'V136', d:'2026-10-18', t:['보고서(교수): ‘양식 편집’ → ‘양식·지시사항’ — 창 안에 ‘양식’과 ‘관리자 지시사항’ 탭','관리자 지시사항(문체·강조점·항목별 작성 방법)을 저장하면 서버에 올라가 모든 기기의 AI 작성이 IL 입력값 + 양식 + 지시사항을 따름(기록에 없는 사실은 지시가 있어도 만들지 않고 ‘미기재’)','서버 6.2 필요(지시사항을 모든 기기에 나누기) — 옛 서버면 이 기기에 맡겨 두었다가 업데이트되면 자동으로 올림']},
     {v:'V135', d:'2026-10-18', t:['IL에 ‘조치사항’ 칸 추가(초안): 주요 조치 10가지(인명 검색·구조, 화재 진압, 연소 확대 방지, 배연·환기, 전기·가스 차단 등)를 여러 개 고르면 시각과 함께 기록, 세부 조치 내용·남은 조치·인계 입력','보고서 규칙 초안에 ‘■ 5. 조치사항’ — AI 작성에도 들어감(예전에 저장한 양식에도 자동으로 끼움)','IL 대응단계 선택이 앱을 다시 열면 사라지던 문제 고침','서버 6.1']},
     {v:'V134', d:'2026-10-18', t:['소화전(T맵) 지도가 카카오맵(DS)보다 오른쪽으로 밀려 보이던 문제 — 지도 칸 크기가 바뀔 때 가운데(+)를 다시 맞춤','DS ↔ 소화전 탭을 바꿔도 보던 자리·확대 정도 그대로(DS에서 넘어오면 화재로 옮기지 않음)','서버 6.0']},
     {v:'V133', d:'2026-10-18', t:['DS: ‘화재대상’ → ‘화재’. 연소 확대에 대비해 화재를 9곳까지 추가(4곳 이상이면 위쪽 바로가기는 ‘화재 n곳’ 하나로)','DS: 화재 표시를 누르면 위로 ‘초진’·‘완진’ — 같은 불꽃 모양에 색만 다르게(초진 주황·완진 회색), 표시에 글자도 붙음. 다시 누르면 ‘화재’로','DS: CP 버튼을 누르면 위로 현장지휘소·유관기관CP·응급의료소(임시·현장) 메뉴 — 고르면 지도 가운데(+)에, CP를 한 번 더 누르면 현장지휘소','47망·디브리핑룸 📌 핀 문구를 교수가 SACHIL방재실(또는 핀을 펼쳐 ‘핀 문구 수정’)에서 고쳐 모든 기기에 적용','IL 발생개요 제목 오른쪽에 대응단계 배너(대형·대응1·대응2·대응3) — 누르면 시각과 함께 기록되고 보고서·AI 작성에 들어감','보고서: ‘초안 편집’ → ‘편집’, 규칙 초안은 교수만 보이고 일반 사용자는 AI 작성본만, ‘다시 작성’·‘AI 사이트로 작성’ 없앰','보고서: ‘공유’ → ‘PDF공유’, ‘파일로 받기’ → ‘PDF받기’ — 글 파일이 아니라 A4 PDF로','서버 5.9 필요(화재 4곳 이상·초진/완진·유관기관CP·응급의료소·핀 문구 저장)']},
@@ -2688,9 +2691,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     '※ 체크 항목과 시각 기록으로 생성한 초안입니다. 본문을 직접 고칠 수 있습니다. 기재하지 않은 사항은 미기재이며, 평가 판정이 아닙니다.'].join('\n');
   const RTPL_KEYS=[['작성시각','보고서 만든 시각'],['경과','경과 시간'],['경과표시','경과(진행 중 표시)'],['시작','체크리스트 시작 시각'],['이행','이행 n/전체'],['발생개요','발생개요 칸'],['화재원인','화재 원인 칸'],['인명피해','인명 피해 칸'],['재산피해','재산 피해 칸'],['조치사항','조치사항 칸'],['지휘활동','단계별 이행 항목·시각'],['미이행','미이행 항목'],['시간기록','시간대별 기록'],['확인요청','교관 확인 요청(자동)']];
   const RTPL_LS='sachil_report_tpl';
-  const RTPL={text:'', ts:0};
-  try{ const j=JSON.parse(localStorage.getItem(RTPL_LS)||'null'); if(j&&typeof j.text==='string'){ RTPL.text=j.text.slice(0,8000); RTPL.ts=+j.ts||0; RTPL.pend=!!j.pend; } }catch(_){ }
-  const rtplSave=()=>{ try{ localStorage.setItem(RTPL_LS,JSON.stringify({text:RTPL.text, ts:RTPL.ts, pend:!!RTPL.pend})); }catch(_){ } };
+  const RTPL={text:'', ts:0, inst:''};   // V136: inst = 관리자 지시사항(AI 작성 때 따름)
+  try{ const j=JSON.parse(localStorage.getItem(RTPL_LS)||'null'); if(j&&typeof j.text==='string'){ RTPL.text=j.text.slice(0,8000); RTPL.ts=+j.ts||0; RTPL.pend=!!j.pend; RTPL.inst=typeof j.inst==='string'?j.inst.slice(0,3000):''; RTPL.ipend=!!j.ipend; } }catch(_){ }
+  const rtplSave=()=>{ try{ localStorage.setItem(RTPL_LS,JSON.stringify({text:RTPL.text, ts:RTPL.ts, pend:!!RTPL.pend, inst:RTPL.inst, ipend:!!RTPL.ipend})); }catch(_){ } };
   const rtplText=()=>RTPL.text||RTPL_DEFAULT;
   function reportDraft(f, stamp, tpl){
     const lines=a=>a.join('\n');
@@ -2721,6 +2724,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       '4 잘잘못·점수·평가 판정을 쓰지 않는다. 통제단장 단계의 내용은 쓰지 않는다.',
       '5 마크다운 기호(#, *, **)를 쓰지 않는다. 전체 500~900자.'];
     if(e.draftEdited) parts.push('6 [작성자 수정 초안]은 작성자가 직접 고친 문서다. [사실]과 다르거나 [사실]에 없는 내용이 있으면 작성자 수정 초안을 우선해 반영한다.');
+    if(RTPL.inst.trim()) parts.push('7 아래 [관리자 지시사항]은 교수(관리자)가 정한 작성 지시다. 문체·강조점·항목별 작성 방법은 이 지시를 따른다. 다만 규칙 1(자료에 없는 사실을 만들지 않음)과 부딪치면 규칙 1이 우선하며, 지시가 요구한 내용이 자료에 없으면 "미기재"로 쓴다.',
+      '[관리자 지시사항]', '<<<', RTPL.inst.slice(0,3000), '>>>');   // V136: AI = IL 입력값 + 양식 + 관리자 지시사항
     const pf=Object.assign({}, f, {elapsed:`약 ${fin(f.elapsedMin,0)}분`, running:undefined, elapsedMin:undefined});
     parts.push('[사실]', '<<<', JSON.stringify(pf), '>>>');
     parts.push('[규칙 초안]', '<<<', reportDraft(f, fmtTs(e.ts)).slice(0,6000), '>>>');   // V125: AI 작성은 규칙 초안(양식)을 따른다
@@ -3012,32 +3017,42 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   $('#repRegen').addEventListener('click',()=>arm($('#repRegen'),'편집 내용 버리고 새로 생성',()=>{ if(!cur||!cur.facts) return; cur.draftEdited=false; cur.draft=cur.draftAuto=reportDraft(cur.facts, fmtTs(cur.ts)); rpsave(); setRepView('draft'); }));
   // V125: 규칙 초안 양식 편집(교수) — 저장하면 서버에 올려 모든 기기의 새 보고서와 AI 작성이 이 양식을 따른다
   const tplEl=document.createElement('div'); tplEl.className='tplov'; tplEl.hidden=true; tplEl.setAttribute('role','dialog'); tplEl.setAttribute('aria-modal','true'); tplEl.setAttribute('aria-label','규칙 초안 양식');
-  tplEl.innerHTML=`<div class="tbox"><header><b>규칙 초안 양식</b><button type="button" class="close" data-a="x" aria-label="닫기">×</button></header>
-    <p class="tnote"><b>{ }</b> 자리표시는 보고서를 만들 때 체크·시각 기록으로 바뀝니다(누르면 커서 자리에 넣음). <b>■</b> 제목과 순서는 AI 작성에도 그대로 쓰입니다.</p>
-    <div class="tkeys">${RTPL_KEYS.map(([k,d])=>`<button type="button" data-k="${k}" title="${d}">{${k}}</button>`).join('')}</div>
+  tplEl.innerHTML=`<div class="tbox"><header><b>AI 보고서 양식</b><button type="button" class="close" data-a="x" aria-label="닫기">×</button></header>
+    <div class="seg ttabs" role="tablist" aria-label="양식·지시사항"><button type="button" role="tab" data-tt="tpl" aria-selected="true">양식</button><button type="button" role="tab" data-tt="inst" aria-selected="false">관리자 지시사항</button></div>
+    <div class="tp-tpl"><p class="tnote"><b>{ }</b> 자리표시는 보고서를 만들 때 IL·체크·시각 기록으로 바뀝니다(누르면 커서 자리에 넣음). <b>■</b> 제목과 순서는 AI 작성에도 그대로 쓰입니다.</p>
+    <div class="tkeys">${RTPL_KEYS.map(([k,d])=>`<button type="button" data-k="${k}" title="${d}">{${k}}</button>`).join('')}</div></div>
     <textarea class="tta" spellcheck="false" aria-label="양식"></textarea><pre class="tpre" hidden></pre>
+    <div class="tp-inst" hidden><p class="tnote">AI가 보고서를 쓸 때 <b>IL에 입력된 값 → 양식 → 이 지시사항</b>을 함께 따릅니다. 문체·강조점·항목별 작성 방법을 한 줄에 하나씩 적으세요. 기록에 없는 사실은 지시가 있어도 만들지 않고 ‘미기재’로 씁니다.</p>
+    <textarea class="tin" spellcheck="false" maxlength="3000" aria-label="관리자 지시사항" placeholder="예)&#10;- 조치사항은 시간 순서대로 쓰고, 각 줄 앞에 시각을 붙인다&#10;- 대응단계 발령 시각을 발생개요 첫 줄에 쓴다&#10;- 안전관리(안전점검관 지정·대원 철수)를 특이사항에 따로 정리한다&#10;- 교관 확인 요청은 3개로 쓴다"></textarea></div>
     <div class="tacts"><button type="button" class="btn ghost sm" data-a="def">기본 양식으로</button><button type="button" class="btn ghost sm" data-a="pre">미리보기</button><span class="sp"></span><button type="button" class="btn primary" data-a="save">저장 · 모든 기기에 적용</button></div>
     <p class="tmsg" role="status"></p></div>`;
   document.body.appendChild(tplEl);
   const tq=x=>tplEl.querySelector(x);
-  function openTpl(){ if(!isProf()) return; tq('.tta').value=rtplText(); tq('.tta').hidden=false; tq('.tpre').hidden=true; tq('[data-a="pre"]').textContent='미리보기'; tq('.tmsg').textContent=RTPL.pend?'이 기기에만 저장된 양식입니다 — 서버가 5.1이 되면 자동으로 모든 기기에 적용됩니다':''; tplEl.hidden=false; tq('.tta').focus(); }
+  function tplTab(t){ tplEl.querySelectorAll('[data-tt]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tt===t))); const ins=t==='inst';
+    tq('.tp-tpl').hidden=ins; tq('.tp-inst').hidden=!ins; tq('[data-a="def"]').hidden=ins; tq('[data-a="pre"]').hidden=ins;
+    if(ins){ tq('.tta').hidden=true; tq('.tpre').hidden=true; tq('.tin').focus(); } else { tq('.tta').hidden=false; tq('.tpre').hidden=true; tq('[data-a="pre"]').textContent='미리보기'; } }
+  function openTpl(){ if(!isProf()) return; tq('.tin').value=RTPL.inst||''; tplTab('tpl'); tq('.tta').value=rtplText(); tq('.tta').hidden=false; tq('.tpre').hidden=true; tq('[data-a="pre"]').textContent='미리보기'; tq('.tmsg').textContent=RTPL.pend?'이 기기에만 저장된 양식입니다 — 서버가 5.1이 되면 자동으로 모든 기기에 적용됩니다':''; tplEl.hidden=false; tq('.tta').focus(); }
   const closeTpl=()=>{ tplEl.hidden=true; const b=$('#repTpl'); if(b&&!b.hidden) b.focus(); };
-  async function rtplPut(text){   // 서버에 저장(옛 서버면 이 기기에 맡겨 둠)
-    if(SRV.on&&PROF.tok){ const x=await api('/api/admin/ai',{json:{action:'tpl',text},tok:PROF.tok});
-      if(x.ok&&x.j&&x.j.ok&&'tpl' in x.j){ RTPL.text=x.j.tpl||''; RTPL.ts=x.j.tpl_ts||Date.now()/1000; RTPL.pend=false; rtplSave(); return {ok:true, msg:x.j.msg}; }
+  async function rtplPut(text,inst){   // 서버에 저장(옛 서버면 이 기기에 맡겨 둠)
+    if(typeof inst!=='string') inst=RTPL.inst||'';
+    if(SRV.on&&PROF.tok){ const x=await api('/api/admin/ai',{json:{action:'tpl',text,inst},tok:PROF.tok});
+      if(x.ok&&x.j&&x.j.ok&&'tpl' in x.j){ RTPL.text=x.j.tpl||''; RTPL.ts=x.j.tpl_ts||Date.now()/1000; RTPL.pend=false;
+        if('inst' in x.j){ RTPL.inst=x.j.inst||''; RTPL.ipend=false; rtplSave(); return {ok:true, msg:x.j.msg}; }
+        RTPL.inst=inst; RTPL.ipend=true; rtplSave(); return {ok:true, msg:'양식은 저장했습니다 — 관리자 지시사항은 서버가 아직 옛 버전(6.2 필요)이라 이 기기에만 저장, 업데이트되면 자동으로 모든 기기에 적용'}; }
       if(x.status===403) return {ok:false, msg:x.j.error||'교수 로그인이 필요합니다'}; }
-    RTPL.text=text; RTPL.ts=Date.now()/1000; RTPL.pend=true; rtplSave();
+    RTPL.text=text; RTPL.ts=Date.now()/1000; RTPL.pend=true; RTPL.inst=inst; RTPL.ipend=true; rtplSave();
     return {ok:true, msg:'이 기기에 저장했습니다 — 서버가 아직 옛 버전이라, 5.1로 업데이트되면 자동으로 모든 기기에 적용됩니다'};
   }
   async function rtplSync(){   // 서버 양식 받기 · 맡겨 둔 양식 올리기
     if(!SRV.on) return;
-    if(RTPL.pend&&isProf()&&PROF.tok){ const r=await rtplPut(RTPL.text); if(r.ok&&!RTPL.pend) toast('맡겨 둔 보고서 양식을 서버에 올렸습니다'); return; }
+    if((RTPL.pend||RTPL.ipend)&&isProf()&&PROF.tok){ const r=await rtplPut(RTPL.text,RTPL.inst); if(r.ok&&!RTPL.pend&&!RTPL.ipend) toast('맡겨 둔 보고서 양식·지시사항을 서버에 올렸습니다'); return; }
     if(RTPL.pend) return;
-    const r=await api('/api/report/tpl'); if(r.ok&&r.j&&r.j.ok&&typeof r.j.tpl==='string'){ RTPL.text=r.j.tpl.slice(0,8000); RTPL.ts=+r.j.ts||0; rtplSave(); }
+    const r=await api('/api/report/tpl'); if(r.ok&&r.j&&r.j.ok&&typeof r.j.tpl==='string'){ RTPL.text=r.j.tpl.slice(0,8000); RTPL.ts=+r.j.ts||0; if(typeof r.j.inst==='string'&&!RTPL.ipend) RTPL.inst=r.j.inst.slice(0,3000); rtplSave(); }
   }
   window.__rtplSync=rtplSync;
   tplEl.addEventListener('click',async e=>{
     if(e.target===tplEl){ closeTpl(); return; }
+    const tt=e.target.closest('[data-tt]'); if(tt){ tplTab(tt.dataset.tt); return; }
     const k=e.target.closest('[data-k]'); if(k){ const ta=tq('.tta'), t='{'+k.dataset.k+'}', a=ta.selectionStart??ta.value.length, z=ta.selectionEnd??a; ta.value=ta.value.slice(0,a)+t+ta.value.slice(z); ta.focus(); ta.setSelectionRange(a+t.length,a+t.length); return; }
     const b=e.target.closest('[data-a]'); if(!b) return; const a=b.dataset.a;
     if(a==='x'){ closeTpl(); return; }
@@ -3045,7 +3060,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(a==='pre'){ const pre=tq('.tpre'), on=pre.hidden; if(on){ const f=cur&&cur.facts?cur.facts:reportFacts(); pre.textContent=reportDraft(f, fmtTs(cur?cur.ts:new Date().toISOString()), tq('.tta').value); }
       pre.hidden=!on; tq('.tta').hidden=on; b.textContent=on?'양식으로':'미리보기'; return; }
     if(a==='save'){ let t=tq('.tta').value.replace(/\r\n/g,'\n').slice(0,8000); if(t.trim()===RTPL_DEFAULT.trim()) t='';
-      b.disabled=true; const r=await rtplPut(t); b.disabled=false; tq('.tmsg').textContent=r.msg||'';
+      const ins=tq('.tin').value.replace(/\r\n/g,'\n').trim().slice(0,3000);
+      b.disabled=true; const r=await rtplPut(t,ins); b.disabled=false; tq('.tmsg').textContent=r.msg||'';
       if(r.ok){ if(cur&&cur.facts&&!cur.draftEdited){ cur.draft=cur.draftAuto=reportDraft(cur.facts, fmtTs(cur.ts)); rpsave(); setRepView('draft'); } toast(r.msg||'저장했습니다'); closeTpl(); } }
   });
   tplEl.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.stopPropagation(); closeTpl(); } });

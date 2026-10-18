@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '6.1'
-APP_VERSION = 'V135'
+VERSION = '6.2'
+APP_VERSION = 'V136'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -761,7 +761,7 @@ class H(BaseHTTPRequestHandler):
                 return self.lib_get(m.group(1), urllib.parse.unquote(m.group(2)))
             self.user = self.get_user()
             if path == '/api/report/tpl':   # V125: 교수가 정한 보고서 규칙 초안 양식(모든 기기 공통). 비어 있으면 앱 기본 양식
-                return self.send(200, {'ok': True, 'tpl': str(CONF.get('report_tpl') or ''), 'ts': CONF.get('report_tpl_ts') or 0}, log=False)
+                return self.send(200, {'ok': True, 'tpl': str(CONF.get('report_tpl') or ''), 'inst': str(CONF.get('report_inst') or ''), 'ts': CONF.get('report_tpl_ts') or 0}, log=False)   # V136: inst = 관리자 지시사항
             if path == '/api/roominfo':   # V133: 47망·디브리핑룸 위 📌 핀 문구(교수가 고침). 비어 있으면 앱 기본 문구
                 return self.send(200, {'ok': True, 'info': CONF.get('room_info') or {}, 'ts': CONF.get('room_info_ts') or 0}, log=False)
             if path == '/api/me':
@@ -1025,7 +1025,7 @@ class H(BaseHTTPRequestHandler):
 
     def report(self):
         """IL 사고보고서 AI 작성: 앱이 만든 지시문(사실 스냅샷 포함)을 Claude로 보내 보고서 본문을 받는다."""
-        j = self.body_json(40000)
+        j = self.body_json(120000)   # V136: 한글 3바이트 — 지시문 3만 자가 들어오도록
         prompt = str(j.get('prompt') or '')[:30000]
         if len(prompt) < 20:
             raise ValueError('보고서 자료가 비어 있습니다')
@@ -1115,7 +1115,7 @@ class H(BaseHTTPRequestHandler):
     def admin_ai(self):
         if self.user['role'] != 'admin':
             return self.err(403, '교수(관리자)만 할 수 있습니다')
-        j = self.body_json(40000)   # V125: 보고서 양식(한글 8천 자)까지
+        j = self.body_json(60000)   # V125: 보고서 양식(한글 8천 자)까지 · V136: + 관리자 지시사항 3천 자
         act = str(j.get('action') or 'status')
         def status():
             return {'ok': True, 'provider': ai_provider(), 'order': ai_has(),
@@ -1140,9 +1140,11 @@ class H(BaseHTTPRequestHandler):
         if act == 'tpl':   # V125: 보고서 규칙 초안 양식 저장(빈 글 = 앱 기본 양식으로)
             t = str(j.get('text') or '').replace('\r\n', '\n')[:8000]
             CONF['report_tpl'] = t if t.strip() else ''
+            if 'inst' in j:   # V136: AI 보고서 관리자 지시사항(AI가 IL 값·양식과 함께 따름)
+                CONF['report_inst'] = str(j.get('inst') or '').replace('\r\n', '\n').strip()[:3000]
             CONF['report_tpl_ts'] = time.time()
             write_conf(CONF)
-            return self.send(200, dict(status(), tpl=CONF['report_tpl'], tpl_ts=CONF['report_tpl_ts'], msg='규칙 초안 양식을 저장했습니다 — 모든 기기의 새 보고서·AI 작성에 적용' if t.strip() else '기본 양식으로 되돌렸습니다'), log=False)
+            return self.send(200, dict(status(), tpl=CONF['report_tpl'], inst=str(CONF.get('report_inst') or ''), tpl_ts=CONF['report_tpl_ts'], msg=('규칙 초안 양식' if t.strip() else '기본 양식') + ('·관리자 지시사항' if CONF.get('report_inst') else '') + '을 저장했습니다 — 모든 기기의 새 보고서·AI 작성에 적용'), log=False)
         if act == 'roominfo':   # V133: 대화방 📌 핀 문구 저장 — kind(net·deb)별 lead(첫 줄) + more(펼치면 보이는 줄들). 빈 글 = 기본 문구로
             kind = str(j.get('kind') or '')
             if kind not in ('net', 'deb'):
