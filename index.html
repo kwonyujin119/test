@@ -2128,20 +2128,21 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // V89: Search는 '찾기'(원문 위치), AI는 '풀기'(상황 적용·요약). 입력 모양으로 서로 안내하고 버튼으로 잇는다(자동으로 넘기지 않음 — AI는 입장코드·하루 한도)
   const isSentence=t=>{ t=String(t||'').trim(); return t.split(/\s+/).length>=4 || /[?？]$/.test(t) || /(나요|까요|할까|인가요|인지|는지|하나요|되나요|어떻게|무엇|뭔가요|왜|언제|알려줘|알려 줘|설명해)/.test(t); };
   // V150: 건축물대장 — '건축물대장'이라고 쓰거나 주소(…동 12, …로 34)처럼 보이면 검색 위쪽에 건축물 현황
-  const BLD_ADDR=/[가-힣\d](?:동|리|가|로|길)\s*(?:산\s*)?\d{1,5}(?:-\d{1,5})?(?![\d가-힣])/;
   // V151: 문장 속에서 주소 부분만(예: '인천 남동구 구월동 1138 건물 화재 시 진입은?' → '인천 남동구 구월동 1138')
-  const ADDR_RE=/((?:(?:서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주)[가-힣]*\s+|[가-힣]+(?:시|군|구)\s+)*[가-힣\d]+(?:동|리|가|로|길)\s*(?:산\s*)?\d{1,5}(?:-\d{1,5})?)(?!\d|\s*(?:단계|층|명|대|개|분|초|회|차|번째|호|급|km|m\b|%))/;
-  const bldAddrOf=t=>{ const m=String(t||'').match(ADDR_RE); return m?m[1].trim():''; };
+  const ADDR_RE=/(?:^|[^가-힣\d])((?:(?:서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주)[가-힣]*\s+|(?!(?:발생|도착|출동|화재|진입|진압|대피|구조|필요|비상|출입|입|사고|작업|점검|훈련)(?:시|구)\s)[가-힣]{1,5}(?:시|군|구)\s+)*([가-힣\d]+(?:동|리|가|로|길))\s*(?:\d{1,4}번?길\s*)?(?:산\s*)?\d{1,5}(?:-\d{1,5})?)(?![\d.]|\s*(?:단계|층|명|대|개|분|초|회|차|번째|호|급|km|m\b|%)|(?:곳|팀|건|점|번(?!지)|년|개월|일(?!대)|시간|시|미터|센티|킬로|cm|mm|kg|배|세|살|톤|평))/g;
+  const ADDR_STOP=/^(?:출동|이동|활동|가동|작동|연동|기동|발동|행동|운동|구동|변동|자동|수동|협동|합동|진동|유동|추가|평가|증가|참가|휴가|단가|부가|거리|처리|관리|수리|정리|조리|분리|무리|대리|원리|심리|통로|진입로|도로|소방도로|경로|회로|선로|퇴로|대피로|피난로|진로|수로|항로|활로|우회로|차로|골목길|진입길)$/;   /* V154: '출동 3팀'·'진입로 2곳'은 주소가 아님 */
+  const bldAddrOf=t=>{ for(const m of String(t||'').matchAll(ADDR_RE)) if(!ADDR_STOP.test(m[2])) return m[1].trim(); return ''; };
   // V153: 주소 대신 건물 이름(○○아파트·○○병원·○○빌딩…)으로 물어도 — 카카오 장소 검색으로 주소를 찾아 같은 조회
-  const PLACE_RE=/([가-힣A-Za-z0-9]{2,20}(?:아파트|빌딩|타워|센터|병원|의원|초등학교|중학교|고등학교|대학교|학교|시장|공장|호텔|모텔|마트|백화점|소방서|경찰서|청사|구청|시청|플라자|오피스텔|요양원|요양병원|교회|성당|창고|주차장|터미널|쇼핑몰|체육관|도서관|박물관|발전소))(?![가-힣])/;
-  const placeOf=t=>{ const m=String(t||'').replace(/건축물\s*대장/g,' ').match(PLACE_RE); return m?m[1]:''; };
+  const PLACE_RE=/(([가-힣A-Za-z0-9]{2,20}?)(?:아파트|빌딩|타워|센터|병원|의원|의료원|초등학교|중학교|고등학교|대학교|학교|시장|공장|호텔|모텔|마트|백화점|소방서|경찰서|청사|구청|시청|플라자|오피스텔|요양원|요양병원|교회|성당|창고|주차장|터미널|쇼핑몰|체육관|도서관|박물관|발전소))(?![가-힣])/g;
+  const PLACE_GEN=/^(?:\d+|고층|초고층|저층|노후|대형|중형|소형|지하|물류|냉동|냉장|전통|재래|공동|일반|요양|종합|현장지휘|현장|지휘|안전|119안전|119|상황|종합상황|해당|인근|주변|근처|관할|다중이용|주상복합|복합|산업|공공|민간|임대|신축|위험물|화학|인접|각|모든|여러|대피|임시|응급|비상|기계식|자주식|옥외|옥내|무인|소규모|대규모)$/;   /* V154: '요양병원·지하주차장'처럼 일반 낱말은 건물 이름이 아님 */
+  const placeOf=t=>{ for(const m of String(t||'').replace(/건축물\s*대장/g,' ').matchAll(PLACE_RE)) if(!PLACE_GEN.test(m[2])) return m[1]; return ''; };
   const bldQuery=t=>{ t=String(t||'').trim(); const ex=/건축물\s*대장|건축물\s*조회/.test(t); const a0=bldAddrOf(t), p0=a0?'':placeOf(t); const a=a0||t.replace(/건축물\s*대장|건축물\s*조회|건축물|조회|정보/g,' ').replace(/\s+/g,' ').trim(); return (ex||a0||p0)&&a.length>=2?{a,ex,place:p0}:null; };
   // 주소(또는 건물 이름) → 카카오 주소 결과 하나. 이름은 장소 이름에 그 낱말이 실제로 들어 있을 때만(엉뚱한 곳 방지), 인천 것을 먼저
   async function geoHit(a,place){
     const geo=q=>Promise.race([new Promise(ok=>new kakao.maps.services.Geocoder().addressSearch(q,(r2,s2)=>ok(s2===kakao.maps.services.Status.OK?r2:[]))),sleep(5000).then(()=>[])]);
     const ok=r=>(r||[]).find(x=>x.address&&/^\d{10}$/.test(x.address.b_code||'')&&x.address.main_address_no);
     if(!place){ const h=ok(await geo(a)); return h?{hit:h,label:''}:null; }
-    const res=await Promise.race([new Promise(r=>new kakao.maps.services.Places().keywordSearch(place,(x,st)=>r(st===kakao.maps.services.Status.OK?x:[]))),sleep(5000).then(()=>[])]);
+    const res=await Promise.race([new Promise(r=>new kakao.maps.services.Places().keywordSearch(((a.split(place)[0].trim().split(/\s+/).pop()||'').match(/^[가-힣]{2,6}$/)?a.split(place)[0].trim().split(/\s+/).pop()+' ':'')+place,(x,st)=>r(st===kakao.maps.services.Status.OK?x:[]))),sleep(5000).then(()=>[])]);
     const key=place.replace(/\s/g,''), c=(res||[]).filter(x=>String(x.place_name||'').replace(/\s/g,'').includes(key)&&x.address_name);
     const pl=c.find(x=>/^인천/.test(x.address_name))||c[0]; if(!pl) return null;
     const h=ok(await geo(pl.address_name)); return h?{hit:h,label:String(pl.place_name).slice(0,30)}:null; }
@@ -2149,7 +2150,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   async function geoFor(t){
     if(!SRV.on||!SRV.bld||!SRV.kakao) return null; const a=bldAddrOf(t), pl=a?'':placeOf(t); if(!a&&!pl) return null;
     try{ await loadKakao(SRV.kakao); }catch(_){ return null; }
-    const g=await geoHit(a,pl); if(!g) return null; const h=g.hit, A=h.address;
+    const g=await geoHit(a||t,pl); if(!g) return null; const h=g.hit, A=h.address;
     return {b:A.b_code,bun:A.main_address_no,ji:A.sub_address_no||'0',mt:A.mountain_yn==='Y'?'1':'0',sd:A.region_1depth_name||'',sg:A.region_2depth_name||'',lat:h.y,lng:h.x,addr:((g.label?g.label+' ':'')+A.address_name).slice(0,60)}; }
   const bldRow=x=>{ const f=(v,u)=>v&&v!=='0'?esc(v)+(u||''):'', num=v=>{ const n=parseFloat(v); return Number.isFinite(n)&&n>0?n.toLocaleString('ko-KR',{maximumFractionDigits:2}):''; };
     const apr=/^\d{8}$/.test(x.apr)?`${x.apr.slice(0,4)}.${x.apr.slice(4,6)}.${x.apr.slice(6)}`:esc(x.apr||'');
@@ -2187,7 +2188,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(tok!==SEARCHGEN||document.getElementById('srchLaw')!==el||!x.ok||!x.j||!x.j.ok) return;
     const rows=x.j.rows||[]; if(!rows.length) return;
     const ord=['law','admrul','ordin'];
-    el.innerHTML='<div class="group-title">법령 원문 · 법제처</div><div class="results">'+rows.slice().sort((a,b)=>ord.indexOf(a.t)-ord.indexOf(b.t)).map(r=>`<a class="card result" href="${esc(r.url)}" target="_blank" rel="noopener">
+    el.innerHTML='<div class="group-title">법령 원문 · 법제처</div><div class="results">'+rows.slice().sort((a,b)=>ord.indexOf(a.t)-ord.indexOf(b.t)).map(r=>`<a class="card result" href="${/^https:\/\/(?:www\.)?law\.go\.kr\//.test(String(r.url||''))?esc(r.url):'https://www.law.go.kr/'}" target="_blank" rel="noopener">
         <span class="ico">${esc(r.t==='law'?(/시행령$/.test(r.name)?'시행령':/시행규칙$/.test(r.name)?'시행규칙':r.kind||'법령'):LAW_T[r.t])}</span>
         <span class="body"><p class="t">${esc(r.name)}${r.art?` <span class="art">${esc(r.art)}</span>`:''}</p><p class="d">${esc([r.t==='law'?'':r.kind,r.org,r.eff?'시행 '+r.eff:''].filter(Boolean).join(' · '))}</p></span>
         <span class="arrow">→</span></a>`).join('')+'</div>'+(x.j.skip&&x.j.skip.length?`<p class="srch-note">${esc(x.j.skip.join('·'))} 검색은 법제처 OPEN API 신청 화면에서 해당 활용 API를 체크하면 함께 나옵니다</p>`:'<p class="srch-note">누르면 법제처 국가법령정보센터의 현행 원문이 열립니다</p>'); }
@@ -3612,7 +3613,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(has('체크리스트','상황판','타이머') && /열|보여|가자|시작|어디/.test(lq)) return answer(v);
     return null;
   }
-  const srcHref=s=>s.url||libHref(s.slug,{name:s.name});
+  const srcHref=s=>s.url||(s.slug==='law'?'https://www.law.go.kr/':s.slug==='pub'?'https://map.kakao.com/':libHref(s.slug,{name:s.name}));
   const srcPg=s=>s.slug==='law'?'법제처 원문':s.slug==='pub'?'공공데이터 · 지도':`${s.page}쪽`, srcPdf=s=>s.slug==='law'||s.slug==='pub'?'':` data-pdfv="${esc(s.name)}" data-page="${s.page}"`;   /* V151: pub = 공공데이터포털 실시간 조회 */   // V144: 법령 원문은 법제처로
   // PDF에서 뽑은 글에 섞인 깨진 기호(□) 지우기(V94) — 예전 서버 답·이 기기에 저장된 대화에도 적용
   const deGlyph=t=>String(t||'').replace(/[\uE000-\uF8FF\uFFFD\u1100-\u11FF\uA960-\uA97F\uD7B0-\uD7FF\u2E80-\u2FDF\uA000-\uA6FF]|[\uDB80-\uDBFF][\uDC00-\uDFFF]/g,' ').replace(/[ \t]{2,}/g,' ');
@@ -3978,25 +3979,27 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(chat.msgs.length) scrollEndOf(panel);
     if(chatPrefill){ const inp=$('#chatText'); if(inp){ inp.value=chatPrefill; if(window.innerWidth>=600) inp.focus(); } chatPrefill=''; }
     const send=(text,att)=>{
-      const v=String(text||'').trim(); att=att||[]; if((!v&&!att.length)||chat.typing) return;
+      const v=String(text||'').trim(); att=att||[]; if(!v&&!att.length) return;
+      if(chat.typing){ const ti=$('#chatText'); if(ti&&!ti.value) ti.value=v; if(att.length){ pending=att.concat(pending); renderPending(); } toast('앞 질문의 답을 기다리는 중입니다'); return; }   // V154: 기다리는 동안 보낸 글을 지우지 않음
       push('me',v,[],att); chat.typing=true; renderBotRoom(panel,room);
       if(SRV.on && v && !localIntent(v)){
         const hist=[]; for(let i=chat.msgs.length-2;i>0&&hist.length<2;i--){ const b=chat.msgs[i], u=chat.msgs[i-1]; if(b.who==='bot'&&(b.mode==='ai'||b.mode==='general')&&u.who==='me'&&u.text) hist.unshift({q:u.text,a:b.text}); }
         const g0=chat.gen||0;
-        geoFor(v).then(geo=>api('/api/ask',{json:{q:v,history:hist,code:aiCode(),...(geo?{geo}:{})}, ...(isProf()?{tok:PROF.tok}:{})})).then(r=>{
+        Promise.race([geoFor(v).catch(()=>null),sleep(6000).then(()=>null)]).then(geo=>api('/api/ask',{json:{q:v,history:hist,code:aiCode(),...(geo?{geo}:{})}, ...(isProf()?{tok:PROF.tok}:{})})).then(r=>{
           if((chat.gen||0)!==g0) return;   // 그사이 '대화 비우기' — 이전 질문의 답은 버림
           chat.typing=false;
           if(r.status===403&&r.j&&r.j.code==='need_code'){ chat.msgs.pop(); csave(); setAiCode(''); SRV.aiGate=true; if(chat.room==='bot'&&state.route==='ai') aiGate(panel,room); return; }   // 코드가 바뀜 → 다시 입력
           if(r.ok&&r.j.ok){ push('bot',String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.cached=!!r.j.cached; m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,art:String(x.art||'').slice(0,60),snip:String(x.snippet||'').slice(0,180),url:/^https:\/\/(?:www\.law\.go\.kr|map\.kakao\.com)\//.test(String(x.url||''))?String(x.url):''})); csave(); }
           else push('bot', r.status===0?'서버에 연결할 수 없습니다. 잠시 뒤 다시 물어보세요.':(r.j.error||'답변을 만들지 못했습니다.'),[]);
           if(chat.room==='bot'&&state.route==='ai'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp&&window.innerWidth>=600) inp.focus(); }
-        });
+        }).catch(()=>{ if((chat.gen||0)!==g0) return; chat.typing=false; push('bot','답변을 만들지 못했습니다. 다시 물어보세요.',[]); if(chat.room==='bot'&&state.route==='ai') renderBotRoom(panel,room); });
         return;
       }
       const delay=window.matchMedia('(prefers-reduced-motion: reduce)').matches?80:520;
       setTimeout(()=>{ const a = v ? answer(v) : {text:`${att.length}개 파일을 받았습니다 (${att.map(x=>x.kind==='image'?'사진':'PDF').join(', ')}). 사진·PDF 내용 분석은 AI 연결 후 가능합니다. 지금은 이 기기에 보관만 합니다.`}; chat.typing=false; push('bot',a.text,a.cards); if(chat.room==='bot'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp && window.innerWidth>=600) inp.focus(); } },delay);
     };
     bindComposer(send);
+    if(SRV.on&&SRV.bld&&SRV.kakao) loadKakao(SRV.kakao).catch(()=>{});   // V154: 주소 질문이 빨리 가도록 미리 불러 둠
     { const ti=$('#chatText'), kh=$('#kwHint'); if(ti&&kh){ const sync=()=>{ kh.hidden=!isKeyword(ti.value); if(window.__fitConvo) window.__fitConvo(); }; ti.addEventListener('input',sync); $('#kwGo').addEventListener('click',()=>toSearch(ti.value)); } }
     panel.querySelectorAll('.to-srch').forEach(b=>b.addEventListener('click',()=>toSearch(b.dataset.srch)));
     { const qb=$('#quick');
@@ -4340,10 +4343,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function loadKakao(key){
     if(window.kakao&&kakao.maps&&kakao.maps.LatLng) return Promise.resolve();
     if(MAPS.p) return MAPS.p;
-    MAPS.p=new Promise((ok,no)=>{ const s=document.createElement('script');
+    MAPS.p=new Promise((ok,no)=>{ const s=document.createElement('script'); let done=false, tm=0;   /* V154: 12초 안에 안 되면 포기(막힌 망에서 영영 기다리지 않게) */
+      const fin=e=>{ if(done) return; done=true; clearTimeout(tm); if(!e){ ok(); return; } MAPS.p=null; if(e.message==='load') s.remove(); no(e); };
+      tm=setTimeout(()=>fin(new Error('timeout')),12000);
       s.src='https://dapi.kakao.com/v2/maps/sdk.js?appkey='+encodeURIComponent(key)+'&autoload=false&libraries=services';
-      s.onload=()=>{ try{ kakao.maps.load(()=>ok()); }catch(e){ MAPS.p=null; no(e); } };
-      s.onerror=()=>{ MAPS.p=null; s.remove(); no(new Error('load')); }; document.head.appendChild(s); });
+      s.onload=()=>{ try{ kakao.maps.load(()=>fin()); }catch(e){ fin(e); } };
+      s.onerror=()=>fin(new Error('load')); document.head.appendChild(s); });
     return MAPS.p;
   }
   const mapEl=document.createElement('div'); mapEl.className='mapov'; mapEl.id='mapov'; mapEl.hidden=true; mapEl.setAttribute('role','dialog'); mapEl.setAttribute('aria-modal','true'); mapEl.setAttribute('aria-label','DS 현장 지도');
@@ -4671,12 +4676,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const fires=HYD.fires.map((b,i)=>`<button type="button" class="hb${b===HYD.base?' on':''}" data-b="${i}">${flame(FST[b.st||''].c,'flm hbf')} ${esc(b.name)}${b.st?' '+FST[b.st].n:''}</button>`).join('');
     hq('.hbase').innerHTML=(fires||'<button type="button" class="hb" data-b="none">🔥 화재</button>')
       +`<button type="button" class="hb${HYD.base&&HYD.base.k==='me'?' on':''}" data-b="me">◎ 내 위치</button>`
-      +(SRV.bld?`<span class="hsrc" role="group" aria-label="소화전 자료"><button type="button" class="hb${hydSrc()==='pub'?' on':''}" data-src="pub" aria-pressed="${hydSrc()==='pub'}">소방청 자료</button><button type="button" class="hb${hydSrc()==='tmap'?' on':''}" data-src="tmap" aria-pressed="${hydSrc()==='tmap'}">T맵</button></span>`:'')
+      +(SRV.bld&&SRV.kakao?`<span class="hsrc" role="group" aria-label="소화전 자료"><button type="button" class="hb${hydSrc()==='pub'?' on':''}" data-src="pub" aria-pressed="${hydSrc()==='pub'}">소방청 자료</button><button type="button" class="hb${hydSrc()==='tmap'?' on':''}" data-src="tmap" aria-pressed="${hydSrc()==='tmap'}">T맵</button></span>`:'')
       +'<span class="hgo-w"><select class="hrad" aria-label="찾을 반경"><option value="300">300m</option><option value="500" selected>500m</option><option value="1000">1km</option><option value="2000">2km</option></select><button type="button" class="hgo">소화전 검색</button></span>';
     const sel=hq('.hrad'); if(sel) sel.value=String(HYD.rad||500);
   }
   // V151: 소화전 자료 고르기 — 소방청(전국소방용수시설표준데이터, 공공데이터포털 키가 있을 때 기본) / T맵(장소 검색)
-  const hydSrc=()=>SRV.bld&&HYD.src!=='tmap'?'pub':'tmap';
+  const hydSrc=()=>SRV.bld&&SRV.kakao&&HYD.src!=='tmap'?'pub':'tmap';
   async function pubHydSearch(c,rm){
     let sd='', sg='';
     if(SRV.kakao){ try{ await loadKakao(SRV.kakao); const r=await Promise.race([new Promise(ok=>new kakao.maps.services.Geocoder().coord2RegionCode(c.lng,c.lat,(r2,s2)=>ok(s2===kakao.maps.services.Status.OK?r2:[]))),sleep(4000).then(()=>[])]);
@@ -4771,7 +4776,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     HYD.key=SRV.tmap||tmPend(); HYD.list=[]; HYD.fires=[]; HYD.base=null; HYD.ref=null; hq('.hlist').innerHTML=''; hq('.hbase').innerHTML=''; hq('.hres').hidden=true; hq('.mbox').hidden=false;
     hydDraw(); hydMarkBase();   // V138: 지난번 소화전·기준 핀이 지도에 남지 않게
     { const n=hydEl.querySelector('.hnote'); if(n) n.remove(); }
-    if(!HYD.key){ hmsg(`T맵 키가 아직 없습니다. ${isProf()?'메뉴 → <b>SACHIL방재실</b> → <b>T맵 키</b>에 App Key를 넣어 주세요.':'교수에게 T맵 키 설정을 요청하세요.'}`,true); return; }
+    if(!HYD.key&&hydSrc()!=='pub'){ hmsg(`T맵 키가 아직 없습니다. ${isProf()?'메뉴 → <b>SACHIL방재실</b> → <b>T맵 키</b>에 App Key를 넣어 주세요.':'교수에게 T맵 키 설정을 요청하세요.'}`,true); return; }
     hmsg('화재 위치를 불러오는 중…');
     const r=await api(`/api/rooms/${rid}/map`); if(hydEl.hidden) return;
     const it=(r.ok&&r.j&&r.j.items)||{}, fs=FIREK.filter(k=>it[k]&&Number.isFinite(+it[k].lat));
