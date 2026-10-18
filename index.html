@@ -864,7 +864,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v164</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v165</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1522,6 +1522,15 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .hz-k b{font-size:calc(21px*var(--fs));font-weight:800;line-height:1.15}
 .hz-k .hd{font-size:calc(11.5px*var(--fs));line-height:1.4;font-weight:600;color:#4a3d00;letter-spacing:-.02em}
 .hz-k .hd.n{display:none}
+.hz-k:has(.hz-tools){width:max-content}
+.hz-k .hz-tools{flex:none;display:flex;gap:calc(6px*var(--fs));margin-top:calc(6px*var(--fs));pointer-events:auto}   /* V165: 47망 칸 — CP·소화전 바로 열기 */
+.hz-k .hzt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:calc(46px*var(--fs));height:calc(46px*var(--fs));padding:0;border:1.5px solid #fff;border-radius:calc(12px*var(--fs));background:var(--ember);box-shadow:0 3px 10px rgba(107,83,0,.25);font:inherit;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.hz-k .hzt:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(107,83,0,.3)}
+.hz-k.s1 .hzt{width:calc(42px*var(--fs));height:calc(42px*var(--fs))}.hz-k.s1 .hzt svg{width:calc(22px*var(--fs));height:calc(22px*var(--fs))}
+.hz-k.s2 .hz-tools{gap:4px;margin-top:4px}.hz-k.s2 .hzt{width:36px;height:36px;border-radius:10px}.hz-k.s2 .hzt svg{width:19px;height:19px}.hz-k.s2 .hzt b{font-size:9px}
+.hz-k .hzt:active{transform:scale(.94)}
+.hz-k .hzt svg{width:calc(24px*var(--fs));height:calc(24px*var(--fs));display:block}
+.hz-k .hzt b{font-size:calc(10.5px*var(--fs));line-height:1;font-weight:800;color:#1F2A44}.hz-k .hzt[data-hzt="hyd"] b{color:#B42318}
 .hz-k.nar .hd.w{display:none}
 .hz-k.nar .hd.n{display:block}
 .hz-k.s1 b{font-size:calc(18px*var(--fs))}
@@ -1656,8 +1665,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V164', SRV_VER='9.0';
+  const APP_VER='V165', SRV_VER='9.1';
   const UPDATES=[
+    {v:'V165', d:'2026-10-18', t:['첫 화면 47망 칸에 CP·소화전 바로 열기 버튼 — 대화방에 들어가지 않고 바로 지도·소화전으로(47망에 처음이면 대화명을 넣는 즉시 열림)']},
     {v:'V164', d:'2026-10-18', t:['첫 화면: 시작 애니메이션이 끝나는 순간 글자·그림이 옆·위로 툭 움직이며 제자리를 찾던 현상 고침(PC·휴대폰)','사고보고서: 교수 모드(맨 위 남색 줄)일 때 ‘보고서 만들기’ 줄이 머리 줄 밑으로 숨어 스크롤을 올려야 누를 수 있던 문제 고침 — 머리 줄 높이에 맞춰 바로 아래에 고정(체크리스트 시간 줄도 같이)']},
     {v:'V163', d:'2026-10-18', t:['47망 소화전 버튼 아이콘을 CP 헬멧과 같은 느낌으로 — 빨간 소화전, 흰 테두리']},
     {v:'V162', d:'2026-10-18', t:['47망 대화창 오른쪽 위 버튼을 시그니처 노란색 바탕으로','DS 버튼 → CP: 지도 그림 대신 텔레그램 파란색 소방 헬멧, 글자는 CP']},
@@ -4157,13 +4167,22 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     reg:{search:['TL','A1','M1','LM'], ai:['A1','A2','M2','M1'], chat:['A2','TR','RM','M2'], debrief:['LM','M1','B1','BL'], board:['M1','M2','B2','B1'], log:['M2','RM','BR','B2']},
     strokes:[['A1','M1','M2','B2'],['V1','V2'],['C1','C2']],   // C1–C2: 시그니처처럼 7의 사선을 가로지르는 짧은 가로획(V80)
     lab:{search:[.16,.15], ai:[.52,.31], board:[.48,.69], log:[.84,.85], chat:[.84,.20], debrief:[.16,.80]}};   // 글자 자리도 화면 중심 점대칭
+  // V165: 첫 화면 47망 칸 — CP(현장 지도)·소화전을 바로 여는 버튼(47망에 들어간 적 없으면 대화명부터)
+  const HUB_CP_SVG='<svg class="cpsym" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 21.5C5 13.6 9.9 7.5 16.5 7.5S28 13.4 28 21.5z" fill="#229ED9" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M16.5 7.5c.9 0 1.6.7 1.6 1.6v12.4h-3.2V9.1c0-.9.7-1.6 1.6-1.6z" fill="#1A7FB0"/><path d="M2.2 21.2h27.3c.9 0 1.2 1.1.5 1.6-1.6 1-3.5 1.6-5.4 1.6H6.2c-2.2 0-4-1.4-4-3.2z" fill="#1A7FB0" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/><path d="M8.6 12.6h4.6v3.6c0 1.6-1.1 2.8-2.3 3.4-1.2-.6-2.3-1.8-2.3-3.4z" fill="#fff"/><path d="M10.9 14.1l.5 1.1 1.2.1-.9.8.3 1.2-1.1-.6-1.1.6.3-1.2-.9-.8 1.2-.1z" fill="#229ED9"/></svg>', HUB_HYD_SVG='<svg class="cpsym" viewBox="0 0 32 32" aria-hidden="true"><path d="M11 6.6c0-2.3 2.2-4.1 5-4.1s5 1.8 5 4.1V8H11z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="8.6" y="7.8" width="14.8" height="3.4" rx="1.7" fill="#B42318" stroke="#fff" stroke-width="1.5"/><path d="M10.8 11.2h10.4v14.6H10.8z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="4.4" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="21" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="7.4" y="25.4" width="17.2" height="3.6" rx="1.8" fill="#B42318" stroke="#fff" stroke-width="1.5"/><circle cx="16" cy="17.4" r="2.6" fill="#fff"/><circle cx="16" cy="17.4" r="1.1" fill="#B42318"/></svg>';
+  let hubPend='';
+  function hubTool(kind){
+    if(!SRV.on){ toast(SRV.probing?'서버(47망)에 연결하는 중입니다 — 잠시 뒤 다시 눌러 주세요':'CP·소화전은 서버(47망)에 연결됐을 때 쓸 수 있습니다'); return; }
+    if(!SRV.room){ toast('47망을 찾지 못했습니다'); return; }
+    if(!TOKS['']){ hubPend=kind; toast('47망에 대화명으로 먼저 들어가면 바로 열립니다'); go('chat'); return; }
+    useRoom('47'); if(kind==='hyd') openHyd(SRV.room); else openMap(SRV.room); }
   function renderHub(panel){
     const corner=h=>h.go==='chat'
-      ? `<span class="hz-k tr" data-k="chat" aria-hidden="true"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd w">지휘·작전망으로 어려운 내용<br>47망으로 전달하세요</span><span class="hd n">지휘·작전망으로<br>어려운 내용<br>47망으로<br>전달하세요</span></span>`
+      ? `<span class="hz-k tr" data-k="chat" aria-hidden="true"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd w">지휘·작전망으로 어려운 내용<br>47망으로 전달하세요</span><span class="hd n">지휘·작전망으로<br>어려운 내용<br>47망으로<br>전달하세요</span><span class="hz-tools"><button type="button" class="hzt" data-hzt="map" aria-label="CP 현장 지휘 지도 열기">${HUB_CP_SVG}<b>CP</b></button><button type="button" class="hzt" data-hzt="hyd" aria-label="소화전 열기">${HUB_HYD_SVG}<b>소화전</b></button></span></span>`
       : `<span class="hz-k bl" data-k="debrief" aria-hidden="true"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd w">익명으로 개선사항 도출<br>의견 청취로 지휘역량 강화</span><span class="hd n">익명으로<br>개선사항 도출<br>의견 청취로<br>지휘역량 강화</span></span>`;
     const cell=h=>h.y?corner(h):`<span class="hz-l" data-l="${h.go}" aria-hidden="true">${sigK(h.k)}<b>${h.t}</b></span>`;
     panel.innerHTML=`<nav class="hub hz" aria-label="SACHIL:47 첫 화면"><svg class="hz-svg" xmlns="http://www.w3.org/2000/svg">${HUB.map(h=>`<a href="#${h.go}" data-hub="${h.go}" aria-label="${h.t}"><path class="hz-p${h.y?' y':''}" data-p="${h.go}"/><path class="hz-hit" data-hit="${h.go}"/></a>`).join('')}${HZ.strokes.map((_,i)=>`<path class="hz-47" data-s="${i}" pathLength="1"/>`).join('')}</svg>${HUB.map(cell).join('')}</nav>`;
     panel.querySelectorAll('[data-hub]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const t=a.dataset.hub; if(t==='search'){ q.value=''; syncClear(); go('search',''); } else go(t); rootScrollTo(0); }));
+    panel.querySelectorAll('[data-hzt]').forEach(b=>{ b.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); hubTool(b.dataset.hzt); }); b.addEventListener('pointerdown',e=>e.stopPropagation()); });
     // V157: 칸 애니메이션 — 칸 모양(path)과 글자(따로 놓인 요소)를 함께 움직인다
     { const parts=k=>[...panel.querySelectorAll(`[data-p="${k}"],[data-l="${k}"],[data-k="${k}"]`)], set=(k,at,on)=>parts(k).forEach(el=>on?el.setAttribute(at,''):el.removeAttribute(at));
       panel.querySelectorAll('[data-hub]').forEach(a=>{ const k=a.dataset.hub;
@@ -5287,7 +5306,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       sh.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); });
     }
     if(SRV.draft){ const d=SRV.draft; SRV.draft=null; const i=$('#chatText'); if(i&&d.text) i.value=d.text; if(d.att&&d.att.length){ pending=d.att.slice(0,MAX_FILES); renderPending(); } stat('다시 입장했습니다. 보내지 못한 내용을 되살렸습니다'); }
-    { const mb=$('#mapBtn'); if(mb) mb.addEventListener('click',()=>openMap(rid)); const hb=$('#hydBtn'); if(hb) hb.addEventListener('click',()=>openHyd(rid)); }
+    { const mb=$('#mapBtn'); if(mb) mb.addEventListener('click',()=>openMap(rid)); const hb=$('#hydBtn'); if(hb) hb.addEventListener('click',()=>openHyd(rid));
+      if(hubPend&&kind!=='deb'&&mb){ const k=hubPend; hubPend=''; setTimeout(()=>{ if(k==='hyd') openHyd(rid); else openMap(rid); },300); } }   // V165: 첫 화면에서 누르고 대화명을 넣었으면 바로 연다
     $('#dbRename').addEventListener('click',async()=>{ const rb=$('#dbRename'); if(rb.dataset.arm!=='1'){ rb.dataset.arm='1'; rb.textContent='한 번 더 누르면 바꿈'; rb.classList.add('accent'); stat('대화명을 바꾸면 지금까지 쓴 글은 다른 사람 글처럼 보이고 지울 수 없게 됩니다'); setTimeout(()=>{ if(rb.isConnected){ rb.dataset.arm=''; rb.textContent='대화명 바꾸기'; rb.classList.remove('accent'); stat(''); } },3500); return; } if(SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } SRV.ctl=null; } SRV.gen++; await api('/api/logout',{json:{}}); setTok(''); SRV.me=null; toChat(); });
     const clr=$('#dbClear');
     if(clr) clr.addEventListener('click',async()=>{
