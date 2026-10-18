@@ -13,7 +13,7 @@ self.addEventListener('fetch', e => {
       fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' })
         .then(r => {
           if (r.redirected) return Response.redirect(r.url, 302);
-          if (r.ok) { const c = r.clone(); caches.open(SHELL).then(s => s.put(SHELL_KEY, c)).catch(() => {}); }
+          if (r.ok && (r.headers.get('content-type') || '').includes('text/html')) { const c = r.clone(); caches.open(SHELL).then(s => s.put(SHELL_KEY, c)).catch(() => {}); }
           return r;
         })
         .catch(() => fetch(req).catch(() => caches.match(SHELL_KEY, { cacheName: SHELL }).then(m => m || Response.error())))

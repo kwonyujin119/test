@@ -88,6 +88,10 @@ def load_conf():
             print('[오류] data\\config.json을 읽지 못했습니다:', e)
             print('  메모장으로 열어 쉼표·따옴표를 고치거나, data\\config.json.bak이 있으면 그것으로 바꾼 뒤 다시 켜세요.')
             print('  (원본은 data\\config.json.bad로 복사해 두었습니다)')
+            try:   # 업데이트 직후라도 '새 버전 실패'로 되돌리지 않게(되돌린 옛 버전은 설정을 기본값으로 덮어씀)
+                os.remove(os.path.join(DATA, 'update_verify.flag'))
+            except OSError:
+                pass
             sys.exit(2)
     changed = False
     defaults = {
@@ -455,12 +459,7 @@ CONN_SEM = threading.BoundedSemaphore(MAX_CONN)
 
 class Server(ThreadingHTTPServer):
     daemon_threads = True
-    allow_reuse_address = os.name != 'nt'   # Windows에서는 이 옵션이 '이미 쓰는 포트'에도 붙게 해서 창 두 개가 같은 포트를 나눠 씀(V111)
-
-    def server_bind(self):
-        if os.name == 'nt' and hasattr(socket, 'SO_EXCLUSIVEADDRUSE'):
-            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
-        super().server_bind()
+    allow_reuse_address = True
 
     def handle_error(self, request, client_address):
         # 폰이 화면을 끄거나 앱이 기다리던 요청을 끊으면 Windows가 WinError 10053/10054를 낸다 — 오류가 아니므로 조용히 넘긴다
@@ -1570,6 +1569,15 @@ class H(BaseHTTPRequestHandler):
                 files.append({'id': f['id'], 'name': f['name'], 'kind': f['kind'], 'size': f['size']})
         if not text and not files:
             return self.err(400, '보낼 내용이 없습니다')
+        self._posted = False
+        try:
+            return self._post_claimed(rid, b, text, files)
+        except Exception:
+            for f in ([] if self._posted else files):   # 글이 저장되지 않았으면 붙이려던 파일을 다시 '안 씀'으로(하루 뒤 정리 대상)
+                q('UPDATE files SET used=0 WHERE id=?', (f['id'],), commit=True)
+            raise
+
+    def _post_claimed(self, rid, b, text, files):
         reply = None
         rid_to = to_int(b.get('reply'), 0)
         if rid_to > 0:   # 답장: 같은 방의 원래 메시지를 짧게 붙여 둔다(원문이 지워져도 인용은 남음)
@@ -1581,6 +1589,7 @@ class H(BaseHTTPRequestHandler):
         now = time.time()
         mid = q('INSERT INTO messages(room,author,name,text,files,ts,reply) VALUES(?,?,?,?,?,?,?)',
                 (rid, self.user['id'], self.user['name'], text, json.dumps(files, ensure_ascii=False), now, reply), commit=True)
+        self._posted = True   # 여기부터는 파일이 글에 붙었다
         q('UPDATE rooms SET last=? WHERE id=?', (now, rid), commit=True)
         self.touch(rid)
         self.set_read(rid, mid)   # 내 글은 내가 읽은 것(안에서 NEW_MSG도 깨움)
@@ -1632,7 +1641,7 @@ class H(BaseHTTPRequestHandler):
         if store_size() + n > MAX_STORE:
             self.close_connection = True
             return self.err(507, '서버 저장 공간이 찼습니다. 관리자에게 알려 주세요')
-        # V111: 한 사람이 하루 200MB 넘게 올려 저장 공간을 다 채우지 못하게
+        # V111: 한 접속(대화명)이 하루 200MB 넘게 올려 저장 공간을 다 채우지 못하게
         used = q('SELECT COALESCE(SUM(size),0) s FROM files WHERE owner=? AND ts>?', (self.user['id'], time.time() - 86400), one=True)['s']
         if used + n > UPLOAD_DAY_MAX and self.user.get('role') != 'admin':
             self.close_connection = True
@@ -2978,6 +2987,22 @@ def main():
         print('sachil.html이 서버 파일과 같은 폴더에 있어야 합니다.')
         sys.exit(1)
     port = int(CONF.get('port') or 4747)
+    # V111: Windows는 같은 포트에 창 두 개가 함께 붙을 수 있다 — 이미 켜진 SACHIL 서버가 답하면 새로 켜지 않는다
+    try:
+        with socket.create_connection(('127.0.0.1', port), timeout=1.5) as c:
+            c.sendall(b'GET /api/me HTTP/1.0\r\nHost: 127.0.0.1\r\n\r\n')
+            c.settimeout(3)
+            got = b''
+            while len(got) < 16384:   # 머리말과 본문이 따로 올 수 있어 끝까지 받는다
+                part = c.recv(4096)
+                if not part:
+                    break
+                got += part
+            if b'"server": "sachil"' in got:
+                print(f'[안내] SACHIL 서버가 이미 켜져 있습니다(포트 {port}). 이 창은 닫고 켜져 있는 창을 쓰세요.')
+                sys.exit(1)
+    except OSError:
+        pass
     try:
         srv = Server(('0.0.0.0', port), H)
     except OSError as e:
