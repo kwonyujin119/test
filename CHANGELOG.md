@@ -1,7 +1,7 @@
 # SACHIL:47 버전 기록 (V1 ~ V55)
 
 인천소방학교 지휘역량강화센터 교육 플랫폼 「SACHIL:47」의 버전별 수정 내용입니다.
-정리일: 2026-10-17 · 현재 배포본: **앱 V122 · 서버 4.9** (github.io + `server/SACHIL47-server-update.zip`)
+정리일: 2026-10-17 · 현재 배포본: **앱 V123 · 서버 4.9** (github.io + `server/SACHIL47-server-update.zip`)
 
 **근거 표기**
 - **패치**: 버전마다 남은 수정 스크립트·작업 기록 기준 (가장 정확)
@@ -110,6 +110,7 @@
 | V120 | 채팅 입력칸 input → textarea(rows 1, 44px~132px 자동 높이, 여러 줄이면 .composer.multi 둥근 모서리 24px·아래 맞춤): Enter = 보내기(isComposing·keyCode 229면 한글 조합 확정만), Shift+Enter = 줄바꿈 · 빈 줄 .bub p:empty에 폭 없는 글자 · PC(hover·fine) 우클릭 메뉴는 커서 자리 작은 메뉴(.act-sheet.at, 화면 밖이면 반대쪽), 휴대폰 길게 누르기는 기존 시트 · 서버 4.8: update_check_min 기본 5(예전 10은 5로 바꿈) | PR #105 |
 | V121 | ＋ 사진 시트(.psheet, body에 붙는 아래 시트): 카메라 칸 + 최근 사진 9장(IndexedDB sachil_media/recent에 이 기기에서 고르거나 보낸 사진 1280px JPEG 최대 12장, 모자라면 이 방 사진, 같은 이름 중복 제거) · 동그라미 고르기(순서 번호, MAX_FILES) → '전송'(addPendingFiles 후 바로 submit) · 사진/파일 줄 · 편집 화면(.pedit): 캔버스(최대 2048px, 화면에 맞춤), 자르기(네 모서리 끌기·이동), 돌리기 90°, 그리기(5색·되돌리기 8단계), 원래대로, 좌우로 밀어 다른 사진, 설명 → 메시지 글, 편집본은 JPEG .92 · 서버 사진은 fetch로 blob을 받아 캔버스 오염 없이 편집 · 뒤로·스와이프 예외 · 앱만 | PR #106 |
 | V122 | 서버 재시작에도 방·대화명 유지: detectServer가 502·530 등 5xx·sachil 아닌 응답도 '끊김'으로 보고 다시 시도, 이 기기에 토큰이 있으면 혼자 쓰는 방으로 바꾸지 않고 끝없이 재시도(최대 15초 간격)하며 renderDebrief는 .srv-wait 안내(SRV.probing을 처음부터 true로 → 첫 그림에서 로컬 방이 안 보임), 연결되면 '공유 대화방으로 바뀌었습니다' 알림 없이 바로 방 · 방 안 5xx는 '서버가 다시 켜지는 중' 문구 · 서버 4.9: START_EPOCH·방별 EPOCH를 data/epoch.json에 저장(재시작마다 모든 화면이 대화를 다시 그리던 것 해소) · 옛 서버(3.7~4.6, 접속자 없을 때만 교체) 대응: 방 화면이 벽시계 기준 10분마다 같은 110초 동안 롱폴링을 쉬어(ONLINE_SEC 40초 + 확인 60초) 서버가 교체될 틈을 줌, 쉰 뒤 /api/me로 버전 다시 확인 | PR #107 |
+| V123 | 카카오 지도 검색: Places keywordSearch(지도 가운데 기준 location, 15곳)·없으면 Geocoder → 1곳이면 바로, 여러 곳이면 .mres 후보 5곳(이름·도로명/지번)+닫기 · 표시 선택 메뉴 .msel을 아래 막대 → 표시 바로 위(공간 없으면 아래) 🗑·✕ 아이콘 둘만, 정보(이름·화재대상 기준 방향거리·작성자·시각)는 mmsg로, dragstart·zoom_start에 닫힘 · 지도 머리줄 '소화전' 탭(closeMap→openHyd), 소화전 머리줄 '지도' 탭(closeHyd→openMap), 소화전 제목은 '소화전' · 앱만 | PR #108 |
 | V108 | 메뉴 'SACHIL방재실'(prof:true, 교수 로그인 때만 보임, 업데이트 내역 바로 앞) → 떠 있는 창(bjov)에 교수 화면(renderProf)+메뉴 관리(섹션별 자료 수·바로가기) · 지도: 가운데 + 제거, 버튼 → 지도 가운데에 표시 → 끌어서 놓으면 저장(CustomOverlay 끌기, 끄는 동안 지도 끌기 끔·다시 그리기 멈춤), 방면설정은 누를 때마다 secA→secF(서버 MAP_KINDS 추가) · 지도·방재실·토스트 위 끌기는 탭 이동 안 함(NOSWIPE·swipeBusy) · 토스트 좌우로 밀어 닫기 · 서버 4.4 | PR #93 |
 | V107 | 카카오맵 키: 옛 서버(4.3 전)면 이 휴대폰 localStorage(sachil_kakao_pending)에 맡기고 지도는 그 키로 바로 열림, 교수 확인·AI 키 화면을 열 때 서버가 받으면 자동 입력 후 삭제 | PR #92 |
 | V106 | 47망 머리에 '지도'·'소화전'(준비 중) 버튼 · 지도: 카카오맵 JS SDK(키는 서버 config `kakao_js_key`, /api/me로 전달, 교수 화면에서 입력) · 가운데 + 위치에 한 번 눌러 화재대상·현장지휘소·차량대기소 표시, 방면설정은 화재대상→+ 방향을 정면(A)으로 B좌측·C후면·D우측(55m 표시·선) · 방마다 maps 표(GET/POST /api/rooms/{id}/map, 국내 좌표만, 표시자·시각 기록), 5초마다 갱신, 표시 눌러 지우기 · 주소·장소 검색(Places→Geocoder), 내 위치 · 서버 CSP에 카카오 허용, Referrer-Policy를 strict-origin-when-cross-origin으로(카카오 도메인 확인) · 서버 4.3 | PR #91 |
