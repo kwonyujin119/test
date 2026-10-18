@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '4.5'
-APP_VERSION = 'V111'
+VERSION = '4.6'
+APP_VERSION = 'V112'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -378,9 +378,9 @@ ICON_SVG = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><r
 MANIFEST = json.dumps({   # V84: 새 시그니처 아이콘(github.io)·노랑 테마 — 예전 static 아이콘을 쓰지 않게
     'name': 'SACHIL:47 지휘역량강화 플랫폼', 'short_name': 'SACHIL:47', 'start_url': '/#hub', 'scope': '/',
     'display': 'standalone', 'background_color': '#FDD000', 'theme_color': '#FDD000', 'lang': 'ko',
-    'icons': [{'src': 'https://kwonyujin119.github.io/test/icons/icon-192.png?v=84', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any'},
-              {'src': 'https://kwonyujin119.github.io/test/icons/icon-512.png?v=84', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any'},
-              {'src': 'https://kwonyujin119.github.io/test/icons/icon-maskable-512.png?v=84', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'}],
+    'icons': [{'src': 'https://kwonyujin119.github.io/test/icons/icon-rounded-192.png?v=112', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any'},
+              {'src': 'https://kwonyujin119.github.io/test/icons/icon-rounded-512.png?v=112', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any'},
+              {'src': 'https://kwonyujin119.github.io/test/icons/icon-maskable-512.png?v=112', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'}],
 }, ensure_ascii=False)
 
 
