@@ -32,6 +32,7 @@ SECTIONS = [  # (앱 slug, 폴더 이름)
     ('law', '04_관련법령'), ('sop', '05_SOP-현장지휘론'), ('ersp', '06_긴급구조대응계획'),
     ('rit', '07_RIT'), ('water', '08_무중단급수체계'), ('safety', '09_안전관리'),
     ('mci', '10_다수사상자'), ('drone', '11_드론전술'), ('cases', '12_대형화재사례'),
+    ('hazmat', '13_위험물'), ('fobj', '14_특정소방대상물'),   # V154
 ]
 SEC_DIR = dict(SECTIONS)
 LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
@@ -789,6 +790,8 @@ class H(BaseHTTPRequestHandler):
                 except Exception as e:
                     return self.send(200, {'ok': False, 'error': str(e)[:200]}, log=False)
                 return self.send(200, {'ok': True, 'rows': rows}, log=False)
+            if path == '/api/contacts':   # V154: 긴급구조대응계획 — 응원협정 대상·긴급구조 관련기관 전화(교수가 고친 목록 > PDF에서 뽑은 목록)
+                return self.send(200, {'ok': True, 'manual': bool(str(CONF.get('contacts') or '').strip()), 'groups': contacts_groups()}, log=False)
             if path == '/api/index':
                 return self.send(200, {'ok': True, 'status': DOCS_IDX.status()}, log=False)
             m = re.fullmatch(r'/lib-thumb/([0-9a-f]{24})\.jpg', path)
@@ -1308,6 +1311,13 @@ class H(BaseHTTPRequestHandler):
             BLD_CACHE.clear()
             FFUS_CACHE.clear()
             return self.send(200, dict(status(), msg='연결 완료 — ' + txt), log=False)
+        if act == 'contacts':   # V154: 교수 — 전화 목록 고치기('구분|기관명|번호' 한 줄씩). 빈 값이면 PDF 자동 목록으로
+            t = str(j.get('text') or '')[:20000]
+            if j.get('auto'):
+                return self.send(200, dict(status(), text=contacts_text(contacts_auto())), log=False)
+            CONF['contacts'] = t.strip()
+            write_conf(CONF)
+            return self.send(200, dict(status(), msg='전화 목록을 저장했습니다' if t.strip() else 'PDF에서 뽑은 자동 목록으로 되돌렸습니다'), log=False)
         if act == 'pubtest':   # V151: 등록된 공공데이터포털 키로 API마다 다시 시험(승인이 늦게 반영된 API 확인)
             if not CONF.get('bld_key'):
                 return self.send(200, dict(status(), ok=False, error='공공데이터포털 인증키가 없습니다'), log=False)
@@ -1977,6 +1987,72 @@ def clean_glyph(t):
     t = _JUNK.sub(' ', t or '')
     t = _MOBILE.sub(lambda m: m.group(1) + '-****-****', t)
     return re.sub(r'[ \t]{2,}', ' ', t)
+
+
+# ---- V154: 긴급구조대응계획 PDF에서 응원협정 대상·긴급구조 관련기관 전화번호 뽑기(휴대전화 010은 이미 가려져 빠진다)
+_TEL = re.compile(r'(?<![\d-])(0(?:2|[3-6][1-5]|70|80)|1[5-9]\d\d)\s?[-.)]\s?(\d{3,4})(?:\s?[-.]\s?(\d{4}))?(?![\d-])')
+CT_KEYS = (('응원협정 대상', re.compile(r'응원\s*협정|상호\s*응원|응원\s*대상')),
+           ('긴급구조 관련기관', re.compile(r'긴급구조\s*지원\s*기관|긴급구조\s*관련\s*기관|유관\s*기관|관계\s*기관|지원\s*기관')))
+
+
+def _tel_fmt(a, b, c):
+    if a.startswith('1') and not c:   # 1588-1234
+        return f'{a}-{b}'
+    return f'{a}-{b}-{c}' if c else ''
+
+
+def contacts_auto():
+    """→ [(구분, 기관명, 번호)] — 쪽마다 번호 앞의 글자를 기관명으로, 가장 가까운 앞쪽 제목(응원협정/관련기관)을 구분으로"""
+    with DOCS_IDX.lock:
+        pages = sorted((k, v) for k, v in DOCS_IDX.pagetext.items() if k[0] == 'ersp')
+    out, seen, cur, last_doc = [], set(), '', None
+    for (slug, name, page), text in pages:
+        if name != last_doc:
+            cur, last_doc = '', name
+        marks = sorted([(m.start(), m.end(), lab) for lab, rx in CT_KEYS for m in rx.finditer(text)])
+        prev_end = 0
+        for m in _TEL.finditer(text):
+            num = _tel_fmt(*m.groups())
+            st, prev_end0 = m.start(), prev_end
+            prev_end = m.end()
+            if not num or num in seen:
+                continue
+            prev = [(e, lab) for pos, e, lab in marks if pos < st]
+            grp = prev[-1][1] if prev else cur
+            if not grp:
+                continue
+            a0 = max(prev_end0, prev[-1][0] if prev else 0, st - 40)   # 바로 앞 번호·제목이 끝난 곳부터
+            seg = re.split(r'[\n|]|제\s?\d+\s?[장절]|(?:^|\s)\d{1,2}[.)]\s|(?:^|\s)[가-하][.)]\s|대상\s|기관\s|현황\s|연락처\s', text[a0:st])[-1]
+            nm = re.sub(r'^[\s\d.,·:()\-]+|[\s:()\-]+$', '', re.sub(r'(?:전화|연락처|TEL|Tel|tel|☎|대표|번호)\s*[:：]?', ' ', seg))
+            nm = re.sub(r'\s+', ' ', nm).strip()[-24:]
+            if len(re.sub(r'[^가-힣A-Za-z]', '', nm)) < 2:
+                continue
+            seen.add(num)
+            out.append((grp, nm, num))
+        if marks:
+            cur = marks[-1][2]
+    return out[:300]
+
+
+def contacts_text(rows):
+    return '\n'.join(f'{g}|{n}|{t}' for g, n, t in rows)
+
+
+def contacts_groups():
+    raw = str(CONF.get('contacts') or '').strip()
+    rows = []
+    if raw:
+        for line in raw.splitlines():
+            p = [x.strip() for x in line.split('|')]
+            if len(p) >= 3 and re.fullmatch(r'[0-9\-]{4,15}', p[2]) and not p[2].startswith('01'):
+                rows.append((p[0] or '기타', p[1][:40], p[2]))
+    else:
+        rows = contacts_auto()
+    groups = {}
+    for g, n, t in rows:
+        groups.setdefault(g[:20], []).append({'name': n, 'tel': t})
+    order = [lab for lab, _ in CT_KEYS]
+    return [{'title': g, 'items': groups[g]} for g in sorted(groups, key=lambda g: order.index(g) if g in order else 9)]
 
 
 def nrm(s):

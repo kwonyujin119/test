@@ -444,6 +444,15 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .sheet h2{margin:0;font-size:16px;font-weight:700}
 .sheet .close{border:0;background:transparent;width:var(--tap);height:var(--tap);border-radius:50%;font-size:22px;color:var(--muted)}
 .sheet-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.sheet-sep{grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:6px 2px 0;color:var(--muted);font-size:11.5px;font-weight:700;letter-spacing:.04em}
+.sheet-sep::before,.sheet-sep::after{content:"";flex:1;height:1px;background:var(--line)}
+.sheet-sep::before{flex:0 0 10px}
+.ct{margin:14px 0 0}.ct h4{margin:12px 0 6px}.ct .ctf{width:100%;min-height:40px;border:1px solid var(--line);border-radius:10px;padding:0 10px;font:inherit;font-size:14px;background:var(--surface);color:var(--fg);box-sizing:border-box}
+.ctl{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;margin:6px 0 0}
+.ctl a{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:46px;padding:6px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);text-decoration:none;font-size:14px}
+.ctl a b{flex:none;font-family:var(--mono);font-size:13px;color:#067647}.ctl a b::before{content:"📞 "}
+.ctl a span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ct .note{font-size:12px;color:var(--muted);margin:8px 0 0}
 .sheet-grid a{display:flex;align-items:center;gap:10px;padding:10px 10px;border:1px solid var(--line);border-radius:12px;min-height:56px;background:var(--surface-2)}
 .sheet-grid a .ab{flex:none;width:34px;height:34px;border-radius:9px;background:var(--navy-soft);color:var(--navy);display:grid;place-items:center;font-size:11px;font-weight:700}
 .sheet-grid a .tt{font-size:14px;font-weight:600;color:var(--fg);min-width:0;overflow-wrap:anywhere;line-height:1.3}
@@ -845,7 +854,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v153</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v154</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -865,7 +874,7 @@ footer b{color:var(--muted);font-weight:600}
   <div class="grip" aria-hidden="true"></div>
   <header><h2 id="sheetTitle"><i class="sg sg-MENU" role="img" aria-label="메뉴"></i></h2><button type="button" class="close" id="sheetClose" aria-label="닫기">×</button></header>
   <div class="sheet-grid" id="sheetGrid"></div>
-  <div class="foot"><span id="sheetFoot">자료 12개 섹션</span><button type="button" class="inst-menu" id="instMenu" hidden>앱 설치</button><a href="#login" id="profLink">교수 로그인</a></div>
+  <div class="foot"><span id="sheetFoot">자료 14개 섹션</span><button type="button" class="inst-menu" id="instMenu" hidden>앱 설치</button><a href="#login" id="profLink">교수 로그인</a></div>
 </section>
 
 <div class="report" id="report" role="dialog" aria-modal="true" aria-labelledby="repTitle" hidden>
@@ -1561,6 +1570,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {slug:'mci',           ab:'다수', title:'다수사상자', desc:'다수사상자 사고 분류·이송 체계와 현장 응급의료소', kw:'다수사상자 MCI 중증도 분류 트리아지 이송 응급의료소 구급 START'},
     {slug:'drone',         ab:'드론', title:'드론전술', desc:'현장 드론 운용 절차와 영상의 지휘 활용', kw:'드론 무인기 영상 열화상 운용 조종 전술 정찰 비행'},
     {slug:'cases',         ab:'사례', title:'대형화재사례', desc:'대형화재 사례 분석과 지휘 판단의 교훈', kw:'사례 대형화재 분석 교훈 복기 공장 창고 샌드위치패널 물류'},
+    {slug:'hazmat',        ab:'위험', title:'위험물', desc:'위험물 류별 성질·지정수량과 화재 시 대응 요령', kw:'위험물 류별 지정수량 인화성 액체 유류 가스 화학물질 MSDS 제조소 저장소 취급소 금수성 자연발화'},
+    {slug:'fobj',          ab:'특정', title:'특정소방대상물', desc:'특정소방대상물 분류와 소방시설 설치 기준', kw:'특정소방대상물 소방대상물 용도 분류 소방시설 설치 기준 근린생활 판매 업무 숙박 노유자 의료 공동주택 복합건축물'},
     {slug:'signature',     ab:'SIG',  title:'SACHIL 시그니처', desc:'SACHIL 심벌·로고·시그니처 컬러', kw:'시그니처 심벌 로고 브랜드 컬러 색상 SACHIL 47 아이콘 디자인', local:true},
     {slug:'bangjae',       ab:'방재', title:'SACHIL방재실', desc:'교수 전용 · 메뉴 자료·AI 키·지도 키·서버 관리', kw:'', local:true, prof:true},
     {slug:'updates',       ab:'내역', title:'업데이트 내역', desc:'버전별 개선·업데이트 기록', kw:'업데이트 버전 내역 변경 개선 보강 패치 기록 새 기능', local:true}
@@ -1593,10 +1604,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {sec:'ictc-eval', type:'안내', title:'실기평가표 항목과 배점', hint:'작성 예정'}
   ];
   const AS = (typeof ICTC_ASSETS==='object' && ICTC_ASSETS) || {sections:[],phases:[]};
-  SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
+  { const ORD=['ictc-schedule','ictc-eval','faq','law','sop','ersp','rit','water','safety','mci','drone','cases'];   // V154: 그림은 처음 12개 순서대로 — 섹션이 늘어도 이름으로 맞춘다
+    SECTIONS.forEach(s=>{ const i=ORD.indexOf(s.slug); s.icon = i>=0 ? (AS.sections[i]||'') : ''; }); }
+  { const svg=b=>'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'+b+'</svg>');
+    const hz=SECTIONS.find(x=>x.slug==='hazmat'), fo=SECTIONS.find(x=>x.slug==='fobj');
+    if(hz) hz.icon=svg('<rect x="10" y="10" width="44" height="44" rx="6" transform="rotate(45 32 32)" fill="#FDD000" stroke="#1F2A44" stroke-width="3"/><path d="M32 18c5 7 9 11 9 17a9 9 0 0 1-18 0c0-4 2-6 4-9 1 3 2 4 4 5-1-5 0-9 1-13z" fill="#D92D20"/>');
+    if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V153', SRV_VER='7.9';
+  const APP_VER='V154', SRV_VER='8.0';
   const UPDATES=[
     {v:'V153', d:'2026-10-18', t:['주소 대신 건물 이름(예: ○○아파트·○○병원·○○빌딩)으로 검색하거나 AI에게 물어도 카카오 장소 검색으로 주소를 찾아 건축물대장·소방용수시설을 함께 씀','AI 법령 답변의 근거 목록에 법제처 행정규칙(고시·화재안전기준)·자치법규(조례) 원문 링크도 붙임']},
     {v:'V152', d:'2026-10-18', t:['주소가 든 AI 질문에서 건축물대장·소방용수시설을 받아 놓고도 일반론만 답하던 문제 고침 — 그 건물의 층수·구조·비상용 승강기와 가까운 소화전 거리를 결론·설명에 꼭 쓰게 함','조회한 공공데이터(건축물대장·소방용수시설)는 답에 인용되지 않아도 근거 목록에 항상 보여 줌']},
@@ -1862,7 +1878,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 
   // ---------- 메뉴 시트 (12개 섹션) ----------
   const sheetGrid=$('#sheetGrid');
+  const SHEET_SEP={sop:'현장 대응', signature:'SACHIL'};   // V154: 위(일정·평가·질의응답·법령) / 가운데(현장 자료) / 아래(시그니처·방재실·업데이트) 구분선
   SECTIONS.forEach(s=>{
+    if(SHEET_SEP[s.slug]){ const d=document.createElement('div'); d.className='sheet-sep'; d.setAttribute('role','separator'); d.innerHTML=`<span>${esc(SHEET_SEP[s.slug])}</span>`; sheetGrid.appendChild(d); }
     const g=document.createElement('a'); g.href='#'+s.slug; g.dataset.slug=s.slug;
     g.innerHTML=`<span class="ab">${s.icon?`<img class="ico-img" src="${s.icon}" alt="">`:esc(s.ab)}</span><span class="tt">${esc(s.title)}<span class="dd">${esc(s.desc)}</span></span>`;
     if(s.prof){ g.hidden=true; g.classList.add('profonly'); g.addEventListener('click',e=>{ e.preventDefault(); closeSheet(); openBangjae(); }); }   // V108: 교수 로그인 때만 보이고, 화면 이동 없이 떠 있는 창으로
@@ -2275,11 +2293,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     });
   }
 
-  const LIB_DIR={ 'ictc-schedule':'01_ICTC 교육일정','ictc-eval':'02_ICTC 평가일정','faq':'03_주요 질의응답','law':'04_관련법령','sop':'05_SOP-현장지휘론','ersp':'06_긴급구조대응계획','rit':'07_RIT','water':'08_무중단급수체계','safety':'09_안전관리','mci':'10_다수사상자','drone':'11_드론전술','cases':'12_대형화재사례' };
+  const LIB_DIR={ 'ictc-schedule':'01_ICTC 교육일정','ictc-eval':'02_ICTC 평가일정','faq':'03_주요 질의응답','law':'04_관련법령','sop':'05_SOP-현장지휘론','ersp':'06_긴급구조대응계획','rit':'07_RIT','water':'08_무중단급수체계','safety':'09_안전관리','mci':'10_다수사상자','drone':'11_드론전술','cases':'12_대형화재사례','hazmat':'13_위험물','fobj':'14_특정소방대상물' };
   const fmtDate=ts=>{ const d=new Date(ts*1000); return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`; };
   const libHref=(slug,f)=>SRV.on?SURL(`/lib/${slug}/${encodeURIComponent(f.name)}`):`lib/${slug}/${encodeURIComponent(f.name)}`;
   const libRow=(slug,f)=>`<a class="libfile" href="${libHref(slug,f)}" ${f.inline?'target="_blank" rel="noopener"':'download'}${f.ext==='pdf'?` data-pdfv="${esc(f.name)}"`:''}>${f.ext==='pdf'?(f.thumb?`<span class="thumb" aria-hidden="true"><img src="${esc(SURL('/lib-thumb/'+f.thumb+'.jpg'))}" alt="" loading="lazy" decoding="async"><span class="ext">PDF</span></span>`:`<span class="thumb" data-thumb="${esc(libHref(slug,f))}" data-slug="${esc(slug)}" data-tname="${esc(f.name)}" aria-hidden="true"><span class="ext">PDF</span></span>`):`<span class="ext">${esc(f.ext)}</span>`}<span class="nm"><b>${esc(f.name.replace(/\.[^.]+$/,'')).replace(/([_\-.])/g,'$1<wbr>')}</b><small>${fmtSize(f.size)} · ${fmtDate(f.mtime)}${f.pages?` · ${f.pages}쪽`:''}</small></span><span class="go">${f.inline?'열기':'받기'}</span></a>`;
-  function syncSheetFoot(){ const el=$('#sheetFoot'); if(!el) return; if(!SRV.lib){ el.textContent=`자료 12개 섹션 · ${APP_VER}`; return; } const n=SECTIONS.filter(x=>!x.local&&(SRV.lib[x.slug]||[]).length).length; el.textContent=(n?`자료 있는 섹션 ${n}/12`:'아직 올라온 자료 없음')+` · ${APP_VER}`; }
+  function syncSheetFoot(){ const el=$('#sheetFoot'); if(!el) return; const T=SECTIONS.filter(x=>!x.local).length; if(!SRV.lib){ el.textContent=`자료 ${T}개 섹션 · ${APP_VER}`; return; } const n=SECTIONS.filter(x=>!x.local&&(SRV.lib[x.slug]||[]).length).length; el.textContent=(n?`자료 있는 섹션 ${n}/${T}`:'아직 올라온 자료 없음')+` · ${APP_VER}`; }
   async function loadLib(){ const r=await api('/api/lib'); if(r.ok&&r.j.lib){ SRV.lib=r.j.lib; SRV.libErr=false; syncSheetFoot(); return true; }
     if(!SRV.on){ try{ const x=await fetch('lib/index.json',{cache:'no-cache'}); if(x.ok){ const j=await x.json(); if(j&&j.lib){ SRV.lib=j.lib; SRV.libStatic=true; SRV.libErr=false; syncSheetFoot(); return true; } } }catch(_){ } }
     SRV.libErr=true; return false; }
@@ -2628,6 +2646,27 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     });
   }
   // 교수: 섹션 자료 올리기·지우기
+  // V154: 긴급구조대응계획 — 응원협정 대상·긴급구조 관련기관 원클릭 전화(첨부 PDF에서 뽑은 대표번호, 교수가 고칠 수 있음)
+  const CT={g:null, manual:false, at:0, q:'', edit:false};
+  function ctHtml(){
+    if(!SRV.on) return '<div class="ct"><p class="note">전화 연결 목록은 서버(47망)에 연결됐을 때 보입니다</p></div>';
+    if(!CT.g) return '<div class="ct" id="ctBox"><p class="note">전화 목록을 불러오는 중…</p></div>';
+    const q=CT.q.trim().replace(/\s+/g,''), f=x=>!q||(x.name+x.tel).replace(/\s+/g,'').includes(q);
+    const body=CT.g.length?CT.g.map(g=>{ const it=g.items.filter(f); return `<h4>${esc(g.title)} <small>${it.length}</small></h4>${it.length?`<div class="ctl">${it.map(x=>`<a href="tel:${esc(x.tel.replace(/[^0-9]/g,''))}"><span>${esc(x.name)}</span><b>${esc(x.tel)}</b></a>`).join('')}</div>`:'<p class="note">찾는 기관이 없습니다</p>'}`; }).join('')
+      :'<p class="note">첨부 PDF에서 응원협정 대상·긴급구조 관련기관 전화번호를 찾지 못했습니다'+(isProf()?' — 아래 [목록 고치기]로 직접 넣을 수 있어요':'')+'</p>';
+    const ed=isProf()?(CT.edit?`<div class="ct-ed"><p class="note">한 줄에 하나씩 <b>구분|기관명|번호</b> (예: 응원협정 대상|부천소방서 상황실|032-000-0000). 휴대전화 번호는 넣지 마세요(누구나 보는 화면). 비우고 저장하면 PDF 자동 목록으로 돌아갑니다.</p><textarea id="ctText" rows="10" style="width:100%;box-sizing:border-box;font:13px var(--mono)"></textarea><div class="kact" style="margin-top:6px"><button type="button" class="btn primary sm" data-ct="save">저장</button><button type="button" class="btn ghost sm" data-ct="auto">PDF 자동 목록 불러오기</button><button type="button" class="btn ghost sm" data-ct="cancel">닫기</button></div></div>`
+      :`<div class="kact" style="margin-top:8px"><button type="button" class="btn ghost sm" data-ct="edit">목록 고치기</button></div>`):'';
+    return `<div class="ct" id="ctBox"><h3 style="margin:0">원클릭 전화 연결</h3><input class="ctf" id="ctQ" type="search" placeholder="기관 이름·번호로 찾기" value="${esc(CT.q)}" aria-label="기관 찾기">${body}<p class="note">${CT.manual?'교수가 정리한 목록':'첨부 PDF에서 자동으로 뽑은 대표번호(휴대전화 제외) — 번호가 틀릴 수 있어요'}. 누르면 전화가 걸립니다.</p>${ed}</div>`; }
+  async function ctLoad(force){ if(!SRV.on||(!force&&CT.g&&Date.now()-CT.at<60000)) return false; const r=await api('/api/contacts'); if(r.ok&&r.j&&r.j.ok){ CT.g=r.j.groups||[]; CT.manual=!!r.j.manual; CT.at=Date.now(); return true; } if(!CT.g) CT.g=[]; CT.at=Date.now(); return true; }
+  function ctBind(panel,redraw){
+    const box=panel.querySelector('#ctBox'); if(!box) return;
+    if(!CT.g||Date.now()-CT.at>60000) ctLoad().then(ch=>{ if(ch) redraw(); });
+    const qi=box.querySelector('#ctQ'); if(qi) qi.addEventListener('input',()=>{ CT.q=qi.value; const pos=qi.selectionStart; redraw(); const n=document.getElementById('ctQ'); if(n){ n.focus(); try{ n.setSelectionRange(pos,pos); }catch(_){ } } });
+    box.addEventListener('click',async e=>{ const b=e.target.closest('[data-ct]'); if(!b) return; const a=b.dataset.ct, ta=box.querySelector('#ctText');
+      if(a==='edit'){ CT.edit=true; redraw(); const t=document.getElementById('ctText'); if(t) t.value=(CT.g||[]).flatMap(g=>g.items.map(x=>`${g.title}|${x.name}|${x.tel}`)).join('\n'); return; }
+      if(a==='cancel'){ CT.edit=false; redraw(); return; }
+      if(a==='auto'){ const r=await api('/api/admin/ai',{json:{action:'contacts',auto:true},tok:PROF.tok}); if(ta) ta.value=(r.j&&r.j.text)||''; toast(r.ok?'PDF에서 뽑은 목록을 불러왔습니다 — 고친 뒤 저장하세요':'불러오지 못했습니다'); return; }
+      if(a==='save'){ b.disabled=true; const r=await api('/api/admin/ai',{json:{action:'contacts',text:ta?ta.value:''},tok:PROF.tok}); b.disabled=false; if(r.ok&&r.j&&r.j.ok!==false){ toast(r.j.msg||'저장했습니다'); CT.edit=false; await ctLoad(true); redraw(); } else toast((r.j&&r.j.error)||'저장하지 못했습니다(서버 업데이트가 필요할 수 있음)'); } }); }
   function profLibBar(slug){ return isProf()&&SRV.on?`<div class="prof-up"><label class="btn primary"><input type="file" id="libUp" multiple hidden>자료 올리기</label><span class="pu-st" id="libUpSt" aria-live="polite"></span></div>`:''; }
   async function profUpload(slug,files,done){
     const st=$('#libUpSt'); let ok=0;
@@ -2686,6 +2725,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
             : files.length?`<h4>자료 ${files.length}</h4>${files.map(f=>libRow(s.slug,f)).join('')}${SRV.libErr?'<p class="none"><b>서버 연결 끊김 — 마지막으로 받은 목록입니다</b> <button type="button" class="btn ghost" id="libRetry">다시 시도</button></p>':''}`
             : `<p class="none">${SRV.libErr&&AS.offline?`<img class="st-illo" src="${AS.offline}" alt="">`:''}${SRV.libErr?'서버 연결이 끊겨 자료 목록을 확인하지 못했습니다. <button type="button" class="btn ghost" id="libRetry">다시 시도</button>':'아직 올라온 자료가 없습니다.'}</p>`}
         </div>
+        ${s.slug==='ersp'?ctHtml():''}
         ${profLibBar(s.slug)}
         ${s.slug==='faq'?qnaHtml(qItems):''}
         <div class="links">
@@ -2697,6 +2737,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     };
     let qItems=null;
     const bindExtra=()=>{
+      if(s.slug==='ersp') ctBind(panel,()=>{ if(SRV.gen===gen) draw(); });
       const up=$('#libUp'); if(up) up.addEventListener('change',()=>{ const fs=[...up.files]; up.value=''; if(fs.length) profUpload(s.slug,fs,()=>{ if(SRV.gen===gen){ draw(); thumbsIn(panel); } }); });
       if(isProf()) panel.querySelectorAll('.lib .libfile').forEach(a=>{ const nm=decodeURIComponent((a.getAttribute('href')||'').split('/').pop().split('?')[0]); const del=document.createElement('button'); del.type='button'; del.className='btn ghost lib-del'; del.textContent='지우기';
         a.after(del); del.addEventListener('click',()=>arm(del,'정말 지우기',async()=>{ const r=await api(`/api/lib/${s.slug}/${encodeURIComponent(nm)}`,{method:'DELETE',tok:PROF.tok}); if(r.ok){ if(SRV.lib) SRV.lib[s.slug]=r.j.files; draw(); thumbsIn(panel); toast('지웠습니다(서버 data\\trash에 보관)'); } else toast(r.j.error||'지우지 못했습니다'); })); });
@@ -3653,7 +3694,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const q=qRaw.trim(), lq=q.toLowerCase();
     const has=(...ws)=>ws.some(w=>lq.includes(w));
     if(has('안녕','하이','hello','반가')) return {text:'안녕하세요. SACHIL AI 도우미입니다. SOP·법령·절차 문서를 찾아 드리고, 체크리스트와 사고보고서로 안내합니다. 아래 추천 질문을 눌러 보셔도 됩니다.'};
-    if(has('도움','사용법','뭐 할 수','뭘 할 수','기능')) return {text:'SACHIL은 이름이 곧 화면입니다.\nS 검색 — SOP·법령·절차·사례를 찾습니다.\nA AI 도우미 — 지금 보시는 화면.\nCH 체크리스트 — 출동부터 지휘소 운영까지 12단계, 경과 타이머.\nIL 사고보고서 — 발생개요·화재 원인·인명·재산 피해를 적고 보고서 만들기.\n47망·디브리핑룸(익명 의견·사진·PDF 공유)과 메뉴(12개 섹션)는 오른쪽 위 심벌에 있습니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
+    if(has('도움','사용법','뭐 할 수','뭘 할 수','기능')) return {text:'SACHIL은 이름이 곧 화면입니다.\nS 검색 — SOP·법령·절차·사례를 찾습니다.\nA AI 도우미 — 지금 보시는 화면.\nCH 체크리스트 — 출동부터 지휘소 운영까지 12단계, 경과 타이머.\nIL 사고보고서 — 발생개요·화재 원인·인명·재산 피해를 적고 보고서 만들기.\n47망·디브리핑룸(익명 의견·사진·PDF 공유)과 메뉴(14개 섹션)는 오른쪽 위 심벌에 있습니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
     if(has('보고서','리포트','report')) return {text:'체크리스트 화면의 "보고서 작성"을 누르면 체크한 항목·화재 원인·인명 피해·재산 피해·시각 기록으로 보고서 초안이 바로 만들어지고 AI 작성본이 이어서 나옵니다. 만든 보고서는 IL 사고보고서 탭에 모이며, 두 본문 모두 직접 고칠 수 있습니다. 교관 확인 전 자료입니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
     if(has('상황판','체크리스트','타이머')) return {text:'체크리스트로 안내합니다. 시작을 누르면 경과 시간과 체크 시각이 기록되고, 사고일시가 자동으로 채워집니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'}]};
     if(has('차이','범위','역할') && has('선착대장','지휘대장')) return {text:'초안 기준 역할 경계입니다. 확정 기준은 교관 승인 후 반영됩니다.\n· 선착대장 — 도착 보고, 초기 상황판단, 선착대 전술(진입·배연·용수), 대원 안전, 지휘권 이양 준비까지.\n· 지휘대장 — 지휘권 인수, 상황 재평가, 대응단계 판단·건의, 자원 요청·배치, 안전관리, 지휘소 운영, 통제단 전환 직전까지.\n· 통제단장 — 이 플랫폼 범위 밖(중앙소방학교).', cards:[{title:'SOP-현장지휘론',slug:'sop',type:'섹션'}]};
@@ -5358,7 +5399,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {k:'DB', t:'디브리핑룸', get:()=>[pick('#dbBtn')],
      d:['현장에 참여했던 대원은 <b>익명으로 개선사항을 도출</b>하고, 지휘관은 의견을 들어 <b>지휘역량을 강화</b>합니다.']},
     {k:'메뉴', t:'메뉴', get:()=>[pick('#menuBtn')],
-     d:['교육일정·SOP·긴급구조대응계획·RIT 등 <b>12개 섹션 자료</b>를 엽니다. PDF는 앱 안에서 바로 볼 수 있어요. 맨 끝 <b>업데이트 내역</b>에서 버전별 바뀐 점을 봅니다.','<b>앱 설치</b>(홈 화면 바로가기)와 교관 로그인도 여기 있습니다.']},
+     d:['교육일정·SOP·긴급구조대응계획·RIT 등 <b>14개 섹션 자료</b>를 엽니다. PDF는 앱 안에서 바로 볼 수 있어요. 맨 끝 <b>업데이트 내역</b>에서 버전별 바뀐 점을 봅니다.','<b>앱 설치</b>(홈 화면 바로가기)와 교관 로그인도 여기 있습니다.']},
     {k:'S', t:'검색', get:()=>[pick('.tabbar [data-go="search"]','#navSearch')],
      d:['SOP·법령·교재·사례를 <b>낱말로 찾습니다</b>.','결과를 누르면 PDF의 해당 쪽이 바로 열립니다.']},
     {k:'A', t:'AI 도우미', get:()=>[pick('.tabbar [data-go="ai"]','.top-nav [data-route="ai"]')],
