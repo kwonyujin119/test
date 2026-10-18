@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '7.4'
-APP_VERSION = 'V148'
+VERSION = '7.5'
+APP_VERSION = 'V149'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -1205,7 +1205,7 @@ class H(BaseHTTPRequestHandler):
             CONF['room_info_ts'] = time.time()
             write_conf(CONF)
             return self.send(200, dict(status(), info=info, info_ts=CONF['room_info_ts'], msg='핀 문구를 저장했습니다 — 모든 기기에 적용' if lead else '기본 문구로 되돌렸습니다'), log=False)
-        if act == 'law':   # V144: 법제처 국가법령정보 OPEN API — OC(신청한 이메일의 @ 앞부분). 저장 전에 한 번 시험
+        if act == 'law':   # V144: 법제처 국가법령정보 OPEN API — API인증키(OC) — 법제처 마이페이지 → API인증키관리. 저장 전에 한 번 시험
             oc = re.sub(r'[^0-9A-Za-z._-]', '', str(j.get('oc') or ''))[:40]
             if not oc:
                 CONF['law_oc'] = ''
@@ -1214,9 +1214,12 @@ class H(BaseHTTPRequestHandler):
             try:
                 got = law_search('소방기본법', oc)
             except Exception as e:
-                return self.send(200, dict(status(), ok=False, error=f'법제처 시험 실패: {str(e)[:160]}'), log=False)
+                why = str(e)[:240]
+            if '검증' in why or 'IP' in why or 'ip' in why:
+                why += ' → 법제처 OPEN API 신청 화면 [수정]에서 서버장비 IP에 이 서버 PC의 공인 IP를 넣어 주세요'
+            return self.send(200, dict(status(), ok=False, error=f'법제처 시험 실패 — {why}'), log=False)
             if not got:
-                return self.send(200, dict(status(), ok=False, error='법제처가 결과를 주지 않았습니다 — OC(신청 이메일의 @ 앞부분)와, 신청 화면의 활용 API·도메인/IP를 확인하세요'), log=False)
+                return self.send(200, dict(status(), ok=False, error='법제처가 결과를 주지 않았습니다 — API인증키(OC — 법제처 마이페이지 → API인증키관리)와, 신청 화면의 활용 API·도메인/IP를 확인하세요'), log=False)
             CONF['law_oc'] = oc
             write_conf(CONF)
             LAW_CACHE.clear()
@@ -2434,6 +2437,9 @@ def law_search(query, oc=None):
 
 def _law_search(query, oc):
     j = law_get('https://www.law.go.kr/DRF/lawSearch.do?OC=' + urllib.parse.quote(oc) + '&target=law&type=JSON&display=5&query=' + urllib.parse.quote(query))
+    if not isinstance(j, dict) or 'LawSearch' not in j:   # V149: 법제처가 결과 대신 안내(사용자 검증 실패 등)를 보내면 그 문장을 그대로
+        msg = json.dumps(j, ensure_ascii=False) if not isinstance(j, str) else j
+        raise RuntimeError('법제처 응답: ' + re.sub(r'\s+', ' ', msg).replace(oc, '***')[:220])
     r = (j.get('LawSearch') or {}).get('law') or []
     return [r] if isinstance(r, dict) else r
 
