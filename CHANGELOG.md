@@ -1,7 +1,7 @@
 # SACHIL:47 버전 기록 (V1 ~ V55)
 
 인천소방학교 지휘역량강화센터 교육 플랫폼 「SACHIL:47」의 버전별 수정 내용입니다.
-정리일: 2026-10-17 · 현재 배포본: **앱 V114 · 서버 4.7** (github.io + `server/SACHIL47-server-update.zip`)
+정리일: 2026-10-17 · 현재 배포본: **앱 V115 · 서버 4.7** (github.io + `server/SACHIL47-server-update.zip`)
 
 **근거 표기**
 - **패치**: 버전마다 남은 수정 스크립트·작업 기록 기준 (가장 정확)
@@ -102,6 +102,7 @@
 | V112 | 설치 아이콘(purpose any)을 둥근 모서리(반경 22%, 투명 바깥) icon-rounded-192/512로 · 탭 아이콘도 icon-rounded-48 · maskable(안드로이드)·apple-touch(iOS가 직접 둥글림)는 그대로 · manifest·서버 manifest 아이콘 주소 v=112 · 서버 4.6(서버 manifest 아이콘만) | PR #97 |
 | V113 | 47망 '소화전'(hydov): T맵 jsv2 로드(document.write를 불러오는 동안만 가로채 DOM으로 삽입), POI 통합검색 searchKeyword=소화전·searchtypCd=R·radius(km 정수)로 받고 거리로 다시 걸러(300m/500m/1km/2km) 이름에 소화전·소방용수·급수탑만, 기준 = 47망 지도 화재대상1~3 또는 내 위치, T맵 지도 마커+목록(8방위·거리, 누르면 확대), 지도 실패 시 목록만 · 방재실 T맵 키(옛 서버면 sachil_tmap_pending에 맡김→tmapFlush) · 스와이프·뒤로·'/' 예외에 hydov · 서버 4.7: tmap_app_key·action 'tmap'·/api/me tmap, CSP에 apis.openapi.sk.com·*.tmap.co.kr, 자동 업데이트 10분 확인·받으면 바로 교체(AI 답변 최대 90초 대기), auto_restart 2시간(접속자 없을 때 우선, 30분 넘으면 그대로), 상태에 restart_next | PR #98 |
 | V114 | 첫 화면 인트로(#intro, body 맨 앞): 로고 손글씨 47(icon-1024에서 파랑만 뽑아 16색 PNG 600px, 약 14KB)을 SVG mask로 쓰고 굵은 흰 선 3획(pathLength=1, stroke-dashoffset)이 지나가며 드러냄 — 1.15s+0.33s+0.4s, 2.25s부터 사라지고 .app·.tabbar가 아래에서 떠오름(appFloat) · 누르면 건너뜀, sessionStorage로 창마다 한 번, #hub 아닌 주소·동작 줄이기면 생략, 2.8s에 요소 제거 · 앱만 | PR #99 |
+| V115 | 인트로를 첫 화면의 hz-47 선 자체로: 로고 PNG·#intro 덮개 삭제, html.intro 동안 위아래 막대·칸·글자·시트·토스트 opacity 0, hz-47(pathLength=1) stroke-dashoffset로 s0(A1→M1→M2→B2, 위→아래) 1.15s → s1 0.33s → s2 0.3s, 2.05s에 intro-float로 나머지 떠오름 · renderHub 끝에서 window.__introGo() 호출, 3.5초 안에 첫 화면이 없으면 인트로 없이 · 써지는 동안 누르면 건너뜀(클릭은 막음) · 앱만 | PR #100 |
 | V108 | 메뉴 'SACHIL방재실'(prof:true, 교수 로그인 때만 보임, 업데이트 내역 바로 앞) → 떠 있는 창(bjov)에 교수 화면(renderProf)+메뉴 관리(섹션별 자료 수·바로가기) · 지도: 가운데 + 제거, 버튼 → 지도 가운데에 표시 → 끌어서 놓으면 저장(CustomOverlay 끌기, 끄는 동안 지도 끌기 끔·다시 그리기 멈춤), 방면설정은 누를 때마다 secA→secF(서버 MAP_KINDS 추가) · 지도·방재실·토스트 위 끌기는 탭 이동 안 함(NOSWIPE·swipeBusy) · 토스트 좌우로 밀어 닫기 · 서버 4.4 | PR #93 |
 | V107 | 카카오맵 키: 옛 서버(4.3 전)면 이 휴대폰 localStorage(sachil_kakao_pending)에 맡기고 지도는 그 키로 바로 열림, 교수 확인·AI 키 화면을 열 때 서버가 받으면 자동 입력 후 삭제 | PR #92 |
 | V106 | 47망 머리에 '지도'·'소화전'(준비 중) 버튼 · 지도: 카카오맵 JS SDK(키는 서버 config `kakao_js_key`, /api/me로 전달, 교수 화면에서 입력) · 가운데 + 위치에 한 번 눌러 화재대상·현장지휘소·차량대기소 표시, 방면설정은 화재대상→+ 방향을 정면(A)으로 B좌측·C후면·D우측(55m 표시·선) · 방마다 maps 표(GET/POST /api/rooms/{id}/map, 국내 좌표만, 표시자·시각 기록), 5초마다 갱신, 표시 눌러 지우기 · 주소·장소 검색(Places→Geocoder), 내 위치 · 서버 CSP에 카카오 허용, Referrer-Policy를 strict-origin-when-cross-origin으로(카카오 도메인 확인) · 서버 4.3 | PR #91 |
