@@ -812,7 +812,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v131</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v132</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1267,6 +1267,8 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .roomhead .rtool{padding:0 12px}
 .roomhead .rtool.sym{padding:0 10px;display:inline-grid;place-items:center}.hydsym{width:24px;height:24px;display:block}
 .mapov .mtab.sym{padding:0 8px;display:inline-grid;place-items:center}
+.dsb{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;min-width:44px}.roomhead .rtool.dsb{padding:0 10px}.dssym{width:20px;height:20px;display:block;flex:none}
+@media (max-width:359px){.roomhead .rtool.dsb{padding:0 7px;gap:3px}.roomhead .rtool.sym{padding:0 6px}.roomhead #dbRename{padding:0 8px}}
 .bjov{position:fixed;inset:0;z-index:61;background:rgba(10,14,30,.45);display:grid;place-items:end center;padding-top:calc(24px + var(--sat))}
 .bjov .bjbox{width:min(100%,640px);max-height:calc(100dvh - 24px - var(--sat));display:flex;flex-direction:column;background:var(--bg);border-radius:18px 18px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.25)}
 @media (min-width:700px){ .bjov{place-items:center} .bjov .bjbox{border-radius:18px;max-height:88dvh} }
@@ -1532,8 +1534,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V131', SRV_VER='5.7';
+  const APP_VER='V132', SRV_VER='5.8';
   const UPDATES=[
+    {v:'V132', d:'2026-10-18', t:['47망 DS 버튼에 파란 지도 그림을 붙임(DS 글자는 그대로) — 빨간 소화전 버튼과 한눈에 구분','소화전 화면의 DS 탭도 같은 모양','서버 5.8']},
     {v:'V131', d:'2026-10-18', t:['서버 5.7: 서버 PC에서 자동 업데이트가 인증서 확인 실패로 계속 멈추던 문제 — 그럴 때 Windows 기본 curl로 받아 자동 업데이트가 다시 동작(인증서 확인은 그대로 유지)']},
     {v:'V130', d:'2026-10-18', t:['DS: 닫았다가 다시 열면 직전에 보던 자리·확대 정도 그대로(방마다, 이 기기에 7일)','서버 5.6']},
     {v:'V129', d:'2026-10-18', t:['47망·디브리핑룸: 카카오톡처럼 마지막으로 본 대화를 이 기기에 남겨 두고, 방에 들어가자마자 바로 보여 준 뒤 새 글만 받아 붙임 — ‘불러오는 중’ 거의 없음','옛 서버 업데이트용 쉬는 시간에도 방에 처음 들어올 때는 바로 대화를 받음','서버 5.5']},
@@ -4087,7 +4090,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   const hydEl=document.createElement('div'); hydEl.className='mapov hydov'; hydEl.id='hydov'; hydEl.hidden=true;
   hydEl.setAttribute('role','dialog'); hydEl.setAttribute('aria-modal','true'); hydEl.setAttribute('aria-label','소화전');
-  hydEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="소화전 닫기">‹</button><b>소화전</b><button type="button" class="mtab" data-tab="map" aria-label="DS 현장 지도로" title="DS(Disaster Site)">DS</button>
+  hydEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="소화전 닫기">‹</button><b>소화전</b><button type="button" class="mtab dsb" data-tab="map" aria-label="DS 현장 지도로" title="DS(Disaster Site)"><svg class="dssym" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 6.2 9 4l6 2.2 5.5-2.2v13.8L15 20l-6-2.2-5.5 2.2z" fill="#EAF2FF" stroke="#2563EB" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 4v13.8M15 6.2V20" stroke="#2563EB" stroke-width="1.6"/><circle cx="12" cy="11.2" r="2.1" fill="#2563EB"/></svg><span>DS</span></button>
       <form class="msrch hsrch" autocomplete="off"><input type="search" placeholder="주소·장소 검색" aria-label="주소·장소 검색" enterkeyhint="search"><button type="submit" class="btn ghost">검색</button></form></div>
     <ul class="hres" hidden></ul>
     <div class="hbase" role="group" aria-label="기준 위치와 소화전 검색"></div>
@@ -4212,7 +4215,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!rid){ panel.innerHTML=`<p class="convo-note">${kind==='deb'?'디브리핑룸은 서버 PC를 새 버전(V57)으로 업데이트하면 열립니다. 지금은 47망을 이용해 주세요.':'47망을 찾지 못했습니다. 서버를 다시 시작해 주세요.'}</p>`; return; }
     pending=[]; SRV.last=0; SRV.seen=new Set(); SRV.epoch=''; SRV.msgs=new Map(); SRV.rp=[]; SRV.rv=-1; SRV.readSent=0; SRV.lastDay=''; SRV.replyTo=null; SRV.dv=-1;
     const admin=SRV.me&&SRV.me.role==='admin';
-    panel.innerHTML=roomHead({id:'s'+rid,title,cnt:true},'',`${kind==='deb'?'':'<button type="button" class="btn ghost rtool" id="mapBtn" title="DS(Disaster Site) — 현장 지도" aria-label="DS 현장 지도">DS</button><button type="button" class="btn ghost rtool sym" id="hydBtn" title="소화전" aria-label="소화전"><svg class="hydsym" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2.5h6v2h.8a1.2 1.2 0 0 1 1.2 1.2V7.5H7V5.7a1.2 1.2 0 0 1 1.2-1.2H9z" fill="#D92D20"/><rect x="5.5" y="7.5" width="13" height="2.2" rx="1.1" fill="#B42318"/><path d="M8 9.7h8V19h1.6a1.1 1.1 0 0 1 0 2.2H6.4a1.1 1.1 0 0 1 0-2.2H8z" fill="#D92D20"/><rect x="3.6" y="11.6" width="4.6" height="3.4" rx="1.2" fill="#B42318"/><rect x="15.8" y="11.6" width="4.6" height="3.4" rx="1.2" fill="#B42318"/><circle cx="12" cy="14.3" r="1.7" fill="#fff"/></svg></button>'}<button type="button" class="btn ghost" id="dbRename">대화명 바꾸기</button>${admin?'<button type="button" class="btn ghost" id="dbClear">대화 비우기</button>':''}`)+`
+    panel.innerHTML=roomHead({id:'s'+rid,title,cnt:true},'',`${kind==='deb'?'':'<button type="button" class="btn ghost rtool dsb" id="mapBtn" title="DS(Disaster Site) — 현장 지도" aria-label="DS 현장 지도 열기"><svg class="dssym" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 6.2 9 4l6 2.2 5.5-2.2v13.8L15 20l-6-2.2-5.5 2.2z" fill="#EAF2FF" stroke="#2563EB" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 4v13.8M15 6.2V20" stroke="#2563EB" stroke-width="1.6"/><circle cx="12" cy="11.2" r="2.1" fill="#2563EB"/></svg><span>DS</span></button><button type="button" class="btn ghost rtool sym" id="hydBtn" title="소화전" aria-label="소화전"><svg class="hydsym" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2.5h6v2h.8a1.2 1.2 0 0 1 1.2 1.2V7.5H7V5.7a1.2 1.2 0 0 1 1.2-1.2H9z" fill="#D92D20"/><rect x="5.5" y="7.5" width="13" height="2.2" rx="1.1" fill="#B42318"/><path d="M8 9.7h8V19h1.6a1.1 1.1 0 0 1 0 2.2H6.4a1.1 1.1 0 0 1 0-2.2H8z" fill="#D92D20"/><rect x="3.6" y="11.6" width="4.6" height="3.4" rx="1.2" fill="#B42318"/><rect x="15.8" y="11.6" width="4.6" height="3.4" rx="1.2" fill="#B42318"/><circle cx="12" cy="14.3" r="1.7" fill="#fff"/></svg></button>'}<button type="button" class="btn ghost" id="dbRename">대화명 바꾸기</button>${admin?'<button type="button" class="btn ghost" id="dbClear">대화 비우기</button>':''}`)+`
       <div class="chat">
         <div class="card convo-card"><div class="convo" id="convo"><p class="convo-note" id="convoNote">불러오는 중…</p></div><button type="button" class="peek" id="peek" hidden></button></div>
         <div class="reply-bar" id="replyBar" hidden></div>
