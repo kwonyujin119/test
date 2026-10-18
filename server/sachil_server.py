@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '4.3'
-APP_VERSION = 'V107'
+VERSION = '4.4'
+APP_VERSION = 'V108'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -968,7 +968,7 @@ class H(BaseHTTPRequestHandler):
         return self.send(200, {'ok': True, 'text': text}, log=False)
 
     # --- 현장 지도(V106): 방마다 화재대상·현장지휘소·방면·차량대기소 하나씩. 방 참여자 모두가 같은 지도를 본다
-    MAP_KINDS = ('fire', 'icp', 'sector', 'staging')
+    MAP_KINDS = ('fire', 'icp', 'sector', 'staging', 'secA', 'secB', 'secC', 'secD', 'secE', 'secF')   # V108: 방면 A~F 각각
 
     def map_get(self, rid):
         if not q('SELECT id FROM rooms WHERE id=?', (rid,), one=True):
