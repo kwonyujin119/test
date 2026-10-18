@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '4.2'
-APP_VERSION = 'V105'
+VERSION = '4.3'
+APP_VERSION = 'V106'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -95,6 +95,7 @@ def load_conf():
         'ai_provider': 'auto',          # auto(키 있는 쪽: gemini → groq → claude) | gemini | groq | claude
         'groq_api_key': '',             # V103: Groq API 키(gsk_…) — Gemini 한도가 차면 예비로. groq-key-setup.bat으로 넣음
         'groq_model': 'openai/gpt-oss-120b',     # Groq 모델 이름(console.groq.com의 Models에 나온 이름). 안 되면 예비 모델을 차례로 시도
+        'kakao_js_key': '',             # V106: 카카오맵 JavaScript 키(developers.kakao.com) — 교수 화면에서 넣음. 공개용 키(도메인 등록으로 보호)
         'ai_cache_days': 3,             # V102: 같은 질문의 AI 답을 이 기간 저장해 다시 씀(AI 호출·한도 안 씀). 0이면 끔
         'auto_update': True,            # V102: 서버 파일을 GitHub에서 스스로 받아 다시 켬(접속자 없을 때). false면 끔
         'update_check_hours': 2,        # 새 버전 확인 간격(시간)
@@ -162,6 +163,7 @@ CREATE INDEX IF NOT EXISTS ix_msg_room ON messages(room, id);
 CREATE TABLE IF NOT EXISTS reads(room INTEGER, user INTEGER, last_id INTEGER, seen REAL, PRIMARY KEY(room, user));
 CREATE TABLE IF NOT EXISTS qna(id INTEGER PRIMARY KEY AUTOINCREMENT, ts REAL, name TEXT, q TEXT, a TEXT, a_ts REAL, ip TEXT);
 CREATE TABLE IF NOT EXISTS members(room INTEGER, user INTEGER, joined REAL, PRIMARY KEY(room, user));
+CREATE TABLE IF NOT EXISTS maps(room INTEGER PRIMARY KEY, data TEXT, ts REAL);
 INSERT OR IGNORE INTO members SELECT room, user, seen FROM reads;
 ''')
 try:   # 예전 DB에 답장 칸 추가
@@ -381,8 +383,9 @@ def packed(key, mtime, make):
     return val
 
 
-CSP = ("default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-       "font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline'; connect-src 'self' data: blob:; "
+CSP = ("default-src 'self'; img-src 'self' data: blob: https://*.daumcdn.net https://*.kakao.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+       "font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline' https://dapi.kakao.com https://*.daumcdn.net; "
+       "connect-src 'self' data: blob: https://dapi.kakao.com https://*.daumcdn.net; "
        "frame-src 'self' blob:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
 
 MAGIC = [
@@ -523,7 +526,7 @@ class H(BaseHTTPRequestHandler):
         self.send_header('Content-Type', ctype)
         self.send_header('Content-Length', str(len(body)))
         self.send_header('X-Content-Type-Options', 'nosniff')
-        self.send_header('Referrer-Policy', 'no-referrer')
+        self.send_header('Referrer-Policy', 'strict-origin-when-cross-origin')   # 카카오맵이 등록 도메인을 확인할 수 있게(주소 경로는 안 보냄)
         self.send_header('X-Frame-Options', 'DENY')
         self.send_header('Content-Security-Policy', CSP)
         extra = dict(extra or {})
@@ -684,7 +687,8 @@ class H(BaseHTTPRequestHandler):
                                        'trim_ratio': CONF.get('weekly_trim_ratio'),
                                        'require_code': bool(CONF.get('require_code')),
                                        'retention_days': CONF.get('retention_days'), 'max_files': 10,
-                                       'ai': ai_ready(), 'ai_name': AI_NAMES.get(ai_provider(), ''), 'index': DOCS_IDX.status()})
+                                       'ai': ai_ready(), 'ai_name': AI_NAMES.get(ai_provider(), ''), 'index': DOCS_IDX.status(),
+                                       'kakao': str(CONF.get('kakao_js_key') or '')})
             if not self.user:
                 return self.err(401, '로그인이 필요합니다')
             if path == '/api/rooms':
@@ -692,6 +696,9 @@ class H(BaseHTTPRequestHandler):
             m = re.fullmatch(r'/api/rooms/(\d{1,12})/messages', path)
             if m:
                 return self.messages(int(m.group(1)), args)
+            m = re.fullmatch(r'/api/rooms/(\d{1,12})/map', path)
+            if m:
+                return self.map_get(int(m.group(1)))
             m = re.fullmatch(r'/f/([a-f0-9]{24})', path)
             if m:
                 return self.file_get(m.group(1))
@@ -738,6 +745,9 @@ class H(BaseHTTPRequestHandler):
             m = re.fullmatch(r'/api/rooms/(\d{1,12})/upload', path)
             if m:
                 return self.upload(int(m.group(1)))
+            m = re.fullmatch(r'/api/rooms/(\d{1,12})/map', path)
+            if m:
+                return self.map_set(int(m.group(1)))
             m = re.fullmatch(r'/api/rooms/(\d{1,12})/read', path)
             if m:
                 return self.read_mark(int(m.group(1)))
@@ -957,6 +967,51 @@ class H(BaseHTTPRequestHandler):
         REPORT_CACHE[key] = (now, text)
         return self.send(200, {'ok': True, 'text': text}, log=False)
 
+    # --- 현장 지도(V106): 방마다 화재대상·현장지휘소·방면·차량대기소 하나씩. 방 참여자 모두가 같은 지도를 본다
+    MAP_KINDS = ('fire', 'icp', 'sector', 'staging')
+
+    def map_get(self, rid):
+        if not q('SELECT id FROM rooms WHERE id=?', (rid,), one=True):
+            return self.err(404, '없는 방입니다')
+        r = q('SELECT data, ts FROM maps WHERE room=?', (rid,), one=True)
+        return self.send(200, {'ok': True, 'items': json.loads(r['data']) if r else {}, 'ts': r['ts'] if r else 0}, log=False)
+
+    def map_set(self, rid):
+        if not q('SELECT id FROM rooms WHERE id=?', (rid,), one=True):
+            return self.err(404, '없는 방입니다')
+        j = self.body_json(2000)
+        with DB_LOCK:
+            r = DB.execute('SELECT data FROM maps WHERE room=?', (rid,)).fetchone()
+            items = json.loads(r['data']) if r else {}
+            if j.get('clear') == 'all':
+                items = {}
+            else:
+                k = str(j.get('kind') or '')
+                if k not in self.MAP_KINDS:
+                    raise ValueError('표시 종류가 잘못됐습니다')
+                if j.get('clear'):
+                    items.pop(k, None)
+                else:
+                    try:
+                        lat, lng = float(j.get('lat')), float(j.get('lng'))
+                    except (TypeError, ValueError):
+                        raise ValueError('위치가 잘못됐습니다')
+                    if not (32.5 <= lat <= 39.5 and 123.5 <= lng <= 132.5):
+                        raise ValueError('국내 위치만 표시할 수 있습니다')
+                    it = {'lat': round(lat, 6), 'lng': round(lng, 6), 'by': self.user['name'], 'ts': time.time()}
+                    if k == 'sector':
+                        try:
+                            it['deg'] = round(float(j.get('deg')) % 360, 1)
+                        except (TypeError, ValueError):
+                            it['deg'] = 180.0
+                    items[k] = it
+            now = time.time()
+            DB.execute('INSERT INTO maps(room,data,ts) VALUES(?,?,?) ON CONFLICT(room) DO UPDATE SET data=excluded.data, ts=excluded.ts',
+                       (rid, json.dumps(items, ensure_ascii=False), now))
+            DB.commit()
+        self.touch(rid)
+        return self.send(200, {'ok': True, 'items': items, 'ts': now}, log=False)
+
     # --- 교수(관리자) AI 키 관리 (V103): 휴대폰 앱에서 키를 넣고 시험. 키는 되돌려 보내지 않고 끝 4자리만 보인다
     def admin_ai(self):
         if self.user['role'] != 'admin':
@@ -970,10 +1025,19 @@ class H(BaseHTTPRequestHandler):
                     'today': AI_DAY.get('n', 0) if AI_DAY.get('d') == time.strftime('%Y-%m-%d') else 0,
                     'limit': int(CONF.get('ai_daily_limit') or 0), 'version': VERSION,
                     'auto_update': bool(CONF.get('auto_update')) and os.environ.get('SACHIL_LOOP') == '1',
+                    'kakao': ('…' + str(CONF.get('kakao_js_key'))[-4:]) if CONF.get('kakao_js_key') else '',
                     'started': SERVER_START, 'upd_next': UPD_STATE['next'], 'upd_last': UPD_STATE['last'], 'upd_result': UPD_STATE['result'],
                     'upd_pending': UPD_STATE['pending'], 'upd_done': last_update_done()[0], 'now': time.time()}
         if act == 'status':
             return self.send(200, status(), log=False)
+        if act == 'kakao':   # V106: 카카오맵 JavaScript 키(공개용 키 — 앱에 그대로 내려간다)
+            k = re.sub(r'[^0-9a-fA-F]', '', str(j.get('key') or ''))
+            if k and len(k) != 32:
+                return self.err(400, '카카오 JavaScript 키(32자)를 그대로 붙여 넣으세요')
+            CONF['kakao_js_key'] = k.lower()
+            with open(CONF_PATH, 'w', encoding='utf-8') as f:
+                json.dump(CONF, f, ensure_ascii=False, indent=2)
+            return self.send(200, dict(status(), msg='카카오맵 키를 저장했습니다' if k else '카카오맵 키를 지웠습니다'), log=False)
         if act == 'update':   # V104: 교수 화면에서 '서버 업데이트 지금 확인'
             if not (CONF.get('auto_update') and os.environ.get('SACHIL_LOOP') == '1'):
                 return self.send(200, dict(status(), ok=False, error='이 서버는 자동 업데이트가 꺼져 있거나 옛 start-domain.bat로 켜져 있습니다 — PC에서 업데이트 묶음을 한 번 받아 주세요'), log=False)
