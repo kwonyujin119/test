@@ -862,7 +862,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v157</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v158</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1480,6 +1480,21 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .hz-svg a:focus-visible .hz-p{stroke:var(--navy);stroke-width:3}
 .hz-svg a:active .hz-p{fill:var(--navy-soft)}
 .hz-svg a:active .hz-p.y{fill:#f0c400}
+/* V157: 첫 화면 칸 — 마우스를 올리면 떠오르고 글자·그림이 커지며 살짝 흔들림, 손가락은 누르면 눌림 → 떼면 튀어 오름 */
+.hz-p{transform-box:fill-box;transform-origin:center;transition:stroke .12s,fill .12s,transform .22s cubic-bezier(.2,.8,.25,1),filter .22s}
+.hz-l,.hz-k{transition:transform .22s cubic-bezier(.2,.8,.25,1)}
+.hz-l .sg,.hz-k .ic{transform-origin:center}
+.hub.hz [data-hov].hz-p{transform:translateY(-4px) scale(1.015);filter:drop-shadow(0 10px 18px rgba(36,78,162,.22))}
+.hub.hz [data-hov].hz-l,.hub.hz [data-hov].hz-k{transform:translate(-50%,calc(-50% - 4px)) scale(1.07)}
+.hub.hz [data-hov].hz-l .sg,.hub.hz [data-hov].hz-k .ic{animation:hzWig .55s ease both}
+.hub.hz [data-prs].hz-p{transform:scale(.975);filter:drop-shadow(0 1px 3px rgba(0,0,0,.12));transition-duration:.08s}
+.hub.hz [data-prs].hz-l,.hub.hz [data-prs].hz-k{transform:translate(-50%,-50%) scale(.95);transition-duration:.08s}
+.hub.hz [data-pop].hz-p{animation:hzPopP .42s cubic-bezier(.2,.8,.25,1)}
+.hub.hz [data-pop].hz-l,.hub.hz [data-pop].hz-k{animation:hzPop .42s cubic-bezier(.2,.8,.25,1)}
+@keyframes hzWig{0%{transform:rotate(0) scale(1)}30%{transform:rotate(-8deg) scale(1.12)}60%{transform:rotate(6deg) scale(1.12)}100%{transform:rotate(0) scale(1.08)}}
+@keyframes hzPop{0%{transform:translate(-50%,-50%) scale(.95)}55%{transform:translate(-50%,calc(-50% - 5px)) scale(1.1)}100%{transform:translate(-50%,-50%) scale(1)}}
+@keyframes hzPopP{0%{transform:scale(.975)}55%{transform:translateY(-4px) scale(1.02)}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){ .hz-p,.hz-l,.hz-k{transition:none} .hub.hz [data-hov],.hub.hz [data-prs],.hub.hz [data-pop]{animation:none!important;transform:translate(-50%,-50%)!important} .hub.hz .hz-p[data-hov],.hub.hz .hz-p[data-prs],.hub.hz .hz-p[data-pop]{transform:none!important} }
 .hz-47{fill:none;stroke:var(--navy);stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;opacity:.92}
 .hz-47[data-s="1"]{stroke-width:3.5;opacity:.75}   /* 4의 세로획: 장식(칸 경계 아님) — 연하게 */
 .hz-hit{fill:transparent;stroke:transparent;pointer-events:all}
@@ -1632,8 +1647,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V157', SRV_VER='8.3';
+  const APP_VER='V158', SRV_VER='8.4';
   const UPDATES=[
+    {v:'V158', d:'2026-10-18', t:['첫 화면 6칸 애니메이션 — 마우스를 올리면 칸이 살짝 떠오르고 글자·그림이 커지며 흔들림, 휴대폰은 손가락이 닿으면 눌렸다가 떼면 튀어 오름(동작 줄이기 설정이면 끔)']},
     {v:'V157', d:'2026-10-18', t:['검색 결과에 법제처 현행 조문을 원문 그대로 보여 줌(첨부 자료 밖의 법령 정보) — 법령 이름이 없어도(예: 소방활동구역, 강제처분) 소방 법령에서 맞는 조문을 찾음','조문마다 ‘조문 전체’ 펼치기와 법제처 원문 링크, 그 아래 관련 법령·시행령·시행규칙·고시·조례 링크']},
     {v:'V156', d:'2026-10-18', t:['소화전: 인천 새 행정구역 — 검단구·서해구는 서구, 영종구는 중구, 제물포구는 중구·동구 자료로 조회','소화전: 주소를 검색하면 소화전 검색까지 한 번에(원클릭)','소화전: 결과는 지도 아래 한 줄로만 보이고, 누르면 목록이 펼쳐짐 — 지도를 가리지 않음','소화전: 지도 위 소화전을 누르면 그 소화전 정보(방향·거리·위치·보호틀·수압)와 길안내가 떠서 보임']},
     {v:'V155', d:'2026-10-18', t:['소방용수시설(소화전) 조회가 매번 오류 나던 문제 고침 — 공공데이터포털 응답 형태를 잘못 읽고 있었음(47망 PC 실제 시험으로 확인)']},
@@ -4130,6 +4146,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const cell=h=>h.y?corner(h):`<span class="hz-l" data-l="${h.go}" aria-hidden="true">${sigK(h.k)}<b>${h.t}</b></span>`;
     panel.innerHTML=`<nav class="hub hz" aria-label="SACHIL:47 첫 화면"><svg class="hz-svg" xmlns="http://www.w3.org/2000/svg">${HUB.map(h=>`<a href="#${h.go}" data-hub="${h.go}" aria-label="${h.t}"><path class="hz-p${h.y?' y':''}" data-p="${h.go}"/><path class="hz-hit" data-hit="${h.go}"/></a>`).join('')}${HZ.strokes.map((_,i)=>`<path class="hz-47" data-s="${i}" pathLength="1"/>`).join('')}</svg>${HUB.map(cell).join('')}</nav>`;
     panel.querySelectorAll('[data-hub]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const t=a.dataset.hub; if(t==='search'){ q.value=''; syncClear(); go('search',''); } else go(t); rootScrollTo(0); }));
+    // V157: 칸 애니메이션 — 칸 모양(path)과 글자(따로 놓인 요소)를 함께 움직인다
+    { const parts=k=>[...panel.querySelectorAll(`[data-p="${k}"],[data-l="${k}"],[data-k="${k}"]`)], set=(k,at,on)=>parts(k).forEach(el=>on?el.setAttribute(at,''):el.removeAttribute(at));
+      panel.querySelectorAll('[data-hub]').forEach(a=>{ const k=a.dataset.hub;
+        a.addEventListener('pointerenter',e=>{ if(e.pointerType==='mouse') set(k,'data-hov',1); });
+        a.addEventListener('pointerleave',()=>{ set(k,'data-hov',0); set(k,'data-prs',0); });
+        a.addEventListener('pointerdown',e=>{ if(e.pointerType!=='mouse'){ set(k,'data-pop',0); set(k,'data-prs',1); } });
+        a.addEventListener('pointerup',e=>{ if(e.pointerType!=='mouse'){ set(k,'data-prs',0); set(k,'data-pop',1); setTimeout(()=>set(k,'data-pop',0),450); } });
+        a.addEventListener('pointercancel',()=>set(k,'data-prs',0));
+        a.addEventListener('focus',()=>set(k,'data-hov',1)); a.addEventListener('blur',()=>set(k,'data-hov',0)); }); }
     fitHub();
     if(window.__introGo) window.__introGo();   // V115~V117: 인트로 — 빨간 펜 끝이 이 자리의 47 선을 그린다
   }
