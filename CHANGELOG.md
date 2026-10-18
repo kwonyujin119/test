@@ -1,7 +1,7 @@
 # SACHIL:47 버전 기록 (V1 ~ V55)
 
 인천소방학교 지휘역량강화센터 교육 플랫폼 「SACHIL:47」의 버전별 수정 내용입니다.
-정리일: 2026-10-17 · 현재 배포본: **앱 V106 · 서버 4.3** (github.io + `server/SACHIL47-server-update.zip`)
+정리일: 2026-10-17 · 현재 배포본: **앱 V107 · 서버 4.3** (github.io + `server/SACHIL47-server-update.zip`)
 
 **근거 표기**
 - **패치**: 버전마다 남은 수정 스크립트·작업 기록 기준 (가장 정확)
@@ -96,6 +96,7 @@
 | V57 | 첫 화면 6개 박스(47망·디브리핑룸 / S·A / CH·IL), 47망과 디브리핑룸을 두 대화방으로 분리(서버 2.1) | PR #38 |
 | V58 | 보고서 'AI 사이트로 작성': API 키 없이 ChatGPT·Claude·Gemini 웹에 요청문 복사·사이트 열기 → 결과 붙여넣어 AI 작성본으로 저장(출처 표시) | PR #39 |
 | V59 | 47 시그니처 아이콘(노란 바탕·흰 말풍선·파란 47)으로 앱 아이콘·상단 47 버튼·첫 화면 교체, 시그니처 컬러(심벌 옐로 #FDD000·화이트·인천 오션 #244EA2) 적용 | PR #40 |
+| V107 | 카카오맵 키: 옛 서버(4.3 전)면 이 휴대폰 localStorage(sachil_kakao_pending)에 맡기고 지도는 그 키로 바로 열림, 교수 확인·AI 키 화면을 열 때 서버가 받으면 자동 입력 후 삭제 | PR #92 |
 | V106 | 47망 머리에 '지도'·'소화전'(준비 중) 버튼 · 지도: 카카오맵 JS SDK(키는 서버 config `kakao_js_key`, /api/me로 전달, 교수 화면에서 입력) · 가운데 + 위치에 한 번 눌러 화재대상·현장지휘소·차량대기소 표시, 방면설정은 화재대상→+ 방향을 정면(A)으로 B좌측·C후면·D우측(55m 표시·선) · 방마다 maps 표(GET/POST /api/rooms/{id}/map, 국내 좌표만, 표시자·시각 기록), 5초마다 갱신, 표시 눌러 지우기 · 주소·장소 검색(Places→Geocoder), 내 위치 · 서버 CSP에 카카오 허용, Referrer-Policy를 strict-origin-when-cross-origin으로(카카오 도메인 확인) · 서버 4.3 | PR #91 |
 | V105 | 교수 화면(AI 키 관리 카드) 서버 상태: 마지막으로 켜진 시각·동작 시간, 마지막 자동 업데이트(update.log의 '업데이트 완료'), 다음 업데이트 확인 예정·마지막 확인 결과, 받아 둔 새 버전(접속자 없을 때 교체) — /api/admin/ai status(관리자만)에 started·upd_next·upd_last·upd_result·upd_pending·upd_done·now 추가, 기기 시계 차이 보정 · 서버 4.2 | PR #90 |
 | V104 | AI 키 관리: 옛 서버(404)면 키를 이 휴대폰 localStorage(sachil_aikey_pending, 3일)에 맡기고, 교수 확인(checkProf)·AI 키 화면을 열 때 서버가 받으면 자동 입력 후 삭제 · 서버 4.1: admin_ai action 'update'(자동 업데이트 켜진 서버만) → UPDATE_NOW 이벤트로 즉시 확인, 앱에 '서버 업데이트 지금 확인' 버튼 | PR #89 |
