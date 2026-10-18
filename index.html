@@ -156,7 +156,7 @@ body.home .panel{display:none}
 body.compact:not(.nosearch) .panel{padding-top:8px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
 .panel-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 16px;margin-bottom:14px}
-.panel-head h2{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em;overflow-wrap:anywhere}
+.panel-head h2{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .panel-head .sub{color:var(--muted);font-size:13px}
 .eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .eyebrow::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--navy)}
@@ -167,6 +167,9 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .hitp .snip mark,.hitp .t mark{background:#FFF1B8;color:inherit;padding:0 1px;border-radius:2px}
 .srch-note{font-size:12.5px;color:var(--muted);margin:8px 2px 0}
 .srch-more{margin-top:10px}
+#srchLaw .ico{font-size:11px;letter-spacing:-.02em;white-space:nowrap;min-width:52px}
+.composer textarea::placeholder{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.sheet-lock,html.sheet-lock body{overflow:hidden}
 .bldc{padding:12px 14px}
 .bldc .t{margin:0 0 8px;font-size:15px}
 .bldc .t small{color:var(--muted);font-weight:500;margin-left:4px}
@@ -593,7 +596,8 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .msg.other .col .bub{max-width:100%;border-bottom-left-radius:6px}
 .msg.other .who{font-size:12px;font-weight:600;color:var(--muted);padding-left:2px}
 .note.err{color:#B42318;font-weight:600}
-.dbwrap{max-width:560px;width:100%;margin:8px auto 0;display:grid;gap:12px}
+.dbwrap{max-width:560px;width:100%;margin:8px auto 0;display:grid;grid-template-columns:minmax(0,1fr);gap:12px}   /* V154: 360px 화면에서 입력칸이 카드를 밀어내지 않게 */
+.kform input{min-width:0}
 .consent{padding:24px 20px;display:grid;gap:12px}
 .consent .art{display:block;width:240px;max-width:60%;height:auto;margin:0 auto 4px}
 .st-ic{display:block;width:56px;height:56px;margin:0 auto}
@@ -1274,9 +1278,9 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .timer .chrow #tmReset{border:1px solid var(--line);min-height:40px}
 .ilbar .ilrow #ilReset{border:1px solid var(--line)}
 .timer .jump{flex-basis:100%}
-.ilbar .ilrow{flex-basis:100%;display:flex;align-items:center;gap:8px}
+.ilbar .ilrow{flex-basis:100%;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .ilbar .ilrow .btn{min-height:40px}
-.ilbar .ilrow .reps{margin-left:auto;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font:inherit;font-size:13px;font-weight:700;color:var(--fg);cursor:pointer}
+.ilbar .ilrow .reps{white-space:nowrap;margin-left:auto;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font:inherit;font-size:13px;font-weight:700;color:var(--fg);cursor:pointer}
 .ilbar .ilrow .reps .c{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--navy);color:#fff;font-size:11.5px;display:inline-grid;place-items:center}
 .ilbar .ilrow #mkReport{margin-left:0}
 
@@ -1614,6 +1618,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
   const APP_VER='V154', SRV_VER='8.0';
   const UPDATES=[
+    {v:'V154', d:'2026-10-18', t:['메뉴에 위험물·특정소방대상물 추가, 구분선으로 나눔 — 위(교육일정·평가일정·질의응답·관련법령) / 현장 대응 / 아래(시그니처·방재실·업데이트 내역)','긴급구조대응계획에 원클릭 전화 연결 — 응원협정 대상·긴급구조 관련기관을 첨부 PDF에서 뽑아 누르면 바로 전화(휴대전화 번호는 빼고 대표번호만), 기관 이름으로 찾기, 교수는 목록 고치기','방재실 공공데이터포털 [다시 시험]이 4개 API(건축물대장·소방용수시설·위험물정보·상수도시설정보)를 모두 시험 — 요청주소를 모르는 API는 서버가 공공데이터포털에서 찾아 시험','‘○○에 관한 법률’·‘○○법 시행령’ 이름을 제대로 알아봐 엉뚱한 조문을 근거로 쓰던 문제 고침','‘요양병원·지하주차장·진입로 2곳’처럼 일반 낱말을 건물·주소로 잘못 읽던 문제 고침','카카오 지도 불러오기가 막히면 AI 입력이 멈추던 문제, 답을 기다리는 동안 보낸 글이 사라지던 문제 고침','작은 휴대폰(360px)에서 대화명·로그인·방재실 서버·AI 화면이 잘리던 문제, 사고보고서 버튼 줄이 넘치던 문제 고침','소화전 창 Esc로 닫기·자료가 없는 지역(세종·전북) 조회·조회 횟수 제한 등 안정성 보강']},
     {v:'V153', d:'2026-10-18', t:['주소 대신 건물 이름(예: ○○아파트·○○병원·○○빌딩)으로 검색하거나 AI에게 물어도 카카오 장소 검색으로 주소를 찾아 건축물대장·소방용수시설을 함께 씀','AI 법령 답변의 근거 목록에 법제처 행정규칙(고시·화재안전기준)·자치법규(조례) 원문 링크도 붙임']},
     {v:'V152', d:'2026-10-18', t:['주소가 든 AI 질문에서 건축물대장·소방용수시설을 받아 놓고도 일반론만 답하던 문제 고침 — 그 건물의 층수·구조·비상용 승강기와 가까운 소화전 거리를 결론·설명에 꼭 쓰게 함','조회한 공공데이터(건축물대장·소방용수시설)는 답에 인용되지 않아도 근거 목록에 항상 보여 줌']},
     {v:'V151', d:'2026-10-18', t:['AI 도우미에 주소가 든 질문(예: 구월동 1138 화재 시 진입 방법은?)을 하면 그 자리에서 건축물대장·소방용수시설을 조회해, 층수·구조·비상용 승강기·가까운 소화전 거리를 근거로 자연스럽게 답함 — 근거 목록에 ‘공공데이터 · 지도’로 표시','검색에서 문장 속 주소도 알아봄(주소 부분만 골라 조회)','47망 → 소화전에 [소방청 자료]/[T맵] 버튼 — 소방청 전국소방용수시설표준데이터로 둘레 소화전·급수탑을 찾아 지도에 표시(공공데이터포털 키가 있으면 소방청 자료가 기본)',
@@ -1891,8 +1896,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const sheet=$('#sheet'), sheetBack=$('#sheetBack');
   let lastFocus=null;
   const appEl=document.querySelector('.app'), tabbarEl=document.querySelector('.tabbar');
-  function openSheet(){ if(sheet.classList.contains('open')) return; lastFocus=document.activeElement; sheet.classList.add('open'); sheetBack.classList.add('open'); sheet.setAttribute('aria-hidden','false'); appEl.inert=true; tabbarEl.inert=true; $('#menuBtn').setAttribute('aria-expanded','true'); setTimeout(()=>$('#sheetClose').focus(),60); }
-  function closeSheet(){ if(!sheet.classList.contains('open')) return; sheet.classList.remove('open'); sheetBack.classList.remove('open'); sheet.setAttribute('aria-hidden','true'); appEl.inert=false; tabbarEl.inert=false; $('#menuBtn').setAttribute('aria-expanded','false'); syncTabbar(); if(lastFocus && lastFocus.focus) lastFocus.focus(); }
+  function openSheet(){ if(sheet.classList.contains('open')) return; lastFocus=document.activeElement; sheet.classList.add('open'); sheetBack.classList.add('open'); sheet.setAttribute('aria-hidden','false'); appEl.inert=true; tabbarEl.inert=true; document.documentElement.classList.add('sheet-lock'); $('#menuBtn').setAttribute('aria-expanded','true'); setTimeout(()=>$('#sheetClose').focus(),60); }
+  function closeSheet(){ if(!sheet.classList.contains('open')) return; sheet.classList.remove('open'); sheetBack.classList.remove('open'); sheet.setAttribute('aria-hidden','true'); appEl.inert=false; tabbarEl.inert=false; document.documentElement.classList.remove('sheet-lock'); $('#menuBtn').setAttribute('aria-expanded','false'); syncTabbar(); if(lastFocus && lastFocus.focus) lastFocus.focus(); }
   sheet.addEventListener('keydown',e=>{ if(e.key!=='Tab') return; const f=[...sheet.querySelectorAll('a,button,[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null); if(!f.length) return; const first=f[0], last=f[f.length-1]; if(e.shiftKey&&document.activeElement===first){ e.preventDefault(); last.focus(); } else if(!e.shiftKey&&document.activeElement===last){ e.preventDefault(); first.focus(); } });
   sheetBack.addEventListener('click',closeSheet); $('#sheetClose').addEventListener('click',closeSheet);
 
@@ -3696,7 +3701,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(has('안녕','하이','hello','반가')) return {text:'안녕하세요. SACHIL AI 도우미입니다. SOP·법령·절차 문서를 찾아 드리고, 체크리스트와 사고보고서로 안내합니다. 아래 추천 질문을 눌러 보셔도 됩니다.'};
     if(has('도움','사용법','뭐 할 수','뭘 할 수','기능')) return {text:'SACHIL은 이름이 곧 화면입니다.\nS 검색 — SOP·법령·절차·사례를 찾습니다.\nA AI 도우미 — 지금 보시는 화면.\nCH 체크리스트 — 출동부터 지휘소 운영까지 12단계, 경과 타이머.\nIL 사고보고서 — 발생개요·화재 원인·인명·재산 피해를 적고 보고서 만들기.\n47망·디브리핑룸(익명 의견·사진·PDF 공유)과 메뉴(14개 섹션)는 오른쪽 위 심벌에 있습니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
     if(has('보고서','리포트','report')) return {text:'체크리스트 화면의 "보고서 작성"을 누르면 체크한 항목·화재 원인·인명 피해·재산 피해·시각 기록으로 보고서 초안이 바로 만들어지고 AI 작성본이 이어서 나옵니다. 만든 보고서는 IL 사고보고서 탭에 모이며, 두 본문 모두 직접 고칠 수 있습니다. 교관 확인 전 자료입니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
-    if(has('상황판','체크리스트','타이머')) return {text:'체크리스트로 안내합니다. 시작을 누르면 경과 시간과 체크 시각이 기록되고, 사고일시가 자동으로 채워집니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'}]};
+    if(has('상황판','체크리스트','타이머')) return {text:'체크리스트로 안내합니다. 첫 항목을 체크하면 경과 시간이 자동으로 시작되고, 체크한 시각이 남으며 사고일시가 자동으로 채워집니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'}]};
     if(has('차이','범위','역할') && has('선착대장','지휘대장')) return {text:'초안 기준 역할 경계입니다. 확정 기준은 교관 승인 후 반영됩니다.\n· 선착대장 — 도착 보고, 초기 상황판단, 선착대 전술(진입·배연·용수), 대원 안전, 지휘권 이양 준비까지.\n· 지휘대장 — 지휘권 인수, 상황 재평가, 대응단계 판단·건의, 자원 요청·배치, 안전관리, 지휘소 운영, 통제단 전환 직전까지.\n· 통제단장 — 이 플랫폼 범위 밖(중앙소방학교).', cards:[{title:'SOP-현장지휘론',slug:'sop',type:'섹션'}]};
     if(has('이의신청','평가 일정','평가일정','재평가')) return {text:'평가·이의신청 일정은 아직 준비 중입니다. 열리면 ICTC 평가일정에서 기수별로 확인할 수 있습니다.', cards:[{title:'ICTC 평가일정',slug:'ictc-eval',type:'섹션'},{title:'실기평가 이의신청은 언제까지 가능한가',slug:'faq',type:'Q&A'}]};
     if(has('교육 일정','교육일정','입교','기수')) return {text:'교육 일정은 준비 중입니다. ICTC 교육일정 섹션에 기수별 시간표가 올라갑니다.', cards:[{title:'ICTC 교육일정',slug:'ictc-schedule',type:'섹션'}]};
@@ -4066,7 +4071,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {go:'debrief', k:'DB', y:true, t:'디브리핑룸', d:'익명으로 개선사항 도출<br>의견 청취로 지휘역량 강화', ic:'<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 7.5C4 5.6 5.6 4 7.5 4h9C18.4 4 20 5.6 20 7.5v5c0 1.9-1.6 3.5-3.5 3.5H10l-4 3.5V16C4.9 15.6 4 14.2 4 12.5v-5Z" fill="#fff" stroke="#244EA2" stroke-width="2" stroke-linejoin="round"/><path d="M22 10.5c1.2.4 2 1.6 2 2.9v4.1c0 1.4-.9 2.6-2 3v3l-3.4-2.9H13c-1.3 0-2.4-.7-3-1.8" fill="none" stroke="#244EA2" stroke-width="2" stroke-linejoin="round"/></svg>'},
     {go:'search', k:'S', t:'Search', d:'SOP·법령·교재·사례 찾기'},
     {go:'ai', k:'A', t:'AI assistant', d:'자료를 근거로 대화하듯 답변'},
-    {go:'board', k:'CH', t:'CHecklist', d:'현재 시각·12단계 지휘 체크'},
+    {go:'board', k:'CH', t:'CHecklist', d:'12단계 지휘 체크·경과 시간'},
     {go:'log', k:'IL', t:'Incident Log', d:'만든 보고서 모아 보기·작성'}
   ];
   const sigK=k=>['S','A','CH','IL'].includes(k)?`<i class="sg sg-${k}" role="img" aria-label="${k}"></i>`:k;   // 시그니처 심벌
@@ -4214,6 +4219,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const v=localStorage.getItem('sachil_srv')||'';
     // 예전 임시 터널 주소(재시작마다 바뀜)는 버리고 고정 주소로 붙는다
     if(v && !/\.trycloudflare\.com$/i.test(v)) return v===location.origin?'':v;
+    if(/^(?:localhost|127\.\d+\.\d+\.\d+|\d+\.\d+\.\d+\.\d+|\[[0-9a-f:]+\])$/i.test(location.hostname)&&location.protocol==='http:') return '';   // V154: 서버 PC·같은 망에서 연 앱은 그 서버를 그대로(새로 고침해도)
     return DEFAULT_SRV===location.origin?'':DEFAULT_SRV;
   }catch(_){ return DEFAULT_SRV===location.origin?'':DEFAULT_SRV; } })();
   const TOKS={}; try{ TOKS['']=localStorage.getItem('sachil_tok:'+SRVBASE)||''; TOKS[':deb']=localStorage.getItem('sachil_tok:'+SRVBASE+':deb')||''; }catch(_){ }
@@ -4769,6 +4775,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     HYD.list=list.map(p=>Object.assign(p,{m:distM(ref,p), dir:D8[Math.round(bearing(ref,p)/45)%8]})).filter(p=>p.m<=rm).sort((x,y)=>x.m-y.m).slice(0,60);
     hydDraw();
     if(!HYD.list.length) toast('소화전을 찾지 못했습니다 — 위 안내 줄을 확인하세요');
+    else { const te=document.getElementById('toast'); if(te) te.classList.remove('on'); }   // V154: 앞 검색의 '못 찾음' 알림을 지움
     if(hydSrc()==='pub'){ hmsg(HYD.list.length?`${ref.name} 기준 ${fmtM(rm)} 안 소방용수시설 ${HYD.list.length}곳(소방청 자료) — 목록을 누르면 지도에서 보입니다`:`${ref.name} 기준 ${fmtM(rm)} 안에 소방청 자료의 소방용수시설이 없습니다 — 반경을 넓히거나 T맵 자료로 바꿔 보세요 [${HYD.diag||'-'}]`); return; }
     hmsg(HYD.list.length?`${ref.name} 기준 ${fmtM(rm)} 안 소화전 ${HYD.list.length}곳 — 목록을 누르면 지도에서 보입니다`:`${ref.name} 기준 ${fmtM(rm)} 안에서 T맵에 등록된 소화전을 찾지 못했습니다 — 반경을 넓혀 보세요 [T맵 응답: ${HYD.diag||'-'} · 기준 ${ref.lat.toFixed(4)},${ref.lng.toFixed(4)}]`);
   }
@@ -4989,6 +4996,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     document.body.appendChild(pop);
     const PK={items:[], sel:[], urls:[]};
     const closePop=()=>{ if(pop.hidden) return; pop.hidden=true; plus.setAttribute('aria-expanded','false'); PK.urls.forEach(u=>URL.revokeObjectURL(u)); PK.urls=[]; };
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!pop.hidden&&!e.isComposing){ e.stopPropagation(); closePop(); plus.focus(); } },true);   // V154: Esc로 닫기
     const pkFile=async it=>{ if(it.file) return it.file; const bl=await (await fetch(it.src)).blob(); return new File([bl], it.name||'사진.jpg', {type:bl.type||'image/jpeg'}); };
     async function pkSend(files,caption){   // 고른 사진(편집본 포함)을 첨부로 넣고 바로 보낸다
       closePop(); if(!files.length||!addPendingFiles) return;
@@ -5030,7 +5038,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       pop.querySelector('.go').addEventListener('click',async()=>{ const b=pop.querySelector('.go'); b.disabled=true; b.textContent='준비 중…';
         try{ const fs=await Promise.all(PK.sel.map(i=>pkFile(PK.items[i]))); pkSend(fs,''); }catch(_){ toast('사진을 가져오지 못했습니다'); pkPaint(); } });
       pop.querySelector('[data-x]').addEventListener('click',closePop);
-      pop.hidden=false; plus.setAttribute('aria-expanded','true');
+      pop.hidden=false; plus.setAttribute('aria-expanded','true'); setTimeout(()=>{ const f=pop.querySelector('button,[href],input'); if(f&&!pop.hidden) f.focus(); },30);   // V154: 열리면 안으로 초점
     }
     // 편집 화면: 위 ← · N 전송 · 고르기 동그라미 / 가운데 사진 / 아래 설명 입력 · 자르기 · 그리기
     function openEditor(list,start,on0,urls){
@@ -5406,7 +5414,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
      d:['메뉴에 올린 자료를 근거로 <b>사람이 말하듯</b> 답합니다.','답변 속 [1] 같은 번호를 누르면 근거가 된 원문 쪽이 열립니다.'],
      n:'AI 답변은 학습용입니다. 중요한 내용은 원문으로 확인하세요.'},
     {k:'CH', t:'체크리스트', get:()=>[pick('.tabbar [data-go="board"]','.top-nav [data-route="board"]')],
-     d:['위에는 <b>현재 시각과 경과 시간</b>, 아래에는 출동부터 지휘소 운영까지 <b>12단계 체크</b>가 있습니다.','<b>시작</b>을 누르면 경과 시간이 흐르고, 체크한 항목은 시각이 자동으로 남습니다. ‘전체 ▾’로 모든 항목을 한눈에.']},
+     d:['출동부터 지휘소 운영까지 <b>12단계 체크</b>가 있습니다.','<b>첫 항목을 체크하면</b> 경과 시간이 자동으로 흐르고, 체크한 항목은 시각이 자동으로 남습니다. ‘전체 ▾’로 모든 항목을 한눈에.']},
     {k:'IL', t:'사고보고서', get:()=>[pick('.tabbar [data-go="log"]','.top-nav [data-route="log"]')],
      d:['<b>발생개요·화재 원인·인명 피해·재산 피해</b>를 적고 <b>보고서 만들기</b>를 누르면 체크리스트 기록과 합쳐 보고서가 나옵니다.','만든 보고서는 아래에 모여 고치기, AI로 작성, 복사·저장·공유를 할 수 있어요.'],
      n:'화면을 좌우로 밀면 옆 탭으로 넘어갑니다.'}
