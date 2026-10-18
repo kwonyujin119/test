@@ -812,7 +812,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v121</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v122</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1036,6 +1036,9 @@ body.chatview .panel{padding-bottom:6px}
 .reply-bar .x{flex:none;width:32px;height:32px;border:0;border-radius:50%;background:var(--surface-2);font-size:18px;cursor:pointer}
 .plus-pop{position:absolute;left:0;bottom:calc(100% + 8px);z-index:6;width:min(100%,340px);padding:12px;border-radius:16px;background:var(--surface);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.18)}
 .plus-pop[hidden]{display:none}
+.srv-wait{display:grid;justify-items:center;gap:10px;text-align:center;padding:60px 20px;color:var(--fg)}.srv-wait p{margin:0;color:var(--muted);font-size:14px}
+.srv-wait .spin{width:34px;height:34px;border-radius:50%;border:4px solid var(--navy-soft);border-top-color:var(--navy);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 /* V121: ＋ 사진 시트(카카오톡식) */
 .psheet{position:fixed;inset:0;z-index:64}
 .psheet .pbd{position:absolute;inset:0;background:rgba(0,0,0,.35)}
@@ -1501,8 +1504,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V121', SRV_VER='4.8';
+  const APP_VER='V122', SRV_VER='4.9';
   const UPDATES=[
+    {v:'V122', d:'2026-10-18', t:['서버가 다시 켜지는 동안 앱을 열어도 대화명을 새로 넣지 않음 — ‘서버가 다시 켜지는 중’ 안내 후 연결되면 그대로 방으로(카카오톡처럼 방·대화명 유지)','방 안에서 서버가 다시 켜져도 대화를 처음부터 다시 그리지 않음(서버 4.9: 대화 구분값을 파일에 저장)','옛 서버(4.6 이하)가 사람이 있어 업데이트를 미루는 문제: 앱이 10분마다 같은 110초 동안 잠깐 쉬어 서버가 새 버전으로 바뀔 틈을 줌(새 서버가 되면 저절로 멈춤)']},
     {v:'V121', d:'2026-10-18', t:['47망 ＋: 카카오톡처럼 아래에서 올라오는 사진 시트 — 맨 앞 카메라, 최근 사진(이 기기에서 고르거나 보낸 사진 + 이 방 사진)을 동그라미로 골라(순서 번호) 오른쪽 위 ‘전송’, 아래 ‘사진·파일’','사진을 누르거나 앨범에서 한 장 고르면 편집 화면: 위 ← · N 전송 · 고르기, 아래 설명 입력 · 자르기 · 돌리기 · 그리기(5색·되돌리기) · 원래대로','휴대폰 갤러리는 웹앱이 먼저 읽을 수 없어 처음에는 이 방 사진만 보이고, 앨범에서 고른 사진은 다음부터 최근 사진에 나옴']},
     {v:'V120', d:'2026-10-18', t:['채팅: Enter는 보내기, Shift+Enter는 줄바꿈 — 줄이 늘면 입력칸도 6줄까지 커짐, 빈 줄도 그대로 보임','PC에서 메시지를 우클릭하면 메뉴가 화면 가운데가 아니라 커서 자리에 뜸','서버 4.8: 새 버전 확인을 5분마다(받으면 바로 다시 켜짐)']},
     {v:'V119', d:'2026-10-18', t:['지도: 표시를 누르면 지도 위에 큰 ‘삭제’ 버튼 — 바로 지우고 6초 동안 되돌리기','지도 방면설정: 화재대상 둘레에 A(아래)·B(왼쪽)·C(위)·D(오른쪽)·E·F 순서로 띄움(화재대상에 가려지지 않게) — 실제 방향으로 끌어 맞추기','지도: 현장지휘소·차량대기소가 이미 있는 표시와 겹치면 비켜서 뜸','PC에서 사진을 누르면 카카오톡처럼 화면 가운데 창으로(남색 머리줄·노란 선, 원래 크기까지만, 좌우 화살표) — 휴대폰은 그대로 전체 화면']},
@@ -3590,10 +3594,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(r.ok&&r.j.ok&&r.j.text) return {text:String(r.j.text)};
     throw {code:r.j.code||'upstream_error', message:r.status===0?'서버에 연결할 수 없습니다. 서버(검은 창)가 켜져 있는지 확인하세요.':(r.j.error||'')};
   }
-  const SRV={on:false, probing:false, notice:'', draft:null, room:0, epoch:'', lib:null, libErr:false, trim:0, requireCode:false, gen:0, last:0, seen:new Set(), retention:0, ctl:null};
+  const SRV={on:false, probing:/^https?:$/.test(location.protocol), notice:'', draft:null, room:0, epoch:'', lib:null, libErr:false, trim:0, requireCode:false, gen:0, last:0, seen:new Set(), retention:0, ctl:null};
   const MES={};   // 방별 서버 대화명(undefined = 아직 모름)
   Object.defineProperty(SRV,'me',{get(){ return MES[RK]||null; }, set(v){ MES[RK]=v||null; }});
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const verLt=(a,b)=>{ const x=String(a).split('.').map(Number), y=String(b).split('.').map(Number); for(let i=0;i<Math.max(x.length,y.length);i++){ const d=(x[i]||0)-(y[i]||0); if(d) return d<0; } return false; };
   async function api(path, opt){
     opt=opt||{};
     const init={method:opt.method||((opt.json!==undefined||opt.body)?'POST':'GET'), credentials:SRVBASE?'omit':'same-origin', headers:{'X-SACHIL':'1'}};
@@ -3620,6 +3625,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     // 다른 방에서 처음 들어왔고 이 방 토큰이 있으면 서버에 대화명을 먼저 묻는다
     if(SRV.on && SRVTOK && MES[RK]===undefined){ const rk=RK; panel.innerHTML='<p class="convo-note">불러오는 중…</p>';
       api('/api/me').then(r=>{ if(MES[rk]===undefined) MES[rk]=(r.ok&&r.j&&r.j.user)||null; if(rk===RK&&ROOMS_R.includes(state.route)) render(); }); return; }
+    if(!SRV.on && SRV.probing && (TOKS['']||TOKS[':deb'])){   // V122: 서버가 다시 켜지는 중 — 대화명은 그대로, 연결되면 바로 방으로
+      panel.innerHTML=`<div class="srv-wait"><span class="spin" aria-hidden="true"></span><b>${SRV.retry?'서버가 다시 켜지는 중입니다':'서버에 연결하는 중…'}</b><p>대화명과 대화는 그대로 유지됩니다. 연결되면 바로 방으로 들어갑니다.</p></div>`; return; }
     if(SRV.on ? !SRV.me : !getNick()){ dbNick(panel,kind); return; }
     DB.enter=false;
     swipeTip();
@@ -4421,6 +4428,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     });
     let first=true, down=false;
     while(SRV.gen===gen){
+      // V122: 옛 서버(4.6 이하)는 방에 사람이 있으면 업데이트를 미룬다 — 모든 화면이 10분마다 같은 110초 동안 잠깐 쉬어 서버가 새 버전으로 바뀔 틈을 준다(새 서버는 기다리지 않으므로 하지 않음)
+      if(SRV.ver&&verLt(SRV.ver,'4.7')&&!verLt(SRV.ver,'3.7')){ const sec=Math.floor(Date.now()/1000)%600;
+        if(sec<110){ stat('서버 새 버전 적용을 위해 잠깐 쉬는 중(최대 2분) — 대화명·방은 그대로, 보낸 글은 그대로 전해집니다'); await sleep((110-sec)*1000); if(SRV.gen!==gen) return; stat(''); first=true;
+          { const me=await api('/api/me'); if(me.ok&&me.j&&me.j.version) SRV.ver=String(me.j.version); }   // 바뀌었으면 다음부터는 쉬지 않음
+          continue; } }
       const ctl=new AbortController(); SRV.ctl=ctl; const to=setTimeout(()=>ctl.abort(),45000);   // 백그라운드 후 멈춘 연결을 끊고 다시
       const r=await api(`/api/rooms/${rid}/messages?after=${SRV.last}&epoch=${encodeURIComponent(SRV.epoch)}${first?'':'&wait=1&rv='+SRV.rv+'&dv='+SRV.dv}`,{signal:ctl.signal});
       clearTimeout(to);
@@ -4438,7 +4450,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         continue;
       }
       if(r.status===401){ render(); return; }
-      down=true; stat('연결이 끊겼습니다. 다시 연결하는 중…'); await sleep(3000);
+      down=true; stat(r.status>=500?'서버가 다시 켜지는 중입니다 — 대화명·방은 그대로, 곧 이어집니다…':'연결이 끊겼습니다. 다시 연결하는 중…'); await sleep(3000);
     }
   }
 
@@ -4485,17 +4497,24 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const r=await api('/api/me',{signal:ctl.signal}); clearTimeout(t);
     if(r.ok && r.j && r.j.server==='sachil'){
       const wasLocal = ROOMS_R.includes(state.route) && !!chat.room;   // 파일 모드 방에 이미 들어가 있었음
-      SRV.probing=false; SRV.on=true; SRV.me=r.j.user||null;
+      const wasWait=attempt>0&&!!(TOKS['']||TOKS[':deb']); SRV.probing=false; SRV.retry=false; SRV.on=true; SRV.me=r.j.user||null; SRV.ver=String(r.j.version||'');
       if(r.j.ai && !CAP.sample){ CAP.sample=serverSample; CAP.ready=true; syncRepUI(); }   // 보고서 AI: Claude 화면 밖에서는 SACHIL 서버(AI 키)로 작성
       SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.roomDb=r.j.room_debrief||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.aiName=String(r.j.ai_name||'').slice(0,20); SRV.kakao=/^[0-9a-f]{32}$/.test(r.j.kakao||'')?r.j.kakao:''; SRV.tmap=/^[0-9A-Za-z]{20,64}$/.test(r.j.tmap||'')?r.j.tmap:''; SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
       if(PROF.tok) checkProf();   // 교수로 로그인해 둔 기기면 교수 표시줄
       await loadLib();
-      if(ROOMS_R.includes(state.route)){ if(DB.agreed){ SRV.notice='서버에 연결되어 공유 대화방으로 바뀌었습니다.'+(wasLocal?' 방금 쓴 내용은 이 기기에만 남습니다.':''); DB.enter=true; } render(); }
+      if(ROOMS_R.includes(state.route)){ if(DB.agreed&&!wasWait){ SRV.notice='서버에 연결되어 공유 대화방으로 바뀌었습니다.'+(wasLocal?' 방금 쓴 내용은 이 기기에만 남습니다.':''); DB.enter=true; } render(); }
       else if(SECTIONS.some(x=>x.slug===state.route) || state.route==='login' || (state.route==='search'&&state.query.trim()) || (state.route==='ai'&&!chat.typing)) render();
       return;
     }
-    if(r.status===0 && !r.aborted && attempt<3){ await sleep([5000,15000,30000][attempt]); return detectServer(attempt+1); }
-    if(r.status===0 && attempt<3){ return detectServer(attempt+1); }   // 10초 타임아웃 → 바로 재시도
+    // V122: 서버가 다시 켜지는 중이면 터널이 502·530 등을 준다 — 끊긴 것과 같이 보고 다시 시도.
+    //       이 기기에 대화명(토큰)이 있으면 혼자 쓰는 방으로 바꾸지 않고 연결될 때까지 계속 기다린다(카카오톡처럼 방·대화명 유지)
+    const down=r.status===0||r.status>=500||(r.ok&&!(r.j&&r.j.server==='sachil'));
+    const hasTok=!!(TOKS['']||TOKS[':deb']);
+    if(down && (attempt<3||hasTok)){
+      SRV.probing=true; SRV.retry=attempt>=1;
+      if(attempt===1&&ROOMS_R.includes(state.route)) render();   // '서버 다시 켜는 중' 안내로
+      await sleep(r.aborted?0:Math.min(15000,[3000,5000,8000,10000][attempt]||15000)); return detectServer(attempt+1);
+    }
     SRV.probing=false;
     if(ROOMS_R.includes(state.route) && !chat.room) render();
   }
