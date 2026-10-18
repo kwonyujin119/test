@@ -735,7 +735,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v112</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v113</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1138,6 +1138,17 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .mapov .kmap{position:absolute;inset:0;background:#e9edf3}
 .mapov .mbox::after{content:'';position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;z-index:4;pointer-events:none;opacity:.7;background:linear-gradient(#244EA2,#244EA2) center/2px 100% no-repeat,linear-gradient(#244EA2,#244EA2) center/100% 2px no-repeat}
 .mapov .mbox.stale .mk{opacity:.5;filter:grayscale(.7)}
+.hydov .mbox::after{display:none}
+.hydov .mh select{min-height:40px;border:1px solid var(--line);border-radius:10px;padding:0 8px;font:inherit;font-size:14px;background:var(--surface);color:var(--fg);margin-left:auto}
+.hydov .hbase{display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px;background:var(--surface);border-bottom:1px solid var(--line)}
+.hydov .hb{min-height:36px;padding:0 12px;border:1px solid var(--line);border-radius:18px;background:var(--surface);font:inherit;font-size:13px;font-weight:700;color:var(--fg)}
+.hydov .hb.on{border-color:#D92D20;background:#FDECEA}
+.hydov .hnote{margin:0;padding:6px 12px;font-size:12.5px;color:var(--warn-fg);background:var(--warn-soft)}
+.hydov .tmapbox{position:absolute;inset:0;background:#e9edf3}
+.hydov .hlist{list-style:none;margin:0;padding:0 10px;max-height:30vh;overflow:auto;background:var(--surface)}
+.hydov .hlist button{width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-height:48px;padding:6px 4px;border:0;border-bottom:1px solid var(--line);background:none;font:inherit;font-size:14px;color:var(--fg);text-align:left}
+.hydov .hlist button span{font-size:12.5px;color:var(--muted)}
+.hydov .hlist button.on{background:#FDECEA}
 .mapov .mjump{position:absolute;left:8px;top:8px;right:56px;z-index:5;display:flex;flex-wrap:wrap;gap:6px;pointer-events:none}
 .mapov .mj{pointer-events:auto;display:inline-flex;align-items:center;gap:5px;min-height:36px;padding:0 10px 0 5px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.94);font:inherit;font-size:12.5px;font-weight:700;color:#1a1a1a;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .mapov .mj i{font-style:normal;display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:12px;font-size:11px;color:#fff;background:#667085}
@@ -1343,8 +1354,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V112', SRV_VER='4.6';
+  const APP_VER='V113', SRV_VER='4.7';
   const UPDATES=[
+    {v:'V113', d:'2026-10-18', t:['47망 ‘소화전’: T맵 장소 검색으로 화재대상(또는 내 위치) 둘레 소화전을 T맵 지도와 목록(방향·거리)으로 — 반경 300m~2km','방재실에 ‘T맵 키’ 칸 추가(서버가 옛 버전이면 이 휴대폰에 맡겨 두었다가 자동으로 넣음)','서버 4.7: 새 버전은 10분마다 확인해 받으면 곧바로 교체, 그 밖에는 2시간마다 서버를 다시 켬(접속자가 없을 때 우선) — 방재실에 다음 재시작 시각 표시']},
     {v:'V112', d:'2026-10-18', t:['PC 바탕화면·작업표시줄 앱 아이콘을 둥근 모서리 사각형으로(이미 설치했다면 앱을 지우고 다시 설치하면 바로 바뀜)']},
     {v:'V111', d:'2026-10-18', t:['지도: 화재가 동시에 나면 화재대상을 3곳까지(화재대상1·2·3) — 지도를 열면 모든 화재대상이 보이게','지도: 표시를 누르면 가장 가까운 화재대상에서 방향·거리(예: 남서쪽 210m)','지도: 서버 연결이 끊기면 \'연결 끊김 — 몇 시 기준\' 안내와 표시를 흐리게','지도: 가운데 + 표시(새 표시가 뜰 자리)','첫 화면을 열 때 칸이 잠깐 검게 보이던 현상 고침','인터넷이 끊겨도 앱 화면이 열리게(체크리스트·보고서는 휴대폰에 저장돼 있음)','체크리스트: 실수로 체크를 풀면 \'되돌리기\'로 기록 시각까지 되살림','AI 도우미: 앱을 다시 열어도 \'근거 없음\' 표시·근거 발췌가 그대로','지도: 회전·키보드가 올라와도 지도 크기가 맞게, 안내 메시지가 지도·방재실 위에 보이게','방재실: 카카오맵 키 빈칸 저장으로 지도가 꺼지던 문제 막음','서버 4.5: 설정 파일 보호(망가져도 키를 지우지 않음)·대화명당 첨부 하루 200MB 한도·서버 창 두 개 동시 실행 막기 등 안정성 보강']},
     {v:'V110', d:'2026-10-18', t:['지도 위쪽에 바로가기 버튼(🔥화재대상·CP현장지휘소·S차량대기소·전체) — 지도를 옮겨도 한 번 누르면 그 자리로 돌아옵니다']},
@@ -1600,7 +1612,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 넘기면 안 되는 상황: 문서·사진·보고서가 열려 있음, 쓰던 글이 입력칸에 남아 있음
   function swipeBusy(){
     if(!document.getElementById('pdfv').hidden || !$('#report').hidden || !lb.hidden) return true;
-    { const mo=document.getElementById('mapov'), bj=document.getElementById('bjov'); if((mo&&!mo.hidden)||(bj&&!bj.hidden)) return true; }   // V108: 지도·방재실 위 끌기는 탭 이동 아님
+    { const mo=document.getElementById('mapov'), bj=document.getElementById('bjov'), hy=document.getElementById('hydov'); if((mo&&!mo.hidden)||(bj&&!bj.hidden)||(hy&&!hy.hidden)) return true; }   // V108: 지도·방재실 위 끌기는 탭 이동 아님
     const ae=document.activeElement;
     if(ae && /^(INPUT|TEXTAREA)$/.test(ae.tagName) && ae.type!=='checkbox' && String(ae.value||'').trim()) return true;
     return false;
@@ -1748,6 +1760,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const pop=document.getElementById('plusPop'); if(pop&&!pop.hidden){ pop.hidden=true; return true; }
     if(!lb.hidden){ closeLightbox(); return true; }
     { const mo=document.getElementById('mapov'); if(mo&&!mo.hidden&&window.__closeMap){ window.__closeMap(); return true; } }
+    { const hy=document.getElementById('hydov'); if(hy&&!hy.hidden&&window.__closeHyd){ window.__closeHyd(); return true; } }
     { const bj=document.getElementById('bjov'); if(bj&&!bj.hidden&&window.__closeBj){ window.__closeBj(); return true; } }
     if(!pv.hidden){ closePdf(true); return true; }
     if(!$('#report').hidden){ closeReport(true); return true; }
@@ -1793,7 +1806,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function render(){
     const r=state.route;
     { const pvEl=document.getElementById('pdfv'); if(pvEl&&!pvEl.hidden) closePdf(true); }
-    if(window.__closeMap) window.__closeMap();
+    if(window.__closeMap) window.__closeMap(); if(window.__closeHyd) window.__closeHyd();
     if(window.__closeBj) window.__closeBj();
     if(SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } SRV.ctl=null; } SRV.gen++;
     pending=[];
@@ -1932,6 +1945,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     PROF.ok=!!(r.ok&&r.j.user&&r.j.user.role==='admin'); if(r.ok&&!PROF.ok) setProf('');
     syncProfUI(); if(PROF.ok && aiPend()) aiKeyFlush();   // V104: 맡겨 둔 AI 키가 있으면 서버에 넣어 본다
     if(PROF.ok && kkPend()) kakaoFlush();
+    if(PROF.ok && tmPend()) tmapFlush();
     return PROF.ok;
   }
   // ---------- SACHIL방재실(V108): 교수 화면을 떠 있는 창으로 — 메뉴 관리·AI 키·지도 키·서버 상태 ----------
@@ -1975,6 +1989,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
               <div class="row"><label for="kakaoIn">카카오맵 키 <small id="kakaoNow"></small></label><input id="kakaoIn" maxlength="64" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="developers.kakao.com의 JavaScript 키(32자)"></div>
               <div class="acts"><button type="submit" class="btn" id="kakaoGo">카카오맵 키 저장</button></div>
               <p class="note">47망 ‘지도’에 씁니다. 카카오 개발자 사이트의 앱 → 플랫폼 → Web 사이트 도메인에 <b>https://kwonyujin119.github.io</b> 와 <b>https://app.sachil47.com</b> 을 등록해야 지도가 열립니다.</p>
+            </form>
+            <form id="tmapForm" autocomplete="off" class="kkf">
+              <div class="row"><label for="tmapIn">T맵 키 <small id="tmapNow"></small></label><input id="tmapIn" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="openapi.sk.com의 App Key"></div>
+              <div class="acts"><button type="submit" class="btn" id="tmapGo">T맵 키 저장</button></div>
+              <p class="note">47망 ‘소화전’에 씁니다(T맵 장소 검색·지도). SK open API에서 앱을 만들고 TMAP 상품을 등록한 뒤 받은 App Key를 붙여 넣으세요.</p>
             </form>
           </section></div>`;
         $('#profOut').addEventListener('click',profLogout);
@@ -2023,9 +2042,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     return `<dl class="srvst">
       <dt>마지막으로 켜진 시각</dt><dd>${at(j.started)} <span>(${dur(up)}째 동작 중)</span></dd>
       <dt>마지막 자동 업데이트</dt><dd>${done?esc(done):'기록 없음'}</dd>
-      <dt>다음 업데이트 확인</dt><dd>${!j.auto_update?'자동 업데이트 꺼짐':j.upd_pending?`새 버전 ${esc(j.upd_pending)} 받음 — <b>접속자가 없을 때 바로</b> 다시 켜짐`:j.upd_next?`${at(j.upd_next)} <span>(${dur(left)} 뒤)</span>`:'곧 확인'}</dd>
+      <dt>다음 업데이트 확인</dt><dd>${!j.auto_update?'자동 업데이트 꺼짐':j.upd_pending?`새 버전 ${esc(j.upd_pending)} 받음 — <b>곧바로</b> 다시 켜짐`:j.upd_next?`${at(j.upd_next)} <span>(${dur(left)} 뒤)</span>`:'곧 확인'}</dd>
       ${j.upd_last?`<dt>마지막 확인</dt><dd>${at(j.upd_last)} · ${esc(j.upd_result||'')}</dd>`:''}
-    </dl><p class="note">서버는 새 버전이 있을 때만 다시 켜집니다(몇 초). 새 버전이 없으면 확인만 하고 그대로 동작합니다.</p>`;
+      ${j.restart_next?`<dt>다음 정기 재시작</dt><dd>${at(j.restart_next)} <span>(${dur(j.restart_next-(j.now||0))} 뒤 · 접속자가 있으면 최대 30분 늦춤)</span></dd>`:''}
+    </dl><p class="note">${'restart_next' in j?'새 버전은 10분마다 확인해 받으면 곧바로, 그 밖에는 2시간마다 서버가 다시 켜집니다(10~20초 동안 47망이 잠깐 끊겼다가 저절로 이어짐).':'서버는 새 버전이 있을 때만 다시 켜집니다(몇 초). 새 버전이 없으면 확인만 하고 그대로 동작합니다.'}</p>`;
   }
   // 서버가 아직 키 관리 기능을 모르면(옛 서버): 키를 이 휴대폰에 잠시 맡겨 두었다가, 서버가 업데이트되면 자동으로 넣는다(V104)
   const AIK_PEND='sachil_aikey_pending';
@@ -2036,6 +2056,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const k=kkPend(); if(!k||!PROF.tok||!SRV.on) return;
     const x=await api('/api/admin/ai',{json:{action:'kakao',key:k},tok:PROF.tok});
     if(x.ok&&x.j.ok){ try{ localStorage.removeItem(KK_PEND); }catch(_){ } SRV.kakao=k; toast('맡겨 둔 카카오맵 키를 서버에 넣었습니다'); }
+  }
+  // V113: T맵 키 — 카카오 키와 같은 방식(옛 서버면 이 휴대폰에 맡겨 둠)
+  const TM_PEND='sachil_tmap_pending', TM_RE=/^[0-9A-Za-z]{20,64}$/;
+  const tmPend=()=>{ try{ const j=JSON.parse(localStorage.getItem(TM_PEND)||'null'); if(j&&TM_RE.test(j.key)) return j.key; }catch(_){ } return ''; };
+  async function tmapFlush(){
+    const k=tmPend(); if(!k||!PROF.tok||!SRV.on) return;
+    const x=await api('/api/admin/ai',{json:{action:'tmap',key:k},tok:PROF.tok});
+    if(x.ok&&x.j.ok){ try{ localStorage.removeItem(TM_PEND); }catch(_){ } SRV.tmap=k; toast('맡겨 둔 T맵 키를 서버에 넣었습니다'); }
   }
   async function aiKeyFlush(){
     const pj=aiPend(); if(!pj||!PROF.tok||!SRV.on) return null;
@@ -2048,9 +2076,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   async function aiKeysBind(){
     const st=$('#aiStat'), f=$('#aiKeyForm'), msg=$('#aiKeyMsg'); if(!st||!f) return;
     const show=(t,bad)=>{ msg.hidden=!t; msg.textContent=t||''; msg.classList.toggle('err',!!bad); };
-    const paint=j=>{ st.innerHTML=aiStatHtml(j); { const kn=$('#kakaoNow'); if(kn) kn.textContent=j&&j.kakao?`(등록됨 ${j.kakao})`:'(없음)'; } st.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>arm(b,'정말 지우기',async()=>{
+    const paint=j=>{ st.innerHTML=aiStatHtml(j); { const kn=$('#kakaoNow'); if(kn) kn.textContent=j&&j.kakao?`(등록됨 ${j.kakao})`:'(없음)'; } { const tn=$('#tmapNow'); if(tn) tn.textContent=j&&j.tmap?`(등록됨 ${j.tmap})`:(tmPend()?`(이 휴대폰에 맡겨 둠 …${tmPend().slice(-4)})`:'(없음)'); } st.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>arm(b,'정말 지우기',async()=>{
       const r=await api('/api/admin/ai',{json:{action:'delete',provider:b.dataset.del},tok:PROF.tok}); if(r.ok&&r.j.keys){ paint(r.j); show(r.j.msg||''); } else show(r.j.error||'지우지 못했습니다',true); }))); };
-    const fl=await aiKeyFlush(); await kakaoFlush();
+    const fl=await aiKeyFlush(); await kakaoFlush(); await tmapFlush();
     const r=await api('/api/admin/ai',{json:{action:'status'},tok:PROF.tok});
     if(!st.isConnected) return;
     paint(r.ok?r.j:null);
@@ -2060,6 +2088,18 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     st.addEventListener('click',async e=>{ const b=e.target.closest('#srvUpd'); if(!b) return; b.disabled=true;
       const x=await api('/api/admin/ai',{json:{action:'update'},tok:PROF.tok}); b.disabled=false;
       show(x.ok?(x.j.msg||x.j.error||''):(x.status===404?'이 서버는 지금 확인 기능이 없습니다 — 2시간마다 자동으로 확인합니다':(x.j.error||'요청하지 못했습니다')), !(x.ok&&x.j.ok)); });
+    { const tf=$('#tmapForm'); if(tf) tf.addEventListener('submit',async e=>{
+        e.preventDefault(); const k=$('#tmapIn').value.replace(/[^0-9A-Za-z]/g,''), b=$('#tmapGo');
+        if(!TM_RE.test(k)){ show('T맵 앱 키(App Key)를 그대로 붙여 넣으세요',true); return; }
+        b.disabled=true; const x=await api('/api/admin/ai',{json:{action:'tmap',key:k},tok:PROF.tok}); b.disabled=false;
+        if(x.ok&&x.j.ok&&'tmap' in x.j){ $('#tmapIn').value=''; paint(x.j); show(x.j.msg||'저장했습니다'); SRV.tmap=k; }
+        else if(x.status===404||(x.ok&&x.j&&!('tmap' in x.j))||(x.j&&/회사를 고르세요/.test(x.j.error||''))){   // 옛 서버(4.7 전)
+          try{ localStorage.setItem(TM_PEND,JSON.stringify({key:k,t:Date.now()})); }catch(_){ }
+          $('#tmapIn').value=''; const tn=$('#tmapNow'); if(tn) tn.textContent=`(이 휴대폰에 맡겨 둠 …${k.slice(-4)})`;
+          show('서버가 아직 옛 버전이라 T맵 키를 이 휴대폰에 맡겨 두었습니다. 이 휴대폰에서는 소화전이 바로 열리고, 서버가 4.7로 업데이트되면 자동으로 넣어 모두에게 적용됩니다.');
+        }
+        else show(x.j.error||'저장하지 못했습니다',true);
+      }); }
     { const kf=$('#kakaoForm'); if(kf) kf.addEventListener('submit',async e=>{
         e.preventDefault(); const v=$('#kakaoIn').value.trim(), b=$('#kakaoGo'); if(!v){ show('카카오 JavaScript 키를 붙여 넣으세요',true); return; }   // V111: 빈칸 저장이 모두의 지도 키를 지우지 않게
         b.disabled=true;
@@ -3649,6 +3689,127 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   window.__closeMap=closeMap;
 
+  // ---------- 소화전(V113): T맵 장소 검색으로 화재대상(47망 지도) 둘레의 소화전을 T맵 지도에 띄운다 ----------
+  // T맵 자료는 T맵 지도 위에만(카카오맵과 섞지 않음). 키는 교수가 방재실에서 넣는다. 지도가 안 열려도 목록·거리는 보인다
+  const HYD={p:null, map:null, mk:[], list:[], base:null, bases:[], rid:0, key:'', seq:0};
+  const D8=['북','북동','동','남동','남','남서','서','북서'], fmtM=m=>m<1000?Math.round(m)+'m':(m/1000).toFixed(1)+'km';
+  const svgUrl=t=>'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(t);
+  const HYD_ICON=svgUrl('<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26"><circle cx="13" cy="13" r="11" fill="#D92D20" stroke="#fff" stroke-width="2.5"/><text x="13" y="17.5" font-size="12" font-weight="700" text-anchor="middle" fill="#fff" font-family="sans-serif">소</text></svg>');
+  const BASE_ICON=svgUrl('<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><circle cx="15" cy="15" r="13" fill="#fff" stroke="#D92D20" stroke-width="3"/><text x="15" y="20" font-size="14" text-anchor="middle">🔥</text></svg>');
+  function loadTmap(key){
+    if(window.Tmapv2&&Tmapv2.Map) return Promise.resolve();
+    if(HYD.p) return HYD.p;
+    // T맵 jsv2는 document.write로 본 스크립트를 부른다 — 페이지가 다 열린 뒤에는 막히므로, 불러오는 동안만 가로채 DOM으로 넣는다
+    HYD.p=new Promise((ok,no)=>{
+      const dw=document.write, dwl=document.writeln;
+      const add=html=>{ String(html).replace(/<script[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi,(m,src)=>{ const t=document.createElement('script'); t.src=src; t.async=false; document.head.appendChild(t); return m; }); };
+      document.write=add; document.writeln=add;
+      let iv=0, to=0;
+      const done=e=>{ clearInterval(iv); clearTimeout(to); document.write=dw; document.writeln=dwl; if(e){ HYD.p=null; no(e); } else ok(); };
+      iv=setInterval(()=>{ if(window.Tmapv2&&Tmapv2.Map) done(); },150);
+      to=setTimeout(()=>done(new Error('timeout')),15000);
+      const s=document.createElement('script'); s.src='https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey='+encodeURIComponent(key);
+      s.onerror=()=>{ s.remove(); done(new Error('load')); }; document.head.appendChild(s);
+    });
+    return HYD.p;
+  }
+  // T맵 장소 통합 검색(거리순). radius는 km 단위 정수라 넉넉히 받고 거리로 다시 거른다
+  async function hydSearch(key,c,km){
+    const u='https://apis.openapi.sk.com/tmap/pois?version=1&format=json&searchKeyword='+encodeURIComponent('소화전')+'&searchType=all&searchtypCd=R'
+      +'&centerLat='+c.lat+'&centerLon='+c.lng+'&radius='+km+'&reqCoordType=WGS84GEO&resCoordType=WGS84GEO&page=1&count=200&appKey='+encodeURIComponent(key);
+    const r=await fetch(u,{headers:{Accept:'application/json'}});
+    if(r.status===204) return [];   // 결과 없음
+    if(!r.ok){ let m=''; try{ const j=await r.json(); m=(j&&j.error&&(j.error.message||j.error.code))||''; }catch(_){ } throw new Error(r.status+(m?' '+m:'')); }
+    const j=await r.json(), a=(((j||{}).searchPoiInfo||{}).pois||{}).poi||[], seen=new Set();
+    return (Array.isArray(a)?a:[a]).map(p=>({name:String(p.name||'').slice(0,60), lat:+(p.noorLat||p.frontLat), lng:+(p.noorLon||p.frontLon),
+        addr:[p.upperAddrName,p.middleAddrName,p.lowerAddrName,p.firstNo&&p.firstNo!=='0'?p.firstNo+(p.secondNo&&p.secondNo!=='0'?'-'+p.secondNo:''):''].filter(Boolean).join(' ').slice(0,80)}))
+      .filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng)&&/소화전|소방용수|급수탑/.test(p.name))
+      .filter(p=>{ const k=p.lat.toFixed(5)+','+p.lng.toFixed(5); if(seen.has(k)) return false; seen.add(k); return true; });
+  }
+  const hydEl=document.createElement('div'); hydEl.className='mapov hydov'; hydEl.id='hydov'; hydEl.hidden=true;
+  hydEl.setAttribute('role','dialog'); hydEl.setAttribute('aria-modal','true'); hydEl.setAttribute('aria-label','소화전');
+  hydEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="소화전 닫기">‹</button><b>소화전 · T맵</b>
+      <select class="hrad" aria-label="찾을 반경"><option value="300">300m</option><option value="500" selected>500m</option><option value="1000">1km</option><option value="2000">2km</option></select></div>
+    <div class="hbase" role="group" aria-label="기준 위치"></div>
+    <div class="mbox"><div class="tmapbox"></div></div>
+    <p class="mmsg" role="status"></p>
+    <ol class="hlist"></ol>
+    <p class="mhint">기준은 47망 지도의 <b>화재대상</b>(없으면 내 위치)입니다. T맵에 ‘소화전’으로 등록된 곳만 보이므로 빠진 소화전이 있을 수 있어요 — 실제 위치·사용 가능 여부는 현장에서 확인하세요.</p>`;
+  document.body.appendChild(hydEl);
+  const hq=s=>hydEl.querySelector(s);
+  const hmsg=(t,html)=>{ const m=hq('.mmsg'); if(html) m.innerHTML=t; else m.textContent=t||''; };
+  function hydBases(){
+    hq('.hbase').innerHTML=HYD.bases.map((b,i)=>`<button type="button" class="hb${b===HYD.base?' on':''}" data-b="${i}">${b.k==='me'?'◎':'🔥'} ${esc(b.name)}</button>`).join('')
+      +(HYD.bases.some(b=>b.k==='me')?'':'<button type="button" class="hb" data-b="me">◎ 내 위치</button>');
+  }
+  function hydDraw(){
+    hq('.hlist').innerHTML=HYD.list.map((p,i)=>`<li><button type="button" data-i="${i}"><b>${esc(p.name)}</b><span>${p.dir}쪽 ${fmtM(p.m)}${p.addr?' · '+esc(p.addr):''}</span></button></li>`).join('');
+    if(!HYD.map||!HYD.base) return;
+    HYD.mk.forEach(m=>{ try{ m.setMap(null); }catch(_){ } }); HYD.mk=[];
+    try{
+      const T=Tmapv2, b=HYD.base;
+      HYD.mk.push(new T.Marker({position:new T.LatLng(b.lat,b.lng), icon:BASE_ICON, iconSize:new T.Size(30,30), map:HYD.map, title:b.name}));
+      HYD.list.forEach(p=>HYD.mk.push(new T.Marker({position:new T.LatLng(p.lat,p.lng), icon:HYD_ICON, iconSize:new T.Size(26,26), map:HYD.map, title:p.name})));
+      HYD.map.setCenter(new T.LatLng(b.lat,b.lng));
+    }catch(_){ }
+  }
+  async function hydRun(){
+    const b=HYD.base; if(!b) return;
+    const rm=+hq('.hrad').value||500, my=++HYD.seq;
+    hmsg(`${b.name} 둘레 소화전을 찾는 중…`);
+    let list;
+    try{ list=await hydSearch(HYD.key,b,Math.max(1,Math.ceil(rm/1000))); }
+    catch(e){ if(my!==HYD.seq||hydEl.hidden) return; const m=String(e.message||'');
+      hmsg(/^40[13]/.test(m)?'T맵 키가 맞지 않거나 사용 승인이 안 됐습니다 — 교수: 방재실의 T맵 키, SK open API에서 TMAP 상품 등록 확인':/^429/.test(m)?'오늘 T맵 검색 한도를 넘었습니다 — 내일 다시':`T맵 검색에 실패했습니다 — 인터넷 연결을 확인하세요 (${m.slice(0,60)})`); return; }
+    if(my!==HYD.seq||hydEl.hidden) return;
+    HYD.list=list.map(p=>Object.assign(p,{m:distM(b,p), dir:D8[Math.round(bearing(b,p)/45)%8]})).filter(p=>p.m<=rm).sort((x,y)=>x.m-y.m).slice(0,60);
+    hydDraw();
+    hmsg(HYD.list.length?`${b.name} 기준 ${fmtM(rm)} 안 소화전 ${HYD.list.length}곳 — 목록을 누르면 지도에서 보입니다`:`${b.name} 기준 ${fmtM(rm)} 안에서 T맵에 등록된 소화전을 찾지 못했습니다 — 반경을 넓혀 보세요`);
+  }
+  function hydPick(b){ HYD.base=b; hydBases(); hydRun(); }
+  hq('.hbase').addEventListener('click',e=>{
+    const t=e.target.closest('[data-b]'); if(!t) return;
+    if(t.dataset.b!=='me'){ const b=HYD.bases[+t.dataset.b]; if(b) hydPick(b); return; }
+    if(!navigator.geolocation){ hmsg('이 기기에서 위치를 쓸 수 없습니다'); return; }
+    hmsg('내 위치를 찾는 중…');
+    navigator.geolocation.getCurrentPosition(p=>{ if(hydEl.hidden) return; HYD.bases=HYD.bases.filter(x=>x.k!=='me').concat({k:'me',name:'내 위치',lat:p.coords.latitude,lng:p.coords.longitude}); hydPick(HYD.bases[HYD.bases.length-1]); },
+      ()=>hmsg('위치 권한이 없거나 찾지 못했습니다'),{enableHighAccuracy:true,timeout:10000});
+  });
+  hq('.hrad').addEventListener('change',hydRun);
+  hq('.hlist').addEventListener('click',e=>{
+    const t=e.target.closest('[data-i]'); if(!t) return; const p=HYD.list[+t.dataset.i]; if(!p) return;
+    hq('.hlist').querySelectorAll('button.on').forEach(x=>x.classList.remove('on')); t.classList.add('on');
+    hmsg(`${p.name} · ${HYD.base.name}에서 ${p.dir}쪽 ${fmtM(p.m)}`);
+    if(HYD.map){ try{ HYD.map.setCenter(new Tmapv2.LatLng(p.lat,p.lng)); HYD.map.setZoom(18); }catch(_){ } }
+  });
+  let hydLast=null;
+  function closeHyd(){ if(hydEl.hidden) return; hydEl.hidden=true; HYD.seq++; appEl.inert=false; tabbarEl.inert=false; if(hydLast&&hydLast.isConnected&&hydLast.focus) hydLast.focus(); }
+  hq('.mclose').addEventListener('click',closeHyd);
+  document.addEventListener('keydown',e=>{ if(!hydEl.hidden&&e.key==='Escape') closeHyd(); });
+  async function openHyd(rid){
+    if(!SRV.on){ toast('소화전은 서버(47망)에 연결됐을 때 쓸 수 있습니다'); return; }
+    hydLast=document.activeElement; HYD.rid=rid; hydEl.hidden=false; appEl.inert=true; tabbarEl.inert=true;
+    try{ hq('.mclose').focus({preventScroll:true}); }catch(_){ }
+    HYD.key=SRV.tmap||tmPend(); HYD.list=[]; HYD.bases=[]; HYD.base=null; hq('.hlist').innerHTML=''; hq('.hbase').innerHTML=''; hq('.mbox').hidden=false;
+    if(!HYD.key){ hmsg(`T맵 키가 아직 없습니다. ${isProf()?'메뉴 → <b>SACHIL방재실</b> → <b>T맵 키</b>에 App Key를 넣어 주세요.':'교수에게 T맵 키 설정을 요청하세요.'}`,true); return; }
+    hmsg('기준 위치(화재대상)를 불러오는 중…');
+    const r=await api(`/api/rooms/${rid}/map`); if(hydEl.hidden) return;
+    const it=(r.ok&&r.j&&r.j.items)||{}, fs=FIREK.filter(k=>it[k]&&Number.isFinite(+it[k].lat));
+    HYD.bases=fs.map(k=>({k, name:'화재대상'+((fs.length>1||k!=='fire')?(FIREK.indexOf(k)+1):''), lat:+it[k].lat, lng:+it[k].lng}));
+    const c=HYD.bases[0]||{lat:37.4563,lng:126.7052};
+    loadTmap(HYD.key).then(()=>{
+      if(hydEl.hidden) return; const box=hq('.tmapbox');
+      if(!HYD.map) HYD.map=new Tmapv2.Map(box,{center:new Tmapv2.LatLng(c.lat,c.lng), width:'100%', height:'100%', zoom:16});
+      else { try{ HYD.map.resize(box.clientWidth,box.clientHeight); }catch(_){ } }
+      hydDraw();
+    }).catch(()=>{ if(hydEl.hidden) return; hq('.mbox').hidden=true;
+      hq('.hbase').insertAdjacentHTML('afterend','<p class="hnote">T맵 지도를 불러오지 못해 목록으로만 보여 줍니다(인터넷·T맵 키 확인)</p>'); });
+    hydBases();
+    if(HYD.bases.length) hydPick(HYD.bases[0]);
+    else hmsg('47망 지도에 화재대상이 없습니다 — 지도에서 화재대상을 놓거나, 위 ‘◎ 내 위치’를 누르세요');
+  }
+  window.__closeHyd=closeHyd;
+
   async function srvRoom(panel,kind){
     const gen=SRV.gen, rid=kind==='deb'?SRV.roomDb:SRV.room, title=ROOM_NAME[kind]||'47망';
     if(!rid){ panel.innerHTML=`<p class="convo-note">${kind==='deb'?'디브리핑룸은 서버 PC를 새 버전(V57)으로 업데이트하면 열립니다. 지금은 47망을 이용해 주세요.':'47망을 찾지 못했습니다. 서버를 다시 시작해 주세요.'}</p>`; return; }
@@ -3873,7 +4034,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       sh.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); });
     }
     if(SRV.draft){ const d=SRV.draft; SRV.draft=null; const i=$('#chatText'); if(i&&d.text) i.value=d.text; if(d.att&&d.att.length){ pending=d.att.slice(0,MAX_FILES); renderPending(); } stat('다시 입장했습니다. 보내지 못한 내용을 되살렸습니다'); }
-    { const mb=$('#mapBtn'); if(mb) mb.addEventListener('click',()=>openMap(rid)); const hb=$('#hydBtn'); if(hb) hb.addEventListener('click',()=>toast('소화전 표시는 다음 업데이트에서 열립니다')); }
+    { const mb=$('#mapBtn'); if(mb) mb.addEventListener('click',()=>openMap(rid)); const hb=$('#hydBtn'); if(hb) hb.addEventListener('click',()=>openHyd(rid)); }
     $('#dbRename').addEventListener('click',async()=>{ const rb=$('#dbRename'); if(rb.dataset.arm!=='1'){ rb.dataset.arm='1'; rb.textContent='한 번 더 누르면 바꿈'; rb.classList.add('accent'); stat('대화명을 바꾸면 지금까지 쓴 글은 다른 사람 글처럼 보이고 지울 수 없게 됩니다'); setTimeout(()=>{ if(rb.isConnected){ rb.dataset.arm=''; rb.textContent='대화명 바꾸기'; rb.classList.remove('accent'); stat(''); } },3500); return; } if(SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } SRV.ctl=null; } SRV.gen++; await api('/api/logout',{json:{}}); setTok(''); SRV.me=null; toChat(); });
     const clr=$('#dbClear');
     if(clr) clr.addEventListener('click',async()=>{
@@ -3926,7 +4087,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!lb.hidden){ if(e.key==='Escape') closeLightbox(); return; }
     if(!$('#report').hidden){ if(e.key==='Escape') closeReport(); return; }
     if(e.key==='Escape'){ if(sheet.classList.contains('open')){ closeSheet(); return; } if(document.activeElement===q){ q.value=''; syncClear(); go('search',''); } }
-    if(e.key==='/' && !/input|textarea|select/i.test(document.activeElement.tagName) && !document.querySelector('#mapov:not([hidden]),#bjov:not([hidden])')){ e.preventDefault(); if(state.route!=='search'){ focusSearchAfter=true; go('search'); } else { q.focus(); q.select(); } }
+    if(e.key==='/' && !/input|textarea|select/i.test(document.activeElement.tagName) && !document.querySelector('#mapov:not([hidden]),#bjov:not([hidden]),#hydov:not([hidden])')){ e.preventDefault(); if(state.route!=='search'){ focusSearchAfter=true; go('search'); } else { q.focus(); q.select(); } }
   });
 
   // ---------- 시작 ----------
@@ -3949,7 +4110,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const wasLocal = ROOMS_R.includes(state.route) && !!chat.room;   // 파일 모드 방에 이미 들어가 있었음
       SRV.probing=false; SRV.on=true; SRV.me=r.j.user||null;
       if(r.j.ai && !CAP.sample){ CAP.sample=serverSample; CAP.ready=true; syncRepUI(); }   // 보고서 AI: Claude 화면 밖에서는 SACHIL 서버(AI 키)로 작성
-      SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.roomDb=r.j.room_debrief||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.aiName=String(r.j.ai_name||'').slice(0,20); SRV.kakao=/^[0-9a-f]{32}$/.test(r.j.kakao||'')?r.j.kakao:''; SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
+      SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.roomDb=r.j.room_debrief||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.aiName=String(r.j.ai_name||'').slice(0,20); SRV.kakao=/^[0-9a-f]{32}$/.test(r.j.kakao||'')?r.j.kakao:''; SRV.tmap=/^[0-9A-Za-z]{20,64}$/.test(r.j.tmap||'')?r.j.tmap:''; SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
       if(PROF.tok) checkProf();   // 교수로 로그인해 둔 기기면 교수 표시줄
       await loadLib();
       if(ROOMS_R.includes(state.route)){ if(DB.agreed){ SRV.notice='서버에 연결되어 공유 대화방으로 바뀌었습니다.'+(wasLocal?' 방금 쓴 내용은 이 기기에만 남습니다.':''); DB.enter=true; } render(); }

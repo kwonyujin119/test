@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '4.6'
-APP_VERSION = 'V112'
+VERSION = '4.7'
+APP_VERSION = 'V113'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -111,10 +111,14 @@ def load_conf():
         'ai_provider': 'auto',          # auto(키 있는 쪽: gemini → groq → claude) | gemini | groq | claude
         'groq_api_key': '',             # V103: Groq API 키(gsk_…) — Gemini 한도가 차면 예비로. groq-key-setup.bat으로 넣음
         'groq_model': 'openai/gpt-oss-120b',     # Groq 모델 이름(console.groq.com의 Models에 나온 이름). 안 되면 예비 모델을 차례로 시도
+        'tmap_app_key': '',             # V113: T맵(SK open API) 앱 키 — 47망 '소화전'(T맵 장소 검색·지도). 교수 화면에서 넣음. 앱에 그대로 내려감(공개용)
         'kakao_js_key': '',             # V106: 카카오맵 JavaScript 키(developers.kakao.com) — 교수 화면에서 넣음. 공개용 키(도메인 등록으로 보호)
         'ai_cache_days': 3,             # V102: 같은 질문의 AI 답을 이 기간 저장해 다시 씀(AI 호출·한도 안 씀). 0이면 끔
         'auto_update': True,            # V102: 서버 파일을 GitHub에서 스스로 받아 다시 켬(접속자 없을 때). false면 끔
-        'update_check_hours': 2,        # 새 버전 확인 간격(시간)
+        'update_check_hours': 2,        # (V113부터 안 씀 — update_check_min)
+        'update_check_min': 10,         # V113: 새 버전 확인 간격(분). 받으면 바로 교체
+        'auto_restart': True,           # V113: 업데이트가 없어도 정기적으로 서버를 다시 켬(접속자 없을 때 우선, 30분 넘게 기다리면 그대로)
+        'restart_hours': 2,             # 정기 재시작 간격(시간)
         'update_url': 'https://raw.githubusercontent.com/kwonyujin119/test/main/server/sachil_server.py',
         'ai_model': 'claude-sonnet-5-5',
         'ai_daily_limit': 50,           # 하루 AI 답변 최대 횟수(비용 상한, 교수 로그인은 제외). 0이면 무제한
@@ -415,9 +419,9 @@ def packed(key, mtime, make):
     return val
 
 
-CSP = ("default-src 'self'; img-src 'self' data: blob: https://*.daumcdn.net https://*.kakao.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-       "font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline' https://dapi.kakao.com https://*.daumcdn.net; "
-       "connect-src 'self' data: blob: https://dapi.kakao.com https://*.daumcdn.net; "
+CSP = ("default-src 'self'; img-src 'self' data: blob: https://*.daumcdn.net https://*.kakao.com https://*.tmap.co.kr https://*.sk.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tmap.co.kr; "
+       "font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline' https://dapi.kakao.com https://*.daumcdn.net https://apis.openapi.sk.com https://*.tmap.co.kr; "
+       "connect-src 'self' data: blob: https://dapi.kakao.com https://*.daumcdn.net https://apis.openapi.sk.com https://*.tmap.co.kr; "
        "frame-src 'self' blob:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
 
 MAGIC = [
@@ -720,7 +724,7 @@ class H(BaseHTTPRequestHandler):
                                        'require_code': bool(CONF.get('require_code')),
                                        'retention_days': CONF.get('retention_days'), 'max_files': 10,
                                        'ai': ai_ready(), 'ai_name': AI_NAMES.get(ai_provider(), ''), 'index': DOCS_IDX.status(),
-                                       'kakao': str(CONF.get('kakao_js_key') or '')})
+                                       'kakao': str(CONF.get('kakao_js_key') or ''), 'tmap': str(CONF.get('tmap_app_key') or '')})
             if not self.user:
                 return self.err(401, '로그인이 필요합니다')
             if path == '/api/rooms':
@@ -1059,8 +1063,9 @@ class H(BaseHTTPRequestHandler):
                     'limit': int(CONF.get('ai_daily_limit') or 0), 'version': VERSION,
                     'auto_update': bool(CONF.get('auto_update')) and os.environ.get('SACHIL_LOOP') == '1',
                     'kakao': ('…' + str(CONF.get('kakao_js_key'))[-4:]) if CONF.get('kakao_js_key') else '',
+                    'tmap': ('…' + str(CONF.get('tmap_app_key'))[-4:]) if CONF.get('tmap_app_key') else '',
                     'started': SERVER_START, 'upd_next': UPD_STATE['next'], 'upd_last': UPD_STATE['last'], 'upd_result': UPD_STATE['result'],
-                    'upd_pending': UPD_STATE['pending'], 'upd_done': last_update_done()[0], 'now': time.time()}
+                    'upd_pending': UPD_STATE['pending'], 'restart_next': UPD_STATE.get('restart_next') or 0, 'upd_done': last_update_done()[0], 'now': time.time()}
         if act == 'status':
             return self.send(200, status(), log=False)
         if act == 'kakao':   # V106: 카카오맵 JavaScript 키(공개용 키 — 앱에 그대로 내려간다)
@@ -1070,6 +1075,13 @@ class H(BaseHTTPRequestHandler):
             CONF['kakao_js_key'] = k.lower()
             write_conf(CONF)
             return self.send(200, dict(status(), msg='카카오맵 키를 저장했습니다' if k else '카카오맵 키를 지웠습니다'), log=False)
+        if act == 'tmap':   # V113: T맵 앱 키(SK open API) — 소화전 찾기에 씀
+            k = re.sub(r'[^0-9A-Za-z]', '', str(j.get('key') or ''))
+            if k and not (20 <= len(k) <= 64):
+                return self.err(400, 'T맵 앱 키(App Key)를 그대로 붙여 넣으세요')
+            CONF['tmap_app_key'] = k
+            write_conf(CONF)
+            return self.send(200, dict(status(), msg='T맵 키를 저장했습니다' if k else 'T맵 키를 지웠습니다'), log=False)
         if act == 'update':   # V104: 교수 화면에서 '서버 업데이트 지금 확인'
             if not (CONF.get('auto_update') and os.environ.get('SACHIL_LOOP') == '1'):
                 return self.send(200, dict(status(), ok=False, error='이 서버는 자동 업데이트가 꺼져 있거나 옛 start-domain.bat로 켜져 있습니다 — PC에서 업데이트 묶음을 한 번 받아 주세요'), log=False)
@@ -2735,7 +2747,7 @@ def last_update_done():
 
 
 def auto_update_loop():
-    """V102: 2시간(update_check_hours)마다 새 서버 파일을 확인 → 검사 → 접속자 없을 때 교체하고 종료(75).
+    """V102: 새 서버 파일을 확인 → 검사 → 교체하고 종료(75). V113: 10분마다 확인·받으면 바로 교체, 그 밖에는 2시간마다 정기 재시작.
     start-domain.bat가 75를 받으면 바로 다시 켜고, 새 파일이 곧바로 죽으면 이전 파일(.bak)로 되돌린다."""
     me = os.path.abspath(__file__)
     flag = os.path.join(DATA, 'update_verify.flag')
@@ -2762,11 +2774,19 @@ def auto_update_loop():
         if CONF.get('auto_update'):
             upd_log('start-domain.bat가 옛 버전이라 자동 업데이트를 쉽니다 — 업데이트 묶음의 start-domain.bat로 덮어쓰세요')
         return
+    # V113: 새 버전은 10분마다 확인해 받으면 곧바로 교체(AI 답변 중이면 최대 90초 기다림).
+    #       업데이트가 없을 때는 2시간마다 다시 켬 — 접속자 없을 때를 우선, 30분 기다려도 계속 있으면 그대로 다시 켬
+    def every(key, dflt, lo):
+        try:
+            return max(lo, float(CONF.get(key) or dflt))
+        except (TypeError, ValueError):
+            return dflt
     UPD_STATE['next'] = time.time() + 120
+    UPD_STATE['restart_next'] = SERVER_START + every('restart_hours', 2, 0.5) * 3600 if CONF.get('auto_restart', True) else 0
     UPDATE_NOW.wait(120)
     while True:
         UPDATE_NOW.clear()
-        if CONF.get('auto_update'):
+        if CONF.get('auto_update') and time.time() >= UPD_STATE['next'] - 1:
             try:
                 UPD_STATE['last'] = time.time()
                 got = fetch_new_server()
@@ -2774,33 +2794,41 @@ def auto_update_loop():
                 if got:
                     new, src = got
                     UPD_STATE['result'] = UPD_STATE['pending'] = new
-                    upd_log(f'새 버전 {new} 받음 — 접속자가 없을 때 교체합니다')
-                    while not room_idle():
-                        time.sleep(60)
+                    upd_log(f'새 버전 {new} 받음 — 바로 교체합니다')
+                    for _ in range(90):   # 답을 만드는 중인 AI 호출만 끝나길 잠깐 기다린다
+                        if not AI_BUSY[0]:
+                            break
+                        time.sleep(1)
                     shutil.copy2(me, me + '.bak')
                     with open(me + '.new', 'w', encoding='utf-8', newline='') as f:
                         f.write(src)
                     os.replace(me + '.new', me)
                     with open(flag, 'w', encoding='utf-8') as f:
                         f.write(new)
-                    upd_log(f'{VERSION} → {new} 교체, 서버를 다시 켭니다')
-                    p = TUNNEL_PROC[0]
-                    if p and p.poll() is None:
-                        try:
-                            p.terminate()
-                            p.wait(timeout=10)
-                        except Exception:
-                            pass
-                    os._exit(75)
+                    restart_self(f'{VERSION} → {new} 교체')
             except Exception as e:
                 UPD_STATE['result'] = '확인 실패(인터넷 확인)'
                 upd_log(f'확인 실패(다음에 다시): {str(e)[:100]}')
+            UPD_STATE['next'] = time.time() + every('update_check_min', 10, 5) * 60
+        due = UPD_STATE.get('restart_next') or 0
+        if due and time.time() >= due and (room_idle() or time.time() >= due + 30 * 60):
+            restart_self('정기 재시작(%g시간마다)' % every('restart_hours', 2, 0.5))
+        UPDATE_NOW.wait(max(5, min(60, UPD_STATE['next'] - time.time())) if CONF.get('auto_update') else 60)   # 1분마다 깨어 확인(교수 화면 '지금 확인'은 바로 깸)
+        if UPDATE_NOW.is_set():
+            UPD_STATE['next'] = 0
+
+
+def restart_self(why):
+    """서버를 다시 켠다: 터널을 닫고 75로 끝내면 start-domain.bat가 곧바로 다시 켠다."""
+    upd_log(f'{why} — 서버를 다시 켭니다')
+    p = TUNNEL_PROC[0]
+    if p and p.poll() is None:
         try:
-            hrs = float(CONF.get('update_check_hours') or 2)
-        except (TypeError, ValueError):
-            hrs = 2
-        UPD_STATE['next'] = time.time() + max(0.25, hrs) * 3600
-        UPDATE_NOW.wait(max(0.25, hrs) * 3600)   # 교수 화면의 '지금 확인'을 누르면 바로 깸(V104)
+            p.terminate()
+            p.wait(timeout=10)
+        except Exception:
+            pass
+    os._exit(75)
 
 
 def run_tunnel(port, named):
