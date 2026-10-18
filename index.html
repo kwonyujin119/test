@@ -838,7 +838,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v143</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v144</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1577,8 +1577,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V143', SRV_VER='6.9';
+  const APP_VER='V144', SRV_VER='7.0';
   const UPDATES=[
+    {v:'V144', d:'2026-10-18', t:['AI 도우미가 법령 질문(근거·의무·벌칙·조문 등)을 받으면 법제처 국가법령정보에서 현행 조문 원문을 찾아 근거로 답함 — 근거 목록에 ‘법령명 제○조(제목)’와 법제처 원문 링크','질문에 법령 이름이 없으면 소방기본법·긴급구조대응활동 및 현장지휘에 관한 규칙·재난안전법·119구조구급법·화재예방법·소방시설법에서 찾음','SACHIL방재실 → 서버·AI 탭에 ‘법제처 OPEN API (OC)’ 칸 — 저장할 때 시험 검색으로 확인','서버 7.0 필요']},
     {v:'V143', d:'2026-10-18', t:['SACHIL방재실을 탭으로: 요약(서버·자동 업데이트·AI·카카오맵·T맵·자료 상태를 한눈에 + 바로 하기) · 서버·AI · 지도 키 · 핀 문구 · 보고서(양식·지시사항 바로 열기) · 메뉴 자료','교수로 로그인해 둔 기기에서 교수 화면을 새로 열면 로그인 창이 다시 뜨던 문제 고침','보고서: ‘PDF공유’ 대신 ‘공유’ — 누르면 PDF·PNG(그림 한 장)·DOCX(워드) 중 골라 공유(공유가 안 되는 기기는 그 파일을 받기)','보고서: ‘세부 조치 내용:’처럼 ‘내용’ 이름표는 붙이지 않음(AI 결과에서도 뺌)','서버 6.9']},
     {v:'V142', d:'2026-10-18', t:['AI 보고서 문체: ‘~임·~함·~됨’ 대신 상황보고식 명사형(예: ‘14:12 2층 요구조자 2명 구조’, ‘대응1단계 발령(14:05)’), 줄 끝 마침표 없음','서버 6.8 필요(서버 쪽 AI 지시에도 같은 문체 규칙)']},
     {v:'V141', d:'2026-10-18', t:['화면을 넓게: AI 도우미 제목 아래 연결 안내, 보고서 위 정보·상태 줄(작성 중·문제가 있을 때만 보임)과 아래 안내문, DS·소화전 아래 안내문, CH 시각 기록의 빈 안내, 메뉴 아래 자료 수·버전 줄을 없앰','보고서: 편집 버튼을 제목 옆으로, 빈 도구 줄은 접고 여백을 줄여 본문을 크게','서버 6.7']},
@@ -2258,6 +2259,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
               <div class="acts"><button type="submit" class="btn primary" id="aiKeyGo">저장하고 시험</button></div>
               <p class="note">키는 서버 PC에만 저장되고 다시 보여 주지 않습니다(끝 4자리만). 시험에 실패하면 이전 키를 그대로 둡니다. 키를 채팅·카카오톡에 붙이지 마세요.</p>
             </form>
+            <form id="lawForm" autocomplete="off" class="kkf">
+              <div class="row"><label for="lawIn">법제처 OPEN API (OC) <small id="lawNow"></small></label><input id="lawIn" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="신청한 이메일의 @ 앞부분"></div>
+              <div class="acts"><button type="submit" class="btn" id="lawGo">저장하고 시험</button></div>
+              <p class="note">AI 도우미가 법령 질문을 받으면 법제처 국가법령정보에서 현행 조문 원문을 찾아 근거로 답하고 원문 링크를 붙입니다. open.law.go.kr에서 승인받은 OC(신청 이메일의 @ 앞부분)를 넣으세요 — 서버 PC에만 저장됩니다.</p>
+            </form>
           </section>
           <section class="card create prof aikeys bjp" data-pane="map" hidden aria-labelledby="mapKeysH">
             <h2 id="mapKeysH">지도 키</h2>
@@ -2333,7 +2339,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!j){ el.innerHTML=ok('서버 상태를 불러오지 못했습니다','bad'); return; }
     el.innerHTML=[ok(`서버 <b>${esc(j.version||'?')}</b>`), j.bat_manual||j.bat_old?ok('자동 업데이트 <b>확인 필요</b>','bad'):ok(`자동 업데이트 <b>${j.auto_update?'켜짐':'꺼짐'}</b>`,j.auto_update?'good':''),
       ok(`AI <b>${j.provider?esc(AI_NM[j.provider]||j.provider):'없음'}</b>`,j.provider?'good':'bad'), ok(`오늘 AI <b>${j.today||0}${j.limit?'/'+j.limit:''}</b>`),
-      ok(`카카오맵 <b>${j.kakao?'등록':'없음'}</b>`,j.kakao?'good':'bad'), ok(`T맵 <b>${j.tmap?'등록':'없음'}</b>`,j.tmap?'good':'bad'), ok(`자료 <b>${libN}/${libT}</b> 섹션`)].join(''); }
+      ok(`카카오맵 <b>${j.kakao?'등록':'없음'}</b>`,j.kakao?'good':'bad'), ok(`T맵 <b>${j.tmap?'등록':'없음'}</b>`,j.tmap?'good':'bad'), ok(`법제처 <b>${j.law?'연결':'없음'}</b>`,j.law?'good':''), ok(`자료 <b>${libN}/${libT}</b> 섹션`)].join(''); }
   // V133: 교수 — 대화방 📌 핀 문구 고치기(서버 5.9부터)
   function pinEditBind(panel){
     rinfoSync(true).then(()=>panel.querySelectorAll('.pinf').forEach(f=>{ const k=f.dataset.kind, L=f.querySelector('textarea[id^="pinL"]'), M=f.querySelector('textarea[id^="pinM"]'); if(L&&L.value===L.defaultValue&&M.value===M.defaultValue&&document.activeElement!==L&&document.activeElement!==M){ L.value=ROOM_INFO[k].lead; M.value=ROOM_INFO[k].more.join('\n'); } }));   // V138: 다른 기기에서 고친 최신 문구로 채움
@@ -2403,7 +2409,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   async function aiKeysBind(){
     const st=$('#aiStat'), f=$('#aiKeyForm'), msg=$('#aiKeyMsg'); if(!st||!f) return;
     const show=(t,bad)=>{ [msg,document.getElementById('mapKeyMsg')].forEach(m=>{ if(!m) return; m.hidden=!t; m.textContent=t||''; m.classList.toggle('err',!!bad); }); };
-    const paint=j=>{ st.innerHTML=aiStatHtml(j); bjSumPaint(j); { const kn=$('#kakaoNow'); if(kn) kn.textContent=j&&j.kakao?`(등록됨 ${j.kakao})`:'(없음)'; } { const tn=$('#tmapNow'); if(tn) tn.textContent=j&&j.tmap?`(등록됨 ${j.tmap})`:(tmPend()?`(이 휴대폰에 맡겨 둠 …${tmPend().slice(-4)})`:'(없음)'); } st.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>arm(b,'정말 지우기',async()=>{
+    const paint=j=>{ st.innerHTML=aiStatHtml(j); bjSumPaint(j); { const kn=$('#kakaoNow'); if(kn) kn.textContent=j&&j.kakao?`(등록됨 ${j.kakao})`:'(없음)'; } { const ln=$('#lawNow'); if(ln) ln.textContent=j&&j.law?`(연결됨 ${j.law})`:(j&&'law' in j?'(없음)':'(서버 업데이트 필요)'); } { const tn=$('#tmapNow'); if(tn) tn.textContent=j&&j.tmap?`(등록됨 ${j.tmap})`:(tmPend()?`(이 휴대폰에 맡겨 둠 …${tmPend().slice(-4)})`:'(없음)'); } st.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>arm(b,'정말 지우기',async()=>{
       const r=await api('/api/admin/ai',{json:{action:'delete',provider:b.dataset.del},tok:PROF.tok}); if(r.ok&&r.j.keys){ paint(r.j); show(r.j.msg||''); } else show(r.j.error||'지우지 못했습니다',true); }))); };
     const fl=await aiKeyFlush(); await kakaoFlush(); await tmapFlush();
     const r=await api('/api/admin/ai',{json:{action:'status'},tok:PROF.tok});
@@ -2415,6 +2421,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     st.addEventListener('click',async e=>{ const b=e.target.closest('#srvUpd'); if(!b) return; b.disabled=true;
       const x=await api('/api/admin/ai',{json:{action:'update'},tok:PROF.tok}); b.disabled=false;
       show(x.ok?(x.j.msg||x.j.error||''):(x.status===404?'이 서버는 지금 확인 기능이 없습니다 — 2시간마다 자동으로 확인합니다':(x.j.error||'요청하지 못했습니다')), !(x.ok&&x.j.ok)); });
+    { const lf=$('#lawForm'); if(lf) lf.addEventListener('submit',async e=>{   // V144: 법제처 OC 저장 — 서버가 시험 검색을 해 보고 저장
+        e.preventDefault(); const v=$('#lawIn').value.trim(), b=$('#lawGo'); if(!v){ show('OC(신청 이메일의 @ 앞부분)를 넣으세요',true); return; }
+        b.disabled=true; b.textContent='시험 중…'; const x=await api('/api/admin/ai',{json:{action:'law',oc:v},tok:PROF.tok}); b.disabled=false; b.textContent='저장하고 시험';
+        if(x.ok&&x.j&&x.j.ok&&'law' in x.j){ $('#lawIn').value=''; paint(x.j); show(x.j.msg||'저장했습니다'); }
+        else if(x.ok&&x.j&&x.j.keys&&!('law' in x.j)) show('서버가 아직 옛 버전입니다 — 서버 7.0으로 업데이트한 뒤 다시 넣어 주세요',true);
+        else show((x.j&&x.j.error)||'저장하지 못했습니다',true); }); }
     { const tf=$('#tmapForm'); if(tf) tf.addEventListener('submit',async e=>{
         e.preventDefault(); const k=$('#tmapIn').value.replace(/[^0-9A-Za-z]/g,''), b=$('#tmapGo');
         if(!TM_RE.test(k)){ show('T맵 앱 키(App Key)를 그대로 붙여 넣으세요',true); return; }
@@ -3427,7 +3439,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const quickHtml=()=>quickPick().map(t=>`<button type="button" data-q="${esc(t)}">${esc(t)}</button>`).join('');
   let quickT=null;
   const now=()=>{const d=new Date();return `${pad(d.getHours())}:${pad(d.getMinutes())}`;};
-  function cload(){ try{ const s=JSON.parse(localStorage.getItem(CKEY)||'null'); if(s&&Array.isArray(s.msgs)) chat.msgs=s.msgs.filter(m=>m&&(m.who==='bot'||m.who==='me')&&typeof m.text==='string').map(m=>({who:m.who,text:m.text.slice(0,4000),t:/^\d{2}:\d{2}$/.test(String(m.t))?m.t:'',mode:['ai','extract','none','general'].includes(m.mode)?m.mode:'',cached:!!m.cached,note:String(m.note||'').slice(0,120),src:Array.isArray(m.src)?m.src.filter(x=>x&&SECTIONS.some(z=>z.slug===x.slug)&&typeof x.name==='string'&&Number.isInteger(x.page)).slice(0,8).map(x=>({slug:x.slug,name:x.name.slice(0,200),page:x.page,art:String(x.art||'').slice(0,40),snip:String(x.snip||'').slice(0,180)})):[],att:(Array.isArray(m.att)?m.att.filter(validAtt).map(cleanAtt):[]).slice(0,MAX_FILES),cards:Array.isArray(m.cards)?m.cards.filter(c=>c&&typeof c.title==='string'&&(['board','search','login','log','ai'].includes(c.slug)||SECTIONS.some(s=>s.slug===c.slug))).slice(0,8).map(c=>({title:c.title.slice(0,120),slug:c.slug,type:String(c.type||'').slice(0,8)})):[]})).slice(-100); }catch(_){ } }
+  function cload(){ try{ const s=JSON.parse(localStorage.getItem(CKEY)||'null'); if(s&&Array.isArray(s.msgs)) chat.msgs=s.msgs.filter(m=>m&&(m.who==='bot'||m.who==='me')&&typeof m.text==='string').map(m=>({who:m.who,text:m.text.slice(0,4000),t:/^\d{2}:\d{2}$/.test(String(m.t))?m.t:'',mode:['ai','extract','none','general'].includes(m.mode)?m.mode:'',cached:!!m.cached,note:String(m.note||'').slice(0,120),src:Array.isArray(m.src)?m.src.filter(x=>x&&(SECTIONS.some(z=>z.slug===x.slug)||(x.slug==='law'&&/^https:\/\/www\.law\.go\.kr\//.test(String(x.url||''))))&&typeof x.name==='string'&&Number.isInteger(x.page)).slice(0,8).map(x=>({slug:x.slug,name:x.name.slice(0,200),page:x.page,art:String(x.art||'').slice(0,60),snip:String(x.snip||'').slice(0,180),url:x.slug==='law'?String(x.url):''})):[],att:(Array.isArray(m.att)?m.att.filter(validAtt).map(cleanAtt):[]).slice(0,MAX_FILES),cards:Array.isArray(m.cards)?m.cards.filter(c=>c&&typeof c.title==='string'&&(['board','search','login','log','ai'].includes(c.slug)||SECTIONS.some(s=>s.slug===c.slug))).slice(0,8).map(c=>({title:c.title.slice(0,120),slug:c.slug,type:String(c.type||'').slice(0,8)})):[]})).slice(-100); }catch(_){ } }
   function csave(){ trySet(CKEY, JSON.stringify({msgs:chat.msgs.slice(-100)})); }
   function push(who,text,cards,att){ chat.msgs.push({who,text,t:now(),cards:cards||[],att:att||[]}); if(chat.msgs.length>100) chat.msgs.splice(0,chat.msgs.length-100); csave(); }
 
@@ -3440,7 +3452,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(has('체크리스트','상황판','타이머') && /열|보여|가자|시작|어디/.test(lq)) return answer(v);
     return null;
   }
-  const srcHref=s=>libHref(s.slug,{name:s.name});
+  const srcHref=s=>s.url||libHref(s.slug,{name:s.name});
+  const srcPg=s=>s.slug==='law'?'법제처 원문':`${s.page}쪽`, srcPdf=s=>s.slug==='law'?'':` data-pdfv="${esc(s.name)}" data-page="${s.page}"`;   // V144: 법령 원문은 법제처로
   // PDF에서 뽑은 글에 섞인 깨진 기호(□) 지우기(V94) — 예전 서버 답·이 기기에 저장된 대화에도 적용
   const deGlyph=t=>String(t||'').replace(/[\uE000-\uF8FF\uFFFD\u1100-\u11FF\uA960-\uA97F\uD7B0-\uD7FF\u2E80-\u2FDF\uA000-\uA6FF]|[\uDB80-\uDBFF][\uDC00-\uDFFF]/g,' ').replace(/[ \t]{2,}/g,' ');
   // 이름표 줄: '결론: …', '[결론] …', '**결론:** …', '근거'(혼자) — '근거로 보면'처럼 문장 첫 낱말은 이름표로 보지 않는다
@@ -3456,7 +3469,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     return pre.concat(...ANS_ORD.filter(k=>sec.has(k)).map(k=>sec.get(k)));
   }
   function botTextHtml(m){
-    const ref=l=>l.replace(/\[근거 부족\]/g,'<span class="nb">근거 부족</span>').replace(/\[(\d{1,2})\]/g,(x,n)=>{ const sc=m.src&&m.src[Number(n)-1]; return sc?`<a class="ref" href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}" aria-label="근거 ${n}: ${esc(pdfName(sc.name))} ${sc.page}쪽">${n}</a>`:x; });
+    const ref=l=>l.replace(/\[근거 부족\]/g,'<span class="nb">근거 부족</span>').replace(/\[(\d{1,2})\]/g,(x,n)=>{ const sc=m.src&&m.src[Number(n)-1]; return sc?`<a class="ref" href="${esc(srcHref(sc))}" target="_blank" rel="noopener"${srcPdf(sc)} aria-label="근거 ${n}: ${esc(pdfName(sc.name))} ${srcPg(sc)}">${n}</a>`:x; });
     // V98 답 형식: 결론 → 설명 → 현장에서 → 근거(- 줄) → 근거 부족. AI가 다른 순서로 써도(이전 대화를 따라 하는 경우 등) 여기서 다시 줄 세운다
     return orderAns(esc(deGlyph(m.text)).split('\n').filter(l=>l.trim())).map(l=>{
       const lb=ansLb(l);
@@ -3468,10 +3481,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function botSrcHtml(m){
     if(!m.src||!m.src.length) return '';
     const cited=new Set([...String(m.text).matchAll(/\[(\d{1,2})\]/g)].map(x=>Number(x[1])-1));   // 본문에서 인용한 근거만 보인다
-    return `<div class="src-h">근거 자료</div><ol class="src" aria-label="근거 자료">${m.src.map((sc,i)=>(cited.size&&!cited.has(i))?'':`<li><a href="${esc(srcHref(sc))}" target="_blank" rel="noopener" data-pdfv="${esc(sc.name)}" data-page="${sc.page}"><b>[${i+1}]</b><em>${esc(pdfName(sc.name))}${sc.art?` · ${esc(sc.art)}`:''}</em><span>${sc.page}쪽</span></a>${sc.snip?`<q class="snip">${esc(deGlyph(sc.snip))}</q>`:''}</li>`).join('')}</ol>`;
+    return `<div class="src-h">근거 자료</div><ol class="src" aria-label="근거 자료">${m.src.map((sc,i)=>(cited.size&&!cited.has(i))?'':`<li${sc.slug==='law'?' class="law"':''}><a href="${esc(srcHref(sc))}" target="_blank" rel="noopener"${srcPdf(sc)}><b>[${i+1}]</b><em>${esc(pdfName(sc.name))}${sc.art?` · ${esc(sc.art)}`:''}</em><span>${srcPg(sc)}</span></a>${sc.snip?`<q class="snip">${esc(deGlyph(sc.snip))}</q>`:''}</li>`).join('')}</ol>`;
   }
   const cacheTag=m=>m.cached?' · 같은 질문의 저장된 답':'';
-  const botModeHtml=m=> m.mode==='ai' ? `<span class="mode">AI 도우미 · 메뉴 자료 근거 답변${cacheTag(m)} — 중요한 내용은 원문으로 확인하세요</span>`
+  const botModeHtml=m=> m.mode==='ai' ? `<span class="mode">AI 도우미 · ${(m.src||[]).some(x=>x.slug==='law')?'법령 원문(법제처)·':''}메뉴 자료 근거 답변${cacheTag(m)} — 중요한 내용은 원문으로 확인하세요</span>`
     : m.mode==='general' ? `<span class="mode warn">AI 일반 설명 · 메뉴 자료에 근거 없음${cacheTag(m)} — 소속 기관 지침·원문으로 확인하세요</span>`
     : m.mode==='extract' ? `<span class="mode">교수 에이전트 · 원문 발췌 정리${m.note?` · ${esc(m.note)}`:' · AI 키 연결 시 해설형 답변'}</span>` : '';
 
@@ -3814,7 +3827,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           if((chat.gen||0)!==g0) return;   // 그사이 '대화 비우기' — 이전 질문의 답은 버림
           chat.typing=false;
           if(r.status===403&&r.j&&r.j.code==='need_code'){ chat.msgs.pop(); csave(); setAiCode(''); SRV.aiGate=true; if(chat.room==='bot'&&state.route==='ai') aiGate(panel,room); return; }   // 코드가 바뀜 → 다시 입력
-          if(r.ok&&r.j.ok){ push('bot',String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.cached=!!r.j.cached; m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,art:String(x.art||'').slice(0,40),snip:String(x.snippet||'').slice(0,180)})); csave(); }
+          if(r.ok&&r.j.ok){ push('bot',String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.cached=!!r.j.cached; m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,art:String(x.art||'').slice(0,60),snip:String(x.snippet||'').slice(0,180),url:/^https:\/\/www\.law\.go\.kr\//.test(String(x.url||''))?String(x.url):''})); csave(); }
           else push('bot', r.status===0?'서버에 연결할 수 없습니다. 잠시 뒤 다시 물어보세요.':(r.j.error||'답변을 만들지 못했습니다.'),[]);
           if(chat.room==='bot'&&state.route==='ai'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp&&window.innerWidth>=600) inp.focus(); }
         });

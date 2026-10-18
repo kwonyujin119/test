@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '6.9'
-APP_VERSION = 'V143'
+VERSION = '7.0'
+APP_VERSION = 'V144'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -991,8 +991,16 @@ class H(BaseHTTPRequestHandler):
         hits = focus_hits(hits)[:7]
         if hits and len(terms) >= 2 and ai_ready() and max(len(h['hit']) for h in hits) / len(terms) < 0.5:
             hits = []   # 질문 낱말을 절반도 못 맞힌 쪽뿐('차이' 같은 흔한 말만 겹침) → 근거 없음으로 보고 일반 설명(V97)
+        laws = []
+        if CONF.get('law_oc') and ai_ready() and law_wanted(qtext):   # V144: 법령 질문이면 법제처에서 조문 원문을 찾아 근거로(앞에 둔다)
+            try:
+                laws = law_lookup(qtext)
+            except Exception as e:
+                upd_log(f'법제처 조회 실패: {str(e)[:120]}')
+        hits = laws + hits[:max(0, 7 - len(laws))]
         st = DOCS_IDX.status()
-        sources = [{'slug': h['slug'], 'name': h['name'], 'page': h['page'], 'art': h.get('art') or '', 'snippet': snippet(h['text'], h['hit'] or terms, 120)} for h in hits]
+        sources = [({'slug': 'law', 'name': h['name'], 'page': 0, 'art': h.get('art') or '', 'url': h['url'], 'snippet': h['text'][:120]} if h.get('law') else
+                    {'slug': h['slug'], 'name': h['name'], 'page': h['page'], 'art': h.get('art') or '', 'snippet': snippet(h['text'], h['hit'] or terms, 120)}) for h in hits]
         if not hits and ai_ready():   # 메뉴 자료에 근거가 없으면 AI 일반 지식으로 짧게([근거 부족] 표시)
             ok, why = ai_allowed(self.ip(), self.is_prof())
             if ok:
@@ -1148,6 +1156,7 @@ class H(BaseHTTPRequestHandler):
                     'bat_manual': bat_needs_manual(),   # V138: 자동 업데이트는 되지만 bat 자체는 한 번 손으로 바꿔야 함
                     'kakao': ('…' + str(CONF.get('kakao_js_key'))[-4:]) if CONF.get('kakao_js_key') else '',
                     'tmap': ('…' + str(CONF.get('tmap_app_key'))[-4:]) if CONF.get('tmap_app_key') else '',
+                    'law': (str(CONF.get('law_oc'))[:2] + '…') if CONF.get('law_oc') else '',   # V144: 법제처 OPEN API(OC) — 앞 2자만
                     'started': SERVER_START, 'upd_next': UPD_STATE['next'], 'upd_last': UPD_STATE['last'], 'upd_result': UPD_STATE['result'],
                     'upd_pending': UPD_STATE['pending'], 'restart_next': UPD_STATE.get('restart_next') or 0, 'upd_done': last_update_done()[0], 'now': time.time()}
         if act == 'status':
@@ -1185,6 +1194,23 @@ class H(BaseHTTPRequestHandler):
             CONF['room_info_ts'] = time.time()
             write_conf(CONF)
             return self.send(200, dict(status(), info=info, info_ts=CONF['room_info_ts'], msg='핀 문구를 저장했습니다 — 모든 기기에 적용' if lead else '기본 문구로 되돌렸습니다'), log=False)
+        if act == 'law':   # V144: 법제처 국가법령정보 OPEN API — OC(신청한 이메일의 @ 앞부분). 저장 전에 한 번 시험
+            oc = re.sub(r'[^0-9A-Za-z._-]', '', str(j.get('oc') or ''))[:40]
+            if not oc:
+                CONF['law_oc'] = ''
+                write_conf(CONF)
+                return self.send(200, dict(status(), msg='법제처 연결을 지웠습니다'), log=False)
+            try:
+                got = law_search('소방기본법', oc)
+            except Exception as e:
+                return self.send(200, dict(status(), ok=False, error=f'법제처 시험 실패: {str(e)[:160]}'), log=False)
+            if not got:
+                return self.send(200, dict(status(), ok=False, error='법제처가 결과를 주지 않았습니다 — OC(신청 이메일의 @ 앞부분)와, 신청 화면의 활용 API·도메인/IP를 확인하세요'), log=False)
+            CONF['law_oc'] = oc
+            write_conf(CONF)
+            LAW_CACHE.clear()
+            LAW_SCACHE.clear()
+            return self.send(200, dict(status(), msg=f'법제처 연결 완료 — 시험 검색 ‘소방기본법’ {len(got)}건'), log=False)
         if act == 'tmap':   # V113: T맵 앱 키(SK open API) — 소화전 찾기에 씀
             k = re.sub(r'[^0-9A-Za-z]', '', str(j.get('key') or ''))
             if k and not (20 <= len(k) <= 64):
@@ -2338,9 +2364,140 @@ def ai_allowed(ip, prof=False):
     return True, ''
 
 
+# ---- V144: 법제처 국가법령정보 OPEN API(DRF) — 질문에서 법령 이름·핵심어를 뽑아 현행 법령 조문 원문을 찾는다
+LAW_CACHE = {}   # MST → (받은 시각, 법령명, 시행일, [(조문 표시, 제목, 본문)])
+LAW_DEFAULT = ['소방기본법', '긴급구조대응활동 및 현장지휘에 관한 규칙', '재난 및 안전관리 기본법', '119구조ㆍ구급에 관한 법률',
+               '화재의 예방 및 안전관리에 관한 법률', '소방시설 설치 및 관리에 관한 법률']
+_LAW_HINT = re.compile(r'(?<![방해기문어용요수편처])법|조문|조항|규칙|시행령|근거|의무|벌칙|과태료|처벌|권한|규정|위반|허가|신고|명령|책임|기준')
+_LAW_NAME = re.compile(r'([가-힣ㆍ·]{2,}(?:\s?[가-힣ㆍ·]+){0,6}?(?:에 관한 법률|에 관한 규칙|법률|시행령|시행규칙|규칙|법))')
+_LAW_NOT = set('법률 규칙 시행령 시행규칙 방법 불법 위법 적법 편법 해법 기법 문법 어법 용법 요법 수법 대처법 진압법 처치법 구조법'.split())
+_LAW_STOP = set('무엇 무엇인가요 어떻게 어떤 언제 누가 있나요 하나요 되나요 인가요 경우 관련 대해 대한 알려 주세요 질문 내용 법령 법률 근거 조문 규정 기준'.split())
+
+
+def law_wanted(q):
+    return bool(_LAW_HINT.search(q))
+
+
+def law_get(url, timeout=15):
+    t = fetch_text(url, 4_000_000, timeout)
+    if t.lstrip().startswith('<'):
+        m = re.search(r'<(?:p|li|h\d|div)[^>]*>([^<]{4,120})', t)
+        raise RuntimeError('법제처 응답이 JSON이 아님' + (f' — {m.group(1).strip()}' if m else ''))
+    return json.loads(t)
+
+
+LAW_SCACHE = {}   # 검색어 → (시각, 결과) — 같은 법령을 질문마다 다시 찾지 않게(하루)
+
+
+def law_search(query, oc=None):
+    oc = oc or CONF.get('law_oc')
+    c = LAW_SCACHE.get((oc, query))
+    if c and time.time() - c[0] < 86400:
+        return c[1]
+    rows = _law_search(query, oc)
+    if len(LAW_SCACHE) > 200:
+        LAW_SCACHE.clear()
+    LAW_SCACHE[(oc, query)] = (time.time(), rows)
+    return rows
+
+
+def _law_search(query, oc):
+    j = law_get('https://www.law.go.kr/DRF/lawSearch.do?OC=' + urllib.parse.quote(oc) + '&target=law&type=JSON&display=5&query=' + urllib.parse.quote(query))
+    r = (j.get('LawSearch') or {}).get('law') or []
+    return [r] if isinstance(r, dict) else r
+
+
+def _law_flat(x):
+    if isinstance(x, list):
+        return x
+    return [x] if isinstance(x, dict) else []
+
+
+def law_articles(mst):
+    now = time.time()
+    hit = LAW_CACHE.get(mst)
+    if hit and now - hit[0] < 86400:
+        return hit[1:]
+    j = law_get('https://www.law.go.kr/DRF/lawService.do?OC=' + urllib.parse.quote(CONF.get('law_oc')) + '&target=law&type=JSON&MST=' + urllib.parse.quote(str(mst)), 25)
+    law = j.get('법령') or {}
+    info = law.get('기본정보') or {}
+    name = str(info.get('법령명_한글') or info.get('법령명한글') or '').strip()
+    eff = str(info.get('시행일자') or '')
+    arts = []
+    for a in _law_flat((law.get('조문') or {}).get('조문단위')):
+        if str(a.get('조문여부') or '') != '조문':
+            continue
+        no = str(a.get('조문번호') or '')
+        br = str(a.get('조문가지번호') or '')
+        label = f'제{no}조' + (f'의{br}' if br and br != '0' else '')
+        title = str(a.get('조문제목') or '')
+        parts = [str(a.get('조문내용') or '')]
+        for h in _law_flat(a.get('항')):
+            parts.append(str(h.get('항내용') or ''))
+            for ho in _law_flat(h.get('호')):
+                parts.append('  ' + str(ho.get('호내용') or ''))
+                for mo in _law_flat(ho.get('목')):
+                    parts.append('    ' + str(mo.get('목내용') or ''))
+        text = re.sub(r'[ \t]+', ' ', '\n'.join(x for x in parts if x.strip())).strip()
+        arts.append((label, title, text))
+    if len(LAW_CACHE) > 30:
+        LAW_CACHE.clear()
+    LAW_CACHE[mst] = (now, name, eff, arts)
+    return name, eff, arts
+
+
+def law_lookup(q, top=3):
+    """질문 → [근거 hit]. 질문에 법령 이름이 있으면 그 법령, 없으면 소방 현장에 자주 쓰는 법령들에서 낱말이 많이 겹치는 조문."""
+    names = []
+    for m in _LAW_NAME.finditer(q):
+        n = m.group(1).strip()
+        if len(n) >= 3 and n not in _LAW_NOT and n not in names:
+            names.append(n)
+    cands = names[:2] or LAW_DEFAULT
+    want_jo = re.findall(r'제\s?(\d+)\s?조(?:의\s?(\d+))?', q)
+    toks = [t for t in re.findall(r'[가-힣]{2,}', q) if t not in _LAW_STOP and not t.endswith(('은', '는', '이', '가', '을', '를'))]
+    toks += [t[:-1] for t in re.findall(r'[가-힣]{3,}', q) if t.endswith(('은', '는', '이', '가', '을', '를', '의', '에'))]
+    scored = []
+    if names and not any(law_search(n) for n in names[:2]):   # 이름처럼 보였지만 법령이 아니면 기본 법령들에서
+        cands = LAW_DEFAULT
+    for cn in cands:
+        rows = law_search(cn)
+        if not rows:
+            continue
+        exact = [r for r in rows if str(r.get('법령명한글') or '').replace(' ', '') == cn.replace(' ', '')]
+        r = (exact or rows)[0]
+        mst = r.get('법령일련번호') or r.get('MST')
+        if not mst:
+            continue
+        name, eff, arts = law_articles(mst)
+        name = name or str(r.get('법령명한글') or cn)
+        for label, title, text in arts:
+            sc = 0
+            if any(label == f'제{a}조' + (f'의{b}' if b else '') for a, b in want_jo):
+                sc += 50
+            for t in toks:
+                if t in title:
+                    sc += 4
+                elif t in text:
+                    sc += 1
+            if sc:
+                scored.append((sc, name, eff, label, title, text))
+    scored.sort(key=lambda x: -x[0])
+    out = []
+    for sc, name, eff, label, title, text in scored[:top]:
+        if sc < 2:
+            break
+        e = f'{eff[:4]}.{eff[4:6]}.{eff[6:8]}' if len(eff) == 8 else eff
+        out.append({'law': True, 'name': name, 'art': label + (f'({title})' if title else ''), 'eff': e, 'text': text[:1500],
+                    'url': 'https://www.law.go.kr/법령/' + urllib.parse.quote(name.replace(' ', '')) + '/' + urllib.parse.quote(label),
+                    'slug': 'law', 'page': 0, 'hit': []})
+    return out
+
+
 def ask_llm(question, hits, history):
     import urllib.request, urllib.error, ssl
-    ctx = '\n\n'.join(f'[{i + 1}] {re.sub(r"[.]pdf$", "", h["name"], flags=re.I)} {h["page"]}쪽{" · " + h["art"] if h.get("art") else ""}\n{h.get("ctx") or h["text"]}' for i, h in enumerate(hits))
+    ctx = '\n\n'.join((f'[{i + 1}] {h["name"]} {h["art"]} (법제처 국가법령정보, 시행 {h.get("eff") or "?"})\n{h["text"]}' if h.get('law') else
+                         f'[{i + 1}] {re.sub(r"[.]pdf$", "", h["name"], flags=re.I)} {h["page"]}쪽{" · " + h["art"] if h.get("art") else ""}\n{h.get("ctx") or h["text"]}') for i, h in enumerate(hits))
     msgs = history_msgs(history)
     msgs.append({'role': 'user', 'content': f'<자료>\n{ctx}\n</자료>\n\n질문: {question}\n(답 순서: 결론 → 설명 → 현장에서 → 근거)'})
     text, why, _code = call_llm(AI_SYS, msgs, 3000, 'low', CONF.get('ai_assist_model') or 'claude-haiku-5-5')
