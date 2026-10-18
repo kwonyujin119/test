@@ -1,17 +1,17 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><style>:root{color-scheme:light;box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest?v=112"><link rel="icon" href="icons/icon-rounded-48.png?v=112" type="image/png" sizes="48x48"><link rel="icon" href="icons/icon-rounded-192.png?v=112" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=84"><meta name="theme-color" content="#FDD000"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SACHIL:47"></head><body>
-<!-- V114~V116: 첫 화면 인트로 — 소방차가 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 따라 달리며 선을 그리고 6시에 도착(약 1.8초).
+<!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
 <style>
 html.intro .top,html.intro footer,html.intro .tabbar,html.intro .hz-p,html.intro .hz-hit,html.intro .hz-l,html.intro .hz-k,html.intro .sheet,html.intro .toast,html.intro .hz-47[data-s="1"],html.intro .hz-47[data-s="2"]{opacity:0}
-html.intro .hz-47[data-s="0"]{stroke-dasharray:1 1;stroke-dashoffset:1}
-html.intro-css .hz-47[data-s="0"]{animation:introDraw 1.6s cubic-bezier(.45,.05,.4,1) forwards}   /* 소방차를 못 움직이는 기기: 선만 그린다 */
+html.intro .hz-47[data-s="0"]{stroke-dasharray:1 1;stroke-dashoffset:1;stroke:#D92D20;opacity:1}
+.hz-47[data-s="0"]{transition:stroke .6s ease}   /* 도착하면 빨강 → 원래 남색 */
+html.intro-css .hz-47[data-s="0"]{animation:introDraw 1.6s cubic-bezier(.45,.05,.4,1) forwards}   /* 길이를 못 재는 기기: 펜 끝 없이 선만 그린다 */
 html.intro-float .top,html.intro-float footer,html.intro-float .tabbar,html.intro-float .hz-l,html.intro-float .hz-k,html.intro-float .sheet{animation:appFloat .55s cubic-bezier(.2,.8,.25,1) both}
 html.intro-float .hz-p,html.intro-float .hz-hit,html.intro-float .hz-47[data-s="1"],html.intro-float .hz-47[data-s="2"]{animation:appFade .5s ease both}
-.hz-truck{pointer-events:none;transition:opacity .45s ease}
-.hz-truck.gone{opacity:0}
-.hz-truck .lt{animation:truckLight .32s steps(1) infinite}
-.hz-truck .lt2{animation:truckLight .32s steps(1) .16s infinite}
-@keyframes truckLight{50%{opacity:.15}}
+.hz-pen{pointer-events:none;transition:opacity .45s ease}
+.hz-pen.gone{opacity:0}
+.hz-pen .glow{fill:#D92D20;opacity:.22;transform-box:fill-box;transform-origin:center;animation:penGlow .9s ease-in-out infinite}
+@keyframes penGlow{50%{transform:scale(1.45);opacity:.1}}
 @keyframes introDraw{to{stroke-dashoffset:0}}
 @keyframes appFloat{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
 @keyframes appFade{from{opacity:0}to{opacity:1}}
@@ -24,39 +24,28 @@ html.intro-float .hz-p,html.intro-float .hz-hit,html.intro-float .hz-47[data-s="
   try{ if(matchMedia('(prefers-reduced-motion: reduce)').matches) see=false; }catch(e){}
   if(!see) return;
   root.classList.add('intro');
-  // 소방차(옆모습, 오른쪽을 봄). 원점 = 바퀴 아래 가운데 → 선 위를 달린다
-  var TRUCK='<g transform="translate(0 -2)">'
-    +'<rect x="-27" y="-21" width="38" height="15" rx="2.5" fill="#D92D20"/>'
-    +'<path d="M11 -21h8.5a3 3 0 0 1 2.6 1.5l4.4 7.6a3 3 0 0 1 .5 1.7V-8a2 2 0 0 1-2 2H11z" fill="#D92D20"/>'
-    +'<path d="M14 -18.5h5.2l3.6 6.2H14z" fill="#CFE3FF"/>'
-    +'<rect x="-27" y="-12.5" width="38" height="2.2" fill="#fff" opacity=".9"/>'
-    +'<rect x="-25" y="-25" width="33" height="2.6" rx="1" fill="#8A94A6"/>'
-    +'<path d="M-21 -25v2.6M-15 -25v2.6M-9 -25v2.6M-3 -25v2.6M3 -25v2.6" stroke="#fff" stroke-width="1"/>'
-    +'<rect class="lt" x="12" y="-24.5" width="3.6" height="3.2" rx="1" fill="#2E6BFF"/><rect class="lt2" x="16" y="-24.5" width="3.6" height="3.2" rx="1" fill="#FF3B30"/>'
-    +'<circle cx="-16" cy="-5" r="5.2" fill="#1F2430"/><circle cx="-16" cy="-5" r="2" fill="#C9CED8"/>'
-    +'<circle cx="17" cy="-5" r="5.2" fill="#1F2430"/><circle cx="17" cy="-5" r="2" fill="#C9CED8"/></g>';
-  var started=false, t=[], raf=0, truck=null, path=null;
+  // 펜 끝: 빨간 점 + 숨 쉬듯 퍼지는 빛
+  var PEN='<circle class="glow" r="13"/><circle r="6.5" fill="#D92D20"/><circle r="2.6" fill="#fff" opacity=".85"/>';
+  var started=false, t=[], raf=0, pen=null, path=null;
   var tidy=function(){ if(raf) cancelAnimationFrame(raf); raf=0; if(path) path.style.strokeDashoffset=''; };
-  var clear=function(){ t.forEach(clearTimeout); tidy(); if(truck&&truck.parentNode) truck.parentNode.removeChild(truck); root.classList.remove('intro','intro-css','intro-float'); document.removeEventListener('click',skip,true); };
-  var float=function(){ tidy(); if(truck) truck.classList.add('gone'); root.classList.add('intro-float'); root.classList.remove('intro','intro-css'); t.push(setTimeout(clear,700)); };
+  var clear=function(){ t.forEach(clearTimeout); tidy(); if(pen&&pen.parentNode) pen.parentNode.removeChild(pen); root.classList.remove('intro','intro-css','intro-float'); document.removeEventListener('click',skip,true); };
+  var float=function(){ tidy(); if(pen) pen.classList.add('gone'); root.classList.add('intro-float'); root.classList.remove('intro','intro-css'); t.push(setTimeout(clear,700)); };
   var skip=function(e){ e.preventDefault(); e.stopPropagation(); t.forEach(clearTimeout); t=[]; float(); };
-  document.addEventListener('click',skip,true);   // 달리는 동안 누르면 건너뜀(칸이 눌리지 않게 막음)
-  // 첫 화면이 그려지면(renderHub) 출발 — 3.5초 안에 첫 화면이 안 나오면 인트로 없이 보여 준다
+  document.addEventListener('click',skip,true);   // 그리는 동안 누르면 건너뜀(칸이 눌리지 않게 막음)
+  // 첫 화면이 그려지면(renderHub) 시작 — 3.5초 안에 첫 화면이 안 나오면 인트로 없이 보여 준다
   window.__introGo=function(){
     if(started) return; started=true;
     var svg=document.querySelector('.hz-svg'); path=svg&&svg.querySelector('.hz-47[data-s="0"]');
     var L=0; try{ L=path.getTotalLength(); }catch(e){}
     if(!L){ root.classList.add('intro-css'); t.push(setTimeout(float,1800)); return; }
-    var vb=svg.viewBox&&svg.viewBox.baseVal, sc=Math.max(.9,Math.min(1.7,((vb&&vb.width)||380)/320)), D=1800, t0=0, flip=1;
-    truck=document.createElementNS('http://www.w3.org/2000/svg','g'); truck.setAttribute('class','hz-truck'); truck.innerHTML=TRUCK; svg.appendChild(truck);
+    var vb=svg.viewBox&&svg.viewBox.baseVal, sc=Math.max(.9,Math.min(1.5,((vb&&vb.width)||380)/360)), D=1800, t0=0;
+    pen=document.createElementNS('http://www.w3.org/2000/svg','g'); pen.setAttribute('class','hz-pen'); pen.innerHTML=PEN; svg.appendChild(pen);
     var step=function(ts){
       if(!t0) t0=ts;
       var k=Math.min(1,(ts-t0)/D), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2, len=e*L;   // 천천히 출발·가속·도착 전 감속
-      var a=path.getPointAtLength(Math.max(0,len-3)), b=path.getPointAtLength(Math.min(L,len+3)), p=path.getPointAtLength(len);
-      var dx=b.x-a.x, dy=b.y-a.y; if(Math.abs(dx)>.3) flip=dx<0?-1:1;
-      var ang=Math.max(-35,Math.min(35,Math.atan2(dy,Math.abs(dx))*180/Math.PI));   // 내리막이면 앞이 숙여짐(뒤집히지 않게 ±35°)
+      var p=path.getPointAtLength(len);
       path.style.strokeDashoffset=String(1-e);
-      truck.setAttribute('transform','translate('+p.x.toFixed(1)+' '+p.y.toFixed(1)+') scale('+(flip*sc).toFixed(3)+' '+sc.toFixed(3)+') rotate('+ang.toFixed(1)+')');
+      pen.setAttribute('transform','translate('+p.x.toFixed(1)+' '+p.y.toFixed(1)+') scale('+sc.toFixed(3)+')');
       if(k<1) raf=requestAnimationFrame(step); else { raf=0; path.style.strokeDashoffset='0'; t.push(setTimeout(float,250)); }   // 6시 도착 → 잠깐 멈췄다가 첫 화면
     };
     raf=requestAnimationFrame(step);
@@ -800,7 +789,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v116</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v117</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1419,8 +1408,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V116', SRV_VER='4.7';
+  const APP_VER='V117', SRV_VER='4.7';
   const UPDATES=[
+    {v:'V117', d:'2026-10-18', t:['인트로: 소방차 대신 빨간 빛(펜 끝)이 12시에서 6시까지 47을 빨간 선으로 그리며 이동 — 도착하면 선이 원래 남색으로 바뀌며 첫 화면이 나타남']},
     {v:'V116', d:'2026-10-18', t:['인트로: 소방차가 12시에서 출발해 첫 화면의 47 긴 획을 따라 달리며 선을 그리고 6시에 도착 — 도착하면 4의 세로선·7의 가로선과 칸들이 나타남(경광등 깜빡임, 내리막에서 앞이 숙여짐)']},
     {v:'V115', d:'2026-10-18', t:['인트로: 첫 화면의 손글씨 47 선이 바로 그 자리에서 위→아래로 써지고, 다 써지면 칸·글자가 둘레에 떠오르게(따로 그린 로고 대신 — 인트로와 첫 화면이 그대로 겹침)']},
     {v:'V114', d:'2026-10-18', t:['앱을 열면 흰 화면에 손글씨 47이 써지고(약 2초) 첫 화면이 떠오르는 인트로 — 화면을 누르면 바로 건너뜀, 같은 창에서는 한 번만, 다른 화면으로 바로 들어오면 생략']},
@@ -3329,7 +3319,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     panel.innerHTML=`<nav class="hub hz" aria-label="SACHIL:47 첫 화면"><svg class="hz-svg" xmlns="http://www.w3.org/2000/svg">${HUB.map(h=>`<a href="#${h.go}" data-hub="${h.go}" aria-label="${h.t}"><path class="hz-p${h.y?' y':''}" data-p="${h.go}"/><path class="hz-hit" data-hit="${h.go}"/></a>`).join('')}${HZ.strokes.map((_,i)=>`<path class="hz-47" data-s="${i}" pathLength="1"/>`).join('')}</svg>${HUB.map(cell).join('')}</nav>`;
     panel.querySelectorAll('[data-hub]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const t=a.dataset.hub; if(t==='search'){ q.value=''; syncClear(); go('search',''); } else go(t); rootScrollTo(0); }));
     fitHub();
-    if(window.__introGo) window.__introGo();   // V115·V116: 인트로 — 소방차가 이 자리의 47 선을 따라 달리며 그린다
+    if(window.__introGo) window.__introGo();   // V115~V117: 인트로 — 빨간 펜 끝이 이 자리의 47 선을 그린다
   }
   // 꺾인 선(획)을 꼭짓점에서 살짝 둥글게 — 손글씨 느낌
   function hzStroke(pts,r){
