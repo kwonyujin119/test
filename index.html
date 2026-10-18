@@ -864,7 +864,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v165</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v166</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1523,14 +1523,15 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .hz-k .hd{font-size:calc(11.5px*var(--fs));line-height:1.4;font-weight:600;color:#4a3d00;letter-spacing:-.02em}
 .hz-k .hd.n{display:none}
 .hz-k:has(.hz-tools){width:max-content}
-.hz-k .hz-tools{flex:none;display:flex;gap:calc(6px*var(--fs));margin-top:calc(6px*var(--fs));pointer-events:auto}   /* V165: 47망 칸 — CP·소화전 바로 열기 */
-.hz-k .hzt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:calc(46px*var(--fs));height:calc(46px*var(--fs));padding:0;border:1.5px solid #fff;border-radius:calc(12px*var(--fs));background:var(--ember);box-shadow:0 3px 10px rgba(107,83,0,.25);font:inherit;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.hz-k .hz-tools{flex:none;display:flex;flex-direction:column;align-items:center;gap:calc(8px*var(--fs));margin-top:calc(8px*var(--fs));pointer-events:auto}   /* V166: 세로로, 1.5배 */   /* V165: 47망 칸 — CP·소화전 바로 열기 */
+.hz-k .hzt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:calc(70px*var(--fs));height:calc(70px*var(--fs));padding:0;border:2px solid #fff;border-radius:calc(18px*var(--fs));background:var(--ember);box-shadow:0 3px 10px rgba(107,83,0,.25);font:inherit;cursor:pointer;transition:transform .12s,box-shadow .12s}
 .hz-k .hzt:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(107,83,0,.3)}
-.hz-k.s1 .hzt{width:calc(42px*var(--fs));height:calc(42px*var(--fs))}.hz-k.s1 .hzt svg{width:calc(22px*var(--fs));height:calc(22px*var(--fs))}
-.hz-k.s2 .hz-tools{gap:4px;margin-top:4px}.hz-k.s2 .hzt{width:36px;height:36px;border-radius:10px}.hz-k.s2 .hzt svg{width:19px;height:19px}.hz-k.s2 .hzt b{font-size:9px}
+.hz-k.s1 .hzt{width:calc(63px*var(--fs));height:calc(63px*var(--fs))}.hz-k.s1 .hzt svg{width:calc(32px*var(--fs));height:calc(32px*var(--fs))}.hz-k.s1 .hzt b{font-size:calc(13px*var(--fs))}
+.hz-k.s2:has(.hz-tools) .ic{display:none}   /* 가장 좁은 단계: 47망 그림 대신 버튼에 자리 */
+.hz-k.s2 .hz-tools{gap:6px;margin-top:6px}.hz-k.s2 .hzt{width:56px;height:56px;border-radius:15px}.hz-k.s2 .hzt svg{width:29px;height:29px}.hz-k.s2 .hzt b{font-size:12px}
 .hz-k .hzt:active{transform:scale(.94)}
-.hz-k .hzt svg{width:calc(24px*var(--fs));height:calc(24px*var(--fs));display:block}
-.hz-k .hzt b{font-size:calc(10.5px*var(--fs));line-height:1;font-weight:800;color:#1F2A44}.hz-k .hzt[data-hzt="hyd"] b{color:#B42318}
+.hz-k .hzt svg{width:calc(36px*var(--fs));height:calc(36px*var(--fs));display:block}
+.hz-k .hzt b{font-size:calc(14px*var(--fs));line-height:1;font-weight:800;color:#1F2A44}.hz-k .hzt[data-hzt="hyd"] b{color:#B42318}
 .hz-k.nar .hd.w{display:none}
 .hz-k.nar .hd.n{display:block}
 .hz-k.s1 b{font-size:calc(18px*var(--fs))}
@@ -1665,8 +1666,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V165', SRV_VER='9.1';
+  const APP_VER='V166', SRV_VER='9.2';
   const UPDATES=[
+    {v:'V166', d:'2026-10-18', t:['첫 화면 47망 칸의 CP·소화전 버튼을 세로로 놓고 1.5배 크게(좁은 휴대폰에서는 47망 그림 대신 버튼에 자리를 줌)']},
     {v:'V165', d:'2026-10-18', t:['첫 화면 47망 칸에 CP·소화전 바로 열기 버튼 — 대화방에 들어가지 않고 바로 지도·소화전으로(47망에 처음이면 대화명을 넣는 즉시 열림)']},
     {v:'V164', d:'2026-10-18', t:['첫 화면: 시작 애니메이션이 끝나는 순간 글자·그림이 옆·위로 툭 움직이며 제자리를 찾던 현상 고침(PC·휴대폰)','사고보고서: 교수 모드(맨 위 남색 줄)일 때 ‘보고서 만들기’ 줄이 머리 줄 밑으로 숨어 스크롤을 올려야 누를 수 있던 문제 고침 — 머리 줄 높이에 맞춰 바로 아래에 고정(체크리스트 시간 줄도 같이)']},
     {v:'V163', d:'2026-10-18', t:['47망 소화전 버튼 아이콘을 CP 헬멧과 같은 느낌으로 — 빨간 소화전, 흰 테두리']},
