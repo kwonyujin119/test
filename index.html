@@ -6,7 +6,8 @@ html.intro .top,html.intro footer,html.intro .tabbar,html.intro .hz-p,html.intro
 html.intro .hz-47[data-s="0"]{stroke-dasharray:1 1;stroke-dashoffset:1;stroke:#D92D20;opacity:1}
 .hz-47[data-s="0"]{transition:stroke .6s ease}   /* 도착하면 빨강 → 원래 남색 */
 html.intro-css .hz-47[data-s="0"]{animation:introDraw 1.6s cubic-bezier(.45,.05,.4,1) forwards}   /* 길이를 못 재는 기기: 펜 끝 없이 선만 그린다 */
-html.intro-float .top,html.intro-float footer,html.intro-float .tabbar,html.intro-float .hz-l,html.intro-float .hz-k,html.intro-float .sheet{animation:appFloat .55s cubic-bezier(.2,.8,.25,1) both}
+html.intro-float .top,html.intro-float footer,html.intro-float .tabbar{animation:appFloat .55s cubic-bezier(.2,.8,.25,1) both}
+html.intro-float .hz-l,html.intro-float .hz-k{animation:appFloatC .55s cubic-bezier(.2,.8,.25,1) both}   /* V164: 칸 글자는 가운데 맞춤(translate -50%)을 지킨 채 떠오름 — 끝나고 제자리로 튀던 현상 없앰 */
 html.intro-float .hz-p,html.intro-float .hz-hit,html.intro-float .hz-47[data-s="1"],html.intro-float .hz-47[data-s="2"]{animation:appFade .5s ease both}
 .hz-pen{pointer-events:none;transition:opacity .45s ease}
 .hz-pen.gone{opacity:0}
@@ -15,6 +16,7 @@ html.intro-float .hz-p,html.intro-float .hz-hit,html.intro-float .hz-47[data-s="
 @keyframes introDraw{to{stroke-dashoffset:0}}
 @keyframes appFloat{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
 @keyframes appFade{from{opacity:0}to{opacity:1}}
+@keyframes appFloatC{from{opacity:0;transform:translate(-50%,calc(-50% + 22px))}to{opacity:1;transform:translate(-50%,-50%)}}
 </style>
 <script>
 (function(){
@@ -246,7 +248,7 @@ html.sheet-lock,html.sheet-lock body{overflow:hidden}
 .roles{display:inline-flex;padding:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;gap:4px;justify-self:start;max-width:100%}
 .roles button{min-height:38px;padding:0 16px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-weight:600;font-size:14px;white-space:nowrap}
 .roles button[aria-selected="true"]{background:var(--surface);color:var(--navy);box-shadow:0 1px 2px rgba(0,0,0,.12)}
-.timer{position:sticky;top:calc(56px + var(--sat) + 8px);z-index:15;display:flex;align-items:center;gap:12px;padding:10px 14px;flex-wrap:wrap;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.timer{position:sticky;top:calc(var(--hdr,56px) + var(--sat) + 6px);z-index:15;display:flex;align-items:center;gap:12px;padding:10px 14px;flex-wrap:wrap;box-shadow:0 6px 18px rgba(0,0,0,.08)}
 .timer .prog{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;margin-left:-4px}
 .timer.live{background:var(--surface);border-color:var(--line)}
 .timer .t{font-family:var(--mono);font-size:26px;font-weight:600;letter-spacing:.02em;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1.1}
@@ -862,7 +864,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v163</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v164</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1654,8 +1656,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V163', SRV_VER='8.9';
+  const APP_VER='V164', SRV_VER='9.0';
   const UPDATES=[
+    {v:'V164', d:'2026-10-18', t:['첫 화면: 시작 애니메이션이 끝나는 순간 글자·그림이 옆·위로 툭 움직이며 제자리를 찾던 현상 고침(PC·휴대폰)','사고보고서: 교수 모드(맨 위 남색 줄)일 때 ‘보고서 만들기’ 줄이 머리 줄 밑으로 숨어 스크롤을 올려야 누를 수 있던 문제 고침 — 머리 줄 높이에 맞춰 바로 아래에 고정(체크리스트 시간 줄도 같이)']},
     {v:'V163', d:'2026-10-18', t:['47망 소화전 버튼 아이콘을 CP 헬멧과 같은 느낌으로 — 빨간 소화전, 흰 테두리']},
     {v:'V162', d:'2026-10-18', t:['47망 대화창 오른쪽 위 버튼을 시그니처 노란색 바탕으로','DS 버튼 → CP: 지도 그림 대신 텔레그램 파란색 소방 헬멧, 글자는 CP']},
     {v:'V161', d:'2026-10-18', t:['47망: DS·소화전 버튼을 대화창 오른쪽 위로 옮기고 크게(그림+글자) — 메시지가 가리지 않게 위쪽 여백']},
@@ -2077,6 +2080,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 탭 이동은 해시를 바꿔 히스토리에 남긴다 — 안드로이드 뒤로가기가 이전 탭으로 돌아간다.
   // 폰에서는 .app이 스크롤 상자(문서는 고정). PC에서는 문서가 스크롤.
   const scrollRoot=()=>{ const a=document.querySelector('.app'); return (a&&/auto|scroll/.test(getComputedStyle(a).overflowY))?a:null; };
+  // V164: 위에 고정되는 줄(사고보고서 '보고서 만들기'·체크리스트 시간)은 머리 줄의 실제 높이 바로 아래에 — 교수 모드 줄이 생기거나 머리 줄이 두 줄이 돼도 가려지지 않게
+  { const hdr=document.querySelector('.top'); const sync=()=>{ if(hdr) document.documentElement.style.setProperty('--hdr',Math.round(hdr.getBoundingClientRect().height)+'px'); };
+    sync(); if(window.ResizeObserver&&hdr) new ResizeObserver(sync).observe(hdr); window.addEventListener('resize',sync); }
   function rootScrollTo(top,smooth){ const o={top:top,behavior:smooth?'smooth':'auto'}; const r=scrollRoot(); if(r) r.scrollTo(o); else window.scrollTo(o); }
   function go(route, query){
     if(query!==undefined) state.query=query;
