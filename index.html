@@ -812,7 +812,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v122</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v123</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1293,11 +1293,16 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .hydov .hlist button{width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-height:48px;padding:6px 4px;border:0;border-bottom:1px solid var(--line);background:none;font:inherit;font-size:14px;color:var(--fg);text-align:left}
 .hydov .hlist button span{font-size:12.5px;color:var(--muted)}
 .hydov .hlist button.on{background:#FDECEA}
-.mapov .msel{position:absolute;left:8px;right:8px;bottom:62px;z-index:6;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 12px;border-radius:14px;background:rgba(255,255,255,.97);box-shadow:0 4px 18px rgba(0,0,0,.22)}
-.mapov .msel .t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}
-.mapov .msel .t b{font-size:14.5px}.mapov .msel .t span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mapov .msel .del{min-height:44px;padding:0 18px;border:0;border-radius:12px;background:#D92D20;color:#fff;font:inherit;font-size:15px;font-weight:800}
-.mapov .msel .x{min-width:44px;min-height:44px;border:0;background:none;font-size:18px;color:var(--muted)}
+.mapov .msel{position:absolute;z-index:7;display:flex;gap:4px;padding:4px;border-radius:14px;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.25);border:1px solid var(--line)}
+.mapov .msel button{width:40px;height:40px;border:0;border-radius:10px;background:none;display:grid;place-items:center;color:var(--fg);padding:0}
+.mapov .msel button svg{width:22px;height:22px}
+.mapov .msel .del{color:#D92D20}.mapov .msel .del:hover{background:#FDECEA}.mapov .msel .x:hover{background:var(--surface-2)}
+.mapov .mtab{margin-left:2px;min-height:34px;padding:0 12px;border:1px solid var(--line);border-radius:17px;background:var(--surface);font:inherit;font-size:13px;font-weight:700;color:var(--navy);flex:none}
+.mapov .mtab:hover{border-color:var(--navy)}
+.mapov .mres{list-style:none;margin:0;padding:4px 10px 8px;background:var(--surface);border-bottom:1px solid var(--line);max-height:44vh;overflow:auto}
+.mapov .mres button{width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-height:46px;padding:6px 6px;border:0;border-bottom:1px solid var(--line);background:none;font:inherit;font-size:14px;color:var(--fg);text-align:left}
+.mapov .mres button span{font-size:12.5px;color:var(--muted)}.mapov .mres button:hover{background:var(--surface-2)}
+.mapov .mres .x button{align-items:center;min-height:38px;border:0;color:var(--muted);font-size:13px}
 .mk.sel{outline:3px solid #FDD000;outline-offset:2px}
 .mapov .mjump{position:absolute;left:8px;top:8px;right:56px;z-index:5;display:flex;flex-wrap:wrap;gap:6px;pointer-events:none}
 .mapov .mj{pointer-events:auto;display:inline-flex;align-items:center;gap:5px;min-height:36px;padding:0 10px 0 5px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.94);font:inherit;font-size:12.5px;font-weight:700;color:#1a1a1a;box-shadow:0 2px 8px rgba(0,0,0,.15)}
@@ -1504,8 +1509,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V122', SRV_VER='4.9';
+  const APP_VER='V123', SRV_VER='4.9';
   const UPDATES=[
+    {v:'V123', d:'2026-10-18', t:['지도 검색: 후보가 여러 곳이면 바로 옮기지 않고 5곳까지(이름·주소) 띄워 한 번에 고르기 — 예: ‘인천소방학교’ → 강화 본교·제2캠퍼스·소방고','지도 표시를 누르면 그 표시 바로 위에 🗑·✕만 있는 작은 메뉴(정보는 아래 안내 줄에), 지도를 움직이면 닫힘','지도 화면 위 ‘소화전’ 탭, 소화전 화면 위 ‘지도’ 탭 — 한 번에 서로 오가기']},
     {v:'V122', d:'2026-10-18', t:['서버가 다시 켜지는 동안 앱을 열어도 대화명을 새로 넣지 않음 — ‘서버가 다시 켜지는 중’ 안내 후 연결되면 그대로 방으로(카카오톡처럼 방·대화명 유지)','방 안에서 서버가 다시 켜져도 대화를 처음부터 다시 그리지 않음(서버 4.9: 대화 구분값을 파일에 저장)','옛 서버(4.6 이하)가 사람이 있어 업데이트를 미루는 문제: 앱이 10분마다 같은 110초 동안 잠깐 쉬어 서버가 새 버전으로 바뀔 틈을 줌(새 서버가 되면 저절로 멈춤)']},
     {v:'V121', d:'2026-10-18', t:['47망 ＋: 카카오톡처럼 아래에서 올라오는 사진 시트 — 맨 앞 카메라, 최근 사진(이 기기에서 고르거나 보낸 사진 + 이 방 사진)을 동그라미로 골라(순서 번호) 오른쪽 위 ‘전송’, 아래 ‘사진·파일’','사진을 누르거나 앨범에서 한 장 고르면 편집 화면: 위 ← · N 전송 · 고르기, 아래 설명 입력 · 자르기 · 돌리기 · 그리기(5색·되돌리기) · 원래대로','휴대폰 갤러리는 웹앱이 먼저 읽을 수 없어 처음에는 이 방 사진만 보이고, 앨범에서 고른 사진은 다음부터 최근 사진에 나옴']},
     {v:'V120', d:'2026-10-18', t:['채팅: Enter는 보내기, Shift+Enter는 줄바꿈 — 줄이 늘면 입력칸도 6줄까지 커짐, 빈 줄도 그대로 보임','PC에서 메시지를 우클릭하면 메뉴가 화면 가운데가 아니라 커서 자리에 뜸','서버 4.8: 새 버전 확인을 5분마다(받으면 바로 다시 켜짐)']},
@@ -3745,12 +3751,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     return MAPS.p;
   }
   const mapEl=document.createElement('div'); mapEl.className='mapov'; mapEl.id='mapov'; mapEl.hidden=true; mapEl.setAttribute('role','dialog'); mapEl.setAttribute('aria-modal','true'); mapEl.setAttribute('aria-label','현장 지도');
-  mapEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="지도 닫기">‹</button><b>현장 지도</b>
+  mapEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="지도 닫기">‹</button><b>현장 지도</b><button type="button" class="mtab" data-tab="hyd" aria-label="소화전으로">소화전</button>
       <form class="msrch" autocomplete="off"><input type="search" placeholder="주소·장소 검색" aria-label="주소·장소 검색" enterkeyhint="search"><button type="submit" class="btn ghost">검색</button></form></div>
-    <div class="mbox"><div class="kmap"></div><div class="mjump" aria-label="표시로 바로 가기" hidden></div><div class="msel" role="group" aria-label="고른 표시" hidden></div><button type="button" class="mme" aria-label="내 위치로">◎</button></div>
+    <ul class="mres" hidden></ul><div class="mbox"><div class="kmap"></div><div class="mjump" aria-label="표시로 바로 가기" hidden></div><div class="msel" role="group" aria-label="고른 표시" hidden></div><button type="button" class="mme" aria-label="내 위치로">◎</button></div>
     <p class="mmsg" role="status"></p>
     <div class="mtools">${Object.entries(MAPK).map(([k,v])=>`<button type="button" class="mt mt-${k}" data-mk="${k}"><i>${v.t}</i><span>${v.n}</span></button>`).join('')}</div>
-    <p class="mhint">버튼을 누르면 지도 가운데에 표시가 뜹니다. <b>표시를 끌어서</b> 원하는 곳에 놓으세요(놓으면 저장). <b>방면설정</b>은 누를 때마다 화재대상 둘레에 A(아래)→B→C→D→E→F 순서로 — 실제 방향으로 끌어 맞추세요. 화재가 여러 곳이면 <b>화재대상</b>을 다시 눌러 3곳까지. 표시를 누르면 <b>삭제</b> 버튼이 뜹니다. 지도를 옮겼다면 <b>위쪽 바로가기</b>(🔥·CP·S·전체)를 누르면 돌아옵니다.</p>`;
+    <p class="mhint">버튼을 누르면 지도 가운데에 표시가 뜹니다. <b>표시를 끌어서</b> 원하는 곳에 놓으세요(놓으면 저장). <b>방면설정</b>은 누를 때마다 화재대상 둘레에 A(아래)→B→C→D→E→F 순서로 — 실제 방향으로 끌어 맞추세요. 화재가 여러 곳이면 <b>화재대상</b>을 다시 눌러 3곳까지. 표시를 누르면 바로 위에 <b>🗑</b>(지우기)·✕가 뜹니다. 지도를 옮겼다면 <b>위쪽 바로가기</b>(🔥·CP·S·전체)를 누르면 돌아옵니다.</p>`;
   document.body.appendChild(mapEl);
   const mq=s=>mapEl.querySelector(s);
   const mmsg=(t,html)=>{ const m=mq('.mmsg'); if(html) m.innerHTML=t; else m.textContent=t||''; };
@@ -3827,9 +3833,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const fs=FIREK.filter(f=>it[f]&&f!==k).map(f=>({f,m:distM(it[f],v)})).sort((a,b)=>a.m-b.m)[0];
     const rel=fs?`${esc(mkName(fs.f))}에서 ${D8[Math.round(bearing(it[fs.f],v)/45)%8]}쪽 ${fs.m<1000?Math.round(fs.m)+'m':(fs.m/1000).toFixed(1)+'km'} · `:'';
     MAPS.sel=k; mapEl.querySelectorAll('.kmap .mk').forEach(x=>x.classList.toggle('sel',x.dataset.k===k));
+    // V123: 누른 표시 바로 위에 🗑·✕만(정보는 아래 안내 줄에) — 지도를 움직이면 닫힘
     const bar=mq('.msel'); bar.hidden=false;
-    bar.innerHTML=`<div class="t"><b>${esc(mkName(k))}</b><span>${rel}${esc(v.by||'')} ${pad(d.getHours())}:${pad(d.getMinutes())}</span></div><button type="button" class="del">삭제</button><button type="button" class="x" aria-label="닫기">✕</button>`;
-    mmsg('끌어서 옮기거나 ‘삭제’를 누르세요');
+    bar.innerHTML=`<button type="button" class="del" aria-label="${esc(mkName(k))} 삭제"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="x" aria-label="닫기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>`;
+    { const mk=mapEl.querySelector(`.kmap .mk[data-k="${k}"]`), box=mq('.mbox').getBoundingClientRect();
+      if(mk){ const r=mk.getBoundingClientRect(), w=bar.offsetWidth, h=bar.offsetHeight; let x=r.left-box.left+r.width/2-w/2, y=r.top-box.top-h-8; if(y<6) y=r.bottom-box.top+8;
+        bar.style.left=Math.max(6,Math.min(box.width-w-6,x))+'px'; bar.style.top=Math.max(6,y)+'px'; } }
+    mmsg(`${mkName(k)} · ${rel}${v.by||''} ${pad(d.getHours())}:${pad(d.getMinutes())} — 끌어서 옮기거나 🗑로 지우기`);
   }
   function mapUnsel(){ MAPS.sel=null; const bar=mq('.msel'); if(bar){ bar.hidden=true; bar.innerHTML=''; } mapEl.querySelectorAll('.kmap .mk.sel').forEach(x=>x.classList.remove('sel')); }
   mq('.msel').addEventListener('click',e=>{
@@ -3881,11 +3891,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   mq('.msrch').addEventListener('submit',e=>{
     e.preventDefault(); const v=mq('.msrch input').value.trim(); if(!v||!MAPS.map||!kakao.maps.services) return;
-    const go=(y,x)=>{ MAPS.map.setLevel(3); MAPS.map.setCenter(new kakao.maps.LatLng(y,x)); mmsg('찾은 곳으로 옮겼습니다 — 가운데 + 자리에 표시가 뜹니다'); mq('.msrch input').blur(); };
+    const go=(y,x,nm)=>{ mq('.mres').hidden=true; MAPS.map.setLevel(3); MAPS.map.setCenter(new kakao.maps.LatLng(y,x)); { const jc=nm?jong(nm):0; mmsg(`${nm?nm+(jc&&jc!==8?'으로':'로'):'찾은 곳으로'} 옮겼습니다 — 가운데 + 자리에 표시가 뜹니다`); } mq('.msrch input').blur(); };
+    // V123: 후보가 여러 곳이면 바로 옮기지 않고 5곳까지 띄워 고르게(예: '인천소방학교' → 강화 본교·제2캠퍼스·소방고 …)
+    const pick=list=>{ if(list.length===1) return go(list[0].y,list[0].x,list[0].n); const box=mq('.mres');
+      box.innerHTML=list.slice(0,5).map((p,i)=>`<li><button type="button" data-r="${i}"><b>${esc(p.n)}</b><span>${esc(p.a||'')}</span></button></li>`).join('')+'<li class="x"><button type="button" data-r="x">닫기</button></li>';
+      box.hidden=false; box.onclick=e=>{ const b=e.target.closest('[data-r]'); if(!b) return; if(b.dataset.r==='x'){ box.hidden=true; return; } const p=list[+b.dataset.r]; if(p) go(p.y,p.x,p.n); };
+      mmsg(`‘${v}’ 후보 ${Math.min(5,list.length)}곳 — 고르세요`); mq('.msrch input').blur(); };
+    const c=MAPS.map.getCenter();
     new kakao.maps.services.Places().keywordSearch(v,(res,st)=>{
-      if(st===kakao.maps.services.Status.OK&&res[0]) return go(res[0].y,res[0].x);
-      new kakao.maps.services.Geocoder().addressSearch(v,(r2,s2)=>{ if(s2===kakao.maps.services.Status.OK&&r2[0]) go(r2[0].y,r2[0].x); else mmsg('찾지 못했습니다 — 다른 낱말로 검색하세요'); });
-    });
+      if(st===kakao.maps.services.Status.OK&&res&&res.length) return pick(res.map(r=>({y:r.y,x:r.x,n:r.place_name,a:r.road_address_name||r.address_name})));
+      new kakao.maps.services.Geocoder().addressSearch(v,(r2,s2)=>{ if(s2===kakao.maps.services.Status.OK&&r2&&r2.length) pick(r2.map(r=>({y:r.y,x:r.x,n:r.address_name,a:r.road_address&&r.road_address.address_name}))); else mmsg('찾지 못했습니다 — 다른 낱말로 검색하세요'); });
+    },{location:new kakao.maps.LatLng(c.getLat(),c.getLng()), size:15});
   });
   mq('.mme').addEventListener('click',()=>{
     if(!navigator.geolocation||!MAPS.map){ mmsg('이 기기에서 위치를 쓸 수 없습니다'); return; }
@@ -3895,6 +3911,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   let mapLast=null;
   function closeMap(){ if(mapEl.hidden) return; mapUnsel(); mapEl.hidden=true; clearInterval(MAPS.poll); appEl.inert=false; tabbarEl.inert=false; if(mapLast&&mapLast.isConnected&&mapLast.focus) mapLast.focus(); }
   mq('.mclose').addEventListener('click',closeMap);
+  mq('.mtab').addEventListener('click',()=>{ const rid=MAPS.rid; closeMap(); openHyd(rid); });   // V123: 지도 → 소화전
   document.addEventListener('keydown',e=>{ if(!mapEl.hidden&&e.key==='Escape') closeMap(); });
   async function openMap(rid){
     if(!SRV.on){ toast('지도는 서버(47망)에 연결됐을 때 쓸 수 있습니다'); return; }
@@ -3908,7 +3925,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         new kakao.maps.services.Places().keywordSearch(HOME_Q,(res,st)=>{ if(st===kakao.maps.services.Status.OK&&res[0]&&homeOk(+res[0].y,+res[0].x)) fix(res[0].y,res[0].x);
           else new kakao.maps.services.Geocoder().addressSearch(HOME_ADDR,(r2,s2)=>{ if(s2===kakao.maps.services.Status.OK&&r2[0]) fix(r2[0].y,r2[0].x); }); }); }
       MAPS.map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
-      try{ kakao.maps.event.addListener(MAPS.map,'click',()=>{ if(MAPS.sel){ mapUnsel(); mmsg(''); } }); }catch(_){ }   // 빈 곳을 누르면 선택 해제
+      try{ const un=()=>{ if(MAPS.sel){ mapUnsel(); } }; kakao.maps.event.addListener(MAPS.map,'click',()=>{ if(MAPS.sel){ mapUnsel(); mmsg(''); } }); ['dragstart','zoom_start'].forEach(ev=>kakao.maps.event.addListener(MAPS.map,ev,un)); }catch(_){ }   // 빈 곳을 누르거나 지도를 움직이면 선택 해제
       if(window.ResizeObserver) new ResizeObserver(()=>{ if(MAPS.map&&!mapEl.hidden) MAPS.map.relayout(); }).observe(mq('.kmap')); }   // V111: 회전·키보드·안내 줄 바뀜에도 지도 크기 다시 맞춤
     MAPS.map.relayout(); MAPS.ts=-1; MAPS.drag=false; MAPS.down=0; MAPS.okAt=0; mq('.mbox').classList.remove('stale'); await mapLoad();
     { const it=MAPS.items||{}, fs=FIREK.filter(k=>it[k]);   // 화재대상이 여러 곳이면 모두 보이게
@@ -3973,7 +3990,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   const hydEl=document.createElement('div'); hydEl.className='mapov hydov'; hydEl.id='hydov'; hydEl.hidden=true;
   hydEl.setAttribute('role','dialog'); hydEl.setAttribute('aria-modal','true'); hydEl.setAttribute('aria-label','소화전');
-  hydEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="소화전 닫기">‹</button><b>소화전 · T맵</b>
+  hydEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="소화전 닫기">‹</button><b>소화전</b><button type="button" class="mtab" data-tab="map" aria-label="지도로">지도</button>
       <form class="msrch hsrch" autocomplete="off"><input type="search" placeholder="주소·장소 검색" aria-label="주소·장소 검색" enterkeyhint="search"><button type="submit" class="btn ghost">검색</button></form></div>
     <ul class="hres" hidden></ul>
     <div class="hbase" role="group" aria-label="기준 위치와 소화전 검색"></div>
@@ -4063,6 +4080,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   let hydLast=null;
   function closeHyd(){ if(hydEl.hidden) return; hydEl.hidden=true; HYD.seq++; appEl.inert=false; tabbarEl.inert=false; if(hydLast&&hydLast.isConnected&&hydLast.focus) hydLast.focus(); }
   hq('.mclose').addEventListener('click',closeHyd);
+  hq('.mtab').addEventListener('click',()=>{ const rid=HYD.rid; closeHyd(); openMap(rid); });   // V123: 소화전 → 지도
   document.addEventListener('keydown',e=>{ if(!hydEl.hidden&&e.key==='Escape') closeHyd(); });
   async function openHyd(rid){
     if(!SRV.on){ toast('소화전은 서버(47망)에 연결됐을 때 쓸 수 있습니다'); return; }
