@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '6.3'
-APP_VERSION = 'V137'
+VERSION = '6.4'
+APP_VERSION = 'V138'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -1068,6 +1068,8 @@ class H(BaseHTTPRequestHandler):
             r = DB.execute('SELECT data FROM maps WHERE room=?', (rid,)).fetchone()
             items = json.loads(r['data']) if r else {}
             if j.get('clear') == 'all':
+                if self.user['role'] != 'admin':   # V138: 지도 전체 지우기는 교수만(앱은 쓰지 않음)
+                    raise ValueError('지도 전체 지우기는 교수만 할 수 있습니다')
                 items = {}
             else:
                 k = str(j.get('kind') or '')
@@ -1082,6 +1084,9 @@ class H(BaseHTTPRequestHandler):
                         raise ValueError('위치가 잘못됐습니다')
                     if not (math.isfinite(lat) and math.isfinite(lng) and 32.5 <= lat <= 39.5 and 123.5 <= lng <= 132.5):
                         raise ValueError('국내 위치만 표시할 수 있습니다')
+                    old = items.get(k) or {}
+                    if j.get('keep') and old and j.get('st') is not None:   # V138: 상태만 바꿀 때는 서버에 있는 최신 위치 그대로(다른 대원이 방금 옮겼어도)
+                        lat, lng = old['lat'], old['lng']
                     it = {'lat': round(lat, 6), 'lng': round(lng, 6), 'by': self.user['name'], 'ts': time.time()}
                     if k.startswith('fire'):   # V133: 화재 상태 — '' 화재 / init 초진 / done 완진. 보내지 않으면(옮기기) 그대로
                         old = items.get(k) or {}
@@ -1093,6 +1098,12 @@ class H(BaseHTTPRequestHandler):
                             if st not in ('', 'init', 'done'):
                                 raise ValueError('화재 상태가 잘못됐습니다')
                             st_ts = old.get('st_ts') if st == old.get('st', '') else time.time()
+                            try:   # V138: 되돌리기는 원래 초진·완진 시각을 그대로
+                                t0 = float(j.get('st_ts'))
+                                if st and not old and math.isfinite(t0) and 0 < t0 <= time.time():
+                                    st_ts = t0
+                            except (TypeError, ValueError):
+                                pass
                         if st:
                             it['st'] = st
                             if st_ts:
@@ -1124,6 +1135,8 @@ class H(BaseHTTPRequestHandler):
                     'today': AI_DAY.get('n', 0) if AI_DAY.get('d') == time.strftime('%Y-%m-%d') else 0,
                     'limit': int(CONF.get('ai_daily_limit') or 0), 'version': VERSION,
                     'auto_update': bool(CONF.get('auto_update')) and os.environ.get('SACHIL_LOOP') == '1',
+                    'bat_old': bool(CONF.get('auto_update')) and os.environ.get('SACHIL_LOOP') != '1',   # V138: 옛 bat로 켜 서버 자동 업데이트가 쉬는 중
+                    'bat_manual': bat_needs_manual(),   # V138: 자동 업데이트는 되지만 bat 자체는 한 번 손으로 바꿔야 함
                     'kakao': ('…' + str(CONF.get('kakao_js_key'))[-4:]) if CONF.get('kakao_js_key') else '',
                     'tmap': ('…' + str(CONF.get('tmap_app_key'))[-4:]) if CONF.get('tmap_app_key') else '',
                     'started': SERVER_START, 'upd_next': UPD_STATE['next'], 'upd_last': UPD_STATE['last'], 'upd_result': UPD_STATE['result'],
@@ -1149,8 +1162,11 @@ class H(BaseHTTPRequestHandler):
             kind = str(j.get('kind') or '')
             if kind not in ('net', 'deb'):
                 return self.err(400, '방 종류가 잘못됐습니다')
-            lead = str(j.get('lead') or '').replace('\r\n', '\n').strip()[:300]
-            more = [str(x).strip()[:300] for x in (j.get('more') or []) if str(x).strip()][:8]
+            lead = j.get('lead') if isinstance(j.get('lead'), str) else ''
+            lead = lead.replace('\r\n', '\n').strip()[:300]
+            m = j.get('more')
+            m = m if isinstance(m, list) else ([m] if isinstance(m, str) else [])   # V138: 글자 하나씩 쪼개지거나 500이 나지 않게
+            more = [str(x).strip()[:300] for x in m if isinstance(x, (str, int, float)) and str(x).strip()][:8]
             info = dict(CONF.get('room_info') or {})
             if lead:
                 info[kind] = {'lead': lead, 'more': more}
@@ -2802,6 +2818,9 @@ def fetch_text(url, limit, timeout=60):
             raise
         out = subprocess.run([exe, '-fsSL', '--max-time', str(int(timeout)), '-H', 'Cache-Control: no-cache', url],
                              capture_output=True, timeout=timeout + 15)
+        if out.returncode == 35 and b'revocation' in out.stderr.lower():   # V138: 폐지 목록(CRL) 확인이 막힌 망 — 인증서 확인은 그대로, 폐지 확인만 '가능하면'
+            out = subprocess.run([exe, '-fsSL', '--ssl-revoke-best-effort', '--max-time', str(int(timeout)), '-H', 'Cache-Control: no-cache', url],
+                                 capture_output=True, timeout=timeout + 15)
         if out.returncode != 0:
             raise RuntimeError('curl 실패: ' + out.stderr.decode('utf-8', 'replace')[:120]) from e
         return out.stdout[:limit].decode('utf-8')
@@ -2909,7 +2928,7 @@ def auto_update_loop():
             pass
     if os.environ.get('SACHIL_LOOP') != '1':   # 다시 켜 줄 새 start-domain.bat로 켠 게 아니면 바꾸지 않는다(꺼진 채로 남지 않게)
         if CONF.get('auto_update'):
-            upd_log('start-domain.bat가 옛 버전이라 자동 업데이트를 쉽니다 — 업데이트 묶음의 start-domain.bat로 덮어쓰세요')
+            upd_log('start-domain.bat가 옛 버전(또는 start.bat로 켬)이라 서버 자동 업데이트를 쉽니다 — 서버 창을 닫고, 업데이트 묶음의 start-domain.bat로 덮어쓴 뒤 그 파일로 다시 켜세요(앱 화면은 계속 자동 교체)')
             while True:   # V126: 서버 파일은 못 바꿔도 앱 화면(sachil.html)은 다시 켜지 않고 바꿀 수 있다
                 time.sleep(300)
                 try:
@@ -2965,9 +2984,58 @@ def auto_update_loop():
             UPD_STATE['next'] = 0
 
 
+def bat_needs_manual():
+    try:
+        p = os.path.join(BASE, 'start-domain.bat')
+        return os.path.exists(p) and os.environ.get('SACHIL_LOOP') == '1' and b'start-domain.new.bat' not in open(p, 'rb').read()
+    except OSError:
+        return False
+
+
+def mark_alive():
+    """V138: 10분 넘게 잘 돌았다는 표시 — start-domain.bat가 '연속 멈춤' 횟수를 다시 센다."""
+    try:
+        with open(os.path.join(DATA, 'alive.flag'), 'w', encoding='utf-8') as f:
+            f.write(VERSION)
+    except OSError:
+        pass
+
+
+def update_bat():
+    """V138: start-domain.bat도 최신으로 — GitHub 것과 다르면 start-domain.new.bat로 받아 두고, bat이 다시 켤 때(75) 바꿔 끼운다."""
+    url = str(CONF.get('update_url') or '')
+    if not url.startswith('https://') or not url.endswith('sachil_server.py'):
+        return
+    here = os.path.join(BASE, 'start-domain.bat')
+    if not os.path.exists(here):
+        return
+    try:
+        new = fetch_text(url[:-len('sachil_server.py')] + 'start-domain.bat?t=' + str(int(time.time())), 200_000, 20)
+        if 'SACHIL_LOOP=1' not in new or ':run' not in new:
+            return
+        new = new.replace('\r\n', '\n').replace('\n', '\r\n')   # bat은 CRLF여야 goto가 바르게 동작
+        cur = open(here, 'rb').read().decode('utf-8', 'replace')
+        nb = os.path.join(BASE, 'start-domain.new.bat')
+        if cur.replace('\r\n', '\n').strip() == new.replace('\r\n', '\n').strip():
+            if os.path.exists(nb):   # 묵은(또는 덜 받은) 새 bat이 끼워지지 않게
+                try:
+                    os.remove(nb)
+                except OSError:
+                    pass
+            return
+        if 'start-domain.new.bat' not in cur:   # V137 이하 bat은 스스로 바꿔 끼우지 못한다 — 한 번은 손으로
+            upd_log('start-domain.bat가 옛 버전입니다 — 서버 창을 닫고 업데이트 묶음의 start-domain.bat로 한 번 덮어쓰면, 그다음부터는 저절로 새것으로 바뀝니다')
+        with open(os.path.join(BASE, 'start-domain.new.bat'), 'wb') as f:
+            f.write(new.encode('utf-8'))
+        upd_log('새 start-domain.bat를 받아 두었습니다 — 다시 켤 때 바꿔 끼웁니다')
+    except Exception as e:
+        upd_log(f'start-domain.bat 확인 실패(다음에 다시): {str(e)[:100]}')
+
+
 def restart_self(why):
     """서버를 다시 켠다: 터널을 닫고 75로 끝내면 start-domain.bat가 곧바로 다시 켠다."""
     upd_log(f'{why} — 서버를 다시 켭니다')
+    update_bat()
     p = TUNNEL_PROC[0]
     if p and p.poll() is None:
         try:
@@ -3197,13 +3265,14 @@ def main():
         '관리자 코드: ********   ← 본인만 (관리자 입장·교수 로그인. 바꾸기: --set-admin-code 새코드)',
         f'47망(디브리핑룸): 매주 월 04시 오래된 대화 {int(float(CONF.get("weekly_trim_ratio") or 0) * 100)}% 정리 (최근 대화 유지)',
         f'메뉴 자료 폴더: {LIB}',
-        (f'자동 업데이트: {CONF.get("update_check_hours") or 2}시간마다 확인, 접속자 없을 때 교체 (끄기: config.json의 auto_update를 false)' if CONF.get('auto_update') else '자동 업데이트: 꺼짐'),
+        (f'자동 업데이트: {CONF.get("update_check_min") or 5}분마다 확인해 새 버전이면 곧바로 교체, 그 밖에는 2시간마다 다시 켬 (끄기: config.json의 auto_update를 false)' if CONF.get('auto_update') else '자동 업데이트: 꺼짐'),
         (f'AI 도우미:   {AI_NAMES[ai_provider()]} 연결 (' + (f'모델 {CONF.get("gemini_model")}' if ai_provider() == 'gemini' else f'모델 {CONF.get("groq_model")}' if ai_provider() == 'groq' else f'도우미 {CONF.get("ai_assist_model")} · 보고서 {CONF.get("ai_model")}') + f', 하루 {CONF.get("ai_daily_limit") or "무제한"}회' + (', 입장코드 사용' if CONF.get('ai_code') else '') + ')'
          + (' · 예비: ' + '·'.join(AI_NAMES[p] for p in ai_has() if p != ai_provider()) if len(ai_has()) > 1 else '')) if ai_ready()
         else 'AI 도우미:   자료 발췌형 (자연어 답변은 gemini-key-setup.bat으로 Gemini API 키 입력)',
     ])
     threading.Thread(target=index_loop, daemon=True).start()
     threading.Thread(target=auto_update_loop, daemon=True).start()
+    t_alive = threading.Timer(600, mark_alive); t_alive.daemon = True; t_alive.start()   # V138
     if '--tunnel' in sys.argv or '--named' in sys.argv:
         threading.Thread(target=run_tunnel, args=(port, '--named' in sys.argv), daemon=True).start()
     try:

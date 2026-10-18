@@ -24,6 +24,18 @@ move /y sachil_server.new sachil_server.py >nul
 echo        Done. Old file saved as sachil_server.py.bak
 
 echo [3/3] Starting the server ...
+rem V138: if this PC uses start-domain.bat (fixed domain), refresh it too - it keeps auto update + restart on
+if exist start-domain.bat (
+  curl -L --fail -o start-domain.new.bat https://raw.githubusercontent.com/kwonyujin119/test/main/server/start-domain.bat
+  if errorlevel 1 (
+    if exist start-domain.new.bat del start-domain.new.bat
+  ) else (
+    findstr /c:"SACHIL_LOOP=1" start-domain.new.bat >nul && move /y start-domain.new.bat start-domain.bat >nul
+    if exist start-domain.new.bat del start-domain.new.bat
+  )
+  call start-domain.bat
+  exit /b
+)
 if not exist start.bat (
   echo [ERROR] start.bat not found in this folder.
   pause

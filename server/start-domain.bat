@@ -18,11 +18,20 @@ if not exist cloudflared.exe (
   pause
   exit /b 1
 )
+set /a FAILS=0
 :run
 %PY% sachil_server.py --named
 set "RC=%errorlevel%"
 rem 75 = the server downloaded a new version of itself: start again right away
 if "%RC%"=="75" (
+  set /a FAILS=0
+  rem V138: the server also downloaded a newer start-domain.bat - swap it in and start over with it
+  if exist start-domain.new.bat findstr /c:"SACHIL_LOOP=1" start-domain.new.bat >nul || del start-domain.new.bat
+  if exist start-domain.new.bat (
+    echo [update] Updating start-domain.bat ...
+    start "" cmd /c "timeout /t 2 /nobreak >nul & move /y start-domain.new.bat start-domain.bat >nul & start "" start-domain.bat"
+    exit
+  )
   echo [update] Restarting with the new server file ...
   goto run
 )
@@ -35,4 +44,25 @@ if exist data\update_verify.flag (
     goto run
   )
 )
+rem V138: 0 = closed on purpose. Anything else = the server crashed: wait and start again (stop after 5 crashes in a row)
+rem data\alive.flag = the server ran 10 minutes fine before it stopped: count from 1 again
+if exist data\alive.flag (
+  set /a FAILS=0
+  del data\alive.flag
+)
+if not "%RC%"=="0" (
+  set /a FAILS+=1
+  call :retry
+  if not errorlevel 1 goto run
+)
 pause
+exit /b
+
+:retry
+if %FAILS% GEQ 5 (
+  echo [ERROR] The server stopped 5 times in a row ^(code %RC%^). Check the messages above, then run this file again.
+  exit /b 1
+)
+echo [restart] The server stopped ^(code %RC%^). Starting again in 20 seconds ... ^(%FAILS%/5^)
+timeout /t 20 /nobreak >nul
+exit /b 0
