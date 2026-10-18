@@ -15,7 +15,7 @@ SACHIL:47 서버 — 앱 화면 제공 + 채팅 중계 (파이썬 표준 라이�
 
 체크리스트(CH)와 사고보고서(IL)는 서버에 저장하지 않는다. 각자 기기 브라우저에만 남는다.
 """
-import datetime, gzip, hashlib, json, os, re, secrets, shutil, socket, sqlite3, subprocess, sys, threading, time, unicodedata, urllib.parse
+import datetime, gzip, hashlib, json, math, os, re, secrets, shutil, socket, sqlite3, subprocess, sys, threading, time, unicodedata, urllib.parse
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -45,11 +45,12 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.zip': ('application/zip', False),
 }
 VERSION = '4.5'
-APP_VERSION = 'V110'
+APP_VERSION = 'V111'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
 MAX_STORE = 3 * 1024 * 1024 * 1024     # 첨부 총량 3GB
+UPLOAD_DAY_MAX = 200 * 1024 * 1024     # V111: 한 사람 하루 첨부 200MB(교수 제외)
 LIB_MAX = 60 * 1024 * 1024             # 교수 메뉴 자료 업로드 파일 1개 60MB
 QNA_HITS, QNA_LOCK = {}, threading.Lock()   # 질의응답 질문 IP별 횟수
 SESSION_DAYS = 7    # V90: 7일 동안 쓰지 않으면 자동 로그아웃(쓸 때마다 다시 7일)
@@ -73,10 +74,21 @@ def load_conf():
     conf = {}
     if os.path.exists(CONF_PATH):
         try:
-            with open(CONF_PATH, encoding='utf-8') as f:
+            with open(CONF_PATH, encoding='utf-8-sig') as f:   # 메모장이 붙이는 BOM도 읽는다(V111)
                 conf = json.load(f)
+            if not isinstance(conf, dict):
+                raise ValueError('JSON 객체가 아닙니다')
         except Exception as e:
-            print('[경고] config.json을 읽지 못했습니다:', e)
+            # V111: 읽지 못했다고 기본값으로 덮으면 API 키·터널 토큰·관리자 코드가 사라진다 — 원본을 남기고 멈춘다
+            bad = CONF_PATH + '.bad'
+            try:
+                shutil.copyfile(CONF_PATH, bad)
+            except OSError:
+                pass
+            print('[오류] data\\config.json을 읽지 못했습니다:', e)
+            print('  메모장으로 열어 쉼표·따옴표를 고치거나, data\\config.json.bak이 있으면 그것으로 바꾼 뒤 다시 켜세요.')
+            print('  (원본은 data\\config.json.bad로 복사해 두었습니다)')
+            sys.exit(2)
     changed = False
     defaults = {
         'access_code': ''.join(secrets.choice('0123456789') for _ in range(8)),
@@ -133,9 +145,25 @@ def load_conf():
             changed = True
     conf['require_code'] = bool(conf.get('require_code'))
     if changed:
-        with open(CONF_PATH, 'w', encoding='utf-8') as f:
-            json.dump(conf, f, ensure_ascii=False, indent=2)
+        write_conf(conf)
     return conf
+
+
+CONF_LOCK = threading.Lock()
+
+
+def write_conf(conf):
+    # V111: 임시 파일에 다 쓴 뒤 바꿔 끼운다 — 쓰는 도중 꺼져도 config.json이 반쪽이 되지 않음. 바꾸기 전 것은 .bak으로
+    with CONF_LOCK:
+        tmp = CONF_PATH + '.tmp'
+        with open(tmp, 'w', encoding='utf-8') as f:
+            json.dump(dict(conf), f, ensure_ascii=False, indent=2)
+        if os.path.exists(CONF_PATH):
+            try:
+                shutil.copyfile(CONF_PATH, CONF_PATH + '.bak')
+            except OSError:
+                pass
+        os.replace(tmp, CONF_PATH)
 
 
 CONF = load_conf()
@@ -427,7 +455,12 @@ CONN_SEM = threading.BoundedSemaphore(MAX_CONN)
 
 class Server(ThreadingHTTPServer):
     daemon_threads = True
-    allow_reuse_address = True
+    allow_reuse_address = os.name != 'nt'   # Windows에서는 이 옵션이 '이미 쓰는 포트'에도 붙게 해서 창 두 개가 같은 포트를 나눠 씀(V111)
+
+    def server_bind(self):
+        if os.name == 'nt' and hasattr(socket, 'SO_EXCLUSIVEADDRUSE'):
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        super().server_bind()
 
     def handle_error(self, request, client_address):
         # 폰이 화면을 끄거나 앱이 기다리던 요청을 끊으면 Windows가 WinError 10053/10054를 낸다 — 오류가 아니므로 조용히 넘긴다
@@ -460,7 +493,7 @@ class Server(ThreadingHTTPServer):
 def to_int(s, default=None, lo=0, hi=2 ** 53):
     try:
         v = int(s)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):   # JSON Infinity 등
         return default
     return v if lo <= v <= hi else default
 
@@ -996,12 +1029,13 @@ class H(BaseHTTPRequestHandler):
                         lat, lng = float(j.get('lat')), float(j.get('lng'))
                     except (TypeError, ValueError):
                         raise ValueError('위치가 잘못됐습니다')
-                    if not (32.5 <= lat <= 39.5 and 123.5 <= lng <= 132.5):
+                    if not (math.isfinite(lat) and math.isfinite(lng) and 32.5 <= lat <= 39.5 and 123.5 <= lng <= 132.5):
                         raise ValueError('국내 위치만 표시할 수 있습니다')
                     it = {'lat': round(lat, 6), 'lng': round(lng, 6), 'by': self.user['name'], 'ts': time.time()}
                     if k == 'sector':
                         try:
-                            it['deg'] = round(float(j.get('deg')) % 360, 1)
+                            d = float(j.get('deg'))
+                            it['deg'] = round(d % 360, 1) if math.isfinite(d) else 180.0   # NaN이 저장되면 방 지도가 계속 깨진다
                         except (TypeError, ValueError):
                             it['deg'] = 180.0
                     items[k] = it
@@ -1035,8 +1069,7 @@ class H(BaseHTTPRequestHandler):
             if k and len(k) != 32:
                 return self.err(400, '카카오 JavaScript 키(32자)를 그대로 붙여 넣으세요')
             CONF['kakao_js_key'] = k.lower()
-            with open(CONF_PATH, 'w', encoding='utf-8') as f:
-                json.dump(CONF, f, ensure_ascii=False, indent=2)
+            write_conf(CONF)
             return self.send(200, dict(status(), msg='카카오맵 키를 저장했습니다' if k else '카카오맵 키를 지웠습니다'), log=False)
         if act == 'update':   # V104: 교수 화면에서 '서버 업데이트 지금 확인'
             if not (CONF.get('auto_update') and os.environ.get('SACHIL_LOOP') == '1'):
@@ -1056,8 +1089,7 @@ class H(BaseHTTPRequestHandler):
             FAILS['aikey:' + ip] = lst + [now]
         if act == 'delete':
             CONF[AI_KEYS[prov]] = ''
-            with open(CONF_PATH, 'w', encoding='utf-8') as f:
-                json.dump(CONF, f, ensure_ascii=False, indent=2)
+            write_conf(CONF)
             self.alog(200, f'ai-key-delete {prov}')
             return self.send(200, dict(status(), msg=f'{AI_NAMES[prov]} 키를 지웠습니다'), log=False)
         raw = str(j.get('key') or '').strip()
@@ -1078,8 +1110,7 @@ class H(BaseHTTPRequestHandler):
             return self.send(200, dict(status(), ok=False, error=f'시험 실패: {why} — 이전 키를 그대로 둡니다'), log=False)
         if prov == 'groq' and GROQ_OK_MODEL[0]:
             CONF['groq_model'] = GROQ_OK_MODEL[0]
-        with open(CONF_PATH, 'w', encoding='utf-8') as f:
-            json.dump(CONF, f, ensure_ascii=False, indent=2)
+        write_conf(CONF)
         self.alog(200, f'ai-key-set {prov}')
         print(f'[AI] 교수 화면에서 {AI_NAMES[prov]} 키를 바꿨습니다(…{key[-4:]}), 시험 성공', flush=True)
         return self.send(200, dict(status(), msg=f'{AI_NAMES[prov]} 키 저장·시험 성공 — 바로 적용됩니다'), log=False)
@@ -1530,7 +1561,11 @@ class H(BaseHTTPRequestHandler):
         ids = [i for i in (fl if isinstance(fl, list) else []) if isinstance(i, str) and re.fullmatch(r'[a-f0-9]{24}', i)][:10]
         files = []
         for i in ids:
-            f = q('SELECT * FROM files WHERE id=? AND owner=? AND room=? AND used=0', (i, self.user['id'], rid), one=True)
+            with DB_LOCK:   # V111: 고르고 표시하는 걸 한 번에 — 같은 파일이 두 글에 붙지 않게
+                f = DB.execute('SELECT * FROM files WHERE id=? AND owner=? AND room=? AND used=0', (i, self.user['id'], rid)).fetchone()
+                if f:
+                    DB.execute('UPDATE files SET used=1 WHERE id=?', (i,))
+                    DB.commit()
             if f:
                 files.append({'id': f['id'], 'name': f['name'], 'kind': f['kind'], 'size': f['size']})
         if not text and not files:
@@ -1546,8 +1581,6 @@ class H(BaseHTTPRequestHandler):
         now = time.time()
         mid = q('INSERT INTO messages(room,author,name,text,files,ts,reply) VALUES(?,?,?,?,?,?,?)',
                 (rid, self.user['id'], self.user['name'], text, json.dumps(files, ensure_ascii=False), now, reply), commit=True)
-        for f in files:
-            q('UPDATE files SET used=1 WHERE id=?', (f['id'],), commit=True)
         q('UPDATE rooms SET last=? WHERE id=?', (now, rid), commit=True)
         self.touch(rid)
         self.set_read(rid, mid)   # 내 글은 내가 읽은 것(안에서 NEW_MSG도 깨움)
@@ -1599,6 +1632,11 @@ class H(BaseHTTPRequestHandler):
         if store_size() + n > MAX_STORE:
             self.close_connection = True
             return self.err(507, '서버 저장 공간이 찼습니다. 관리자에게 알려 주세요')
+        # V111: 한 사람이 하루 200MB 넘게 올려 저장 공간을 다 채우지 못하게
+        used = q('SELECT COALESCE(SUM(size),0) s FROM files WHERE owner=? AND ts>?', (self.user['id'], time.time() - 86400), one=True)['s']
+        if used + n > UPLOAD_DAY_MAX and self.user.get('role') != 'admin':
+            self.close_connection = True
+            return self.err(429, '오늘 올릴 수 있는 양(200MB)을 넘었습니다. 내일 다시 올려 주세요')
         data = self.rfile.read(n)
         self._body_read = True
         kind = sniff(data[:16])
@@ -2707,8 +2745,7 @@ def auto_update_loop():
             os.remove(rb)
             if bad:
                 CONF.setdefault('update_skip', []).append(bad)
-                with open(CONF_PATH, 'w', encoding='utf-8') as f:
-                    json.dump(CONF, f, ensure_ascii=False, indent=2)
+                write_conf(CONF)
                 upd_log(f'서버 {bad}가 바로 멈춰 이전 파일로 되돌렸습니다 — 이 버전은 건너뜀')
         except OSError:
             pass
@@ -2828,7 +2865,19 @@ def run_tunnel(port, named):
     print('[터널] 3번 시도 후 포기합니다. 서버는 내부망 주소로는 계속 동작합니다. 기록: data\\tunnel.log', flush=True)
 
 
+def rotate_logs():
+    # V111: 기록 파일이 끝없이 커지지 않게 — 켤 때 20MB를 넘으면 .1로 넘기고 새로 시작(이전 .1은 지움)
+    for name in ('access.log', 'tunnel.log', 'update.log'):
+        p = os.path.join(DATA, name)
+        try:
+            if os.path.getsize(p) > 20 * 1024 * 1024:
+                os.replace(p, p + '.1')
+        except OSError:
+            pass
+
+
 def main():
+    rotate_logs()
     if '--set-admin-code' in sys.argv:
         i = sys.argv.index('--set-admin-code')
         new = norm_code(' '.join(sys.argv[i + 1:]))
@@ -2837,8 +2886,7 @@ def main():
             sys.exit(1)
         CONF['admin_code_hash'] = admin_hash(new)
         CONF.pop('admin_code', None)
-        with open(CONF_PATH, 'w', encoding='utf-8') as f:
-            json.dump(CONF, f, ensure_ascii=False, indent=2)
+        write_conf(CONF)
         print('관리자 코드 변경 완료 (config.json에는 해시로만 저장)')
         return
     if '--set-token' in sys.argv:
@@ -2849,8 +2897,7 @@ def main():
             print('토큰을 찾지 못했습니다. 대시보드에 나온 eyJ로 시작하는 긴 글자를 붙여 넣으세요.')
             sys.exit(1)
         CONF['tunnel_token'] = m.group(0)
-        with open(CONF_PATH, 'w', encoding='utf-8') as f:
-            json.dump(CONF, f, ensure_ascii=False, indent=2)
+        write_conf(CONF)
         print('터널 토큰 저장 완료 (' + m.group(0)[:10] + '…)')
         return
     if '--set-groq-key' in sys.argv or ('--set-gemini-key' in sys.argv and 'gsk_' in ' '.join(sys.argv)):
@@ -2862,8 +2909,7 @@ def main():
             print('Groq API 키를 찾지 못했습니다. console.groq.com의 API Keys에서 만든 gsk_ 로 시작하는 키를 붙여 넣으세요.')
             sys.exit(1)
         CONF['groq_api_key'] = m.group(0)
-        with open(CONF_PATH, 'w', encoding='utf-8') as f:
-            json.dump(CONF, f, ensure_ascii=False, indent=2)
+        write_conf(CONF)
         print('Groq 키 저장 완료 (' + m.group(0)[:8] + '…' + m.group(0)[-4:] + '). 연결을 시험합니다…')
         text, why, _c = call_groq('짧게 답한다.', [{'role': 'user', 'content': '연결 확인입니다. "연결됨"이라고만 답하세요.'}], 1000)
         if text:
@@ -2871,8 +2917,7 @@ def main():
             print('이제 Gemini 한도가 차거나 오류가 나면 Groq가 대신 답합니다' + (' (Gemini 키가 없어 지금은 Groq가 먼저 답함).' if not CONF.get('gemini_api_key') else '.'))
             if GROQ_OK_MODEL[0] and GROQ_OK_MODEL[0] != CONF.get('groq_model'):
                 CONF['groq_model'] = GROQ_OK_MODEL[0]
-                with open(CONF_PATH, 'w', encoding='utf-8') as f:
-                    json.dump(CONF, f, ensure_ascii=False, indent=2)
+                write_conf(CONF)
         else:
             print('시험 실패:', why)
             print('키는 저장했습니다. 키를 다시 복사했는지 console.groq.com에서 확인하세요.')
@@ -2889,8 +2934,7 @@ def main():
             sys.exit(1)
         CONF['gemini_api_key'] = key
         CONF['ai_provider'] = 'gemini'
-        with open(CONF_PATH, 'w', encoding='utf-8') as f:
-            json.dump(CONF, f, ensure_ascii=False, indent=2)
+        write_conf(CONF)
         print('Gemini 키 저장 완료 (' + key[:6] + '…' + key[-4:] + '). 연결을 시험합니다…')
         text, why, _c = call_llm('짧게 답한다.', [{'role': 'user', 'content': '연결 확인입니다. "연결됨"이라고만 답하세요.'}], 1000)
         if text:
@@ -2910,8 +2954,7 @@ def main():
             sys.exit(1)
         CONF['ai_api_key'] = m.group(0)
         CONF['ai_provider'] = 'claude'
-        with open(CONF_PATH, 'w', encoding='utf-8') as f:
-            json.dump(CONF, f, ensure_ascii=False, indent=2)
+        write_conf(CONF)
         print('AI 키 저장 완료 (' + m.group(0)[:12] + '…). 연결을 시험합니다…')
         text, why, _c = call_llm('짧게 답한다.', [{'role': 'user', 'content': '연결 확인입니다. "연결됨"이라고만 답하세요.'}], 1000, 'low')
         if text:
@@ -2928,8 +2971,7 @@ def main():
         if url and not url.startswith('http'):
             url = 'https://' + url
         CONF['public_url'] = url
-        with open(CONF_PATH, 'w', encoding='utf-8') as f:
-            json.dump(CONF, f, ensure_ascii=False, indent=2)
+        write_conf(CONF)
         print('고정 주소 저장:', url)
         return
     if not os.path.exists(APP_PATH):
