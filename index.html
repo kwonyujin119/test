@@ -456,8 +456,11 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .quick button:hover{border-color:var(--navy)}
 .quick{transition:opacity .2s}.quick.swap{opacity:0}
 .composer{position:sticky;bottom:8px;z-index:3;display:flex;gap:8px;align-items:center;padding:8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;box-shadow:var(--shadow)}
-.composer input{flex:1;min-width:0;height:44px;border:0;background:transparent;padding:0 10px 0 12px;font-size:16px}
-.composer input:focus{outline:none}
+.composer input,.composer textarea{flex:1;min-width:0;height:44px;border:0;background:transparent;padding:0 10px 0 12px;font-size:16px}
+.composer textarea{display:block;max-height:132px;padding:11px 10px 11px 12px;line-height:22px;resize:none;overflow-y:hidden;font-family:inherit;color:inherit}
+.composer.multi{align-items:flex-end;border-radius:24px}.composer.multi textarea{overflow-y:auto}
+.composer input:focus,.composer textarea:focus{outline:none}
+.bub p:empty::before{content:'\200b'}   /* 빈 줄도 한 줄로 */
 .composer .send{width:44px;height:44px;border-radius:50%;border:0;background:var(--ember);color:var(--navy);display:grid;place-items:center;flex:none}
 .composer .send:hover{background:var(--ember-2)}
 .composer .send svg{width:20px;height:20px}
@@ -809,7 +812,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v119</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v120</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1049,6 +1052,11 @@ body.chatview .panel{padding-bottom:6px}
 .act-sheet button{min-height:48px;border:0;border-radius:10px;background:transparent;font:inherit;font-size:15px;font-weight:600;text-align:left;padding:0 14px;cursor:pointer}
 .act-sheet button:hover,.act-sheet button:focus-visible{background:var(--surface-2)}
 .act-sheet button.danger{color:#C62828}
+.act-sheet.at{background:transparent;display:block}
+.act-sheet.at .box{position:fixed;width:200px;margin:0;padding:6px;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.22);border:1px solid var(--line)}
+.act-sheet.at button{min-height:38px;font-size:14px;padding:0 12px}
+.act-sheet.at .pv{margin:2px 6px 4px}
+.act-sheet.at button.cancel{display:none}
 .act-sheet button.cancel{text-align:center;color:var(--muted);border-top:1px solid var(--line);border-radius:0 0 10px 10px}
 /* 가로 아이폰: 노치·둥근 모서리에 내용이 잘리지 않게 */
 @media (orientation:landscape) and (max-height:520px){
@@ -1440,8 +1448,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V119', SRV_VER='4.7';
+  const APP_VER='V120', SRV_VER='4.8';
   const UPDATES=[
+    {v:'V120', d:'2026-10-18', t:['채팅: Enter는 보내기, Shift+Enter는 줄바꿈 — 줄이 늘면 입력칸도 6줄까지 커짐, 빈 줄도 그대로 보임','PC에서 메시지를 우클릭하면 메뉴가 화면 가운데가 아니라 커서 자리에 뜸','서버 4.8: 새 버전 확인을 5분마다(받으면 바로 다시 켜짐)']},
     {v:'V119', d:'2026-10-18', t:['지도: 표시를 누르면 지도 위에 큰 ‘삭제’ 버튼 — 바로 지우고 6초 동안 되돌리기','지도 방면설정: 화재대상 둘레에 A(아래)·B(왼쪽)·C(위)·D(오른쪽)·E·F 순서로 띄움(화재대상에 가려지지 않게) — 실제 방향으로 끌어 맞추기','지도: 현장지휘소·차량대기소가 이미 있는 표시와 겹치면 비켜서 뜸','PC에서 사진을 누르면 카카오톡처럼 화면 가운데 창으로(남색 머리줄·노란 선, 원래 크기까지만, 좌우 화살표) — 휴대폰은 그대로 전체 화면']},
     {v:'V118', d:'2026-10-18', t:['소화전(T맵): 위쪽에 주소·장소 검색칸 — 후보가 여러 곳이면 골라서 그 자리로','🔥 화재대상 버튼 한 번으로 47망 지도에 놓은 화재대상 자리로(1·2·3곳)','빨간 ‘소화전 검색’ 버튼 한 번으로 지도 가운데(+) 둘레 소화전 찾기 — 지도를 옮겼으면 옮긴 자리 기준','카카오맵·T맵 처음 위치를 인천소방학교 제2캠퍼스(서해구 심곡동)로']},
     {v:'V117', d:'2026-10-18', t:['인트로: 소방차 대신 빨간 빛(펜 끝)이 12시에서 6시까지 47을 빨간 선으로 그리며 이동 — 도착하면 선이 원래 남색으로 바뀌며 첫 화면이 나타남']},
@@ -2137,7 +2146,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       <dt>다음 업데이트 확인</dt><dd>${!j.auto_update?'자동 업데이트 꺼짐':j.upd_pending?`새 버전 ${esc(j.upd_pending)} 받음 — <b>곧바로</b> 다시 켜짐`:j.upd_next?`${at(j.upd_next)} <span>(${dur(left)} 뒤)</span>`:'곧 확인'}</dd>
       ${j.upd_last?`<dt>마지막 확인</dt><dd>${at(j.upd_last)} · ${esc(j.upd_result||'')}</dd>`:''}
       ${j.restart_next?`<dt>다음 정기 재시작</dt><dd>${at(j.restart_next)} <span>(${dur(j.restart_next-(j.now||0))} 뒤 · 접속자가 있으면 최대 30분 늦춤)</span></dd>`:''}
-    </dl><p class="note">${'restart_next' in j?'새 버전은 10분마다 확인해 받으면 곧바로, 그 밖에는 2시간마다 서버가 다시 켜집니다(10~20초 동안 47망이 잠깐 끊겼다가 저절로 이어짐).':'서버는 새 버전이 있을 때만 다시 켜집니다(몇 초). 새 버전이 없으면 확인만 하고 그대로 동작합니다.'}</p>`;
+    </dl><p class="note">${'restart_next' in j?'새 버전은 5분마다 확인해 받으면 곧바로, 그 밖에는 2시간마다 서버가 다시 켜집니다(10~20초 동안 47망이 잠깐 끊겼다가 저절로 이어짐).':'서버는 새 버전이 있을 때만 다시 켜집니다(몇 초). 새 버전이 없으면 확인만 하고 그대로 동작합니다.'}</p>`;
   }
   // 서버가 아직 키 관리 기능을 모르면(옛 서버): 키를 이 휴대폰에 잠시 맡겨 두었다가, 서버가 업데이트되면 자동으로 넣는다(V104)
   const AIK_PEND='sachil_aikey_pending';
@@ -3128,7 +3137,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <form class="composer" id="composer" autocomplete="off">
           <label class="attach" for="fileIn" aria-label="사진·PDF 첨부"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></label>
           <input id="fileIn" type="file" accept="image/*,application/pdf,.pdf" multiple hidden>
-          <input id="chatText" placeholder="${ph}" aria-label="메시지" enterkeyhint="send" maxlength="500">
+          <textarea id="chatText" rows="1" placeholder="${ph}" aria-label="메시지" enterkeyhint="send" maxlength="500"></textarea>
           <button type="submit" class="send" aria-label="보내기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12 20 4l-4 16-4-7z"/></svg></button>
         </form>`;
   let pendMsg='', pendMsgT=null;
@@ -3147,6 +3156,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const bc=el.querySelector('#bundleChk'); if(bc) bc.addEventListener('change',()=>{ bundlePref=bc.checked; try{ localStorage.setItem('sachil_bundle',bundlePref?'1':'0'); }catch(_){ } });
   }
   let addPendingFiles=null;   // 47망 ＋ 메뉴(앨범·카메라·파일·최근 사진)가 같은 첨부 처리로 넣는다
+  function fitChatText(){
+    const t=$('#chatText'); if(!t||t.tagName!=='TEXTAREA') return;
+    t.style.height='44px'; const h=Math.min(t.scrollHeight,132); t.style.height=h+'px';
+    const f=t.closest('.composer'); if(f) f.classList.toggle('multi',h>46);
+    if(window.__fitConvo) window.__fitConvo();
+  }
   function bindComposer(onSend){
     const fi=$('#fileIn');
     addPendingFiles=async all=>{
@@ -3157,7 +3172,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(msgs.length) pendNote(msgs.join(' · ')); else renderPending();
     };
     fi.addEventListener('change',()=>{ const all=[...fi.files]; fi.value=''; addPendingFiles(all); });
-    $('#composer').addEventListener('submit',e=>{ e.preventDefault(); const inp=$('#chatText'); const v=inp.value.trim(); if(!v&&!pending.length) return; const att=pending; pending=[]; inp.value=''; renderPending(); onSend(v,att); });
+    $('#composer').addEventListener('submit',e=>{ e.preventDefault(); const inp=$('#chatText'); const v=inp.value.trim(); if(!v&&!pending.length) return; const att=pending; pending=[]; inp.value=''; fitChatText(); renderPending(); onSend(v,att); });
+    // V120: Enter = 보내기, Shift+Enter = 줄바꿈(한글 조합 중 Enter는 글자 확정만). 줄이 늘면 입력칸도 6줄까지 커짐
+    { const inp=$('#chatText');
+      inp.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&e.keyCode!==229){ e.preventDefault(); const f=$('#composer'); if(f.requestSubmit) f.requestSubmit(); else f.dispatchEvent(new Event('submit',{cancelable:true})); } });
+      inp.addEventListener('input',fitChatText); }
     renderPending();
   }
   const footHtml=(left)=>`<div class="chat-foot"><span>${left} · 저장 ${fmtSize(storageUse())}${storageFull?' · <b class="warn">저장 공간 부족 — 새 내용은 이 세션에만 유지</b>':''}</span><span class="r"></span></div>`;
@@ -4170,7 +4189,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const cancelLp=e=>{ if(!lp) return; if(e&&e.type==='pointermove'&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)<10) return; clearTimeout(lp.t); lp=null; };
     ['pointermove','pointerup','pointercancel'].forEach(t=>convo.addEventListener(t,cancelLp,{passive:true}));
     convo.addEventListener('scroll',()=>cancelLp(),{passive:true});
-    convo.addEventListener('contextmenu',e=>{ const m=msgOf(e.target); if(!m) return; e.preventDefault(); cancelLp(); if(!$('#actSheet')) openActs(m); });
+    convo.addEventListener('contextmenu',e=>{ const m=msgOf(e.target); if(!m) return; e.preventDefault(); cancelLp(); if(!$('#actSheet')) openActs(m, matchMedia('(hover:hover) and (pointer:fine)').matches?{x:e.clientX,y:e.clientY}:null); });   // V120: 마우스 우클릭은 커서 자리에
     convo.addEventListener('click',e=>{
       if(eat){ e.preventDefault(); e.stopPropagation(); eat=false; return; }
       const g=e.target.closest('[data-goto]'); if(g){ const t=convo.querySelector(`.msg[data-mid="${CSS.escape(g.dataset.goto)}"]`); if(t){ t.scrollIntoView({block:'center',behavior:'smooth'}); t.classList.add('flash'); setTimeout(()=>t.classList.remove('flash'),1200); } else toast('원래 메시지가 화면에 없습니다(오래된 대화)'); return; }
@@ -4184,7 +4203,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         openLightbox(b.dataset.sview,b.dataset.name,list); }
     },true);
     async function fileBlobs(m){ const out=[]; for(const f of (m.files||[])){ try{ const bl=await (await fetch(FURL(f.id))).blob(); out.push(new File([bl], f.name, {type:bl.type||(f.kind==='image'?'image/jpeg':'application/pdf')})); }catch(_){ } } return out; }
-    function openActs(m){
+    function openActs(m,at){
       const old=$('#actSheet'); if(old) old.remove();
       let pre=null; const preP=(m.files||[]).length?fileBlobs(m).then(f=>{ pre=f; return f; }):Promise.resolve(pre=[]);
       const deleted=m.text==='(삭제된 메시지)'&&!(m.files||[]).length;
@@ -4192,6 +4211,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const sh=document.createElement('div'); sh.className='act-sheet'; sh.id='actSheet'; sh.setAttribute('role','dialog'); sh.setAttribute('aria-modal','true'); sh.setAttribute('aria-label','메시지 메뉴');
       sh.innerHTML=`<div class="box"><p class="pv"><b>${esc(m.mine?'나':m.name)}</b> ${esc(msgSnip(m,30))}</p>${acts.map(([k,l])=>`<button type="button" data-a="${k}" class="${k==='del'?'danger':''}">${l}</button>`).join('')}<button type="button" data-a="close" class="cancel">닫기</button></div>`;
       document.body.appendChild(sh);
+      if(at){ sh.classList.add('at'); const bx=sh.querySelector('.box'), w=bx.offsetWidth, h=bx.offsetHeight;   // 커서 오른쪽 아래, 화면 밖으로 나가면 반대쪽
+        bx.style.left=Math.max(8,Math.min(at.x+2, innerWidth-w-8))+'px'; bx.style.top=Math.max(8, at.y+h+8>innerHeight?at.y-h-2:at.y+2)+'px'; }
       const close=()=>{ sh.remove(); };
       sh.addEventListener('click',async e=>{
         if(e.target===sh){ close(); return; }

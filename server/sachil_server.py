@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '4.7'
-APP_VERSION = 'V119'
+VERSION = '4.8'
+APP_VERSION = 'V120'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -116,7 +116,7 @@ def load_conf():
         'ai_cache_days': 3,             # V102: 같은 질문의 AI 답을 이 기간 저장해 다시 씀(AI 호출·한도 안 씀). 0이면 끔
         'auto_update': True,            # V102: 서버 파일을 GitHub에서 스스로 받아 다시 켬(접속자 없을 때). false면 끔
         'update_check_hours': 2,        # (V113부터 안 씀 — update_check_min)
-        'update_check_min': 10,         # V113: 새 버전 확인 간격(분). 받으면 바로 교체
+        'update_check_min': 5,          # V113: 새 버전 확인 간격(분). 받으면 바로 교체(V120: 10 → 5)
         'auto_restart': True,           # V113: 업데이트가 없어도 정기적으로 서버를 다시 켬(접속자 없을 때 우선, 30분 넘게 기다리면 그대로)
         'restart_hours': 2,             # 정기 재시작 간격(시간)
         'update_url': 'https://raw.githubusercontent.com/kwonyujin119/test/main/server/sachil_server.py',
@@ -127,6 +127,9 @@ def load_conf():
         'allowed_origins': ['https://kwonyujin119.github.io'],   # 이 서버에 접속을 허용할 외부 앱 주소(github.io)
         'app_url': 'https://kwonyujin119.github.io/test/',       # 교육생에게 줄 앱 주소(뒤에 ?srv=서버주소 가 붙음)
     }
+    if conf.get('update_check_min') == 10:   # V120: 예전 기본값 10분 → 5분
+        conf['update_check_min'] = 5
+        changed = True
     if conf.get('ai_daily_limit') == 300:   # V93: 예전 기본값 300 → 50(교수 사용은 셈에서 제외)
         conf['ai_daily_limit'] = 50
         changed = True
@@ -2774,7 +2777,7 @@ def auto_update_loop():
         if CONF.get('auto_update'):
             upd_log('start-domain.bat가 옛 버전이라 자동 업데이트를 쉽니다 — 업데이트 묶음의 start-domain.bat로 덮어쓰세요')
         return
-    # V113: 새 버전은 10분마다 확인해 받으면 곧바로 교체(AI 답변 중이면 최대 90초 기다림).
+    # V113: 새 버전은 5분(V120)마다 확인해 받으면 곧바로 교체(AI 답변 중이면 최대 90초 기다림).
     #       업데이트가 없을 때는 2시간마다 다시 켬 — 접속자 없을 때를 우선, 30분 기다려도 계속 있으면 그대로 다시 켬
     def every(key, dflt, lo):
         try:
@@ -2809,7 +2812,7 @@ def auto_update_loop():
             except Exception as e:
                 UPD_STATE['result'] = '확인 실패(인터넷 확인)'
                 upd_log(f'확인 실패(다음에 다시): {str(e)[:100]}')
-            UPD_STATE['next'] = time.time() + every('update_check_min', 10, 5) * 60
+            UPD_STATE['next'] = time.time() + every('update_check_min', 5, 5) * 60
         due = UPD_STATE.get('restart_next') or 0
         if due and time.time() >= due and (room_idle() or time.time() >= due + 30 * 60):
             restart_self('정기 재시작(%g시간마다)' % every('restart_hours', 2, 0.5))
