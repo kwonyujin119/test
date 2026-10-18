@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '5.0'
-APP_VERSION = 'V124'
+VERSION = '5.1'
+APP_VERSION = 'V125'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -759,6 +759,8 @@ class H(BaseHTTPRequestHandler):
             if m:
                 return self.lib_get(m.group(1), urllib.parse.unquote(m.group(2)))
             self.user = self.get_user()
+            if path == '/api/report/tpl':   # V125: 교수가 정한 보고서 규칙 초안 양식(모든 기기 공통). 비어 있으면 앱 기본 양식
+                return self.send(200, {'ok': True, 'tpl': str(CONF.get('report_tpl') or ''), 'ts': CONF.get('report_tpl_ts') or 0}, log=False)
             if path == '/api/me':
                 return self.send(200, {'server': 'sachil', 'version': VERSION, 'user': self.user, 'room': ROOM47, 'room_debrief': ROOM_DB,
                                        'trim_ratio': CONF.get('weekly_trim_ratio'),
@@ -1095,7 +1097,7 @@ class H(BaseHTTPRequestHandler):
     def admin_ai(self):
         if self.user['role'] != 'admin':
             return self.err(403, '교수(관리자)만 할 수 있습니다')
-        j = self.body_json(4000)
+        j = self.body_json(40000)   # V125: 보고서 양식(한글 8천 자)까지
         act = str(j.get('action') or 'status')
         def status():
             return {'ok': True, 'provider': ai_provider(), 'order': ai_has(),
@@ -1117,6 +1119,12 @@ class H(BaseHTTPRequestHandler):
             CONF['kakao_js_key'] = k.lower()
             write_conf(CONF)
             return self.send(200, dict(status(), msg='카카오맵 키를 저장했습니다' if k else '카카오맵 키를 지웠습니다'), log=False)
+        if act == 'tpl':   # V125: 보고서 규칙 초안 양식 저장(빈 글 = 앱 기본 양식으로)
+            t = str(j.get('text') or '').replace('\r\n', '\n')[:8000]
+            CONF['report_tpl'] = t if t.strip() else ''
+            CONF['report_tpl_ts'] = time.time()
+            write_conf(CONF)
+            return self.send(200, dict(status(), tpl=CONF['report_tpl'], tpl_ts=CONF['report_tpl_ts'], msg='규칙 초안 양식을 저장했습니다 — 모든 기기의 새 보고서·AI 작성에 적용' if t.strip() else '기본 양식으로 되돌렸습니다'), log=False)
         if act == 'tmap':   # V113: T맵 앱 키(SK open API) — 소화전 찾기에 씀
             k = re.sub(r'[^0-9A-Za-z]', '', str(j.get('key') or ''))
             if k and not (20 <= len(k) <= 64):
