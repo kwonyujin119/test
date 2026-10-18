@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '8.0'
-APP_VERSION = 'V154'
+VERSION = '8.1'
+APP_VERSION = 'V155'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -2662,7 +2662,7 @@ def _bld_get(bcode, bun, ji, mt, k=None):
             w = '인증키가 등록되지 않았습니다(승인 직후면 1시간쯤 뒤 다시, Decoding 키인지 확인)'
         raise RuntimeError('건축물대장 응답: ' + re.sub(r'\s+', ' ', w).replace(k, '***')[:160])
     j = json.loads(t)
-    r = j.get('response') or {}
+    r = j.get('response') or j   # V155: 표준데이터 API는 response 없이 맨 위에 header·body
     h = r.get('header') or {}
     code = str(h.get('resultCode'))
     if code == '03':   # NODATA
@@ -2711,7 +2711,7 @@ def _ffus_get(params, k=None):
             w = '인증키가 등록되지 않았습니다(승인 직후면 1시간쯤 뒤 다시)'
         raise RuntimeError('소방용수시설 응답: ' + re.sub(r'\s+', ' ', w).replace(k, '***')[:160])
     j = json.loads(t)
-    r = j.get('response') or {}
+    r = j.get('response') or j   # V155: 표준데이터 API는 response 없이 맨 위에 header·body
     h = r.get('header') or {}
     code = str(h.get('resultCode'))
     if code == '03':   # NODATA_ERROR — 조건에 맞는 자료 없음
