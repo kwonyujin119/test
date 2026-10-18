@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '4.8'
-APP_VERSION = 'V121'
+VERSION = '4.9'
+APP_VERSION = 'V122'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -251,8 +251,41 @@ MEMBER_DAYS = 7                          # 최근 7일 안에 들어온 사람�
 DEL_VER = {}                             # 방 → 지운 글 순번(바뀌면 다른 사람 화면에서도 지움)
 DELETED = {}                             # 방 → [(순번, 글 id)] 최근 300개
 DELETED_TXT = '(삭제된 메시지)'
-START_EPOCH = secrets.token_hex(4)
+# V122: 대화 구분값을 파일에 남겨 서버를 다시 켜도 그대로 — 재시작마다 모든 화면이 대화를 처음부터 다시 그리지 않게
+EPOCH_PATH = os.path.join(DATA, 'epoch.json')
+
+
+def _epoch_load():
+    try:
+        with open(EPOCH_PATH, encoding='utf-8') as f:
+            j = json.load(f)
+        return j if isinstance(j, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+_EP = _epoch_load()
+START_EPOCH = str(_EP.get('start') or secrets.token_hex(4))
+EPOCH.update({int(k): str(v) for k, v in (_EP.get('rooms') or {}).items() if str(k).isdigit()})
 epoch = lambda rid: EPOCH.get(rid, START_EPOCH)
+
+
+def epoch_save():
+    try:
+        tmp = EPOCH_PATH + '.tmp'
+        with open(tmp, 'w', encoding='utf-8') as f:
+            json.dump({'start': START_EPOCH, 'rooms': {str(k): v for k, v in EPOCH.items()}}, f)
+        os.replace(tmp, EPOCH_PATH)
+    except OSError:
+        pass
+
+
+if not _EP.get('start'):   # 처음 한 번 기록
+    try:
+        os.makedirs(DATA, exist_ok=True)
+    except OSError:
+        pass
+    epoch_save()
 POSTS = {}
 POSTS_LOCK = threading.Lock()
 POST_MAX, POST_WINDOW = 24, 30          # 한 사람이 30초에 24번 넘게 보내면 잠시 막음(사진 10장 따로 보내기 + 글 여유)
@@ -335,6 +368,7 @@ def _weekly_trim(force):
                     q('DELETE FROM files WHERE id=?', (f['id'],), commit=True)
             q('DELETE FROM messages WHERE room=? AND id<=?', (rid, rows[-1]['id']), commit=True)
             EPOCH[rid] = secrets.token_hex(4)
+            epoch_save()
             removed += drop
         if removed:
             with NEW_MSG:
@@ -1457,6 +1491,7 @@ class H(BaseHTTPRequestHandler):
         q('DELETE FROM files WHERE room=?', (rid,), commit=True)
         q('DELETE FROM messages WHERE room=?', (rid,), commit=True)
         EPOCH[rid] = secrets.token_hex(4)
+        epoch_save()
         with NEW_MSG:
             NEW_MSG.notify_all()
         self.alog(200, 'room-clear')
