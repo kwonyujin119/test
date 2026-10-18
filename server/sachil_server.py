@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '8.2'
-APP_VERSION = 'V156'
+VERSION = '8.3'
+APP_VERSION = 'V157'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -771,6 +771,19 @@ class H(BaseHTTPRequestHandler):
                 if not pub_allowed(self.ip()):
                     return self.send(429, {'ok': False, 'error': '조회가 너무 잦습니다. 잠시 뒤 다시 해 보세요'}, log=False)
                 return self.send(200, dict(ok=True, **law_find(qtext)), log=False)
+            if path == '/api/lawtext':   # V157: 검색 — 법제처 현행 조문 원문(첨부 PDF 밖의 법령 정보)
+                qtext = re.sub(r'\s+', ' ', (args.get('q') or [''])[0][:200]).strip()
+                if not CONF.get('law_oc'):
+                    return self.send(200, {'ok': False, 'off': True}, log=False)
+                if len(qtext) < 2:
+                    return self.send(200, {'ok': True, 'rows': []}, log=False)
+                if not pub_allowed(self.ip()):
+                    return self.send(429, {'ok': False, 'error': '조회가 너무 잦습니다. 잠시 뒤 다시 해 보세요'}, log=False)
+                try:
+                    hits = law_lookup(qtext, top=3)
+                except Exception as e:
+                    return self.send(200, {'ok': False, 'error': str(e).replace(str(CONF.get('law_oc')), '***')[:160]}, log=False)
+                return self.send(200, {'ok': True, 'rows': [{'name': h['name'], 'art': h['art'], 'eff': h.get('eff') or '', 'text': h['text'][:1500], 'url': h['url']} for h in hits]}, log=False)
             if path == '/api/ffus':   # V150: 전국소방용수시설표준데이터 — 그 주소에서 가까운 소화전·급수탑·저수조
                 sd, sg = (args.get('sd') or [''])[0][:20], (args.get('sg') or [''])[0][:30]
                 try:
@@ -3106,7 +3119,7 @@ def law_lookup(q, top=3):
     want_jo = re.findall(r'제\s?(\d+)\s?조(?:의\s?(\d+))?', q)
     toks = [t for t in re.findall(r'[가-힣]{2,}', q) if t not in _LAW_STOP and not t.endswith(('은', '는', '이', '가', '을', '를'))]
     toks += [t[:-1] for t in re.findall(r'[가-힣]{3,}', q) if t.endswith(('은', '는', '이', '가', '을', '를', '의', '에'))]
-    scored = []
+    scored, last_err, got_any = [], None, False
     if names and not any(law_search(n) for n in names[:2]):   # 이름처럼 보였지만 법령이 아니면 기본 법령들에서
         cands = LAW_DEFAULT
     for cn in cands:
@@ -3118,7 +3131,12 @@ def law_lookup(q, top=3):
         mst = r.get('법령일련번호') or r.get('MST')
         if not mst:
             continue
-        name, eff, arts = law_articles(mst)
+        try:
+            name, eff, arts = law_articles(mst)
+        except Exception as e:   # V157: 한 법령을 못 받아도 나머지 법령에서 계속 찾는다
+            last_err = e
+            continue
+        got_any = True
         name = name or str(r.get('법령명한글') or cn)
         for label, title, text in arts:
             sc = 0
@@ -3131,6 +3149,8 @@ def law_lookup(q, top=3):
                     sc += 1
             if sc:
                 scored.append((sc, name, eff, label, title, text))
+    if not scored and last_err and not got_any:   # 모두 못 받았을 때만 오류
+        raise last_err
     scored.sort(key=lambda x: -x[0])
     out = []
     for sc, name, eff, label, title, text in scored[:top]:
