@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '5.6'
-APP_VERSION = 'V130'
+VERSION = '5.7'
+APP_VERSION = 'V131'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -2752,15 +2752,34 @@ def ver_tuple(v):
     return tuple(int(x) for x in re.findall(r'\d+', str(v))[:4]) or (0,)
 
 
+def fetch_text(url, limit, timeout=60):
+    """V131: GitHub 파일 받기. 파이썬(OpenSSL)이 이 PC에서 루트 인증서를 못 찾으면(CERTIFICATE_VERIFY_FAILED) Windows 기본 curl.exe로 다시 받는다
+    — curl.exe는 Windows 인증서 저장소를 쓰고 빠진 루트도 Windows가 받아 온다. 인증서 확인은 끄지 않는다."""
+    import urllib.request
+    req = urllib.request.Request(url, headers={'Cache-Control': 'no-cache'})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return r.read(limit).decode('utf-8')
+    except Exception as e:
+        if 'CERTIFICATE_VERIFY_FAILED' not in str(e) and 'SSL' not in type(e).__name__ + str(e):
+            raise
+        exe = shutil.which('curl.exe') or shutil.which('curl')
+        if not exe:
+            raise
+        out = subprocess.run([exe, '-fsSL', '--max-time', str(int(timeout)), '-H', 'Cache-Control: no-cache', url],
+                             capture_output=True, timeout=timeout + 15)
+        if out.returncode != 0:
+            raise RuntimeError('curl 실패: ' + out.stderr.decode('utf-8', 'replace')[:120]) from e
+        return out.stdout[:limit].decode('utf-8')
+
+
 def fetch_new_server():
     """GitHub의 서버 파일을 받아 지금보다 새 버전이고 정상이면 (버전, 내용)을 돌려준다."""
     import urllib.request
     url = str(CONF.get('update_url') or '')
     if not url.startswith('https://'):
         return None
-    req = urllib.request.Request(url + ('&' if '?' in url else '?') + 't=' + str(int(time.time())), headers={'Cache-Control': 'no-cache'})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        src = r.read(5_000_000).decode('utf-8')
+    src = fetch_text(url + ('&' if '?' in url else '?') + 't=' + str(int(time.time())), 5_000_000)
     m = re.search(r"^VERSION = '([0-9.]+)'", src, re.M)
     if not m:
         raise ValueError('받은 파일에 VERSION이 없음')
@@ -2784,9 +2803,7 @@ def update_app_file():
     url = str(CONF.get('app_update_url') or '')
     if not url.startswith('https://'):
         return None
-    req = urllib.request.Request(url + ('&' if '?' in url else '?') + 't=' + str(int(time.time())), headers={'Cache-Control': 'no-cache'})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        src = r.read(12_000_000).decode('utf-8')
+    src = fetch_text(url + ('&' if '?' in url else '?') + 't=' + str(int(time.time())), 12_000_000)
     new = _app_ver(src)
     try:
         with open(APP_PATH, encoding='utf-8') as f:

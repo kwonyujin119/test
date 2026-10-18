@@ -812,7 +812,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v130</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v131</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1532,8 +1532,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V130', SRV_VER='5.6';
+  const APP_VER='V131', SRV_VER='5.7';
   const UPDATES=[
+    {v:'V131', d:'2026-10-18', t:['서버 5.7: 서버 PC에서 자동 업데이트가 인증서 확인 실패로 계속 멈추던 문제 — 그럴 때 Windows 기본 curl로 받아 자동 업데이트가 다시 동작(인증서 확인은 그대로 유지)']},
     {v:'V130', d:'2026-10-18', t:['DS: 닫았다가 다시 열면 직전에 보던 자리·확대 정도 그대로(방마다, 이 기기에 7일)','서버 5.6']},
     {v:'V129', d:'2026-10-18', t:['47망·디브리핑룸: 카카오톡처럼 마지막으로 본 대화를 이 기기에 남겨 두고, 방에 들어가자마자 바로 보여 준 뒤 새 글만 받아 붙임 — ‘불러오는 중’ 거의 없음','옛 서버 업데이트용 쉬는 시간에도 방에 처음 들어올 때는 바로 대화를 받음','서버 5.5']},
     {v:'V128', d:'2026-10-18', t:['소화전: 지도가 화면 밖까지 커져 안내·결과 목록이 가려지던 문제 고침 — 안내 줄을 지도 위로, 지도 칸 크기 고정','검색칸에 ‘소화전’만 넣으면 장소 찾기 대신 소화전 검색','못 찾으면 알림도 띄움','서버 5.4']},
