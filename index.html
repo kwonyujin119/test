@@ -858,7 +858,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v155</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v156</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1365,7 +1365,19 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .hydov .tmapbox{position:absolute!important;inset:0!important;width:auto!important;height:auto!important;overflow:hidden;background:#e9edf3}
 .hydov .mmsg{border-bottom:1px solid var(--line)}
 .hydov .mhint{font-size:11.5px;padding-top:6px}
-.hydov .hlist{list-style:none;margin:0;padding:0 10px;max-height:30vh;overflow:auto;background:var(--surface)}
+.hydov .hlist{list-style:none;margin:0;padding:0 10px;background:var(--surface)}
+.hydov .hbar{flex:none;background:var(--surface);border-top:1px solid var(--line)}   /* V156: 지도 아래 한 줄 → 누르면 펼침 */
+.hydov .hsum{width:100%;display:flex;align-items:center;gap:8px;min-height:46px;padding:0 14px;border:0;background:none;font:inherit;font-size:14px;font-weight:700;color:var(--fg);text-align:left}
+.hydov .hsum-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hydov .hsum-a{flex:none;color:var(--muted);transition:transform .15s}
+.hydov .hsum[aria-expanded="true"] .hsum-a{transform:rotate(180deg)}
+.hydov .hpanel{max-height:42vh;overflow:auto;border-top:1px solid var(--line)}
+.hydov .hpop{position:absolute;left:10px;right:10px;bottom:10px;z-index:6;max-width:420px;margin:0 auto;padding:12px 14px;border-radius:14px;background:var(--surface);box-shadow:0 6px 24px rgba(0,0,0,.22);font-size:14px}
+.hydov .hpop b{display:block;font-size:15px;padding-right:30px}
+.hydov .hpop .hp-d{margin:4px 0 0;color:var(--fg)}
+.hydov .hpop .hp-m{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+.hydov .hpop .hp-x{position:absolute;top:6px;right:6px;width:36px;height:36px;border:0;border-radius:18px;background:none;font-size:20px;color:var(--muted)}
+.hydov .hpop .hnav{margin:8px 0 0}
 .hydov .hlist button{width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-height:48px;padding:6px 4px;border:0;border-bottom:1px solid var(--line);background:none;font:inherit;font-size:14px;color:var(--fg);text-align:left}
 .hydov .hlist button span{font-size:12.5px;color:var(--muted)}
 .hydov .hlist button.on{background:#FDECEA}
@@ -1616,8 +1628,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V155', SRV_VER='8.1';
+  const APP_VER='V156', SRV_VER='8.2';
   const UPDATES=[
+    {v:'V156', d:'2026-10-18', t:['소화전: 인천 새 행정구역 — 검단구·서해구는 서구, 영종구는 중구, 제물포구는 중구·동구 자료로 조회','소화전: 주소를 검색하면 소화전 검색까지 한 번에(원클릭)','소화전: 결과는 지도 아래 한 줄로만 보이고, 누르면 목록이 펼쳐짐 — 지도를 가리지 않음','소화전: 지도 위 소화전을 누르면 그 소화전 정보(방향·거리·위치·보호틀·수압)와 길안내가 떠서 보임']},
     {v:'V155', d:'2026-10-18', t:['소방용수시설(소화전) 조회가 매번 오류 나던 문제 고침 — 공공데이터포털 응답 형태를 잘못 읽고 있었음(47망 PC 실제 시험으로 확인)']},
     {v:'V154', d:'2026-10-18', t:['메뉴에 위험물·특정소방대상물 추가, 구분선으로 나눔 — 위(교육일정·평가일정·질의응답·관련법령) / 현장 대응 / 아래(시그니처·방재실·업데이트 내역)','긴급구조대응계획에 원클릭 전화 연결 — 응원협정 대상·긴급구조 관련기관을 첨부 PDF에서 뽑아 누르면 바로 전화(휴대전화 번호는 빼고 대표번호만), 기관 이름으로 찾기, 교수는 목록 고치기','방재실 공공데이터포털 [다시 시험]이 4개 API(건축물대장·소방용수시설·위험물정보·상수도시설정보)를 모두 시험 — 요청주소를 모르는 API는 서버가 공공데이터포털에서 찾아 시험','‘○○에 관한 법률’·‘○○법 시행령’ 이름을 제대로 알아봐 엉뚱한 조문을 근거로 쓰던 문제 고침','‘요양병원·지하주차장·진입로 2곳’처럼 일반 낱말을 건물·주소로 잘못 읽던 문제 고침','카카오 지도 불러오기가 막히면 AI 입력이 멈추던 문제, 답을 기다리는 동안 보낸 글이 사라지던 문제 고침','작은 휴대폰(360px)에서 대화명·로그인·방재실 서버·AI 화면이 잘리던 문제, 사고보고서 버튼 줄이 넘치던 문제 고침','소화전 창 Esc로 닫기·자료가 없는 지역(세종·전북) 조회·조회 횟수 제한 등 안정성 보강']},
     {v:'V153', d:'2026-10-18', t:['주소 대신 건물 이름(예: ○○아파트·○○병원·○○빌딩)으로 검색하거나 AI에게 물어도 카카오 장소 검색으로 주소를 찾아 건축물대장·소방용수시설을 함께 씀','AI 법령 답변의 근거 목록에 법제처 행정규칙(고시·화재안전기준)·자치법규(조례) 원문 링크도 붙임']},
@@ -4711,9 +4724,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     <ul class="hres" hidden></ul>
     <div class="hbase" role="group" aria-label="기준 위치와 소화전 검색"></div>
     <p class="mmsg" role="status"></p>
-    <div class="mbox"><div class="tmapbox"></div></div>
-    <ol class="hlist"></ol>
-    <p class="mhint"><b>🔥 화재</b>는 47망 지도에 놓은 자리로, <b>검색</b>은 입력한 주소로 옮깁니다. <b>소화전 검색</b>을 누르면 지도 가운데(+) 둘레를 찾습니다. <b>소방청 자료</b>는 전국소방용수시설표준데이터, <b>T맵</b>은 T맵에 ‘소화전’으로 등록된 곳이라 서로 빠진 곳이 있을 수 있어요 — 실제 위치·사용 가능 여부는 현장에서 확인하세요.</p>`;
+    <div class="mbox"><div class="tmapbox"></div><div class="hpop" role="dialog" aria-label="소화전 정보" hidden></div></div>
+    <div class="hbar"><button type="button" class="hsum" aria-expanded="false"><span class="hsum-t">주소를 검색하면 소화전까지 바로 찾습니다</span><span class="hsum-a" aria-hidden="true">▴</span></button>
+    <div class="hpanel" hidden><ol class="hlist"></ol>
+    <p class="mhint"><b>🔥 화재</b>는 47망 지도에 놓은 자리로, <b>검색</b>은 입력한 주소로 옮깁니다. <b>소화전 검색</b>을 누르면 지도 가운데(+) 둘레를 찾습니다. <b>소방청 자료</b>는 전국소방용수시설표준데이터, <b>T맵</b>은 T맵에 ‘소화전’으로 등록된 곳이라 서로 빠진 곳이 있을 수 있어요 — 실제 위치·사용 가능 여부는 현장에서 확인하세요.</p></div></div>`;
   document.body.appendChild(hydEl);
   const hq=s=>hydEl.querySelector(s);
   const hmsg=(t,html)=>{ const m=hq('.mmsg'); if(html) m.innerHTML=t; else m.textContent=t||''; };
@@ -4748,10 +4762,25 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   function hydDraw(){
     hq('.hlist').innerHTML=HYD.list.map((p,i)=>`<li><button type="button" data-i="${i}"><b>${esc(p.name)}</b><span>${p.dir}쪽 ${fmtM(p.m)}${p.addr?' · '+esc(p.addr):''}</span></button></li>`).join('');
+    hydPop(-1); hydSum();
     if(!HYD.map) return;
     HYD.mk.forEach(m=>{ try{ m.setMap(null); }catch(_){ } }); HYD.mk=[];
-    try{ HYD.list.forEach(p=>HYD.mk.push(new Tmapv2.Marker({position:new Tmapv2.LatLng(p.lat,p.lng), icon:HYD_ICON, iconSize:new Tmapv2.Size(26,26), map:HYD.map, title:p.name}))); }catch(_){ }
+    HYD.list.forEach((p,i)=>{ try{ const mk=new Tmapv2.Marker({position:new Tmapv2.LatLng(p.lat,p.lng), icon:HYD_ICON, iconSize:new Tmapv2.Size(26,26), map:HYD.map, title:p.name}); HYD.mk.push(mk);
+      let lt=0; const on=()=>{ const t=Date.now(); if(t-lt<450) return; lt=t; hydPop(i); };   // V156: 지도 위 소화전을 누르면 정보 플로팅(터치·클릭 겹침 방지)
+      try{ mk.addListener('click',on); }catch(_){ } try{ mk.addListener('touchend',on); }catch(_){ } }catch(_){ } });
   }
+  // V156: 지도 아래 한 줄 요약(누르면 목록 펼침)과 소화전 정보 플로팅
+  function hydSum(){ const t=hq('.hsum-t'); if(!t) return; const L=HYD.list, p=L[0];
+    t.textContent=L.length?`소화전 ${L.length}곳 · 가장 가까운 ${p.name} ${p.dir}쪽 ${fmtM(p.m)}`:HYD.ref?`${fmtM(HYD.rad||500)} 안에서 찾은 소화전 없음 — 펼쳐서 안내 보기`:'주소를 검색하면 소화전까지 바로 찾습니다'; }
+  function hydPanel(open){ const b=hq('.hsum'), pn=hq('.hpanel'); if(!b||!pn) return; pn.hidden=!open; b.setAttribute('aria-expanded',String(!!open)); }
+  function hydPop(i){ const el=hq('.hpop'); if(!el) return; const p=HYD.list[i];
+    hq('.hlist').querySelectorAll('button.on').forEach(x=>x.classList.remove('on'));
+    if(!p){ el.hidden=true; el.innerHTML=''; return; }
+    const b=hq(`.hlist [data-i="${i}"]`); if(b) b.classList.add('on');
+    el.innerHTML=`<button type="button" class="hp-x" aria-label="닫기">×</button><b>${esc(p.name)}</b><p class="hp-d">${esc((HYD.ref&&HYD.ref.name)||'기준')}에서 ${p.dir}쪽 ${fmtM(p.m)}</p>${p.addr?`<p class="hp-m">${esc(p.addr)}</p>`:''}<a class="hnav" href="https://map.kakao.com/link/to/${encodeURIComponent(String(p.name).replace(/,/g,' '))},${(+p.lat).toFixed(6)},${(+p.lng).toFixed(6)}" target="_blank" rel="noopener">길안내</a>`;
+    el.hidden=false; }
+  hq('.hsum').addEventListener('click',()=>hydPanel(hq('.hpanel').hidden));
+  hq('.hpop').addEventListener('click',e=>{ if(e.target.closest('.hp-x')) hydPop(-1); });
   // 기준 위치로 옮기기(화재대상·주소·내 위치) — 소화전은 '소화전 검색'을 누를 때 찾는다
   function hydPick(b,auto){
     HYD.base=b; HYD.list=[]; hydDraw(); hydBases(); hydMarkBase();
@@ -4765,7 +4794,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!ref){ hmsg('기준 위치가 없습니다 — 🔥 화재, 주소 검색, ◎ 내 위치 중 하나를 고르세요'); return; }
     HYD.ref=ref; HYD.rad=+((hq('.hrad')||{}).value)||500;
     const rm=HYD.rad, my=++HYD.seq, btn=hq('.hgo'); if(btn) btn.disabled=true;
-    hmsg(`${ref.name} 둘레 ${fmtM(rm)} 소화전을 찾는 중…`);
+    hmsg(`${ref.name} 둘레 ${fmtM(rm)} 소화전을 찾는 중…`); { const st=hq('.hsum-t'); if(st) st.textContent='소화전을 찾는 중…'; }
     let list;
     try{ list=hydSrc()==='pub'?await pubHydSearch(ref,rm):await hydSearch(ref,Math.max(1,Math.ceil(rm/1000))); }
     catch(e){ if(btn) btn.disabled=false; if(my!==HYD.seq||hydEl.hidden) return; const m=String(e.message||'');
@@ -4777,8 +4806,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     hydDraw();
     if(!HYD.list.length) toast('소화전을 찾지 못했습니다 — 위 안내 줄을 확인하세요');
     else { const te=document.getElementById('toast'); if(te) te.classList.remove('on'); }   // V154: 앞 검색의 '못 찾음' 알림을 지움
-    if(hydSrc()==='pub'){ hmsg(HYD.list.length?`${ref.name} 기준 ${fmtM(rm)} 안 소방용수시설 ${HYD.list.length}곳(소방청 자료) — 목록을 누르면 지도에서 보입니다`:`${ref.name} 기준 ${fmtM(rm)} 안에 소방청 자료의 소방용수시설이 없습니다 — 반경을 넓히거나 T맵 자료로 바꿔 보세요 [${HYD.diag||'-'}]`); return; }
-    hmsg(HYD.list.length?`${ref.name} 기준 ${fmtM(rm)} 안 소화전 ${HYD.list.length}곳 — 목록을 누르면 지도에서 보입니다`:`${ref.name} 기준 ${fmtM(rm)} 안에서 T맵에 등록된 소화전을 찾지 못했습니다 — 반경을 넓혀 보세요 [T맵 응답: ${HYD.diag||'-'} · 기준 ${ref.lat.toFixed(4)},${ref.lng.toFixed(4)}]`);
+    if(hydSrc()==='pub'){ hmsg(HYD.list.length?`${ref.name} 기준 ${fmtM(rm)} 안 소방용수시설 ${HYD.list.length}곳(소방청 자료) — 지도 위 소화전을 누르면 정보가 보입니다`:`${ref.name} 기준 ${fmtM(rm)} 안에 소방청 자료의 소방용수시설이 없습니다 — 반경을 넓히거나 T맵 자료로 바꿔 보세요 [${HYD.diag||'-'}]`); return; }
+    hmsg(HYD.list.length?`${ref.name} 기준 ${fmtM(rm)} 안 소화전 ${HYD.list.length}곳 — 지도 위 소화전을 누르면 정보가 보입니다`:`${ref.name} 기준 ${fmtM(rm)} 안에서 T맵에 등록된 소화전을 찾지 못했습니다 — 반경을 넓혀 보세요 [T맵 응답: ${HYD.diag||'-'} · 기준 ${ref.lat.toFixed(4)},${ref.lng.toFixed(4)}]`);
   }
   hq('.hbase').addEventListener('click',e=>{
     if(e.target.closest('.hgo')){ hydGo(); return; }
@@ -4801,16 +4830,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(hydEl.hidden) return;
     if(!list.length){ hmsg('찾지 못했습니다 — 다른 낱말이나 주소(예: 구월동 1138)로 검색하세요'); return; }
     HYD.found=list; inp.blur();
-    if(list.length===1){ hydPick({k:'addr',name:list[0].name,lat:list[0].lat,lng:list[0].lng}); return; }
+    if(list.length===1){ hydPick({k:'addr',name:list[0].name,lat:list[0].lat,lng:list[0].lng},true); return; }   // V156: 주소 검색 = 소화전 검색까지 한 번에
     box.innerHTML=list.map((p,i)=>`<li><button type="button" data-f="${i}"><b>${esc(p.name)}</b>${p.addr?`<span>${esc(p.addr)}</span>`:''}</button></li>`).join('');
     box.hidden=false; hmsg(`‘${v}’ 후보 ${list.length}곳 — 고르세요`);
   });
   hq('.hres').addEventListener('click',e=>{ const t=e.target.closest('[data-f]'); if(!t) return; const p=(HYD.found||[])[+t.dataset.f]; if(!p) return;
-    hq('.hres').hidden=true; hydPick({k:'addr',name:p.name,lat:p.lat,lng:p.lng}); });
+    hq('.hres').hidden=true; hydPick({k:'addr',name:p.name,lat:p.lat,lng:p.lng},true); });
   hq('.hlist').addEventListener('click',e=>{
     const t=e.target.closest('[data-i]'); if(!t) return; const p=HYD.list[+t.dataset.i]; if(!p) return;
-    hq('.hlist').querySelectorAll('button.on').forEach(x=>x.classList.remove('on')); t.classList.add('on');
-    hmsg(`${esc(p.name)} · ${esc(HYD.ref.name)}에서 ${p.dir}쪽 ${fmtM(p.m)} <a class="hnav" href="https://map.kakao.com/link/to/${encodeURIComponent(String(p.name).replace(/,/g,' '))},${(+p.lat).toFixed(6)},${(+p.lng).toFixed(6)}" target="_blank" rel="noopener">길안내</a>`,true);   // V138: 카카오맵 길찾기로 바로
+    hydPanel(false); hydPop(+t.dataset.i);   // V156: 목록에서 고르면 목록을 접고 지도에서 그 소화전을 보여 줌
     if(HYD.map){ try{ HYD.map.setCenter(new Tmapv2.LatLng(p.lat,p.lng)); HYD.map.setZoom(18); }catch(_){ } }
   });
   let hydLast=null;
@@ -4823,7 +4851,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     hydLast=document.activeElement; HYD.rid=rid; hydEl.hidden=false; appEl.inert=true; tabbarEl.inert=true;
     try{ hq('.mclose').focus({preventScroll:true}); }catch(_){ }
     HYD.key=SRV.tmap||tmPend(); HYD.list=[]; HYD.fires=[]; HYD.base=null; HYD.ref=null; hq('.hlist').innerHTML=''; hq('.hbase').innerHTML=''; hq('.hres').hidden=true; hq('.mbox').hidden=false;
-    hydDraw(); hydMarkBase();   // V138: 지난번 소화전·기준 핀이 지도에 남지 않게
+    hydDraw(); hydMarkBase(); hydPanel(false);   // V138: 지난번 소화전·기준 핀이 지도에 남지 않게
     { const n=hydEl.querySelector('.hnote'); if(n) n.remove(); }
     if(!HYD.key&&hydSrc()!=='pub'){ hmsg(`T맵 키가 아직 없습니다. ${isProf()?'메뉴 → <b>SACHIL방재실</b> → <b>T맵 키</b>에 App Key를 넣어 주세요.':'교수에게 T맵 키 설정을 요청하세요.'}`,true); return; }
     hmsg('화재 위치를 불러오는 중…');

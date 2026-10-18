@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '8.1'
-APP_VERSION = 'V155'
+VERSION = '8.2'
+APP_VERSION = 'V156'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -2730,6 +2730,7 @@ FF_KEEP = ('ctprvnNm', 'latitude', 'longitude', 'fcltySeNm', 'fcltySe', 'fcltySe
            'prtcYn', 'waterPressr', 'installationYear', 'safeCnterNm', 'referenceDate')
 _SIDO_LONG = {'전라북도': '전북', '충청북도': '충북', '충청남도': '충남', '전라남도': '전남', '경상북도': '경북', '경상남도': '경남'}
 FFUS_LOCKS = {}
+SG_ALIAS = {'검단구': ('서구',), '서해구': ('서구',), '제물포구': ('중구', '동구'), '영종구': ('중구',)}   # V156: 인천 2026 행정구역 개편 → 소방용수 표준데이터의 옛 구
 
 
 def _sido(s):
@@ -2768,12 +2769,22 @@ def ffus_near(sd, sg, lat, lng, n=8, within=1000):
         if c and time.time() - c[0] < 86400:
             rows = c[1]
         else:
-            cands = [sg] + ([sg.split()[-1], sg.split()[0], sg.replace(' ', '')] if ' ' in sg else [])   # '수원시 장안구' → 장안구·수원시
             rows = []
-            for cand in dict.fromkeys(cands):
-                rows = _ffus_all(sd, cand)
-                if rows:
-                    break
+            alias = SG_ALIAS.get(sg.replace(' ', ''))
+            if alias and _sido(sd) in ('', '인천'):   # V156: 인천 새 행정구역 — 자료는 아직 옛 구 이름(합쳐서 받고 거리로 거른다)
+                seen = set()
+                for a in alias:
+                    for x in _ffus_all(sd, a):
+                        k = (x.get('fcltyNo'), x.get('latitude'), x.get('longitude'))
+                        if k not in seen:
+                            seen.add(k)
+                            rows.append(x)
+            else:
+                cands = [sg] + ([sg.split()[-1], sg.split()[0], sg.replace(' ', '')] if ' ' in sg else [])   # '수원시 장안구' → 장안구·수원시
+                for cand in dict.fromkeys(cands):
+                    rows = _ffus_all(sd, cand)
+                    if rows:
+                        break
             if len(FFUS_CACHE) > 30:
                 FFUS_CACHE.clear()
             FFUS_CACHE[key] = (time.time(), rows)
