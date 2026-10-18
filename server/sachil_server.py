@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '5.8'
-APP_VERSION = 'V132'
+VERSION = '5.9'
+APP_VERSION = 'V133'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -762,6 +762,8 @@ class H(BaseHTTPRequestHandler):
             self.user = self.get_user()
             if path == '/api/report/tpl':   # V125: 교수가 정한 보고서 규칙 초안 양식(모든 기기 공통). 비어 있으면 앱 기본 양식
                 return self.send(200, {'ok': True, 'tpl': str(CONF.get('report_tpl') or ''), 'ts': CONF.get('report_tpl_ts') or 0}, log=False)
+            if path == '/api/roominfo':   # V133: 47망·디브리핑룸 위 📌 핀 문구(교수가 고침). 비어 있으면 앱 기본 문구
+                return self.send(200, {'ok': True, 'info': CONF.get('room_info') or {}, 'ts': CONF.get('room_info_ts') or 0}, log=False)
             if path == '/api/me':
                 return self.send(200, {'server': 'sachil', 'version': VERSION, 'user': self.user, 'room': ROOM47, 'room_debrief': ROOM_DB,
                                        'trim_ratio': CONF.get('weekly_trim_ratio'),
@@ -1049,7 +1051,8 @@ class H(BaseHTTPRequestHandler):
         return self.send(200, {'ok': True, 'text': text}, log=False)
 
     # --- 현장 지도(V106): 방마다 화재대상·현장지휘소·방면·차량대기소 하나씩. 방 참여자 모두가 같은 지도를 본다
-    MAP_KINDS = ('fire', 'fire2', 'fire3', 'icp', 'sector', 'staging', 'secA', 'secB', 'secC', 'secD', 'secE', 'secF')   # V108: 방면 A~F 각각 · V111: 화재대상 최대 3곳
+    MAP_KINDS = ('fire', 'fire2', 'fire3', 'fire4', 'fire5', 'fire6', 'fire7', 'fire8', 'fire9', 'icp', 'acp', 'emt', 'ems',
+                 'sector', 'staging', 'secA', 'secB', 'secC', 'secD', 'secE', 'secF')   # V108: 방면 A~F · V111: 화재 여러 곳 · V133: 화재 9곳, 유관기관CP, 응급의료소(임시·현장)
 
     def map_get(self, rid):
         if not q('SELECT id FROM rooms WHERE id=?', (rid,), one=True):
@@ -1080,6 +1083,20 @@ class H(BaseHTTPRequestHandler):
                     if not (math.isfinite(lat) and math.isfinite(lng) and 32.5 <= lat <= 39.5 and 123.5 <= lng <= 132.5):
                         raise ValueError('국내 위치만 표시할 수 있습니다')
                     it = {'lat': round(lat, 6), 'lng': round(lng, 6), 'by': self.user['name'], 'ts': time.time()}
+                    if k.startswith('fire'):   # V133: 화재 상태 — '' 화재 / init 초진 / done 완진. 보내지 않으면(옮기기) 그대로
+                        old = items.get(k) or {}
+                        st = j.get('st')
+                        if st is None:
+                            st, st_ts = old.get('st', ''), old.get('st_ts')
+                        else:
+                            st = str(st)
+                            if st not in ('', 'init', 'done'):
+                                raise ValueError('화재 상태가 잘못됐습니다')
+                            st_ts = old.get('st_ts') if st == old.get('st', '') else time.time()
+                        if st:
+                            it['st'] = st
+                            if st_ts:
+                                it['st_ts'] = st_ts
                     if k == 'sector':
                         try:
                             d = float(j.get('deg'))
@@ -1126,6 +1143,21 @@ class H(BaseHTTPRequestHandler):
             CONF['report_tpl_ts'] = time.time()
             write_conf(CONF)
             return self.send(200, dict(status(), tpl=CONF['report_tpl'], tpl_ts=CONF['report_tpl_ts'], msg='규칙 초안 양식을 저장했습니다 — 모든 기기의 새 보고서·AI 작성에 적용' if t.strip() else '기본 양식으로 되돌렸습니다'), log=False)
+        if act == 'roominfo':   # V133: 대화방 📌 핀 문구 저장 — kind(net·deb)별 lead(첫 줄) + more(펼치면 보이는 줄들). 빈 글 = 기본 문구로
+            kind = str(j.get('kind') or '')
+            if kind not in ('net', 'deb'):
+                return self.err(400, '방 종류가 잘못됐습니다')
+            lead = str(j.get('lead') or '').replace('\r\n', '\n').strip()[:300]
+            more = [str(x).strip()[:300] for x in (j.get('more') or []) if str(x).strip()][:8]
+            info = dict(CONF.get('room_info') or {})
+            if lead:
+                info[kind] = {'lead': lead, 'more': more}
+            else:
+                info.pop(kind, None)
+            CONF['room_info'] = info
+            CONF['room_info_ts'] = time.time()
+            write_conf(CONF)
+            return self.send(200, dict(status(), info=info, info_ts=CONF['room_info_ts'], msg='핀 문구를 저장했습니다 — 모든 기기에 적용' if lead else '기본 문구로 되돌렸습니다'), log=False)
         if act == 'tmap':   # V113: T맵 앱 키(SK open API) — 소화전 찾기에 씀
             k = re.sub(r'[^0-9A-Za-z]', '', str(j.get('key') or ''))
             if k and not (20 <= len(k) <= 64):
