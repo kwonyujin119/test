@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '7.2'
-APP_VERSION = 'V146'
+VERSION = '7.3'
+APP_VERSION = 'V147'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -983,6 +983,9 @@ class H(BaseHTTPRequestHandler):
             raise ValueError('질문을 입력하세요')   # 앱은 빈 질문으로 입장코드만 확인한다(AI 호출 없음)
         hist = j.get('history') if isinstance(j.get('history'), list) else []
         ck = ans_cache_key(qtext)
+        law_q = bool(CONF.get('law_oc')) and law_wanted(qtext)
+        if ck and law_q:
+            ck = 'law1:' + ck   # V147: 법령 질문은 법제처 연결 전에 저장된 답(PDF 근거)을 다시 쓰지 않는다
         hit = ans_cache_get(ck)
         if hit:   # V102: 같은 질문(띄어쓰기·물음표만 다른 것 포함)은 저장된 답으로 — AI 호출·하루 한도를 쓰지 않는다
             return self.send(200, {'ok': True, 'mode': hit['mode'], 'note': '', 'answer': hit['answer'], 'sources': hit['sources'],
@@ -991,16 +994,24 @@ class H(BaseHTTPRequestHandler):
         hits = focus_hits(hits)[:7]
         if hits and len(terms) >= 2 and ai_ready() and max(len(h['hit']) for h in hits) / len(terms) < 0.5:
             hits = []   # 질문 낱말을 절반도 못 맞힌 쪽뿐('차이' 같은 흔한 말만 겹침) → 근거 없음으로 보고 일반 설명(V97)
-        laws = []
-        if CONF.get('law_oc') and ai_ready() and law_wanted(qtext):   # V144: 법령 질문이면 법제처에서 조문 원문을 찾아 근거로(앞에 둔다)
+        laws, links = [], law_links(qtext)   # V147: 질문에 법령 이름이 있으면 법제처 원문 링크는 API 없이도 붙인다
+        if law_q and ai_ready():   # V144: 법령 질문이면 법제처에서 조문 원문을 찾아 근거로(앞에 둔다)
             try:
                 laws = law_lookup(qtext)
             except Exception as e:
+                print(f'[법제처] 조회 실패: {str(e)[:160]}', flush=True)
                 upd_log(f'법제처 조회 실패: {str(e)[:120]}')
-        hits = laws + hits[:max(0, 7 - len(laws))]
+        if laws and links:   # 조문을 콕 집어 물었으면 PDF 근거는 2개까지만(법령 원문이 먼저)
+            hits = laws + hits[:2]
+        else:
+            hits = laws + hits[:max(0, 7 - len(laws))]
         st = DOCS_IDX.status()
         sources = [({'slug': 'law', 'name': h['name'], 'page': 0, 'art': h.get('art') or '', 'url': h['url'], 'snippet': h['text'][:120]} if h.get('law') else
                     {'slug': h['slug'], 'name': h['name'], 'page': h['page'], 'art': h.get('art') or '', 'snippet': snippet(h['text'], h['hit'] or terms, 120)}) for h in hits]
+        have = {x['url'] for x in sources if x.get('url')}
+        for lk in links:   # 원문을 못 받아 왔어도 법제처 원문 링크는 근거 목록 맨 끝에
+            if lk['url'] not in have:
+                sources.append({'slug': 'law', 'name': lk['name'], 'page': 0, 'art': lk['art'], 'url': lk['url'], 'snippet': '법제처 국가법령정보센터 원문'})
         if not hits and ai_ready():   # 메뉴 자료에 근거가 없으면 AI 일반 지식으로 짧게([근거 부족] 표시)
             ok, why = ai_allowed(self.ip(), self.is_prof())
             if ok:
@@ -2374,6 +2385,26 @@ _LAW_NOT = set('법률 규칙 시행령 시행규칙 방법 불법 위법 적법
 _LAW_STOP = set('무엇 무엇인가요 어떻게 어떤 언제 누가 있나요 하나요 되나요 인가요 경우 관련 대해 대한 알려 주세요 질문 내용 법령 법률 근거 조문 규정 기준'.split())
 
 
+def _law_name_ok(n):
+    last = n.split()[-1] if n.split() else n
+    return len(n) >= 3 and n not in _LAW_NOT and last not in _LAW_NOT and not last.endswith(('방법', '기법', '요법', '수법', '용법', '문법', '어법', '해법', '편법', '처리법', '작성법'))
+
+
+def law_links(q):
+    """V147: 질문 속 '○○법 제N조' → 법제처 원문 링크(API 없이 만든다). 조문 번호가 없으면 법령 첫 화면."""
+    out = []
+    for m in _LAW_NAME.finditer(q):
+        n = m.group(1).strip()
+        if not _law_name_ok(n) or any(o['name'] == n for o in out):
+            continue
+        rest = q[m.end():m.end() + 16]
+        jm = re.match(r'\s*제\s?(\d+)\s?조(?:의\s?(\d+))?', rest)
+        art = (f'제{jm.group(1)}조' + (f'의{jm.group(2)}' if jm.group(2) else '')) if jm else ''
+        url = 'https://www.law.go.kr/법령/' + urllib.parse.quote(n.replace(' ', '')) + ('/' + urllib.parse.quote(art) if art else '')
+        out.append({'name': n, 'art': art, 'url': url})
+    return out[:2]
+
+
 def law_wanted(q):
     return bool(_LAW_HINT.search(q))
 
@@ -2451,7 +2482,7 @@ def law_lookup(q, top=3):
     names = []
     for m in _LAW_NAME.finditer(q):
         n = m.group(1).strip()
-        if len(n) >= 3 and n not in _LAW_NOT and n not in names:
+        if _law_name_ok(n) and n not in names:
             names.append(n)
     cands = names[:2] or LAW_DEFAULT
     want_jo = re.findall(r'제\s?(\d+)\s?조(?:의\s?(\d+))?', q)
