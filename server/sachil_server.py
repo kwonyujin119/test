@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '7.1'
-APP_VERSION = 'V145'
+VERSION = '7.2'
+APP_VERSION = 'V146'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -2677,12 +2677,31 @@ def call_groq(system, msgs, max_tokens):
     want = re.sub(r'[^A-Za-z0-9./\-_:]', '', str(CONF.get('groq_model') or '')) or GROQ_FALLBACK_MODELS[0]
     models = [m for m in ([GROQ_OK_MODEL[0]] if GROQ_OK_MODEL[0] else []) + [want] + GROQ_FALLBACK_MODELS if m]
     seen, code, why = set(), 'upstream_error', ''
+    # V146: 무료 계정은 '보낸 글 + 답 최대 길이'가 분당 한도(모델마다 6천~1만2천 토큰)를 넘으면 413 — 답 길이는 3천으로, 413이면 글을 줄여 다시
+    out_tok = min(max(int(max_tokens), 1024), 3000)
+    def shrink(ms, frac):
+        if frac >= 1:
+            return ms
+        big = max(range(len(ms)), key=lambda i: len(ms[i]['content'])) if ms else -1
+        out = [dict(m) for m in ms]
+        if big >= 0:
+            c = out[big]['content']; keep = max(800, int(len(c) * frac))
+            out[big]['content'] = c[:keep] + '\n…(자료 일부 생략)'
+        return out
+    tries = []
     for model in models:
-        if model in seen:
+        if model not in seen:
+            seen.add(model)
+            tries += [(model, 1.0), (model, 0.55), (model, 0.3)]
+    skip = set()
+    for model, frac in tries:
+        if model in skip:
             continue
-        seen.add(model)
-        body = {'model': model, 'max_tokens': max(int(max_tokens), 4096), 'temperature': 0.3,
-                'messages': [{'role': 'system', 'content': system}] + [{'role': m['role'], 'content': m['content']} for m in msgs]}
+        sysc = system if frac >= 1 else system[:max(1500, int(len(system) * max(frac, 0.6)))]
+        body = {'model': model, 'max_tokens': out_tok if frac >= 1 else min(out_tok, 2000), 'temperature': 0.3,
+                'messages': [{'role': 'system', 'content': sysc}] + [{'role': m['role'], 'content': m['content']} for m in shrink(msgs, frac)]}
+        if model.startswith('openai/gpt-oss'):
+            body['reasoning_effort'] = 'low'   # 생각에 토큰을 덜 써 답이 끊기지 않게
         req = urllib.request.Request(url, data=json.dumps(body).encode('utf-8'), method='POST',
                                      headers={'Authorization': 'Bearer ' + CONF.get('groq_api_key', ''), 'content-type': 'application/json',
                                               'User-Agent': 'SACHIL47-server'})
@@ -2703,7 +2722,13 @@ def call_groq(system, msgs, max_tokens):
             msg = json.dumps(err, ensure_ascii=False)
             if e.code == 404 or 'model_not_found' in msg or 'decommissioned' in msg:
                 why = f'groq_model 이름({model})을 확인하세요'
+                skip.add(model)
                 continue   # 다음 예비 모델로
+            if e.code == 413 or 'too large' in msg.lower() or ('tokens per minute' in msg.lower() and e.code == 429 and 'Requested' in msg):
+                why = f'Groq 무료 계정 한 번 요청 한도를 넘음({model})'
+                if frac <= 0.3:
+                    skip.add(model)   # 더 줄여도 안 되면 한도가 큰 다음 모델로
+                continue
             if e.code == 401 or 'invalid_api_key' in msg:
                 why = 'Groq API 키가 틀렸습니다'
             elif e.code == 403:
