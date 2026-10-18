@@ -2541,9 +2541,13 @@ FFUS_SIDO = {'서울': '서울특별시', '부산': '부산광역시', '대구':
              '전북': '전북특별자치도', '전남': '전라남도', '경북': '경상북도', '경남': '경상남도', '제주': '제주특별자치도'}
 
 
+FFUS_URL = 'https://api.data.go.kr/openapi/tn_pubr_public_ffus_wtrcns_api'
+
+
 def _ffus_get(params, k=None):
     k = k or CONF.get('bld_key')
-    url = ('https://api.data.go.kr/openapi/tn_pubr_public_ffus_wtrcns_api?serviceKey=' + urllib.parse.quote(k, safe='')
+    base = ((CONF.get('pub_ep') or {}).get('소방용수시설') if isinstance(CONF.get('pub_ep'), dict) else '') or FFUS_URL   # V154: 상세 페이지에서 찾은 주소가 있으면 그것
+    url = (base + '?serviceKey=' + urllib.parse.quote(k, safe='')
            + '&type=json&pageNo=' + str(params.pop('pageNo', 1)) + '&' + urllib.parse.urlencode(params))
     try:
         t = fetch_text(url, 8_000_000, 30)
@@ -2758,8 +2762,49 @@ def pub_hits(geo, q):
     return out
 
 
+PUB_DISCOVER = (('위험물정보(소방청)', '15061055'), ('상수도시설정보(수자원공사)', '15089952'))   # V154: 요청주소를 모르는 API — 서버 PC가 data.go.kr 상세 페이지에서 찾는다
+
+
+def _pub_try(url, k):
+    """V154: 요청주소 하나를 인증키로 1건만 불러 본다 → (성공, 설명)"""
+    u = url + ('&' if '?' in url else '?') + 'serviceKey=' + urllib.parse.quote(k, safe='') + '&pageNo=1&numOfRows=1&type=json&_type=json&resultType=json'
+    try:
+        t = fetch_text(u, 400_000, 20)
+    except Exception as e:
+        w = str(e).replace(k, '***')
+        return False, ('인증키가 이 API에 아직 쓰이지 않음(승인 직후면 1시간 뒤)' if '401' in w or '403' in w else w[:120])
+    t2 = re.sub(r'\s+', ' ', t).replace(k, '***')
+    m = re.search(r'<returnAuthMsg>([^<]+)', t2)
+    if m:
+        return False, m.group(1)[:120]
+    code = re.search(r'"resultCode"\s*:\s*"?([0-9A-Za-z]+)', t2) or re.search(r'<resultCode>([^<]+)', t2)
+    msg = re.search(r'"resultMsg"\s*:\s*"([^"]*)', t2) or re.search(r'<resultMsg>([^<]+)', t2)
+    tot = re.search(r'"totalCount"\s*:\s*"?(\d+)', t2) or re.search(r'<totalCount>(\d+)', t2)
+    if code and code.group(1) in ('00', '0', '000', 'INFO-000'):
+        return True, f"{int(tot.group(1)):,}건 자료" if tot else '응답 정상'
+    return False, ((code.group(1) + ' ') if code else '') + (msg.group(1) if msg else t2[:100])
+
+
+def _pub_discover(pid, k):
+    """V154: data.go.kr 상세 페이지에서 apis.data.go.kr 요청주소 후보를 찾아 차례로 시험"""
+    try:
+        html = fetch_text(f'https://www.data.go.kr/data/{pid}/openapi.do', 3_000_000, 20)
+    except Exception as e:
+        return False, 'data.go.kr 상세 페이지를 열지 못함 — ' + str(e)[:80], ''
+    cands = list(dict.fromkeys(re.findall(r'https?://apis?\.data\.go\.kr/[A-Za-z0-9_\-/]+[A-Za-z0-9_]', html)))[:8]
+    if not cands:
+        return False, '상세 페이지에서 요청주소를 찾지 못함', ''
+    last = (False, '', cands[0])
+    for c in cands:
+        ok, w = _pub_try(c, k)
+        if ok:
+            return True, w, c
+        last = (False, w, c)
+    return last
+
+
 def pub_test(k):
-    """V151: 공공데이터포털 인증키 하나로 쓰는 API마다 시험 → {이름: [성공, 설명, 시각]}"""
+    """V151: 공공데이터포털 인증키 하나로 쓰는 API마다 시험 → {이름: [성공, 설명, 시각]}. V154: 요청주소를 모르는 API는 찾아서 시험"""
     res = {}
     for nm, fn in (('건축물대장', lambda: f"{len(_bld_get('1168010300', '12', '0', False, k))}건 조회"),   # 서울 강남구 개포동 12(공식 예제 주소)
                    ('소방용수시설', lambda: f"{_ffus_get({'numOfRows': '1'}, k)[1]:,}건 자료")):
@@ -2767,6 +2812,19 @@ def pub_test(k):
             res[nm] = [True, fn(), time.time()]
         except Exception as e:
             res[nm] = [False, str(e)[:160], time.time()]
+    eps = CONF.get('pub_ep') if isinstance(CONF.get('pub_ep'), dict) else {}
+    if not res['소방용수시설'][0]:   # 짐작한 주소가 틀렸으면 상세 페이지(표준데이터)에서 찾아 다시
+        ok, w, url = _pub_discover('15034538', k)
+        if ok:
+            eps['소방용수시설'] = url.split('?')[0]
+            res['소방용수시설'] = [True, w + ' · ' + re.sub(r'^https?://apis?\.data\.go\.kr', '', url), time.time()]
+    for nm, pid in PUB_DISCOVER:
+        ok, w, url = _pub_discover(pid, k)
+        if url:
+            eps[nm] = url
+        short = re.sub(r'^https?://apis?\.data\.go\.kr', '', url)
+        res[nm] = [ok, (w + (f' · {short}' if short else ''))[:200], time.time()]
+    CONF['pub_ep'] = eps
     return res
 
 
