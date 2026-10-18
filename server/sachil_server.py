@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '5.5'
-APP_VERSION = 'V129'
+VERSION = '5.6'
+APP_VERSION = 'V130'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
