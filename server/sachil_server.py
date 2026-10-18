@@ -44,8 +44,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '4.9'
-APP_VERSION = 'V123'
+VERSION = '5.0'
+APP_VERSION = 'V124'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -123,10 +123,14 @@ def load_conf():
         'ai_model': 'claude-sonnet-5-5',
         'ai_daily_limit': 50,           # 하루 AI 답변 최대 횟수(비용 상한, 교수 로그인은 제외). 0이면 무제한
         'ai_assist_model': 'claude-haiku-5-5',   # AI 도우미 전용 모델(가장 저렴). 보고서는 ai_model
-        'ai_code': '5081',              # AI 도우미 입장코드. 비우면 코드 없이 사용
+        'ai_code': '',                  # AI 도우미 입장코드. 비우면 코드 없이 누구나 사용(V124부터 기본 공개)
         'allowed_origins': ['https://kwonyujin119.github.io'],   # 이 서버에 접속을 허용할 외부 앱 주소(github.io)
         'app_url': 'https://kwonyujin119.github.io/test/',       # 교육생에게 줄 앱 주소(뒤에 ?srv=서버주소 가 붙음)
     }
+    if conf.get('ai_code') == '5081' and not conf.get('ai_open_v124'):   # V124: AI 도우미 공개 — 예전 기본 입장코드를 한 번 비움(다시 걸면 그대로 둠)
+        conf['ai_code'] = ''
+        conf['ai_open_v124'] = True
+        changed = True
     if conf.get('update_check_min') == 10:   # V120: 예전 기본값 10분 → 5분
         conf['update_check_min'] = 5
         changed = True
@@ -761,7 +765,8 @@ class H(BaseHTTPRequestHandler):
                                        'require_code': bool(CONF.get('require_code')),
                                        'retention_days': CONF.get('retention_days'), 'max_files': 10,
                                        'ai': ai_ready(), 'ai_name': AI_NAMES.get(ai_provider(), ''), 'index': DOCS_IDX.status(),
-                                       'kakao': str(CONF.get('kakao_js_key') or ''), 'tmap': str(CONF.get('tmap_app_key') or '')})
+                                       'kakao': str(CONF.get('kakao_js_key') or ''), 'tmap': str(CONF.get('tmap_app_key') or ''),
+                                       'ai_open': not norm_code(CONF.get('ai_code'))})
             if not self.user:
                 return self.err(401, '로그인이 필요합니다')
             if path == '/api/rooms':

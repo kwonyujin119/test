@@ -812,7 +812,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v123</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v124</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1509,8 +1509,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   SECTIONS.forEach((s,i)=>{ s.icon = AS.sections[i] || ''; });
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V123', SRV_VER='4.9';
+  const APP_VER='V124', SRV_VER='5.0';
   const UPDATES=[
+    {v:'V124', d:'2026-10-18', t:['AI 도우미를 모두에게 공개 — 입장코드 없이 바로 질문(서버 5.0: 예전 기본 입장코드를 비움)','교수가 다시 입장코드를 걸면 첫 질문 때만 코드 화면이 뜸']},
     {v:'V123', d:'2026-10-18', t:['지도 검색: 후보가 여러 곳이면 바로 옮기지 않고 5곳까지(이름·주소) 띄워 한 번에 고르기 — 예: ‘인천소방학교’ → 강화 본교·제2캠퍼스·소방고','지도 표시를 누르면 그 표시 바로 위에 🗑·✕만 있는 작은 메뉴(정보는 아래 안내 줄에), 지도를 움직이면 닫힘','지도 화면 위 ‘소화전’ 탭, 소화전 화면 위 ‘지도’ 탭 — 한 번에 서로 오가기']},
     {v:'V122', d:'2026-10-18', t:['서버가 다시 켜지는 동안 앱을 열어도 대화명을 새로 넣지 않음 — ‘서버가 다시 켜지는 중’ 안내 후 연결되면 그대로 방으로(카카오톡처럼 방·대화명 유지)','방 안에서 서버가 다시 켜져도 대화를 처음부터 다시 그리지 않음(서버 4.9: 대화 구분값을 파일에 저장)','옛 서버(4.6 이하)가 사람이 있어 업데이트를 미루는 문제: 앱이 10분마다 같은 110초 동안 잠깐 쉬어 서버가 새 버전으로 바뀔 틈을 줌(새 서버가 되면 저절로 멈춤)']},
     {v:'V121', d:'2026-10-18', t:['47망 ＋: 카카오톡처럼 아래에서 올라오는 사진 시트 — 맨 앞 카메라, 최근 사진(이 기기에서 고르거나 보낸 사진 + 이 방 사진)을 동그라미로 골라(순서 번호) 오른쪽 위 ‘전송’, 아래 ‘사진·파일’','사진을 누르거나 앨범에서 한 장 고르면 편집 화면: 위 ← · N 전송 · 고르기, 아래 설명 입력 · 자르기 · 돌리기 · 그리기(5색·되돌리기) · 원래대로','휴대폰 갤러리는 웹앱이 먼저 읽을 수 없어 처음에는 이 방 사진만 보이고, 앨범에서 고른 사진은 다음부터 최근 사진에 나옴']},
@@ -3364,7 +3365,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     });
   }
   function renderBotRoom(panel, room){
-    if(!aiCode()){ aiGate(panel,room); return; }
+    if(!aiCode()&&SRV.aiGate){ aiGate(panel,room); return; }   // V124: AI 도우미 공개 — 서버가 입장코드를 요구할 때만(403 need_code) 코드 화면
     const toSrch=(m,i)=>{ const u=chat.msgs[i-1]; return (m.mode==='ai'||m.mode==='extract'||m.mode==='general') && u && u.who==='me' && u.text ? `<button type="button" class="to-srch" data-srch="${esc(u.text)}">Search에서 원문 더 찾기 →</button>` : ''; };
     const msgsHtml = chat.msgs.length ? chat.msgs.map((m,i)=> m.who==='me' ? msgMeHtml(m) : `
       <div class="msg bot">${avHtml()}
@@ -3396,7 +3397,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         api('/api/ask',{json:{q:v,history:hist,code:aiCode()}, ...(isProf()?{tok:PROF.tok}:{})}).then(r=>{
           if((chat.gen||0)!==g0) return;   // 그사이 '대화 비우기' — 이전 질문의 답은 버림
           chat.typing=false;
-          if(r.status===403&&r.j&&r.j.code==='need_code'){ chat.msgs.pop(); csave(); setAiCode(''); if(chat.room==='bot'&&state.route==='ai') aiGate(panel,room); return; }   // 코드가 바뀜 → 다시 입력
+          if(r.status===403&&r.j&&r.j.code==='need_code'){ chat.msgs.pop(); csave(); setAiCode(''); SRV.aiGate=true; if(chat.room==='bot'&&state.route==='ai') aiGate(panel,room); return; }   // 코드가 바뀜 → 다시 입력
           if(r.ok&&r.j.ok){ push('bot',String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.cached=!!r.j.cached; m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,art:String(x.art||'').slice(0,40),snip:String(x.snippet||'').slice(0,180)})); csave(); }
           else push('bot', r.status===0?'서버에 연결할 수 없습니다. 잠시 뒤 다시 물어보세요.':(r.j.error||'답변을 만들지 못했습니다.'),[]);
           if(chat.room==='bot'&&state.route==='ai'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp&&window.innerWidth>=600) inp.focus(); }
