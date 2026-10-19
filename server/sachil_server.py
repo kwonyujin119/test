@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '10.6'
-APP_VERSION = 'V180'
+VERSION = '10.7'
+APP_VERSION = 'V181'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -2342,7 +2342,7 @@ class DocIndex:
 
     def scan(self):
         """폴더를 훑어 새로 들어오거나 바뀐 파일만 뽑고, 목록이 바뀌었으면 색인을 다시 짠다."""
-        todo, docs = [], []
+        docs = []
         for slug, d in SECTIONS:
             for f in H.lib_files(slug):
                 ext = '.' + f['ext']
@@ -3975,7 +3975,6 @@ def app_link(url):
 
 
 TUNNEL_PROC = [None]
-UPD_LOG = None
 
 
 def upd_log(msg):
