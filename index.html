@@ -173,6 +173,7 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .hitp .snip{color:var(--fg);font-size:13.5px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .hitp .snip mark,.hitp .t mark{background:#FFF1B8;color:inherit;padding:0 1px;border-radius:2px}
 .srch-note{font-size:12.5px;color:var(--muted);margin:8px 2px 0}
+.pubhint{margin:4px 2px 14px;line-height:1.9}.pubex{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font:inherit;font-size:12.5px;font-weight:700;color:var(--navy);cursor:pointer;min-height:30px}
 .srch-more{margin-top:10px}
 .lawtx{padding:12px 14px}.lawtx .t{margin:0;font-size:15px}.lawtx .d{margin:2px 0 6px;font-size:12px;color:var(--muted)}
 .lawtx .lx{margin:0;white-space:pre-line;font-size:13.5px;line-height:1.6;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
@@ -919,7 +920,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v179</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v180</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1794,8 +1795,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V179', SRV_VER='10.5';
+  const APP_VER='V180', SRV_VER='10.6';
   const UPDATES=[
+    {v:'V180', d:'2026-10-19', t:['Search: 동네 이름만(예: 구월동) 검색해도 공공데이터포털에서 그 동네 소방용수시설을 바로 조회','Search: 주소·건물이 아닌 검색어에도 ‘공공데이터 조회는 주소·건물 이름·동네로’ 안내와 예시 버튼 표시','Search: 건물 이름의 주소를 못 찾으면 조용히 사라지지 않고 이유를 알려 줌']},
     {v:'V179', d:'2026-10-19', t:['방재실 체크리스트에서 CH 항목을 1단·2단·3단으로 나눠 보이게 설정(전체 또는 단계마다)','IL: 박스 위 파란·초록 띠를 없애고 차분하게 정리','IL: ‘화재 개요’(화재 성상·화재 상황·화재 원인), ‘피해 현황’(인명피해·재산피해)으로 묶음','IL: 재산피해는 처음부터 ‘조사 중’이 눌려 있음(다시 누르면 해제)','보고서도 같은 순서로: 1 발생개요 · 2 화재 개요 · 3 피해 현황 · 4 조치 사항 · 5 향후 전망']},
     {v:'V178', d:'2026-10-19', t:['AI 보고서도 쓰는 대로 바로 보임(다 쓸 때까지 기다리지 않음)','AI 보고서의 ‘깊은 생각’ 단계를 줄이고, AI에 보내는 자료를 절반 가까이 줄여(빈 칸·중복 빼기) 작성 시간 단축','보고서 작성 전 양식 확인 기다림 3초 → 0.6초']},
     {v:'V177', d:'2026-10-19', t:['SACHIL AI 답이 글자가 나오는 대로 바로 보임(다 쓸 때까지 기다리지 않음) — 첫 글자 보통 1~2초','AI가 답하기 전 ‘생각’ 단계를 줄여 전체 답 시간 단축','법제처·건축물대장·소방용수 조회를 동시에 해서 기다림 단축']},
@@ -2400,7 +2402,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const PLACE_RE=/(([가-힣A-Za-z0-9]{2,20}?)(?:아파트|빌딩|타워|센터|병원|의원|의료원|초등학교|중학교|고등학교|대학교|학교|시장|공장|호텔|모텔|마트|백화점|소방서|경찰서|청사|구청|시청|플라자|오피스텔|요양원|요양병원|교회|성당|창고|주차장|터미널|쇼핑몰|체육관|도서관|박물관|발전소))(?![가-힣])/g;
   const PLACE_GEN=/^(?:\d+|고층|초고층|저층|노후|대형|중형|소형|지하|물류|냉동|냉장|전통|재래|공동|일반|요양|종합|현장지휘|현장|지휘|안전|119안전|119|상황|종합상황|해당|인근|주변|근처|관할|다중이용|주상복합|복합|산업|공공|민간|임대|신축|위험물|화학|인접|각|모든|여러|대피|임시|응급|비상|기계식|자주식|옥외|옥내|무인|소규모|대규모)$/;   /* V154: '요양병원·지하주차장'처럼 일반 낱말은 건물 이름이 아님 */
   const placeOf=t=>{ for(const m of String(t||'').replace(/건축물\s*대장/g,' ').matchAll(PLACE_RE)) if(!PLACE_GEN.test(m[2])) return m[1]; return ''; };
-  const bldQuery=t=>{ t=String(t||'').trim(); const ex=/건축물\s*대장|건축물\s*조회/.test(t); const a0=bldAddrOf(t), p0=a0?'':placeOf(t); const a=a0||t.replace(/건축물\s*대장|건축물\s*조회|건축물|조회|정보/g,' ').replace(/\s+/g,' ').trim(); return (ex||a0||p0)&&a.length>=2?{a,ex,place:p0}:null; };
+  // V180: 번지 없는 동네 이름(예: 구월동, 남동구 구월동, 강화읍)만 써도 — 그 동네 중심의 소방용수시설(건축물대장은 번지가 있어야)
+  const REG_RE=/(?:^|\s)((?:(?:서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주)[가-힣]*\s+)?(?:[가-힣]{1,5}(?:시|군|구)\s+)*([가-힣]{1,6}(?:동|읍)|[가-힣]{1,4}군\s+[가-힣]{1,4}면))(?=\s|$)/;   /* ‘○방면·전면’과 헷갈리지 않게 면은 군 이름이 앞에 있을 때만 */
+  const REG_STOP=/^(?:공동|노동|감동|충동|난동|폭동|격동|선동|파동|이동|활동|가동|작동|연동|기동|발동|행동|운동|구동|변동|자동|수동|협동|합동|진동|유동|출동|대응|추가|평가|증가|참가|휴가|단가|부가|국가|전문가|작가|면|동|가)$/;
+  const regOf=t=>{ t=String(t||'').trim(); if(t.split(/\s+/).length>4) return ''; const m=t.match(REG_RE); return m&&!REG_STOP.test(m[2])&&!/(대응|진압|구조|화재|훈련)/.test(m[2])?m[1].trim():''; };
+  const bldQuery=t=>{ t=String(t||'').trim(); const ex=/건축물\s*대장|건축물\s*조회/.test(t); const a0=bldAddrOf(t), p0=a0?'':placeOf(t), r0=a0||p0?'':regOf(t); const a=a0||r0||t.replace(/건축물\s*대장|건축물\s*조회|건축물|조회|정보/g,' ').replace(/\s+/g,' ').trim(); return (ex||a0||p0||r0)&&a.length>=2?{a,ex,place:p0,reg:!!r0&&!ex}:null; };
   // 주소(또는 건물 이름) → 카카오 주소 결과 하나. 이름은 장소 이름에 그 낱말이 실제로 들어 있을 때만(엉뚱한 곳 방지), 인천 것을 먼저
   async function geoHit(a,place){
     const geo=q=>Promise.race([new Promise(ok=>new kakao.maps.services.Geocoder().addressSearch(q,(r2,s2)=>ok(s2===kakao.maps.services.Status.OK?r2:[]))),sleep(5000).then(()=>[])]);
@@ -2430,9 +2436,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!SRV.bld){ fail(isProf()?'공공데이터포털 인증키가 아직 없습니다 — 메뉴 → <b>SACHIL방재실</b> → 서버·AI → <b>공공데이터포털 인증키</b>에 등록하세요':'건축물대장 조회가 아직 설정되지 않았습니다(교수에게 요청)'); return; }
     if(!SRV.kakao){ fail('주소를 찾으려면 카카오맵 키가 필요합니다(방재실 → 지도 키)'); return; }
     try{ await loadKakao(SRV.kakao); }catch(_){ fail('주소 검색(카카오)을 불러오지 못했습니다'); return; }
+    if(bq.reg){ const r=await Promise.race([new Promise(ok=>new kakao.maps.services.Geocoder().addressSearch(bq.a,(r2,s2)=>ok(s2===kakao.maps.services.Status.OK?r2:[]))),sleep(5000).then(()=>[])]);
+      if(!live()) return; const h=(r||[]).find(x=>x.x&&x.y&&(x.address||x.road_address)), A=h&&(h.address||h.road_address);
+      if(!h){ box.innerHTML=''; return; }
+      box.innerHTML=`<div class="group-title">공공데이터 · ${esc(A.address_name||bq.a)}</div><p class="srch-note">동네 이름으로 찾아 <b>그 동네 중심에서 가까운 소방용수시설</b>을 보여 줍니다. 건축물대장은 번지까지 넣으면 나옵니다(예: ${esc((A.region_3depth_name||'구월동')+' 1138')}).</p>`;
+      box.insertAdjacentHTML('afterend','<div id="srchFfus"><div class="group-title">가까운 소방용수시설</div><p class="srch-note">찾는 중…</p></div>');
+      ffusSearch(A.region_1depth_name||'', A.region_2depth_name||'', +h.y, +h.x, tok); return; }
     const g=await geoHit(bq.a,bq.place), hit=g&&g.hit;
     if(!live()) return;
-    if(!hit){ if(bq.place&&!bq.ex){ box.innerHTML=''; return; } fail('주소를 찾지 못했습니다 — 시·구·동과 번지(예: 구월동 1138) 또는 도로명과 건물번호(예: 정각로 29)로 검색하세요'); return; }
+    if(!hit){ if(bq.place&&!bq.ex){ box.innerHTML=`<div class="group-title">공공데이터 · 건축물대장</div><p class="srch-note">‘${esc(bq.place)}’의 주소를 카카오에서 찾지 못했습니다 — 주소(예: 구월동 1138)로 검색하면 건축물대장·소방용수시설을 조회합니다</p>`; return; } fail('주소를 찾지 못했습니다 — 시·구·동과 번지(예: 구월동 1138) 또는 도로명과 건물번호(예: 정각로 29)로 검색하세요'); return; }
     const A=hit.address, lab=(g.label?g.label+' · ':'')+A.address_name;
     box.innerHTML=`<div class="group-title">건축물대장 · ${esc(lab)}</div><p class="srch-note">건축물대장을 찾는 중…</p>`;
     box.insertAdjacentHTML('afterend','<div id="srchFfus"><div class="group-title">가까운 소방용수시설</div><p class="srch-note">찾는 중…</p></div>');
@@ -2503,6 +2515,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     let html=`<div class="panel-head" aria-live="polite"><h2>“${esc(q)}” 검색 결과</h2><span class="sub" id="srchSub">${SRV.on?'본문 검색 중…':''}</span></div>`;
     const bq=bldQuery(q);
     if(bq) html+='<div id="srchBld"><div class="group-title">건축물대장</div><p class="srch-note">주소를 찾는 중…</p></div>';
+    else if(SRV.on&&SRV.bld) html+=`<p class="srch-note pubhint">🏢 공공데이터포털 실시간 조회는 <b>주소·건물 이름·동네</b>로 검색할 때 함께 나옵니다 — 예: ${['구월동 1138','인천 남동구청','구월동'].map(x=>`<button type="button" class="pubex" data-pubex="${esc(x)}">${esc(x)}</button>`).join(' ')}</p>`;
     const lawTxtOn=SRV.on&&!(bq&&!/법|조례|기준|고시|규칙|시행령|조문/.test(q));   // V157: 주소만 찾는 검색은 빼고
     if(lawTxtOn) html+='<div id="srchLawTxt"></div>';   // V157: 법제처 현행 조문 원문(첨부 PDF 밖)
     if(SRV.on) html+='<div id="srchLaw"></div>';   // V150: 법제처 원문 링크(법령 관련 검색일 때만 채워짐)
@@ -2526,6 +2539,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     }
     panel.innerHTML=html;
     panel.querySelectorAll('[data-ask-ai]').forEach(a=>a.addEventListener('click',()=>{ autoAsk=q; }));
+    panel.querySelectorAll('[data-pubex]').forEach(b=>b.addEventListener('click',()=>toSearch(b.dataset.pubex)));
     if(bq) bldSearch(bq,tok);
     if(SRV.on) lawSearch(q,tok);
     if(lawTxtOn) lawTextSearch(q,tok);
