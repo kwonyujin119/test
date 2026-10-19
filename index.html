@@ -1447,6 +1447,44 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .qna-adm{display:grid;grid-template-columns:1fr auto auto;gap:6px;margin-top:10px;align-items:start}
 @media (max-width:599px){ .qna-adm{grid-template-columns:1fr 1fr} .qna-adm textarea{grid-column:1/-1} }
 </style>
+<style id="mx-ui-css">
+/* 화면 다듬기(메뉴 섹션·47망·디브리핑룸·CP/소화전·방재실) — 이 화면 선택자로만 한정 */
+/* 대화명 입장·교수 로그인·방재실 카드: 격자 칸이 입력칸 기본 폭만큼 커져 390px 화면에서 카드 오른쪽 밖으로 밀리던 문제 */
+.dbwrap .create{grid-template-columns:minmax(0,1fr)}
+.dbwrap .create > *{min-width:0}
+.dbwrap .create .row{grid-template-columns:minmax(0,1fr)}
+.dbwrap .create .row > input,.dbwrap .create .row > select,.dbwrap .create .row > textarea{width:100%;min-width:0}
+/* 방재실 탭 8개: 옆으로 숨어 안 보이던 탭을 4칸×2줄로 모두 보이게, 누르는 높이 44px */
+.bj2 .bjtabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;overflow:visible;padding:6px 0}
+.bj2 .bjtabs button{min-height:44px;padding:0 4px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 방재실 체크리스트·상황보고서 편집: ↑ ↓ 삭제·켜짐 버튼과 입력칸 44px, 좁은 화면은 버튼 묶음을 다음 줄 오른쪽으로 */
+.bj2 .clbt .btn{min-width:44px;min-height:44px}
+.bj2 .cln,.bj2 .clc{min-height:44px}
+.bj2 .clcols button,.bj2 .kc .btn{min-height:44px}
+/* 방재실 키 카드: 입력칸 기본 폭 때문에 카드가 오른쪽 밖으로 밀리던 문제, 입력칸 44px·16px(아이폰 확대 방지) */
+.bj2 .kcs{grid-template-columns:minmax(0,1fr)}
+.bj2 .kc{min-width:0}
+.bj2 .kform input{min-width:0;min-height:44px;font-size:16px}
+@media (max-width:520px){ .bj2 .clh{flex-wrap:wrap;row-gap:6px} .bj2 .cln{flex-basis:100px} .bj2 .clbt{margin-left:auto} }
+/* 메뉴 섹션 화면: 법령 바로가기·아래 버튼 44px */
+.laws .lk .btn{min-height:44px;padding:0 14px}
+.prep .links .btn{min-height:44px}
+/* 47망·디브리핑룸 머리: 뒤로 버튼 44px(보이는 자리는 그대로), 휴대폰에서 '대화명 바꾸기' 등 44px */
+.roomhead:has(#dbRename) .back{width:44px;height:44px;margin-left:-14px}
+.roomhead:has(#dbRename) .sub{padding-left:32px}
+@media (pointer:coarse){ .roomhead:has(#dbRename) .btn{min-height:44px} }
+/* CP·소화전 지도: 전환 버튼·검색칸·검색 버튼 44px, 안 고른 쪽 글자 대비 올림(2.6:1 → 4.9:1), 검색칸 16px(아이폰 확대 방지), '검색'이 버튼으로 보이게 */
+.mapov .mseg .seg{min-height:44px;color:#5D6B82}
+.mapov .msrch input{min-height:44px;font-size:16px}
+.mapov .msrch .btn{min-height:44px;padding:0 12px;border:1px solid var(--navy);border-radius:10px;background:var(--surface);color:var(--navy);font-weight:700}
+.mapov .mmsg .btn,.mapov .mres .x button{min-height:44px}
+.mapov .msel button{width:44px;height:44px}
+.mapov .mmulti button{height:44px}.mapov .mmulti .mx{width:44px}
+.mapov .mj{min-height:40px}
+.hydov .hb,.hydov .hrad,.hydov .hgo{min-height:44px}
+.hydov .hb,.hydov .hgo{border-radius:22px}
+.hydov .hpop .hp-x{width:44px;height:44px;top:2px;right:2px}
+</style>
 <style id="hub-z-css">
 /* V72 첫 화면 — 칸막이가 손글씨 '47'. 색은 기존 그대로: 칸=흰 바탕·회색 테두리, 47망·디브리핑룸=심벌 옐로, 획=인천 오션 */
 .hub.hz{position:relative;display:block;max-width:760px;margin:4px auto 0}
@@ -5007,7 +5045,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   const mapEl=document.createElement('div'); mapEl.className='mapov'; mapEl.id='mapov'; mapEl.hidden=true; mapEl.setAttribute('role','dialog'); mapEl.setAttribute('aria-modal','true'); mapEl.setAttribute('aria-label','CP 현장 지휘 지도');
   mapEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="지도 닫기">‹</button><div class="mseg" role="group" aria-label="CP·소화전 전환"><span class="seg on" aria-current="page"><svg class="tsym" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 21.5C5 13.6 9.9 7.5 16.5 7.5S28 13.4 28 21.5z" fill="#229ED9" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M16.5 7.5c.9 0 1.6.7 1.6 1.6v12.4h-3.2V9.1c0-.9.7-1.6 1.6-1.6z" fill="#1A7FB0"/><path d="M2.2 21.2h27.3c.9 0 1.2 1.1.5 1.6-1.6 1-3.5 1.6-5.4 1.6H6.2c-2.2 0-4-1.4-4-3.2z" fill="#1A7FB0" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/><path d="M8.6 12.6h4.6v3.6c0 1.6-1.1 2.8-2.3 3.4-1.2-.6-2.3-1.8-2.3-3.4z" fill="#fff"/><path d="M10.9 14.1l.5 1.1 1.2.1-.9.8.3 1.2-1.1-.6-1.1.6.3-1.2-.9-.8 1.2-.1z" fill="#229ED9"/></svg><b>CP</b></span><button type="button" class="seg mtab" data-tab="hyd" aria-label="소화전으로"><svg class="tsym" viewBox="0 0 32 32" aria-hidden="true"><path d="M11 6.6c0-2.3 2.2-4.1 5-4.1s5 1.8 5 4.1V8H11z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="8.6" y="7.8" width="14.8" height="3.4" rx="1.7" fill="#B42318" stroke="#fff" stroke-width="1.5"/><path d="M10.8 11.2h10.4v14.6H10.8z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="4.4" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="21" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="7.4" y="25.4" width="17.2" height="3.6" rx="1.8" fill="#B42318" stroke="#fff" stroke-width="1.5"/><circle cx="16" cy="17.4" r="2.6" fill="#fff"/><circle cx="16" cy="17.4" r="1.1" fill="#B42318"/></svg><b>소화전</b></button></div>
-      <form class="msrch" autocomplete="off"><input type="search" placeholder="주소·장소 검색" aria-label="주소·장소 검색" enterkeyhint="search"><button type="submit" class="btn ghost">검색</button></form></div>
+      <form class="msrch" autocomplete="off"><input type="search" placeholder="주소·장소" aria-label="주소·장소 검색" enterkeyhint="search"><button type="submit" class="btn ghost">검색</button></form></div>
     <ul class="mres" hidden></ul><div class="mbox"><div class="kmap"></div><div class="mjump" aria-label="표시로 바로 가기" hidden></div><div class="msel" role="group" aria-label="고른 표시" hidden></div><div class="mcp" role="menu" aria-label="CP 종류" hidden></div><button type="button" class="mme" aria-label="내 위치로">◎</button><button type="button" class="mbsel" aria-pressed="false" aria-label="범위 선택 — 끌어서 여러 표시 고르기" title="범위 선택(PC는 Shift+끌기)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 2.5"/><path d="M13 13l6 2.5-2.6 1 -1 2.6z" fill="currentColor"/></svg></button><div class="mlayer" hidden></div><div class="mrect" hidden></div><div class="mmulti" role="group" aria-label="고른 표시 여러 개" hidden></div></div>
     <p class="mmsg" role="status"></p>
     <div class="mtools">${TOOLK.map(k=>{ const v=MAPK[k]; return `<button type="button" class="mt mt-${k}" data-mk="${k}"${k==='icp'?' aria-haspopup="menu" aria-expanded="false"':''}><i>${v.t}</i><span>${k==='icp'?'현장지휘소 ▾':v.n}</span></button>`; }).join('')}</div>
@@ -5355,7 +5393,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const hydEl=document.createElement('div'); hydEl.className='mapov hydov'; hydEl.id='hydov'; hydEl.hidden=true;
   hydEl.setAttribute('role','dialog'); hydEl.setAttribute('aria-modal','true'); hydEl.setAttribute('aria-label','소화전');
   hydEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="소화전 닫기">‹</button><div class="mseg" role="group" aria-label="CP·소화전 전환"><button type="button" class="seg mtab" data-tab="map" aria-label="CP 현장 지휘 지도로"><svg class="tsym" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 21.5C5 13.6 9.9 7.5 16.5 7.5S28 13.4 28 21.5z" fill="#229ED9" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M16.5 7.5c.9 0 1.6.7 1.6 1.6v12.4h-3.2V9.1c0-.9.7-1.6 1.6-1.6z" fill="#1A7FB0"/><path d="M2.2 21.2h27.3c.9 0 1.2 1.1.5 1.6-1.6 1-3.5 1.6-5.4 1.6H6.2c-2.2 0-4-1.4-4-3.2z" fill="#1A7FB0" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/><path d="M8.6 12.6h4.6v3.6c0 1.6-1.1 2.8-2.3 3.4-1.2-.6-2.3-1.8-2.3-3.4z" fill="#fff"/><path d="M10.9 14.1l.5 1.1 1.2.1-.9.8.3 1.2-1.1-.6-1.1.6.3-1.2-.9-.8 1.2-.1z" fill="#229ED9"/></svg><b>CP</b></button><span class="seg on" aria-current="page"><svg class="tsym" viewBox="0 0 32 32" aria-hidden="true"><path d="M11 6.6c0-2.3 2.2-4.1 5-4.1s5 1.8 5 4.1V8H11z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="8.6" y="7.8" width="14.8" height="3.4" rx="1.7" fill="#B42318" stroke="#fff" stroke-width="1.5"/><path d="M10.8 11.2h10.4v14.6H10.8z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="4.4" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="21" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="7.4" y="25.4" width="17.2" height="3.6" rx="1.8" fill="#B42318" stroke="#fff" stroke-width="1.5"/><circle cx="16" cy="17.4" r="2.6" fill="#fff"/><circle cx="16" cy="17.4" r="1.1" fill="#B42318"/></svg><b>소화전</b></span></div>
-      <form class="msrch hsrch" autocomplete="off"><input type="search" placeholder="주소·장소 검색" aria-label="주소·장소 검색" enterkeyhint="search"><button type="submit" class="btn ghost">검색</button></form></div>
+      <form class="msrch hsrch" autocomplete="off"><input type="search" placeholder="주소·장소" aria-label="주소·장소 검색" enterkeyhint="search"><button type="submit" class="btn ghost">검색</button></form></div>
     <ul class="hres" hidden></ul>
     <div class="hbase" role="group" aria-label="기준 위치와 소화전 검색"></div>
     <p class="mmsg" role="status"></p>
