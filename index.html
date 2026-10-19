@@ -205,6 +205,33 @@ html.sheet-lock,html.sheet-lock body{overflow:hidden}
 .xhint.sm{margin:6px 0 0;padding:8px 12px;font-size:12.5px}
 .xhint.sm .btn{min-height:34px;padding:0 12px;font-size:12.5px}
 .to-srch{display:inline-block;margin-top:8px;border:0;background:none;padding:4px 0;color:var(--navy);font-weight:700;font-size:12.5px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+/* V181(sa): S·A 화면 다듬기 — 검색 화면(body:not(.nosearch))과 AI 도우미(.botchat·.ai-gate)에만 */
+body:not(.nosearch) #panel .group-title{text-transform:none;letter-spacing:.02em}
+body:not(.nosearch) #panel .srch-note + .group-title,body:not(.nosearch) #srchBld + #srchFfus{margin-top:18px}
+body:not(.nosearch) #srchBld:empty{display:none}
+body:not(.nosearch) #panel .panel-head h2.long{font-size:16.5px;line-height:1.4}
+body:not(.nosearch) #panel .pubhint{margin:18px 2px 0}
+body:not(.nosearch) #panel .pubex{min-height:36px;padding:2px 12px}
+body:not(.nosearch) #panel .card.empty.srch-none{padding:20px 16px;margin-bottom:4px}
+.srch-none p{margin:4px 0}
+.ai-gate{grid-template-columns:minmax(0,1fr)}
+.ai-gate input{width:100%;min-width:0;box-sizing:border-box}
+.ai-gate .gate-h{margin:2px 0 0;font-size:17px}
+.ai-gate .note{margin:0;font-size:12.5px;color:var(--muted);line-height:1.5}
+#panel:has(.botchat) .roomhead .btn{grid-row:1}
+.botchat .to-srch{display:inline-flex;align-items:center;min-height:var(--tap);margin-top:2px;padding:0}
+.botchat .bub a.ref{position:relative}
+.botchat .bub a.ref::after{content:"";position:absolute;inset:-9px -4px}
+.botchat .bub ol.src a{padding:7px 0;min-height:32px}
+.botchat .bub .src-h{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);font-size:12px;font-weight:700;color:var(--muted)}
+.botchat .bub .src-h + ol.src{border-top:0;margin-top:2px;padding-top:0}
+.botchat .bub ol.src li{display:grid;gap:2px}
+.botchat .bub ol.src q.snip{display:block;quotes:none;font-size:12px;line-height:1.5;color:var(--muted);padding:2px 0 6px 10px;border-left:2px solid var(--ember);margin-left:2px;overflow-wrap:anywhere}
+.botchat .bub.typing::after{content:"자료를 찾아 답을 쓰는 중";margin-left:8px;font-size:12.5px;color:var(--muted);vertical-align:middle}
+.botchat .bub.ai-err{background:var(--warn-soft);border-color:#E9CF73}
+.botchat .bub.ai-err p::before{content:"⚠ ";color:var(--warn)}
+.botchat .ai-retry{display:inline-flex;align-items:center;min-height:var(--tap);margin-top:4px;padding:0 14px;border:1px solid var(--line-2);border-radius:999px;background:var(--surface);color:var(--navy);font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+@media (pointer:coarse){ #panel:has(.botchat) .roomhead .btn{min-height:var(--tap)} }
 .bub ol.src{list-style:none;margin:10px 0 0;padding:8px 0 0;border-top:1px dashed var(--line);display:grid;gap:4px}
 .bub ol.src a{display:flex;gap:6px;align-items:baseline;font-size:12.5px;color:var(--navy);padding:4px 0;line-height:1.4}
 .bub ol.src a b{flex:none;white-space:nowrap}
@@ -2458,10 +2485,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     fileHits.sort((a,b)=>b.score-a.score); fileHits.splice(8);
     const mkHl=ts=>{ const list=[...new Set(ts.filter(Boolean))].sort((a,b)=>b.length-a.length); if(!list.length) return t=>esc(t); const re=new RegExp('('+list.map(rx).join('|')+')','ig'); return txt=>String(txt).split(re).map((p,i)=>i%2?'<mark>'+esc(p)+'</mark>':esc(p)).join(''); };
     const hl=mkHl(terms);
-    let html=`<div class="panel-head" aria-live="polite"><h2>“${esc(q)}” 검색 결과</h2><span class="sub" id="srchSub">${SRV.on?'본문 검색 중…':''}</span></div>`;
+    let html=`<div class="panel-head" aria-live="polite"><h2${q.length>18?' class="long"':''}>“${esc(q)}” 검색 결과</h2><span class="sub" id="srchSub">${SRV.on?'본문 검색 중…':''}</span></div>`;
     const bq=bldQuery(q);
     if(bq) html+='<div id="srchBld"><div class="group-title">건축물대장</div><p class="srch-note">주소를 찾는 중…</p></div>';
-    else if(SRV.on&&SRV.bld) html+=`<p class="srch-note pubhint">🏢 공공데이터포털 실시간 조회는 <b>주소·건물 이름·동네</b>로 검색할 때 함께 나옵니다 — 예: ${['구월동 1138','인천 남동구청','구월동'].map(x=>`<button type="button" class="pubex" data-pubex="${esc(x)}">${esc(x)}</button>`).join(' ')}</p>`;
+    let pubHint='';   /* V181: 공공데이터 안내는 결과 아래로(검색 결과를 먼저) */
+    if(!bq&&SRV.on&&SRV.bld) pubHint=`<p class="srch-note pubhint">🏢 공공데이터포털 실시간 조회는 <b>주소·건물 이름·동네</b>로 검색할 때 함께 나옵니다 — 예: ${['구월동 1138','인천 남동구청','구월동'].map(x=>`<button type="button" class="pubex" data-pubex="${esc(x)}">${esc(x)}</button>`).join(' ')}</p>`;
     const lawTxtOn=SRV.on&&!(bq&&!/법|조례|기준|고시|규칙|시행령|조문/.test(q));   // V157: 주소만 찾는 검색은 빼고
     if(lawTxtOn) html+='<div id="srchLawTxt"></div>';   // V157: 법제처 현행 조문 원문(첨부 PDF 밖)
     if(SRV.on) html+='<div id="srchLaw"></div>';   // V150: 법제처 원문 링크(법령 관련 검색일 때만 채워짐)
@@ -2483,7 +2511,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(secHits.length){
       html+='<div class="group-title">메뉴 바로가기</div><div class="menu-chips">'+secHits.map(({s})=>`<a href="#${s.slug}">${s.icon?`<img src="${s.icon}" alt="">`:''}${esc(s.title)}</a>`).join('')+'</div>';
     }
-    panel.innerHTML=html;
+    panel.innerHTML=html+pubHint;
     panel.querySelectorAll('[data-ask-ai]').forEach(a=>a.addEventListener('click',()=>{ autoAsk=q; }));
     panel.querySelectorAll('[data-pubex]').forEach(b=>b.addEventListener('click',()=>toSearch(b.dataset.pubex)));
     if(bq) bldSearch(bq,tok);
@@ -2511,6 +2539,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       box.innerHTML = hits.length
         ? `<div class="results">${hits.slice(0,6).map(row).join('')}</div>${hits.length>6?`<div class="srch-more" id="srchMoreBox"><button type="button" class="btn ghost" id="srchMore">본문 결과 ${hits.length-6}건 더 보기</button></div>`:''}<p class="srch-note">${esc(stTxt)}</p>`
         : `<p class="srch-note">본문에서 찾지 못했습니다. ${esc(stTxt)}</p>`;
+      if(!hits.length&&!fileHits.length&&!bq) box.insertAdjacentHTML('beforebegin',`<div class="card empty srch-none"><p><b>‘${esc(trunc(q,24))}’와 일치하는 자료가 없습니다.</b></p><p>낱말을 줄이거나(예: 위험물, RIT) 다른 표현으로 찾아 보세요. 상황을 문장으로 물으려면 아래 <b>AI 도우미</b>를 쓰세요.</p></div>`);   /* V181: 서버 연결 중에도 '결과 없음'을 분명히 */
       if(hits.length){ const p=$('#askAiP'); if(p) p.innerHTML=`이 검색 결과를 근거로 <b>AI가 답을 정리</b>합니다 · 근거 후보: ${(()=>{ const g=new Map(); hits.slice(0,4).forEach(h=>{ if(!g.has(h.name)) g.set(h.name,[]); if(!g.get(h.name).includes(h.page)) g.get(h.name).push(h.page); }); return [...g].slice(0,2).map(([n,ps])=>`<b>${esc(trunc(pdfName(n),24))}</b> ${ps.join('·')}쪽`).join(', '); })()}`; }
       const mb=$('#srchMore'); if(mb) mb.addEventListener('click',()=>{ $('#srchMoreBox').outerHTML=`<div class="results" style="margin-top:10px">${hits.slice(6).map(row).join('')}</div>`; });
       done(hits.length,st);
@@ -4568,6 +4597,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function aiGate(panel,room){
     panel.innerHTML=`<div class="dbwrap"><form class="card create ai-gate" id="aiGate" autocomplete="off">
         <span class="eyebrow">AI 도우미</span>
+        <h2 class="gate-h">입장코드를 넣어 주세요</h2>
+        <p class="note">교육 담당 교수에게 받은 코드입니다. 이 기기에서 한 번 맞히면 다음부터는 묻지 않습니다.</p>
         <div class="row"><label for="aiCodeIn">입장코드</label><input id="aiCodeIn" type="password" inputmode="numeric" maxlength="20" required enterkeyhint="go" autocomplete="off"></div>
         <p class="note err" id="aiCodeErr" role="alert" hidden></p>
         <div class="acts"><button type="button" class="btn ghost" id="aiHome">첫 화면으로</button><button type="submit" class="btn primary" id="aiCodeGo">확인</button></div>
@@ -4587,25 +4618,26 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       setAiCode(v); renderBotRoom(panel,room);
     });
   }
+  let aiErrAt=-1;   /* V181: 방금 실패한 AI 답의 위치(화면 표시용 · 저장 안 함) */
   function renderBotRoom(panel, room){
     if(!aiCode()&&SRV.aiGate){ aiGate(panel,room); return; }   // V124: AI 도우미 공개 — 서버가 입장코드를 요구할 때만(403 need_code) 코드 화면
     const toSrch=(m,i)=>{ const u=chat.msgs[i-1]; return (m.mode==='ai'||m.mode==='extract'||m.mode==='general') && u && u.who==='me' && u.text ? `<button type="button" class="to-srch" data-srch="${esc(u.text)}">Search에서 원문 더 찾기 →</button>` : ''; };
     const msgsHtml = chat.msgs.length ? chat.msgs.map((m,i)=> m.who==='me' ? msgMeHtml(m) : `
       <div class="msg bot">${avHtml()}
-        <div class="bub">${botTextHtml(m)}${botSrcHtml(m)}${botModeHtml(m)}${toSrch(m,i)}${m.cards&&m.cards.length?`<ul class="mini">${m.cards.map(c=>`<li><a href="#${esc(c.slug)}"><span class="tag">${esc(c.type)}</span><span>${esc(c.title)}</span><span class="arrow">→</span></a></li>`).join('')}</ul>`:''}</div>
+        <div class="bub${i===aiErrAt?' ai-err':''}">${botTextHtml(m)}${botSrcHtml(m)}${botModeHtml(m)}${toSrch(m,i)}${i===aiErrAt&&chat.msgs[i-1]&&chat.msgs[i-1].who==='me'&&chat.msgs[i-1].text?'<button type="button" class="ai-retry" data-retry>다시 묻기</button>':''}${m.cards&&m.cards.length?`<ul class="mini">${m.cards.map(c=>`<li><a href="#${esc(c.slug)}"><span class="tag">${esc(c.type)}</span><span>${esc(c.title)}</span><span class="arrow">→</span></a></li>`).join('')}</ul>`:''}</div>
         <span class="t">${esc(m.t)}</span>
       </div>`).join('') : '';
     panel.innerHTML=roomHead(room, '', /* V141: 제목 아래 연결 안내 줄 없앰 */ `<button type="button" class="btn ghost" id="chatClear">대화 비우기</button>`)+`
-      <div class="chat">
+      <div class="chat botchat">
         <div class="card">
           <div class="convo" id="convo">
-            ${msgsHtml || `<div class="convo-empty ai-hello"><img src="img/ai-hello.webp" alt="" width="360" height="675" decoding="async" onerror="this.parentNode.remove()"></div><div class="msg bot">${avHtml()}<div class="bub"><p>안녕하세요. SACHIL AI 도우미입니다. ${SRV.on?'메뉴에 첨부된 SOP·계획·교재를 근거로 답하고, 근거 쪽을 바로 열어 드립니다.':'체크리스트와 사고보고서, 메뉴로 안내합니다.'}</p><span class="note">지금은 검색 인덱스 기반으로 문서 제목까지만 안내합니다. 사진·PDF는 받을 수 있지만 내용 분석은 AI 연결 후입니다.</span></div></div>`}
+            ${msgsHtml || `<div class="convo-empty ai-hello"><img src="img/ai-hello.webp" alt="" width="360" height="675" decoding="async" onerror="this.parentNode.remove()"></div><div class="msg bot">${avHtml()}<div class="bub"><p>안녕하세요. SACHIL AI 도우미입니다. ${SRV.on?'메뉴에 첨부된 SOP·계획·교재를 근거로 답하고, 근거 쪽을 바로 열어 드립니다.':'체크리스트와 사고보고서, 메뉴로 안내합니다.'}</p>${SRV.on?'':'<span class="note">지금은 검색 인덱스 기반으로 문서 제목까지만 안내합니다. 사진·PDF는 받을 수 있지만 내용 분석은 AI 연결 후입니다.</span>'}</div></div>`}
             ${chat.typing?`<div class="msg bot">${avHtml()}<div class="bub typing" aria-label="입력 중"><i></i><i></i><i></i></div></div>`:''}
           </div>
           <div class="quick" id="quick" aria-label="추천 질문">${quickHtml()}</div>
         </div>
         <div class="xhint sm" id="kwHint" hidden><span>낱말 찾기는 <b>Search</b>가 더 빠르고 원문 그대로입니다.</span><button type="button" class="btn ghost" id="kwGo">Search에서 찾기</button></div>
-        ${composerHtml('상황·질문을 문장으로 물어보세요')}
+        ${composerHtml('상황·질문을 물어보세요')}
         <div class="chat-foot"><span>대화는 이 기기에만 저장 · ${fmtSize(storageUse())}${storageFull?' · <b class="warn">저장 공간 부족</b>':''}</span><span class="r"></span></div>
       </div>`;
     bindAtts(panel);
@@ -4614,7 +4646,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const send=(text,att)=>{
       const v=String(text||'').trim(); att=att||[]; if(!v&&!att.length) return;
       if(chat.typing){ const ti=$('#chatText'); if(ti&&!ti.value) ti.value=v; if(att.length){ pending=att.concat(pending); renderPending(); } toast('앞 질문의 답을 기다리는 중입니다'); return; }   // V154: 기다리는 동안 보낸 글을 지우지 않음
-      push('me',v,[],att); chat.typing=true; renderBotRoom(panel,room);
+      push('me',v,[],att); aiErrAt=-1; chat.typing=true; renderBotRoom(panel,room);
       if(SRV.on && v && !localIntent(v)){
         const hist=[]; for(let i=chat.msgs.length-2;i>0&&hist.length<2;i--){ const b=chat.msgs[i], u=chat.msgs[i-1]; if(b.who==='bot'&&(b.mode==='ai'||b.mode==='general')&&u.who==='me'&&u.text) hist.unshift({q:u.text,a:b.text}); }
         const g0=chat.gen||0;
@@ -4627,9 +4659,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           chat.typing=false;
           if(r.status===403&&r.j&&r.j.code==='need_code'){ chat.msgs.pop(); csave(); setAiCode(''); SRV.aiGate=true; if(chat.room==='bot'&&state.route==='ai') aiGate(panel,room); return; }   // 코드가 바뀜 → 다시 입력
           if(r.ok&&r.j.ok){ push('bot',String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.cached=!!r.j.cached; m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,art:String(x.art||'').slice(0,60),snip:String(x.snippet||'').slice(0,180),url:/^https:\/\/(?:www\.law\.go\.kr|map\.kakao\.com)\//.test(String(x.url||''))?String(x.url):''})); csave(); }
-          else push('bot', r.status===0?'서버에 연결할 수 없습니다. 잠시 뒤 다시 물어보세요.':(r.j.error||'답변을 만들지 못했습니다.'),[]);
+          else{ push('bot', r.status===0?'서버에 연결할 수 없습니다. 잠시 뒤 다시 물어보세요.':(r.j.error||'답변을 만들지 못했습니다.'),[]); aiErrAt=chat.msgs.length-1; }
           if(chat.room==='bot'&&state.route==='ai'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp&&window.innerWidth>=600) inp.focus(); }
-        }).catch(()=>{ if((chat.gen||0)!==g0) return; chat.typing=false; push('bot','답변을 만들지 못했습니다. 다시 물어보세요.',[]); if(chat.room==='bot'&&state.route==='ai') renderBotRoom(panel,room); });
+        }).catch(()=>{ if((chat.gen||0)!==g0) return; chat.typing=false; push('bot','답변을 만들지 못했습니다. 다시 물어보세요.',[]); aiErrAt=chat.msgs.length-1; if(chat.room==='bot'&&state.route==='ai') renderBotRoom(panel,room); });
         return;
       }
       const delay=window.matchMedia('(prefers-reduced-motion: reduce)').matches?80:520;
@@ -4639,6 +4671,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(SRV.on&&SRV.bld&&SRV.kakao) loadKakao(SRV.kakao).catch(()=>{});   // V154: 주소 질문이 빨리 가도록 미리 불러 둠
     { const ti=$('#chatText'), kh=$('#kwHint'); if(ti&&kh){ const sync=()=>{ kh.hidden=!isKeyword(ti.value); if(window.__fitConvo) window.__fitConvo(); }; ti.addEventListener('input',sync); $('#kwGo').addEventListener('click',()=>toSearch(ti.value)); } }
     panel.querySelectorAll('.to-srch').forEach(b=>b.addEventListener('click',()=>toSearch(b.dataset.srch)));
+    { const rb=panel.querySelector('[data-retry]'); if(rb) rb.addEventListener('click',()=>{ const i=aiErrAt, u=chat.msgs[i-1]; if(chat.typing||!u||u.who!=='me') return; const t=u.text; chat.msgs.splice(i-1,2); aiErrAt=-1; csave(); send(t,[]); }); }   /* V181: 실패한 질문을 한 번에 다시 */
     { const qb=$('#quick');
       qb.addEventListener('click',e=>{ const b=e.target.closest('button[data-q]'); if(b) send(b.dataset.q,[]); });
       // 3분마다 새 질문으로(보고 있는 중·입력 중·누르려는 중·화면 숨김·움직임 줄이기 설정이면 건너뜀)
@@ -4651,7 +4684,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       },180000);
     }
     if(autoAsk){ const t=autoAsk; autoAsk=''; send(t,[]); }
-    $('#chatClear').addEventListener('click',()=>{ const b=$('#chatClear'); if(b.dataset.arm!=='1'){ b.dataset.arm='1'; b.textContent='정말 비우기'; b.classList.add('accent'); setTimeout(()=>{ if(b.isConnected){ b.dataset.arm=''; b.textContent='대화 비우기'; b.classList.remove('accent'); } },2500); return; } chat.msgs=[]; chat.typing=false; chat.gen=(chat.gen||0)+1; csave(); renderBotRoom(panel,room); });
+    $('#chatClear').addEventListener('click',()=>{ const b=$('#chatClear'); if(b.dataset.arm!=='1'){ b.dataset.arm='1'; b.textContent='정말 비우기'; b.classList.add('accent'); setTimeout(()=>{ if(b.isConnected){ b.dataset.arm=''; b.textContent='대화 비우기'; b.classList.remove('accent'); } },2500); return; } chat.msgs=[]; chat.typing=false; chat.gen=(chat.gen||0)+1; aiErrAt=-1; csave(); renderBotRoom(panel,room); });
   }
 
 
