@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '10.2'
-APP_VERSION = 'V176'
+VERSION = '10.3'
+APP_VERSION = 'V177'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -1067,20 +1067,33 @@ class H(BaseHTTPRequestHandler):
             hits = []   # 질문 낱말을 절반도 못 맞힌 쪽뿐('차이' 같은 흔한 말만 겹침) → 근거 없음으로 보고 일반 설명(V97)
         laws, links = [], law_links(qtext)   # V147: 질문에 법령 이름이 있으면 법제처 원문 링크는 API 없이도 붙인다
         rlinks = []
+        # V177: 법제처(행정규칙·조문)·공공데이터 조회를 동시에(차례로 기다리지 않게) — 가장 느린 것 하나만큼만 걸린다
+        def _rl():
+            out = []
+            for r in [x for x in law_find(qtext).get('rows', []) if x.get('t') in ('admrul', 'ordin')][:3]:
+                out.append({'name': r['name'], 'art': r['kind'] or ('행정규칙' if r['t'] == 'admrul' else '자치법규'), 'url': r['url']})
+            return out
+        jobs = {}
         if CONF.get('law_oc') and (law_q or _LAW_ANY.search(qtext)):   # V153: 고시·화재안전기준(행정규칙)·조례(자치법규) 원문 링크도
-            try:
-                for r in [x for x in law_find(qtext).get('rows', []) if x.get('t') in ('admrul', 'ordin')][:3]:
-                    rlinks.append({'name': r['name'], 'art': r['kind'] or ('행정규칙' if r['t'] == 'admrul' else '자치법규'), 'url': r['url']})
-            except Exception as e:
-                print(f'[법제처] 행정규칙·자치법규 실패: {str(e)[:120]}', flush=True)
+            jobs['rl'] = _rl
         if law_q and ai_ready():   # V144: 법령 질문이면 법제처에서 조문 원문을 찾아 근거로(앞에 둔다)
-            try:
-                laws = law_lookup(qtext)
-            except Exception as e:
+            jobs['law'] = lambda: law_lookup(qtext)
+        if geo:   # V151: 주소가 든 질문 — 건축물대장·소방용수시설을 그 자리에서 조회해 근거로
+            jobs['pub'] = lambda: pub_hits(geo, qtext)
+        res = run_parallel(jobs, 25)
+        if 'rl' in res:
+            if isinstance(res['rl'], Exception):
+                print(f'[법제처] 행정규칙·자치법규 실패: {str(res["rl"])[:120]}', flush=True)
+            else:
+                rlinks = res['rl']
+        if 'law' in res:
+            if isinstance(res['law'], Exception):
                 ck = ''   # V154: 법령 조회가 실패한 답은 저장하지 않는다
-                print(f'[법제처] 조회 실패: {str(e)[:160]}', flush=True)
-                upd_log(f'법제처 조회 실패: {str(e)[:120]}')
-        pubs = pub_hits(geo, qtext) if geo else []   # V151: 주소가 든 질문 — 건축물대장·소방용수시설을 그 자리에서 조회해 근거로
+                print(f'[법제처] 조회 실패: {str(res["law"])[:160]}', flush=True)
+                upd_log(f'법제처 조회 실패: {str(res["law"])[:120]}')
+            else:
+                laws = res['law']
+        pubs = res['pub'] if isinstance(res.get('pub'), list) else []
         if geo and len(pubs) < 2:
             ck = ''   # V154: 공공데이터 조회가 (일부) 실패한 답은 저장하지 않는다
         if laws and links:   # 조문을 콕 집어 물었으면 PDF 근거는 2개까지만(법령 원문이 먼저)
@@ -1096,6 +1109,10 @@ class H(BaseHTTPRequestHandler):
                 sources.append({'slug': 'law', 'name': lk['name'], 'page': 0, 'art': lk['art'], 'url': lk['url'], 'snippet': '법제처 국가법령정보센터 원문'})
         if not hits and ai_ready():   # 메뉴 자료에 근거가 없으면 AI 일반 지식으로 짧게([근거 부족] 표시)
             ok, why = ai_allowed(self.ip(), self.is_prof())
+            if ok and j.get('stream') and ai_provider() == 'gemini':   # V177: 글자가 나오는 대로 보냄
+                gm = history_msgs(hist)
+                gm.append({'role': 'user', 'content': f'질문: {qtext}'})
+                return self.ask_stream(AI_GEN_SYS, gm, 2000, 'general', sources, st, ck if not hist else '', '')
             if ok:
                 ans, why = ask_general(qtext, hist)
                 if ans:
@@ -1113,6 +1130,8 @@ class H(BaseHTTPRequestHandler):
         mode, note, ans = 'extract', '', ''
         if ai_ready():
             ok, why = ai_allowed(self.ip(), self.is_prof())
+            if ok and j.get('stream') and ai_provider() == 'gemini':   # V177: 글자가 나오는 대로 보냄
+                return self.ask_stream(AI_SYS, ask_msgs(qtext, hits, hist), 3000, 'ai', sources, st, ck if not hist else '', extract_as_format(extract_answer(qtext, hits, terms), ''))
             if ok:
                 ans, why = ask_llm(qtext, hits, hist)
                 if ans:
@@ -1123,6 +1142,56 @@ class H(BaseHTTPRequestHandler):
         if not ans:
             ans = extract_as_format(extract_answer(qtext, hits, terms), note if ai_ready() else 'AI 키 미연결')
         return self.send(200, {'ok': True, 'mode': mode, 'note': note, 'answer': ans, 'sources': sources, 'status': st}, log=False)
+
+    def ask_stream(self, sysmsg, msgs, max_tokens, mode, sources, st, ck, fallback):
+        """V177: AI 답을 SSE(text/event-stream)로 조각조각 보낸다 — 첫 글자가 1~2초 안에 보여 기다림이 짧게 느껴진다.
+        마지막에 {done:1, …}로 정리된 전체 답(순서 맞춤)·근거를 보낸다. 스트림이 실패하면 보통 호출(다른 회사 대체)로 이어서."""
+        self.drain()
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/event-stream; charset=utf-8')
+        self.send_header('Cache-Control', 'no-store')
+        self.send_header('X-Accel-Buffering', 'no')
+        self.send_header('X-Content-Type-Options', 'nosniff')
+        self.send_header('Transfer-Encoding', 'chunked')
+        self.end_headers()
+        alive = [True]
+
+        def ev(obj):
+            if not alive[0]:
+                return
+            b = ('data: ' + json.dumps(obj, ensure_ascii=False) + '\n\n').encode('utf-8')
+            try:
+                self.wfile.write(f'{len(b):x}\r\n'.encode() + b + b'\r\n')
+                self.wfile.flush()
+            except Exception:
+                alive[0] = False
+        ev({'start': 1, 'sources': sources})
+        with AI_BUSY_LOCK:
+            AI_BUSY[0] += 1
+        try:
+            text, why, code = gemini_stream(sysmsg, msgs, max_tokens, lambda t: ev({'t': t}))
+        finally:
+            with AI_BUSY_LOCK:
+                AI_BUSY[0] -= 1
+        if not text or code:   # 스트림 실패 → 보통 호출(재시도·다른 회사)로
+            t2, why2, _c = call_llm(sysmsg, msgs, max_tokens, 'low', CONF.get('ai_assist_model') or 'claude-haiku-5-5')
+            if t2:
+                text, why = t2, ''
+            else:
+                why = why2 or why
+        ans = order_answer(text) if text else ''
+        note = '' if ans else why
+        if ans and ck:
+            ans_cache_put(ck, mode, ans, sources)
+        if not ans:
+            ans, mode = (fallback or ('AI 답변을 만들지 못했습니다: ' + (why or '다시 물어보세요'))), ('extract' if fallback else 'none')
+        ev({'done': 1, 'ok': True, 'mode': mode, 'note': note, 'answer': ans, 'sources': sources, 'status': st})
+        try:
+            self.wfile.write(b'0\r\n\r\n')
+            self.wfile.flush()
+        except Exception:
+            pass
+        self.alog(200)
 
     def report(self):
         """IL 사고보고서 AI 작성: 앱이 만든 지시문(사실 스냅샷 포함)을 Claude로 보내 보고서 본문을 받는다."""
@@ -3283,7 +3352,27 @@ def law_lookup(q, top=3):
     return out
 
 
-def ask_llm(question, hits, history):
+def run_parallel(jobs, timeout):
+    """V177: 이름 → 함수 여럿을 동시에 실행해 이름 → 결과(실패면 예외 객체). timeout 초가 지나면 남은 것은 TimeoutError."""
+    out, ts = {}, []
+    def one(k, fn):
+        try:
+            out[k] = fn()
+        except Exception as e:
+            out[k] = e
+    for k, fn in jobs.items():
+        t = threading.Thread(target=one, args=(k, fn), daemon=True)
+        t.start()
+        ts.append(t)
+    end = time.time() + timeout
+    for t in ts:
+        t.join(max(0.1, end - time.time()))
+    for k in jobs:
+        out.setdefault(k, TimeoutError('시간 초과'))
+    return out
+
+
+def ask_msgs(question, hits, history):
     import urllib.request, urllib.error, ssl
     ctx = '\n\n'.join((f'[{i + 1}] {h["name"]} · {h["art"]} (공공데이터포털 실시간 조회 {time.strftime("%Y.%m.%d")})\n{h["text"]}' if h.get('pub') else
                          f'[{i + 1}] {h["name"]} {h["art"]} (법제처 국가법령정보, 시행 {h.get("eff") or "?"})\n{h["text"]}' if h.get('law') else
@@ -3296,7 +3385,11 @@ def ask_llm(question, hits, history):
                  '비상용 승강기 유무를, 설명이나 현장에서에 가장 가까운 소방용수시설의 종류·거리를 그 [번호]와 함께 반드시 쓰고, SOP 기준은 그 건물에 맞춰 적용해 말하라. '
                  '자료가 "없음"이면 없다고 말하고 현장 확인을 권하라. 근거 줄에도 이 자료를 넣어라.)')
     msgs.append({'role': 'user', 'content': f'<자료>\n{ctx}\n</자료>\n\n질문: {question}\n(답 순서: 결론 → 설명 → 현장에서 → 근거){extra}'})
-    text, why, _code = call_llm(AI_SYS, msgs, 3000, 'low', CONF.get('ai_assist_model') or 'claude-haiku-5-5')
+    return msgs
+
+
+def ask_llm(question, hits, history):
+    text, why, _code = call_llm(AI_SYS, ask_msgs(question, hits, history), 3000, 'low', CONF.get('ai_assist_model') or 'claude-haiku-5-5')
     return order_answer(text), why
 
 
@@ -3437,7 +3530,7 @@ def _call_llm(system, msgs, max_tokens, effort='', model=''):
         return '', 'AI 키 미연결', 'not_granted'
     def call(p):
         if p == 'gemini':
-            return call_gemini(system, msgs, max_tokens)
+            return call_gemini(system, msgs, max_tokens, effort)
         if p == 'groq':
             return call_groq(system, msgs, max_tokens)
         return call_claude(system, msgs, max_tokens, effort, model)
@@ -3547,7 +3640,51 @@ def call_groq(system, msgs, max_tokens):
     return '', why, code
 
 
-def call_gemini(system, msgs, max_tokens):
+def gemini_stream(system, msgs, max_tokens, on_text, effort='low'):
+    """V177: Gemini를 글자가 나오는 대로 받기(streamGenerateContent, SSE). on_text(조각)를 부른다. (본문, 실패 사유, 오류 코드).
+    실패하면 본문 없이 돌아오고, 부른 쪽이 보통 호출(다른 회사 대체 포함)로 다시 한다."""
+    import urllib.request, urllib.error
+    model = re.sub(r'[^A-Za-z0-9.\-_]', '', str(CONF.get('gemini_model') or 'gemini-flash-latest')) or 'gemini-flash-latest'
+    base = (CONF.get('gemini_api_url') or 'https://generativelanguage.googleapis.com/v1beta').rstrip('/')
+    body = {'systemInstruction': {'parts': [{'text': system}]},
+            'contents': [{'role': 'model' if m['role'] == 'assistant' else 'user', 'parts': [{'text': m['content']}]} for m in msgs],
+            'generationConfig': {'maxOutputTokens': max(int(max_tokens), 8192)}}
+    if effort == 'low':
+        body['generationConfig']['thinkingConfig'] = {'thinkingBudget': int(CONF.get('gemini_think') or 0)}
+    req = urllib.request.Request(f'{base}/models/{model}:streamGenerateContent?alt=sse', data=json.dumps(body).encode('utf-8'), method='POST',
+                                 headers={'x-goog-api-key': CONF.get('gemini_api_key', ''), 'content-type': 'application/json'})
+    out = []
+    try:
+        with urllib.request.urlopen(req, timeout=120) as r:
+            for raw in r:
+                line = raw.decode('utf-8', 'replace').strip()
+                if not line.startswith('data:'):
+                    continue
+                try:
+                    j = json.loads(line[5:].strip())
+                except ValueError:
+                    continue
+                for c in (j.get('candidates') or [])[:1]:
+                    t = ''.join(p.get('text', '') for p in ((c.get('content') or {}).get('parts') or []) if not p.get('thought'))
+                    if t:
+                        out.append(t)
+                        on_text(t)
+        text = ''.join(out).strip()
+        return (text, '', '') if text else ('', 'AI가 내용을 내지 않았습니다', 'empty_completion')
+    except urllib.error.HTTPError as e:
+        if e.code == 400 and effort == 'low' and not out:
+            try:
+                if 'thinking' in e.read().decode('utf-8', 'replace').lower():
+                    return gemini_stream(system, msgs, max_tokens, on_text, '')
+            except Exception:
+                pass
+        return ''.join(out).strip(), f'Gemini 스트림 오류 {e.code}', 'upstream_error'
+    except Exception as e:
+        print('[AI] 스트림 끊김:', str(e)[:120], flush=True)
+        return ''.join(out).strip(), 'AI 연결이 끊겼습니다', 'upstream_error'
+
+
+def call_gemini(system, msgs, max_tokens, effort=''):
     """Google Gemini API(generateContent) 한 번 호출. 키는 머리글(x-goog-api-key)로만 보낸다(주소에 넣지 않음)."""
     import urllib.request, urllib.error, ssl
     model = re.sub(r'[^A-Za-z0-9.\-_]', '', str(CONF.get('gemini_model') or 'gemini-flash-latest')) or 'gemini-flash-latest'
@@ -3555,6 +3692,8 @@ def call_gemini(system, msgs, max_tokens):
     body = {'systemInstruction': {'parts': [{'text': system}]},
             'contents': [{'role': 'model' if m['role'] == 'assistant' else 'user', 'parts': [{'text': m['content']}]} for m in msgs],
             'generationConfig': {'maxOutputTokens': max(int(max_tokens), 8192)}}   # 생각(thinking) 몫까지 넉넉히
+    if effort == 'low':   # V177: AI 도우미는 '생각'을 줄여 빨리(gemini_think 설정, 기본 0 = 바로 답) — 모델이 안 받으면 아래에서 빼고 다시
+        body['generationConfig']['thinkingConfig'] = {'thinkingBudget': int(CONF.get('gemini_think') or 0)}
     req = urllib.request.Request(f'{base}/models/{model}:generateContent', data=json.dumps(body).encode('utf-8'), method='POST',
                                  headers={'x-goog-api-key': CONF.get('gemini_api_key', ''), 'content-type': 'application/json'})
     code, why = 'upstream_error', ''
@@ -3579,6 +3718,8 @@ def call_gemini(system, msgs, max_tokens):
         except Exception:
             err = {}
         msg = json.dumps(err, ensure_ascii=False)
+        if e.code == 400 and effort == 'low' and 'thinking' in msg.lower():
+            return call_gemini(system, msgs, max_tokens, '')   # 생각 줄이기를 모르는 모델 — 그대로 다시
         if 'API_KEY_INVALID' in msg or e.code in (401,):
             why = 'Gemini API 키가 틀렸습니다'
         elif e.code == 403:

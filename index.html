@@ -324,6 +324,8 @@ html.sheet-lock,html.sheet-lock body{overflow:hidden}
 .shmenu button{display:grid;gap:1px;text-align:left;min-height:52px;padding:6px 12px;border:0;border-radius:10px;background:none;font:inherit;color:var(--fg)}
 .shmenu button:hover,.shmenu button:focus-visible{background:var(--surface-2)}.shmenu b{font-size:15px}.shmenu span{font-size:12px;color:var(--muted)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.bub.streaming{white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
+.bub.streaming::after{content:"▍";display:inline-block;margin-left:2px;color:var(--navy);animation:stcar .9s steps(1) infinite}@keyframes stcar{50%{opacity:0}}
 .rtov{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(11,27,63,.55)}
 .rtov[hidden]{display:none}
 .rtbox{width:min(720px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:var(--surface,#fff);border-radius:20px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
@@ -917,7 +919,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v176</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v177</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1786,8 +1788,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V176', SRV_VER='10.2';
+  const APP_VER='V177', SRV_VER='10.3';
   const UPDATES=[
+    {v:'V177', d:'2026-10-19', t:['SACHIL AI 답이 글자가 나오는 대로 바로 보임(다 쓸 때까지 기다리지 않음) — 첫 글자 보통 1~2초','AI가 답하기 전 ‘생각’ 단계를 줄여 전체 답 시간 단축','법제처·건축물대장·소방용수 조회를 동시에 해서 기다림 단축']},
     {v:'V176', d:'2026-10-19', t:['보고서 만들기 → 종류부터 고르기: 신속 브리핑형(A4 1쪽·표·아이콘) / 인포그래픽 요약형(숫자 타일·차트·단계 도식) / 사진기록 리포트형(사진 6장까지·캡션·설명·나란히 비교)','보고서 사진: 여러 장 넣고 순서 바꾸기·캡션·설명(사진기록형), 신속 브리핑형은 첫 사진이 발생개요 옆에','IL 재산피해에 ‘조사 중’ 버튼','방재실 체크리스트·상황보고서 서식: 서버가 옛 버전이거나 꺼져 있어도 이 기기에 저장해 두고, 서버가 업데이트·연결되면 자동으로 모든 기기에 적용(지금 서버 버전 안내)','CH: 항목을 두 줄로 나눠 오른쪽 빈자리에도 체크, 단계마다 진행 막대 · IL: 칸 번호·입력 완료 색 표시']},
     {v:'V175', d:'2026-10-19', t:['보고서 AI 작성 중 표시를 크게: 남색 띠에 돌아가는 표시·움직이는 막대·경과 초·받은 글자 수, 바로 중지 버튼','보고서 서식: 1 발생개요(오른쪽에 사진) · 2 화재 상황(성상·상황·원인) · 3 피해 현황(인명·재산을 표로) · 4 조치 사항 | 5 향후 전망(좌우 나란히)','IL에 재산피해 칸 추가(추정 피해액 만원 → 1억 5,000만원처럼 표시, 피해 내용)','보고서 ‘편집’에서 📷 사진 넣기·바꾸기·빼기 — 1 발생개요 오른쪽 빈자리에 들어가고 A4 한 장에 맞춤']},
     {v:'V174', d:'2026-10-19', t:['IL ‘사고보고서’ → ‘화재등 상황 보고서’로 이름 변경','입력을 누르기만 하면 되게: 발생개요(일시 ‘지금’·장소·처종·타는 것) / 화재 성상 / 화재 상황(+수기작성) / 인명피해(해당없음·경상·중상·심정지 −/+ 인원, 고르면 인명구조 칸이 켜짐) / 화재 원인 / 조치 사항 / 향후 전망','SACHIL방재실에 ‘상황보고서’ 탭 신설 — 교수가 칸 이름·선택지·안내 문구를 고치고 칸을 켜고 끄거나 새로 만들면 모든 기기에 바로 적용','보고서 만들기: A4 한 장에 꽉 맞게 간격·글자 크기를 자동으로 맞추고(넘치면 줄이고 남으면 넓힘), 이름 칸·값 칸이 나뉜 표 모양 디자인. 미리보기가 실제 A4 그대로이고 누르면 크게 보기']},
@@ -4626,7 +4629,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(SRV.on && v && !localIntent(v)){
         const hist=[]; for(let i=chat.msgs.length-2;i>0&&hist.length<2;i--){ const b=chat.msgs[i], u=chat.msgs[i-1]; if(b.who==='bot'&&(b.mode==='ai'||b.mode==='general')&&u.who==='me'&&u.text) hist.unshift({q:u.text,a:b.text}); }
         const g0=chat.gen||0;
-        Promise.race([geoFor(v).catch(()=>null),sleep(6000).then(()=>null)]).then(geo=>api('/api/ask',{json:{q:v,history:hist,code:aiCode(),...(geo?{geo}:{})}, ...(isProf()?{tok:PROF.tok}:{})})).then(r=>{
+        // V177: 답을 글자가 나오는 대로 받아 '입력 중' 말풍선에 바로 보여 줌(서버 10.3+ · Gemini). 옛 서버·저장된 답은 한 번에
+        let acc='', raf=0; const paint=()=>{ raf=0; if((chat.gen||0)!==g0||chat.room!=='bot'||state.route!=='ai') return; const tb=panel.querySelector('.bub.typing,.bub.streaming'); if(!tb) return;
+          if(tb.classList.contains('typing')){ tb.classList.remove('typing'); tb.classList.add('streaming'); tb.removeAttribute('aria-label'); }
+          tb.textContent=acc.replace(/\*\*/g,''); const cv=panel.querySelector('.convo'); if(cv&&cv.scrollHeight-cv.scrollTop-cv.clientHeight<160) cv.scrollTop=cv.scrollHeight; };
+        Promise.race([geoFor(v).catch(()=>null),sleep(6000).then(()=>null)]).then(geo=>askStream({q:v,history:hist,code:aiCode(),stream:true,...(geo?{geo}:{})}, t=>{ acc+=t; if(!raf) raf=requestAnimationFrame(paint); })).then(r=>{
           if((chat.gen||0)!==g0) return;   // 그사이 '대화 비우기' — 이전 질문의 답은 버림
           chat.typing=false;
           if(r.status===403&&r.j&&r.j.code==='need_code'){ chat.msgs.pop(); csave(); setAiCode(''); SRV.aiGate=true; if(chat.room==='bot'&&state.route==='ai') aiGate(panel,room); return; }   // 코드가 바뀜 → 다시 입력
@@ -4878,6 +4885,22 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   Object.defineProperty(SRV,'me',{get(){ return MES[RK]||null; }, set(v){ MES[RK]=v||null; }});
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   const verLt=(a,b)=>{ const x=String(a).split('.').map(Number), y=String(b).split('.').map(Number); for(let i=0;i<Math.max(x.length,y.length);i++){ const d=(x[i]||0)-(y[i]||0); if(d) return d<0; } return false; };
+  // V177: AI 도우미 스트리밍 — 서버가 text/event-stream으로 주면 조각마다 onText, 끝 이벤트(done)를 api()와 같은 모양으로 돌려줌
+  async function askStream(body, onText){
+    const init={method:'POST', credentials:SRVBASE?'omit':'same-origin', headers:{'X-SACHIL':'1','Content-Type':'application/json'}, body:JSON.stringify(body)};
+    if(isProf()&&PROF.tok) init.headers['Authorization']='Bearer '+PROF.tok; else if(SRVTOK) init.headers['Authorization']='Bearer '+SRVTOK;
+    try{
+      const r=await fetch(SURL('/api/ask'),init);
+      if(!/event-stream/.test(r.headers.get('content-type')||'')||!r.body||!r.body.getReader){ let j={}; try{ j=await r.json(); }catch(_){ } return {ok:r.ok, status:r.status, j:j||{}}; }
+      const rd=r.body.getReader(), dec=new TextDecoder(); let buf='', fin=null;
+      for(;;){ const {value,done}=await rd.read(); if(done) break; buf+=dec.decode(value,{stream:true});
+        let k; while((k=buf.indexOf('\n\n'))>=0){ const blk=buf.slice(0,k); buf=buf.slice(k+2);
+          const d=blk.split('\n').filter(l=>l.startsWith('data:')).map(l=>l.slice(5).trim()).join(''); if(!d) continue;
+          let o=null; try{ o=JSON.parse(d); }catch(_){ continue; }
+          if(o.t) onText(String(o.t)); else if(o.done) fin=o; } }
+      return fin?{ok:true, status:200, j:fin}:{ok:false, status:0, j:{error:'답변이 중간에 끊겼습니다. 다시 물어보세요.'}};
+    }catch(e){ return {ok:false, status:0, j:{error:'서버에 연결할 수 없습니다'}}; }
+  }
   async function api(path, opt){
     opt=opt||{};
     const init={method:opt.method||((opt.json!==undefined||opt.body)?'POST':'GET'), credentials:SRVBASE?'omit':'same-origin', headers:{'X-SACHIL':'1'}};
