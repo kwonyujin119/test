@@ -919,7 +919,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v178</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v179</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1602,14 +1602,18 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .board .phase .phbar{position:absolute;left:0;right:0;bottom:0;height:4px;border-radius:2px;background:var(--surface-2,#EEF1F5);overflow:hidden}
 .board .phase .phbar::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--p);background:linear-gradient(90deg,#244EA2,#3D6BD1);border-radius:2px;transition:width .25s}
 .board .phase.done .phbar::after{background:#067647}
-.board .phase .items{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px}   /* V176: 항목을 두 줄로 나눠 오른쪽 빈자리에도 체크 */
+.board .phase .items{grid-template-columns:repeat(var(--cols,2),minmax(0,1fr));column-gap:14px}   /* V176: 항목을 두 줄로 나눠 오른쪽 빈자리에도 체크 */
 .board .phase .item{display:flex;flex-direction:column;align-items:stretch;gap:0}
 .board .phase .item label{align-items:flex-start;min-width:0;padding:9px 0 4px;min-height:0}.board .phase .item label input{margin-top:1px}
 .board .phase .item .tx{word-break:keep-all;overflow-wrap:anywhere;line-height:1.35}
 .board .phase .item .at{display:block;text-align:left;padding:0 0 8px 32px;font-size:11px;line-height:1.2}.board .phase .item .at:empty{padding:0 0 6px}
 @media (max-width:339px){ .board .phase .items{grid-template-columns:1fr} }
+@media (max-width:479px){ .board .phase .items[style*="--cols:3"]{grid-template-columns:repeat(2,minmax(0,1fr))} }
 .il2{counter-reset:ils}.il2 .ilsec>header h3::before{counter-increment:ils;content:counter(ils);display:inline-grid;place-items:center;min-width:26px;height:26px;margin-right:8px;border-radius:8px;background:var(--navy);color:#fff;font-size:13px;font-weight:800;vertical-align:1px}
-.il2 .ilsec{border-top:4px solid var(--navy)}.il2 .ilsec:has(.st.has){border-top-color:#067647}
+.il2 .ilsec .st.has{background:#ECFDF3;border-color:#ABEFC6;color:#067647}   /* V179: 상단 색 띠 대신 상태 표시만 차분하게 */
+.il2 .ilsub{padding:14px 0 6px;border-top:1px solid var(--line)}.il2 .ilsub:first-of-type{border-top:0;padding-top:4px}
+.il2 .ilsub>h4{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;margin:0 0 10px;font-size:15px;font-weight:800;color:var(--fg)}.il2 .ilsub>h4 .st{margin-left:auto}
+.il2 .ilsub>h4 .lvl{flex:1 1 100%;display:flex;gap:6px}.il2 .ilsub>h4 .lvl button{flex:1 1 0;min-width:0;min-height:40px;border:1px solid var(--line);border-radius:17px;background:var(--surface);font:inherit;font-size:12.5px;font-weight:800}.il2 .ilsub>h4 .lvl button[aria-pressed="true"]{background:#D92D20;border-color:#D92D20;color:#fff}
 .il2 .ilsec>header{flex-wrap:wrap;row-gap:8px}.il2 .ilsec>header h3{white-space:nowrap;flex:1 1 auto}.il2 .ilsec>header .lvl{order:3;flex:1 1 100%;display:flex;gap:6px}.il2 .ilsec>header .lvl button{flex:1 1 0;min-width:0}
 .il2 .ilfs{display:flex;flex-direction:column;gap:14px;padding:2px 0 4px}
 .ilfield{display:flex;flex-direction:column;gap:6px;min-width:0}.ilfield.off{opacity:.5}
@@ -1638,6 +1642,8 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .ilefh small{flex:none;color:var(--muted);font-size:12px}
 .ilp.ioff{opacity:.55}.ilen{margin:6px 0 0}
 .ilp .ilo,.ilp .ilph,.ilp .ilnn{width:100%;box-sizing:border-box;font:inherit;font-size:14px;line-height:1.5;padding:6px 8px;border:1px solid var(--line);border-radius:8px}
+.clcols{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px;border-radius:12px;background:var(--surface-2,#F2F4F7)}.clcols b{font-size:14px}.clcols span{display:flex;gap:4px}.clcols button{min-width:58px;min-height:40px;border-radius:10px;border:1px solid var(--line);background:#fff;font:inherit;font-weight:800;cursor:pointer}.clcols button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}.clcols small{flex:1 1 100%;color:var(--muted);font-size:12px}
+.clc{flex:none;width:76px;min-height:36px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:13px;padding:0 4px;background:#fff}
 .cl-warn{margin:0;padding:10px 12px;border-radius:10px;background:#FFFAEB;border:1px solid #FEC84B;color:#93370D;font-weight:700}
 .cled{display:flex;flex-direction:column;gap:10px;margin:10px 0;min-width:0;max-width:100%}
 .clp{min-width:0;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface,#fff)}
@@ -1788,8 +1794,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V178', SRV_VER='10.4';
+  const APP_VER='V179', SRV_VER='10.5';
   const UPDATES=[
+    {v:'V179', d:'2026-10-19', t:['방재실 체크리스트에서 CH 항목을 1단·2단·3단으로 나눠 보이게 설정(전체 또는 단계마다)','IL: 박스 위 파란·초록 띠를 없애고 차분하게 정리','IL: ‘화재 개요’(화재 성상·화재 상황·화재 원인), ‘피해 현황’(인명피해·재산피해)으로 묶음','IL: 재산피해는 처음부터 ‘조사 중’이 눌려 있음(다시 누르면 해제)','보고서도 같은 순서로: 1 발생개요 · 2 화재 개요 · 3 피해 현황 · 4 조치 사항 · 5 향후 전망']},
     {v:'V178', d:'2026-10-19', t:['AI 보고서도 쓰는 대로 바로 보임(다 쓸 때까지 기다리지 않음)','AI 보고서의 ‘깊은 생각’ 단계를 줄이고, AI에 보내는 자료를 절반 가까이 줄여(빈 칸·중복 빼기) 작성 시간 단축','보고서 작성 전 양식 확인 기다림 3초 → 0.6초']},
     {v:'V177', d:'2026-10-19', t:['SACHIL AI 답이 글자가 나오는 대로 바로 보임(다 쓸 때까지 기다리지 않음) — 첫 글자 보통 1~2초','AI가 답하기 전 ‘생각’ 단계를 줄여 전체 답 시간 단축','법제처·건축물대장·소방용수 조회를 동시에 해서 기다림 단축']},
     {v:'V176', d:'2026-10-19', t:['보고서 만들기 → 종류부터 고르기: 신속 브리핑형(A4 1쪽·표·아이콘) / 인포그래픽 요약형(숫자 타일·차트·단계 도식) / 사진기록 리포트형(사진 6장까지·캡션·설명·나란히 비교)','보고서 사진: 여러 장 넣고 순서 바꾸기·캡션·설명(사진기록형), 신속 브리핑형은 첫 사진이 발생개요 옆에','IL 재산피해에 ‘조사 중’ 버튼','방재실 체크리스트·상황보고서 서식: 서버가 옛 버전이거나 꺼져 있어도 이 기기에 저장해 두고, 서버가 업데이트·연결되면 자동으로 모든 기기에 적용(지금 서버 버전 안내)','CH: 항목을 두 줄로 나눠 오른쪽 빈자리에도 체크, 단계마다 진행 막대 · IL: 칸 번호·입력 완료 색 표시']},
@@ -2005,7 +2012,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const clOk=l=>Array.isArray(l)&&l.length&&l.every(p=>p&&typeof p.name==='string'&&Array.isArray(p.items)&&p.items.length);
   let CHECKLIST=(()=>{ try{ const v=JSON.parse(localStorage.getItem(CL_KEY)||'null'); if(v&&clOk(v.list)) return v.list; }catch(_){ } return CL_DEF; })();
   let CL_TS=(()=>{ try{ return +(JSON.parse(localStorage.getItem(CL_KEY)||'null')||{}).ts||0; }catch(_){ return 0; } })();
-  const clSig=()=>{ let h=0; const t=JSON.stringify(CHECKLIST); for(let k=0;k<t.length;k++) h=(h*31+t.charCodeAt(k))|0; return String(h>>>0); };   // 목록이 바뀌면 이전 체크(번호로 저장)는 다른 항목을 가리키므로 비운다
+  let CL_COLS=(()=>{ try{ return +(JSON.parse(localStorage.getItem(CL_KEY)||'null')||{}).cols||0; }catch(_){ return 0; } })();   // V179: CH 항목 단 수(교수 설정, 0 = 기본 2단)
+  const clColsOf=p=>Math.max(1,Math.min(3,(p&&p.cols)||CL_COLS||2));
+  const clSig=()=>{ let h=0; const t=JSON.stringify(CHECKLIST.map(p=>[p.name,p.items]));   /* 단 수는 체크와 무관 */ for(let k=0;k<t.length;k++) h=(h*31+t.charCodeAt(k))|0; return String(h>>>0); };   // 목록이 바뀌면 이전 체크(번호로 저장)는 다른 항목을 가리키므로 비운다
   const totalItems=()=>CHECKLIST.reduce((n,p)=>n+p.items.length,0);
 
   // 피해·원인 박스 — 화재 원인 / 인명 피해 / 재산 피해. 역할 공통(같은 사고). 각 박스: '조사 중' 체크 → '직접 입력' → 보조 입력. 초안 예시(교관 승인 전).
@@ -2018,16 +2027,16 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       {k:'place',label:'장소',type:'text',ph:'예: 인천 서구 ○○로 12, ○○물류센터'},
       {k:'kind',label:'처종',type:'one',other:true,opts:['건축물 화재','차량 화재','임야 화재','선박 화재','위험물 화재','기타 화재']},
       {k:'burn',label:'타는 것',type:'one',other:true,opts:['주택','공동주택','공장','창고','근린생활시설','판매시설','숙박시설','차량','임야','쓰레기']}]},
-    {id:'phase', name:'화재 성상', fields:[{k:'phase',label:'화재 성상',type:'one',opts:['초기','성장기','최성기','감쇠기']}]},
-    {id:'fire', name:'화재 상황', fields:[{k:'fstat',label:'화재 상황',type:'one',opts:['연소확대','연소확대 저지(방어선 구축)','초진','완진']},
+    {id:'phase', name:'화재 성상', grp:'화재 개요', fields:[{k:'phase',label:'화재 성상',type:'one',opts:['초기','성장기','최성기','감쇠기']}]},
+    {id:'fire', name:'화재 상황', grp:'화재 개요', fields:[{k:'fstat',label:'화재 상황',type:'one',opts:['연소확대','연소확대 저지(방어선 구축)','초진','완진']},
       {k:'fnote',label:'수기작성',type:'long',fold:true,ph:'예: 2층 창고 연소 중, B방면 방어선 구축 완료'}]},
-    {id:'life', name:'인명피해', fields:[{k:'life',label:'인명피해',type:'injury',none:'현재까지 해당없음',opts:['경상','중상','심정지']},
+    {id:'cause', name:'화재 원인', grp:'화재 개요', fields:[{k:'cause_est',label:'추정 발화 요인',type:'one',opts:['전기적 요인','기계적 요인','화학적 요인','가스 누출','부주의','방화 의심','자연적 요인','조사 중','미상']},
+      {k:'cause_txt',label:'직접 입력',type:'text',ph:'예: 2층 분전반 부근 발화 추정(관계자 진술)'}]},
+    {id:'life', name:'인명피해', grp:'피해 현황', fields:[{k:'life',label:'인명피해',type:'injury',none:'현재까지 해당없음',opts:['경상','중상','심정지']},
       {k:'rescue',label:'인명구조',type:'num',unit:'명',dep:'life'},
       {k:'rescue_note',label:'구조 내용',type:'text',dep:'life',ph:'예: 3층 요구조자 2명 구조·이송'}]},
-    {id:'prop', name:'재산피해', fields:[{k:'prop_st',label:'',type:'one',opts:['조사 중']},{k:'prop_est',label:'추정 피해액',type:'num',unit:'만원',max:9999999},
+    {id:'prop', name:'재산피해', grp:'피해 현황', fields:[{k:'prop_st',label:'',type:'one',opts:['조사 중'],def:'조사 중'},{k:'prop_est',label:'추정 피해액',type:'num',unit:'만원',max:9999999},
       {k:'prop_note',label:'피해 내용',type:'text',ph:'예: 공장 1동 2층 일부 소실, 설비 피해 추정'}]},
-    {id:'cause', name:'화재 원인', fields:[{k:'cause_est',label:'추정 발화 요인',type:'one',opts:['전기적 요인','기계적 요인','화학적 요인','가스 누출','부주의','방화 의심','자연적 요인','조사 중','미상']},
-      {k:'cause_txt',label:'직접 입력',type:'text',ph:'예: 2층 분전반 부근 발화 추정(관계자 진술)'}]},
     {id:'act', name:'조치 사항', fields:[{k:'acts',label:'주요 조치',type:'multi',opts:['인명 검색·구조','화재 진압(방수)','연소 확대 방지','배연·환기','전기·가스 차단','위험물 제거·이동','현장 통제·대피 유도','응급처치·구급 이송','유관기관 협조','잔화 정리·재발화 감시']},
       {k:'act_note',label:'세부 조치',type:'long',fold:true,ph:'예: 14:12 2층 요구조자 1명 구조, 14:20 B방면 방수로 연소 확대 차단'}]},
     {id:'outlook', name:'향후 전망', fields:[{k:'outlook',label:'향후 전망',type:'multi',opts:['추가 연소 우려','연소 확대 저지 예상','장시간 진화 예상','잔화정리 후 철수 예정','재발화 감시 필요','화재조사 예정','유관기관 인계 예정']},
@@ -2037,6 +2046,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const ilOk=l=>Array.isArray(l)&&l.length&&l.every(b=>b&&typeof b.id==='string'&&typeof b.name==='string'&&Array.isArray(b.fields)&&b.fields.every(f=>f&&typeof f.k==='string'&&IL_TYPES.includes(f.type)));
   let IL_ALL=(()=>{ try{ const v=JSON.parse(localStorage.getItem(IL_KEY)||'null'); if(v&&ilOk(v.form)) return v.form; }catch(_){ } return IL_DEF; })();
   let SITU=IL_ALL.filter(b=>!b.off);
+  // V179: 묶음(grp) — 화재 개요(성상·상황·원인) · 피해 현황(인명·재산). 묶음 없는 옛 서식도 id로 묶는다
+  const IL_GRP={phase:'화재 개요',fire:'화재 개요',cause:'화재 개요',life:'피해 현황',prop:'피해 현황'};
+  const grpOf=b=>String(typeof b.grp==='string'?b.grp:(IL_GRP[b.id]||'')).trim();
+  function ilUnits(S){ const out=[], at={}; (S||SITU).forEach(b=>{ const g=grpOf(b); if(g&&at[g]){ at[g].bs.push(b); return; } const u={g, bs:[b], id:g?'grp-'+b.id:'sec-'+b.id}; if(g) at[g]=u; out.push(u); }); return out; }
   const ilKey=b=>String(b.name).replace(/\s+/g,'');   // 보고서 양식의 {자리표시} 이름
   const MULTI_SEP=', ';
   const multiGet=k=>String(state.situ.fields[k]||'').split(MULTI_SEP).filter(Boolean);
@@ -2085,7 +2098,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         const oi={}, ot={}, of={};
         IL_ALL.forEach(b=>b.fields.forEach(fd=>{ const v=f[fd.k]; if(typeof v!=='string'||!v||v.length>600) return;
           if(fd.type==='level'){ if((fd.opts||[]).some(o=>o[1]===v)) of[fd.k]=v; } else if(fd.type==='datetime'){ if(DT.test(v)) of[fd.k]=v; } else of[fd.k]=v; }));   // V174: 서식이 바뀌어도 값은 글자로 보관
-        state.situ={inv:oi, text:ot, fields:of};
+        state.situ={inv:oi, text:ot, fields:of}; if(s.situ.defs) state.situ.defs=1;
       }
     }catch(_){ }
   }
@@ -2787,29 +2800,30 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // V173: 방재실 → 체크리스트 편집(단계 이름 + 항목 한 줄에 하나, 순서 바꾸기·삭제·추가)
   function clEditBind(panel){
     const box=panel.querySelector('#clEd'), msg=panel.querySelector('#clMsg'), sec=panel.querySelector('#clEdit'); if(!box) return;
-    let W=CHECKLIST.map(p=>({name:p.name,items:p.items.slice()}));
-    const read=()=>{ W=[...box.querySelectorAll('.clp')].map(d=>({name:d.querySelector('.cln').value, items:d.querySelector('.cli').value.split(/\r?\n/)})); };
+    let W=CHECKLIST.map(p=>({name:p.name,items:p.items.slice(),cols:p.cols||0})), WC=CL_COLS||2;
+    const read=()=>{ W=[...box.querySelectorAll('.clp')].map(d=>({name:d.querySelector('.cln').value, items:d.querySelector('.cli').value.split(/\r?\n/), cols:+(d.querySelector('.clc')||{}).value||0})); };
     const vnote=()=>!SRV.on?'<p class="note cl-warn">서버에 연결되지 않았습니다 — 저장하면 이 기기에 맡겨 두고, 서버가 켜지면 자동으로 올립니다</p>':(SRV.ver&&verLt(SRV.ver,'9.9'))?`<p class="note cl-warn">지금 서버 ${esc(SRV.ver)} — 체크리스트를 모든 기기에 적용하려면 서버 9.9 이상이 필요합니다(저장은 이 기기에 맡겨 두고, 업데이트되면 자동으로 올림)</p>`:clPend()?'<p class="note cl-warn">이 기기에 맡겨 둔 목록이 있습니다 — 서버에 올리는 중…</p>':'';
-    const draw=()=>{ box.innerHTML=vnote()+W.map((p,i)=>`<div class="clp" data-i="${i}"><div class="clh"><b class="clno">${i+1}</b><input class="cln" value="${esc(p.name)}" maxlength="40" aria-label="${i+1}단계 이름" placeholder="단계 이름"><span class="clbt"><button type="button" class="btn ghost sm" data-cl="up" aria-label="위로" ${i?'':'disabled'}>↑</button><button type="button" class="btn ghost sm" data-cl="down" aria-label="아래로" ${i<W.length-1?'':'disabled'}>↓</button><button type="button" class="btn ghost sm cl-del" data-cl="del" aria-label="${i+1}단계 삭제">삭제</button></span></div><textarea class="cli" rows="${Math.max(3,Math.min(9,p.items.length+1))}" aria-label="${i+1}단계 항목(한 줄에 하나)" placeholder="항목을 한 줄에 하나씩">${esc(p.items.join('\n'))}</textarea></div>`).join('')+`<p class="note cl-sum">${W.length}단계 · ${W.reduce((n,p)=>n+p.items.filter(x=>String(x).trim()).length,0)}항목</p>`; };
+    const draw=()=>{ box.innerHTML=vnote()+`<div class="clcols" role="group" aria-label="CH 항목 단 수"><b>CH 항목 배치</b><span>${[1,2,3].map(n=>`<button type="button" data-clcols="${n}" aria-pressed="${WC===n}">${n}단</button>`).join('')}</span><small>모든 단계에 적용 · 단계마다 따로 정하려면 아래 ‘단’ 선택(휴대폰 좁은 화면은 3단 → 2단)</small></div>`+W.map((p,i)=>`<div class="clp" data-i="${i}"><div class="clh"><b class="clno">${i+1}</b><input class="cln" value="${esc(p.name)}" maxlength="40" aria-label="${i+1}단계 이름" placeholder="단계 이름"><select class="clc" aria-label="${i+1}단계 단 수"><option value="0"${!p.cols?' selected':''}>기본</option>${[1,2,3].map(n=>`<option value="${n}"${p.cols===n?' selected':''}>${n}단</option>`).join('')}</select><span class="clbt"><button type="button" class="btn ghost sm" data-cl="up" aria-label="위로" ${i?'':'disabled'}>↑</button><button type="button" class="btn ghost sm" data-cl="down" aria-label="아래로" ${i<W.length-1?'':'disabled'}>↓</button><button type="button" class="btn ghost sm cl-del" data-cl="del" aria-label="${i+1}단계 삭제">삭제</button></span></div><textarea class="cli" rows="${Math.max(3,Math.min(9,p.items.length+1))}" aria-label="${i+1}단계 항목(한 줄에 하나)" placeholder="항목을 한 줄에 하나씩">${esc(p.items.join('\n'))}</textarea></div>`).join('')+`<p class="note cl-sum">${W.length}단계 · ${W.reduce((n,p)=>n+p.items.filter(x=>String(x).trim()).length,0)}항목</p>`; };
     draw();
-    clSync(true).then(ch=>{ if(ch&&!box.contains(document.activeElement)){ W=CHECKLIST.map(p=>({name:p.name,items:p.items.slice()})); draw(); } }).catch(()=>{});
+    clSync(true).then(ch=>{ if(ch&&!box.contains(document.activeElement)){ W=CHECKLIST.map(p=>({name:p.name,items:p.items.slice(),cols:p.cols||0})); WC=CL_COLS||2; draw(); } }).catch(()=>{});
     box.addEventListener('input',e=>{ if(e.target.matches('.cln,.cli')){ read(); const sm=box.querySelector('.cl-sum'); if(sm) sm.textContent=`${W.length}단계 · ${W.reduce((n,p)=>n+p.items.filter(x=>String(x).trim()).length,0)}항목`; } });
-    sec.addEventListener('click',async e=>{ const b=e.target.closest('[data-cl]'); if(!b) return; const a=b.dataset.cl, d=b.closest('.clp'), i=d?+d.dataset.i:-1; read();
+    sec.addEventListener('click',async e=>{ const cc=e.target.closest('[data-clcols]'); if(cc){ read(); WC=+cc.dataset.clcols; draw(); msg.textContent=`${WC}단으로 바꿨습니다 — 저장해야 적용됩니다`; return; }
+      const b=e.target.closest('[data-cl]'); if(!b) return; const a=b.dataset.cl, d=b.closest('.clp'), i=d?+d.dataset.i:-1; read();
       if(a==='up'&&i>0){ [W[i-1],W[i]]=[W[i],W[i-1]]; draw(); return; }
       if(a==='down'&&i<W.length-1){ [W[i+1],W[i]]=[W[i],W[i+1]]; draw(); return; }
       if(a==='del'){ if(!b.dataset.arm){ b.dataset.arm='1'; b.textContent='삭제?'; setTimeout(()=>{ if(b.isConnected){ delete b.dataset.arm; b.textContent='삭제'; } },2500); return; } W.splice(i,1); draw(); return; }
       if(a==='add'){ W.push({name:'',items:[]}); draw(); const n=box.querySelectorAll('.cln'); if(n.length) n[n.length-1].focus(); return; }
       if(a==='def'){ W=CL_DEF.map(p=>({name:p.name,items:p.items.slice()})); draw(); msg.textContent='기본 목록을 불러왔습니다 — 저장해야 적용됩니다'; return; }
       if(a==='save'){ if(!PROF.tok){ msg.textContent='교수 로그인이 필요합니다'; return; }
-        const list=W.map(p=>({name:String(p.name).replace(/\s+/g,' ').trim(), items:p.items.map(x=>String(x).replace(/\s+/g,' ').trim()).filter(Boolean)})).filter(p=>p.name||p.items.length);
+        const list=W.map(p=>Object.assign({name:String(p.name).replace(/\s+/g,' ').trim(), items:p.items.map(x=>String(x).replace(/\s+/g,' ').trim()).filter(Boolean)},p.cols?{cols:p.cols}:{})).filter(p=>p.name||p.items.length);
         const bad=list.findIndex(p=>!p.name||!p.items.length); if(bad>=0){ msg.textContent=`${bad+1}단계: 이름과 항목을 하나 이상 넣으세요`; return; }
         if(!list.length){ msg.textContent='단계를 하나 이상 넣으세요(기본으로 돌리려면 ‘기본 목록으로’ 뒤 저장)'; return; }
         const same=JSON.stringify(list)===JSON.stringify(CL_DEF);
-        b.disabled=true; const x=await api('/api/admin/ai',{json:{action:'checklist',list:same?[]:list},tok:PROF.tok}); b.disabled=false;
-        if(x.ok&&x.j&&x.j.ok!==false&&'checklist_ts' in x.j){ clApply(x.j.checklist,+x.j.checklist_ts||0); W=CHECKLIST.map(p=>({name:p.name,items:p.items.slice()})); draw(); msg.textContent=x.j.msg||'저장했습니다'; toast(x.j.msg||'저장했습니다'); return; }
+        b.disabled=true; const x=await api('/api/admin/ai',{json:{action:'checklist',list:same?[]:list,cols:WC},tok:PROF.tok}); b.disabled=false;
+        if(x.ok&&x.j&&x.j.ok!==false&&'checklist_ts' in x.j){ clApply(x.j.checklist,+x.j.checklist_ts||0,false,'checklist_cols' in x.j?x.j.checklist_cols:WC); W=CHECKLIST.map(p=>({name:p.name,items:p.items.slice(),cols:p.cols||0})); WC=CL_COLS||2; draw(); msg.textContent=x.j.msg||'저장했습니다'; toast(x.j.msg||'저장했습니다'); return; }
         if(x.status===403){ msg.textContent=(x.j&&x.j.error)||'교수 로그인이 다시 필요합니다'; return; }
         if(x.status===400){ msg.textContent=(x.j&&x.j.error)||'저장하지 못했습니다'; return; }
-        clApply(same?null:list,Date.now()/1000,true); W=CHECKLIST.map(p=>({name:p.name,items:p.items.slice()})); draw();   // V176: 옛 서버·연결 끊김 → 이 기기에 저장 + 업데이트되면 자동으로 올림
+        clApply(same?null:list,Date.now()/1000,true,WC); W=CHECKLIST.map(p=>({name:p.name,items:p.items.slice(),cols:p.cols||0})); draw();   // V176: 옛 서버·연결 끊김 → 이 기기에 저장 + 업데이트되면 자동으로 올림
         msg.textContent=x.status===0||!SRV.on?'서버에 연결되지 않아 이 기기에 저장했습니다 — 서버가 켜지면 자동으로 모든 기기에 적용':`서버(${SRV.ver||'옛 버전'})가 아직 체크리스트 저장을 몰라 이 기기에 저장했습니다 — 서버를 9.9 이상으로 업데이트하면 자동으로 모든 기기에 적용`;
         toast('이 기기에 저장했습니다(서버 업데이트 후 자동 적용)'); } });
   }
@@ -3151,22 +3165,35 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(f.type==='num') return wrap(`<div class="ilnum"><button type="button" data-num="${esc(f.k)}" data-d="-1" ${dis?'disabled':''} aria-label="빼기">−</button><input type="number" inputmode="numeric" min="0" max="${f.max||999}" data-f="${esc(f.k)}" value="${esc(v)}" placeholder="0" ${dis?'disabled':''} aria-label="${esc(f.label)}"><button type="button" data-num="${esc(f.k)}" data-d="1" ${dis?'disabled':''} aria-label="더하기">+</button><span>${esc(f.unit||'')}</span>${dis?'<em>경상·중상·심정지를 고르면 켜집니다</em>':''}</div>`);
     return '';
   }
-  function situHtml(){
-    return `<div class="situ il2" aria-label="화재등 상황 보고서 입력">${SITU.map(b=>{const st=situStatus(b); return `<section class="card phase ilsec" id="sec-${esc(b.id)}">
-        <header><h3>${esc(b.name)}</h3>${b.fields.filter(f=>f.type==='level').map(f=>`<div class="lvl" role="group" aria-label="${esc(f.label)}">${f.opts.map(([t,v])=>`<button type="button" data-lvl="${esc(f.k)}" data-v="${esc(v)}" aria-pressed="${state.situ.fields[f.k]===v}">${esc(t)}</button>`).join('')}</div>`).join('')}<span class="st ${st.cls}">${st.t}</span></header>
-        <div class="ilfs">${b.fields.filter(f=>f.type!=='level').map(f=>ilFieldHtml(b,f)).join('')}</div>
+  // V179: 기본값(재산피해 '조사 중' 등) — 기록마다 한 번만. 그 칸 묶음에 아무 값도 없을 때만 채움(지우면 다시 안 채움, 기록 초기화 후엔 다시)
+  function ilDefs(){ if(state.situ.defs) return; state.situ.defs=1; let n=0;
+    IL_ALL.forEach(b=>{ if(b.off||b.fields.some(f=>f.type!=='level'&&state.situ.fields[f.k])) return; b.fields.forEach(f=>{ const dv=f.def||(f.k==='prop_st'&&(f.opts||[]).includes('조사 중')?'조사 중':'');   /* 기본값 없이 저장된 옛 서식도 */ if(dv&&!state.situ.fields[f.k]){ state.situ.fields[f.k]=dv; n++; } }); });
+    if(n) save(); }
+  const unitStatus=u=>u.bs.some(b=>situStatus(b).cls==='has')?{cls:'has',t:'입력됨'}:{cls:'',t:'미기재'};
+  const lvlHtml=b=>b.fields.filter(f=>f.type==='level').map(f=>`<div class="lvl" role="group" aria-label="${esc(f.label)}">${f.opts.map(([t,v])=>`<button type="button" data-lvl="${esc(f.k)}" data-v="${esc(v)}" aria-pressed="${state.situ.fields[f.k]===v}">${esc(t)}</button>`).join('')}</div>`).join('');
+  const ilfsHtml=b=>`<div class="ilfs">${b.fields.filter(f=>f.type!=='level').map(f=>ilFieldHtml(b,f)).join('')}</div>`;
+  function situHtml(){ ilDefs();
+    return `<div class="situ il2" aria-label="화재등 상황 보고서 입력">${ilUnits().map(u=>{const st=unitStatus(u);
+      if(!u.g){ const b=u.bs[0]; return `<section class="card phase ilsec" id="sec-${esc(b.id)}">
+        <header><h3>${esc(b.name)}</h3>${lvlHtml(b)}<span class="st ${st.cls}">${st.t}</span></header>${ilfsHtml(b)}
+      </section>`; }
+      return `<section class="card phase ilsec ilgrp" id="${esc(u.id)}">
+        <header><h3>${esc(u.g)}</h3><span class="st ${st.cls}">${st.t}</span></header>
+        ${u.bs.map(b=>{const s2=situStatus(b); return `<div class="ilsub" id="sec-${esc(b.id)}"><h4>${esc(b.name)}<span class="st ${s2.cls}">${s2.t}</span>${lvlHtml(b)}</h4>${ilfsHtml(b)}</div>`;}).join('')}
       </section>`;}).join('')}</div>`;
   }
   // V138: 칩을 잘못 눌러 10초 안에 되돌리면 앞 기록을 지운다(‘✔’·‘해제’가 함께 쌓여 보고서·AI를 헷갈리게 하지 않게)
   const CHIPLOG={};
   function chipLog(key, text){ const l=CHIPLOG[key]; if(l&&state.log[0]&&state.log[0]===l.e&&Date.now()-l.t<10000){ state.log.shift(); delete CHIPLOG[key]; return false; } return true; }
   function chipAdd(key, text){ addLog(text); CHIPLOG[key]={e:state.log[0], t:Date.now()}; }
-  function situDot(b,st){ const d=document.querySelector(`#jump [data-j="sec-${b.id}"] i.d`); if(d) d.className='d '+st.cls; }
+  function situDot(u,st){ const d=document.querySelector(`#jump [data-j="${u.id}"] i.d`); if(d) d.className='d '+st.cls; }
   const ilFind=k=>{ for(const b of IL_ALL){ const f=b.fields.find(x=>x.k===k); if(f) return {b,f}; } return {}; };
   function bindSitu(panel, redraw){
     const box=panel.querySelector('.il2'); if(!box) return;
     const done=soft=>{ save(); renderLog(); if(!soft) return redraw();   // 글자 칸은 다시 그리지 않음(바로 이어 누른 칩이 사라지지 않게) — 상태 표시만
-      SITU.forEach(b=>{ const st=situStatus(b), sec=panel.querySelector(`#sec-${b.id} .st`); if(sec){ sec.className='st '+st.cls; sec.textContent=st.t; } situDot(b,st); }); };
+      const put=(el,st)=>{ if(el){ el.className='st '+st.cls; el.textContent=st.t; } };
+      SITU.forEach(b=>put(panel.querySelector(`#sec-${b.id} .st`),situStatus(b)));
+      ilUnits().forEach(u=>{ const st=unitStatus(u); if(u.g) put(panel.querySelector(`#${u.id}>header .st`),st); situDot(u,st); }); };
     const tag=(b,f)=>`[${b.name}] `+(f.label&&f.label!==b.name?f.label+': ':(!f.label?b.name+' ':''));   // 이름표 없는 칩(재산피해 조사 중)은 칸 이름을 붙여 시간 기록에서도 알아보게
     box.addEventListener('click',e=>{ const t=e.target.closest('button'); if(!t) return; const d=t.dataset;
       if(d.lvl){ const k=d.lvl, v=d.v, {b}=ilFind(k), on=state.situ.fields[k]===v;   // V133: 대응단계 — 다시 누르면 해제
@@ -3227,7 +3254,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <div class="phases">
           ${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length;return `<section class="card phase ${d===p.items.length?'done':''}" id="ph-${pi}">
               <header><h3><span class="no">${pi+1}</span>${esc(p.name)}</h3><span class="cnt">${d}/${p.items.length}</span><i class="phbar" style="--p:${Math.round(d/p.items.length*100)}%" aria-hidden="true"></i></header>
-              <ul class="items">${p.items.map((it,ii)=>{const k=pi+'-'+ii, at=checks[k];return `<li class="item"><label><input type="checkbox" data-k="${k}" ${at?'checked':''}><span class="tx">${esc(it)}</span></label><span class="at">${at?esc(at):''}</span></li>`;}).join('')}</ul>
+              <ul class="items" style="--cols:${clColsOf(p)}">${p.items.map((it,ii)=>{const k=pi+'-'+ii, at=checks[k];return `<li class="item"><label><input type="checkbox" data-k="${k}" ${at?'checked':''}><span class="tx">${esc(it)}</span></label><span class="at">${at?esc(at):''}</span></li>`;}).join('')}</ul>
             </section>`;}).join('')}
         </div>
         <section class="card logbox" id="sec-log">
@@ -3331,7 +3358,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function rtplDef(situ){ const S=situ||SITU, has=id=>S.some(b=>b.id===id), byId=id=>S.find(b=>b.id===id), L=['화재등 상황 보고서','보고일시 {작성시각} · 경과 {경과표시}',''];
     let n=0; const sec=(t,body)=>{ n++; L.push(`■ ${n}. ${t}`,...body,''); };
     S.forEach(b=>{
-      if(IL_FIRE.includes(b.id)){ if(b.id===IL_FIRE.find(has)) sec('화재 상황',['{화재현황}']); return; }
+      if(IL_FIRE.includes(b.id)){ if(b.id===IL_FIRE.find(has)) sec('화재 개요',['{화재현황}']); return; }
       if(IL_DMG.includes(b.id)){ if(b.id===IL_DMG.find(has)) sec('피해 현황',['{피해현황}']); return; }
       if(b.id==='act'&&has('outlook')){ L.push('[[나란히]]'); sec(b.name,[`{${ilKey(b)}}`]); const o=byId('outlook'); n++; L.push(`■ ${n}. ${o.name}`,`{${ilKey(o)}}`,'[[/나란히]]',''); return; }
       if(b.id==='outlook'&&has('act')) return;
@@ -3982,7 +4009,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       }); }
     // 아래 요약 3칸
     { const yy=1600-sumH, w3=(W-2*M-40)/3, life=fxv(f,'life'), raw=String(life&&life.raw||''), c={}; raw.split('|').forEach(x=>{ const m=x.match(/^(.+)=(\d+)$/); if(m) c[m[1]]=+m[2]; });
-      const boxes=[['fire','화재 상황',[fxs(f,'phase'),fxs(f,'fstat'),fxs(f,'cause_est')].filter(Boolean)],['person','피해 현황',[raw==='none'?((life&&life.none)||'인명피해 해당없음'):Object.keys(c).length?Object.keys(c).map(k=>`${k} ${c[k]}명`).join(' · '):'인명피해 파악 중', fxs(f,'rescue')?`인명구조 ${fxs(f,'rescue')}`:'', (fxv(f,'prop_est')||{}).raw?`재산 ${wonTxt(+(fxv(f,'prop_est')||{}).raw)}`:fxs(f,'prop_st')?`재산 ${fxs(f,'prop_st')}`:''].filter(Boolean)],['check','조치 사항',fxs(f,'acts').split(MULTI_SEP).filter(Boolean)]];
+      const boxes=[['fire','화재 개요',[fxs(f,'phase'),fxs(f,'fstat'),fxs(f,'cause_est')].filter(Boolean)],['person','피해 현황',[raw==='none'?((life&&life.none)||'인명피해 해당없음'):Object.keys(c).length?Object.keys(c).map(k=>`${k} ${c[k]}명`).join(' · '):'인명피해 파악 중', fxs(f,'rescue')?`인명구조 ${fxs(f,'rescue')}`:'', (fxv(f,'prop_est')||{}).raw?`재산 ${wonTxt(+(fxv(f,'prop_est')||{}).raw)}`:fxs(f,'prop_st')?`재산 ${fxs(f,'prop_st')}`:''].filter(Boolean)],['check','조치 사항',fxs(f,'acts').split(MULTI_SEP).filter(Boolean)]];
       boxes.forEach(([ic,lb,ls],i)=>{ const x=M+i*(w3+20); g.fillStyle='#F8FAFC'; g.strokeStyle='#E4E7EC'; g.lineWidth=2; rRound(g,x,yy,w3,sumH-10,16); g.fill(); g.stroke(); g.fillStyle='#244EA2'; g.beginPath(); g.arc(x+30,yy+32,17,0,7); g.fill(); rIco(g,ic,x+30,yy+32,9,'#fff'); T(lb,x+56,yy+32,20,800,'#0B1B3F');
         g.font=`500 18px ${RFF}`; const lines=(ls.length?ls:['파악 중']).flatMap(t=>rWrap(g,'· '+t,w3-36)).slice(0,5); lines.forEach((t,k)=>T(t,x+20,yy+72+k*26,18,500,'#344054')); }); }
     rFoot(g,W,M,1,1); return rOut([cv],mode); }
@@ -4176,7 +4203,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       </div>
       <div class="card timer ilbar" id="timerBar">
         <div class="ilrow"><button type="button" class="btn ghost" id="ilReset" title="발생개요 등 현장 기록을 비웁니다(CH 체크·작성된 보고서는 그대로)">기록 초기화</button><button type="button" class="reps" data-j="sec-reps" id="ilReps">작성된 보고서 <span class="c">${reports.length}</span></button><button type="button" class="btn primary" id="mkReport">보고서 만들기</button></div>
-        <nav class="jump" id="jump" aria-label="항목 바로가기"><div class="jl">${SITU.map(b=>{const st=situStatus(b); return `<button type="button" data-j="sec-${b.id}"><i class="d ${st.cls}" aria-hidden="true"></i>${esc(b.name.replace(/\s+/g,''))}</button>`;}).join('')}</div></nav>
+        <nav class="jump" id="jump" aria-label="항목 바로가기"><div class="jl">${ilUnits().map(u=>{const st=unitStatus(u); return `<button type="button" data-j="${u.id}"><i class="d ${st.cls}" aria-hidden="true"></i>${esc((u.g||u.bs[0].name).replace(/\s+/g,''))}</button>`;}).join('')}</div></nav>
       </div>
       <div class="il-situ">${situHtml()}</div>
       <h3 class="il-h" id="sec-reps">작성된 보고서</h3>
@@ -4471,16 +4498,16 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // V173: 체크리스트 목록 — 서버에 교수가 고친 목록이 있으면 그것, 없으면 기본 목록
   const CLS={at:0};
   const clPend=()=>{ try{ return !!(JSON.parse(localStorage.getItem(CL_KEY)||'null')||{}).pend; }catch(_){ return false; } };
-  function clApply(list,ts,pend){ const before=clSig(), ok=clOk(list); CHECKLIST=ok?list:CL_DEF; CL_TS=ts||0;
-    try{ localStorage.setItem(CL_KEY,JSON.stringify({list:ok?list:null,ts:CL_TS,pend:!!pend})); }catch(_){ }   // V176: pend = 서버가 옛 버전이라 이 기기에 맡겨 둔 목록(서버가 업데이트되면 자동으로 올림)
-    if(clSig()===before) return false;
+  function clApply(list,ts,pend,cols){ const before=clSig()+'|'+CL_COLS+'|'+JSON.stringify(CHECKLIST.map(p=>p.cols||0)), ok=clOk(list); CHECKLIST=ok?list:CL_DEF; CL_TS=ts||0; if(cols!==undefined) CL_COLS=+cols||0;
+    try{ localStorage.setItem(CL_KEY,JSON.stringify({list:ok?list:null,ts:CL_TS,pend:!!pend,cols:CL_COLS})); }catch(_){ }
+    if(before.split('|')[0]===clSig()) return before!==clSig()+'|'+CL_COLS+'|'+JSON.stringify(CHECKLIST.map(p=>p.cols||0));   // 단 수만 바뀌면 체크는 그대로 · V176: pend = 서버가 옛 버전이라 이 기기에 맡겨 둔 목록(서버가 업데이트되면 자동으로 올림)
     if(Object.keys(state.checks).length){ state.checks={}; toast('체크리스트 항목이 바뀌어 체크 표시를 비웠습니다(시각 기록은 그대로)'); }
     save(); return true; }
   async function clSync(force){ if(!SRV.on||(!force&&Date.now()-CLS.at<60e3)) return false; CLS.at=Date.now();
-    if(clPend()){ if(!isProf()) CLS.at=0; if(isProf()&&PROF.tok){ const same=JSON.stringify(CHECKLIST)===JSON.stringify(CL_DEF), x=await api('/api/admin/ai',{json:{action:'checklist',list:same?[]:CHECKLIST},tok:PROF.tok});
-        if(x.ok&&x.j&&x.j.ok!==false&&'checklist_ts' in x.j){ clApply(x.j.checklist,+x.j.checklist_ts||0); toast('이 기기에 맡겨 둔 체크리스트를 서버에 올렸습니다 — 모든 기기에 적용'); } }
+    if(clPend()){ if(!isProf()) CLS.at=0; if(isProf()&&PROF.tok){ const same=JSON.stringify(CHECKLIST)===JSON.stringify(CL_DEF), x=await api('/api/admin/ai',{json:{action:'checklist',list:same?[]:CHECKLIST,cols:CL_COLS},tok:PROF.tok});
+        if(x.ok&&x.j&&x.j.ok!==false&&'checklist_ts' in x.j){ clApply(x.j.checklist,+x.j.checklist_ts||0,false,x.j.checklist_cols); toast('이 기기에 맡겨 둔 체크리스트를 서버에 올렸습니다 — 모든 기기에 적용'); } }
       return false; }   // 맡겨 둔 목록이 있으면 서버 것으로 덮지 않음
-    const r=await api('/api/checklist'); if(!(r.ok&&r.j&&r.j.ok)) return false; return clApply(r.j.list,+r.j.ts||0); }
+    const r=await api('/api/checklist'); if(!(r.ok&&r.j&&r.j.ok)) return false; return clApply(r.j.list,+r.j.ts||0,false,r.j.cols); }
   // V174: 상황보고서 서식 — 서버에 교수가 고친 서식이 있으면 그것, 없으면 기본 서식
   const ILS={at:0};
   const ilPend=()=>{ try{ return !!(JSON.parse(localStorage.getItem(IL_KEY)||'null')||{}).pend; }catch(_){ return false; } };
