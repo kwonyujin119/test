@@ -869,7 +869,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v172</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v173</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1424,6 +1424,15 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .mapov .mj{pointer-events:auto;display:inline-flex;align-items:center;gap:5px;min-height:36px;padding:0 10px 0 5px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.94);font:inherit;font-size:12.5px;font-weight:700;color:#1a1a1a;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .mapov .mj i{font-style:normal;display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:12px;font-size:11px;color:#fff;background:#667085}
 .mapov .mj-fire i{background:#fff;font-size:13px}.mapov .mj-icp i{background:#244EA2}.mapov .mj-staging i{background:#079455}.mapov .mj-all{padding-left:5px}
+.mapov .mbsel{position:absolute;left:62px;bottom:10px;z-index:5;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--navy);box-shadow:0 2px 8px rgba(0,0,0,.15);display:grid;place-items:center;padding:0}
+.mapov .mbsel svg{width:24px;height:24px}
+.mapov .mbox.multi .mjump{visibility:hidden}
+.mapov .mbsel[aria-pressed="true"]{background:var(--ember);border-color:#1F2A44;color:#1F2A44;box-shadow:inset 0 0 0 2px #1F2A44}
+.mapov .mlayer{position:absolute;inset:0;z-index:6;cursor:crosshair;touch-action:none;background:rgba(36,78,162,.04)}
+.mapov .mrect{position:absolute;z-index:7;border:2px dashed #244EA2;background:rgba(36,78,162,.12);border-radius:4px;pointer-events:none}
+.mapov .mmulti{position:absolute;z-index:8;left:50%;top:10px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px 6px 6px 12px;border-radius:14px;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.25);border:1px solid var(--line);font-size:14px;font-weight:800;white-space:nowrap}
+.mapov .mmulti button{height:40px;border:0;border-radius:10px;padding:0 12px;font:inherit;font-size:14px;font-weight:800;cursor:pointer}
+.mapov .mmulti .mdel{background:#D92D20;color:#fff}.mapov .mmulti .mx{background:var(--surface-2);color:var(--fg);width:40px;padding:0}
 .mapov .mme{position:absolute;left:10px;bottom:10px;z-index:5;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:20px;color:var(--navy);box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .mapov .mmsg{margin:0;padding:6px 12px;min-height:20px;font-size:13px;color:var(--fg);background:var(--surface)}
 .mapov .mmsg .btn{min-height:40px;padding:0 10px;font-size:12.5px;margin-left:6px}
@@ -1537,6 +1546,14 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .hz-k b{font-size:calc(21px*var(--fs));font-weight:800;line-height:1.15}
 .hz-k .hd{font-size:calc(11.5px*var(--fs));line-height:1.4;font-weight:600;color:#4a3d00;letter-spacing:-.02em}
 .hz-k .hd.n{display:none}
+.cled{display:flex;flex-direction:column;gap:10px;margin:10px 0;min-width:0;max-width:100%}
+.clp{min-width:0;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface,#fff)}
+.clh{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.clno{flex:none;display:inline-grid;place-items:center;min-width:28px;height:28px;border-radius:8px;background:var(--ember);color:#1F2A44;font-size:13px}
+.cln{flex:1 1 0;width:0;min-width:0;font:inherit;font-weight:700;padding:6px 8px;border:1px solid var(--line);border-radius:8px}
+.clbt{display:flex;gap:4px;flex:none}.clbt .btn{min-width:34px;padding:0 8px}
+.cli{width:100%;box-sizing:border-box;font:inherit;font-size:14px;line-height:1.5;padding:6px 8px;border:1px solid var(--line);border-radius:8px;resize:vertical}
+.cl-acts{flex-wrap:wrap}
 .hz-tools{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:calc(var(--tb,70px)*.12);z-index:2;pointer-events:auto}   /* V167: 47망 글자 묶음과 따로(디브리핑룸 배치에 영향 없음) — 글자 아래 남은 자리 중 아래쪽 */
 .hz-tools.row{flex-direction:row}
 .hz-tools .hzt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:var(--tb,70px);height:var(--tb,70px);padding:0;border:2px solid #fff;border-radius:calc(var(--tb,70px)*.26);background:var(--ember);box-shadow:0 3px 10px rgba(107,83,0,.25);font:inherit;cursor:pointer;transition:transform .12s,box-shadow .12s}
@@ -1678,8 +1695,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V172', SRV_VER='9.8';
+  const APP_VER='V173', SRV_VER='9.9';
   const UPDATES=[
+    {v:'V173', d:'2026-10-19', t:['CH 체크리스트를 새 13단계(출동중 → 상황전파 → 도착 → 전략 결정 → … → 최종보고, 52항목)로 바꿈','SACHIL방재실에 ‘체크리스트’ 탭 신설 — 교수가 단계 이름·항목을 고치고 순서 바꾸기·추가·삭제, 저장하면 모든 기기의 CH 탭이 바로 바뀜(항목이 바뀌면 그 기기의 체크 표시는 비우고 시각 기록은 남김)','CP 지도: 왼쪽 아래 ⬚ 범위 선택을 누르고(PC는 Shift를 누른 채) 지도를 끌면 네모 안 표시를 모두 골라 한 번에 삭제(되돌리기 가능)']},
     {v:'V172', d:'2026-10-19', t:['SACHIL 시그니처 안내 그림: SIG-002·WM-002의 소문자 i를 대문자 I로 바로잡음(SACHIL)','시그니처 컬러 설명 고침 — White: 태극기의 바탕색, 대한민국 상징 / Incheon Ocean: 인천광역시의 바다 색, 인천광역시 상징 / Symbol Yellow: 소방청 심벌 컬러, 용맹한 소방관 상징']},
     {v:'V171', d:'2026-10-19', t:['소화전 창이 더 빨리 뜸: 지도 프로그램·화재 위치·소화전 자료를 차례로 기다리지 않고 한꺼번에 불러옴','지도가 뜨기 전에도 소화전 목록(아래 한 줄)이 먼저 나옴','47망에 들어와 있으면 소화전 지도를 미리 받아 두어, 누르면 바로 열림','서버가 소방청 소화전 자료를 파일로 저장해 둠 — 서버를 다시 켠 뒤에도 처음부터 받지 않음']},
     {v:'V170', d:'2026-10-19', t:['CP 지도·소화전 창 맨 윗줄을 똑같이: ‹ [헬멧 CP | 소화전] 검색창 검색','지금 보고 있는 쪽(CP 또는 소화전)은 노란 바탕·진한 테두리, 다른 쪽은 흐린 회색으로 확실히 구분']},
@@ -1869,22 +1887,28 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     $('#sigImg').addEventListener('click',()=>openLightbox('img/signature.webp?v=172',s.title));
   }
   const phaseIcon = pi => AS.phases[pi] || '';
-  // 체크리스트 — 역할 구분 없이 출동부터 지휘소 운영까지 12단계 한 줄기. 항목은 초안 예시(교관 승인 전).
-  const CHECKLIST = [
-    {name:'출동 중', items:['대상물 정보 확인 (용도·층수·진입로)','가용 용수 확인 (소화전 위치·구경)','후속 출동대 현황 확인']},
-    {name:'도착 보고', items:['도착 시각·위치 보고','외관 상황 보고 (연소 범위·연기·요구조자)','선착대 지휘 선언']},
-    {name:'상황판단', items:['요구조자 유무·위치 확인','연소 확대 방향 판단','위험 요인 확인 (붕괴·폭발·위험물)']},
-    {name:'전술 결정', items:['구조·진압 우선순위 결정','진입·배연 지시','용수 공급 라인 지시']},
-    {name:'안전', items:['진입 대원 인원·시각 기록','철수 신호 공유','안전담당 임시 지정']},
-    {name:'지휘권 이양', items:['지휘대장 도착 확인','상황·자원·조치 사항 브리핑','이양 시각 보고']},
-    {name:'지휘권 인수', items:['선착대장 브리핑 청취','지휘권 인수 선언·보고','지휘 위치 선정']},
-    {name:'상황 재평가', items:['연소 상황·구조 진행 재확인','가용 자원 대비 소요 판단','정보 공백 식별']},
-    {name:'대응단계', items:['대응단계 상향 필요성 판단','발령 건의·보고','추가 자원 요청']},
-    {name:'자원 배치', items:['후착대 임무 부여','구역·담당 지정','용수 체계 재편']},
-    {name:'안전관리', items:['안전담당 지정','인원 확인 주기 설정','철수 기준 공유']},
-    {name:'지휘소 운영', items:['지휘소 위치·표시','상황판 기록 지정','통제단 전환 대비 정보 정리']}
+  // 체크리스트 — 출동부터 최종보고까지 한 줄기. V173: 교수가 SACHIL방재실 → 체크리스트에서 고치면 서버(/api/checklist)를 거쳐 모든 기기에 적용(없으면 아래 기본 목록)
+  const CL_DEF = [
+    {name:'출동중', items:['대상물 정보(용도·층수·진입로)', '용수정보(위치 등)', '출동대 현황', '사전임무']},
+    {name:'상황전파', items:['검은구름', '출동중 장애요소', '취득정보']},
+    {name:'도착(상황판단/초기상황보고)', items:['구조대상자 유무 확인', '화재 성상 확인(성장기·최성기)', '연소 확대 여부 확인', '독점여부', '위험 요인 확인(위험물, 장애물 등)']},
+    {name:'도착(지휘권)', items:['지휘권 선언', '지휘형태(이동,고정 등)', '방면설정']},
+    {name:'전략 결정', items:['공격(인명구조상황, 진압가능, 40mm수관)', '방어(구조대상자 없음, 연소확대, 65mm수관)', '병행']},
+    {name:'자원 배치', items:['특수차배치공간', '대기단계(1,2단계)', '1선펌프', '중요탱크', '소화전 점령']},
+    {name:'임무부여', items:['화재진압', '인명구조', '단위지휘관', '통제선', '임시의료소', '안전점검관', '직전대기', '차량대기소']},
+    {name:'안전관리', items:['RIT', '도어엔트리 기법', '비상탈출로 확보']},
+    {name:'중간보고', items:['화재상황', '인명구조상황', '향후계획']},
+    {name:'추가요청', items:['드론', '전기차 진압장비', '출동대', '유관기관']},
+    {name:'초진', items:['2차인명 검색', '잔화정리', '배연', '초진선언']},
+    {name:'완진', items:['정밀인명 검색', '지휘관 현장확인', '상황판단회의', '완진선언']},
+    {name:'최종보고', items:['화재상황', '인명구조상황', '완진여부']}
   ];
-  const TOTAL_ITEMS=CHECKLIST.reduce((n,p)=>n+p.items.length,0);
+  const CL_KEY='sachil_checklist_v1';
+  const clOk=l=>Array.isArray(l)&&l.length&&l.every(p=>p&&typeof p.name==='string'&&Array.isArray(p.items)&&p.items.length);
+  let CHECKLIST=(()=>{ try{ const v=JSON.parse(localStorage.getItem(CL_KEY)||'null'); if(v&&clOk(v.list)) return v.list; }catch(_){ } return CL_DEF; })();
+  let CL_TS=(()=>{ try{ return +(JSON.parse(localStorage.getItem(CL_KEY)||'null')||{}).ts||0; }catch(_){ return 0; } })();
+  const clSig=()=>{ let h=0; const t=JSON.stringify(CHECKLIST); for(let k=0;k<t.length;k++) h=(h*31+t.charCodeAt(k))|0; return String(h>>>0); };   // 목록이 바뀌면 이전 체크(번호로 저장)는 다른 항목을 가리키므로 비운다
+  const totalItems=()=>CHECKLIST.reduce((n,p)=>n+p.items.length,0);
 
   // 피해·원인 박스 — 화재 원인 / 인명 피해 / 재산 피해. 역할 공통(같은 사고). 각 박스: '조사 중' 체크 → '직접 입력' → 보조 입력. 초안 예시(교관 승인 전).
   const SITU = [
@@ -1929,7 +1953,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         Object.keys(c['지휘대장']||{}).forEach(k=>{ const m=k.match(/^(\d+)-(\d+)$/); if(m) merged[(Number(m[1])+6)+'-'+m[2]]=c['지휘대장'][k]; });
         s=Object.assign({}, o, {checks:merged}); try{ localStorage.removeItem(KEY_V2); }catch(_){ }
       }
-      const c=(s.checks&&typeof s.checks==='object')?s.checks:{}; const out={}; Object.keys(c).forEach(k=>{ const m=k.match(/^(\d+)-(\d+)$/); if(m&&CHECKLIST[m[1]]&&CHECKLIST[m[1]].items[m[2]]&&TS.test(String(c[k]))) out[k]=String(c[k]); }); state.checks=out;
+      const c=(s.checks&&typeof s.checks==='object'&&s.csig===clSig())?s.checks:{}; const out={}; Object.keys(c).forEach(k=>{ const m=k.match(/^(\d+)-(\d+)$/); if(m&&CHECKLIST[m[1]]&&CHECKLIST[m[1]].items[m[2]]&&TS.test(String(c[k]))) out[k]=String(c[k]); }); state.checks=out;
       if(s.timer&&typeof s.timer==='object') state.timer={running:!!s.timer.running,start:fin(s.timer.start,0),acc:fin(s.timer.acc,0)};
       if(state.timer.running&&!state.timer.start) state.timer.running=false;
       if(Array.isArray(s.log)) state.log=s.log.filter(l=>l&&TS.test(String(l.ts))&&EL.test(String(l.el))).map(l=>({ts:String(l.ts),el:String(l.el),text:String(l.text||'').slice(0,200)})).slice(0,200);
@@ -1945,7 +1969,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       }
     }catch(_){ }
   }
-  function flush(){ clearTimeout(saveT); saveT=null; const ok=trySet(KEY, JSON.stringify({checks:state.checks,timer:state.timer,log:state.log,situ:state.situ})); markSaved(ok); }
+  function flush(){ clearTimeout(saveT); saveT=null; const ok=trySet(KEY, JSON.stringify({checks:state.checks,csig:clSig(),timer:state.timer,log:state.log,situ:state.situ})); markSaved(ok); }
   function markSaved(ok){ document.querySelectorAll('#panel .saved').forEach(el=>{ el.textContent= ok?'이 기기에 자동 저장':'저장 공간 부족 — 저장되지 않음. 기록 복사·보고서로 내보내세요'; el.classList.toggle('warn',!ok); }); }
   function save(){ clearTimeout(saveT); saveT=setTimeout(flush,150); }
   window.addEventListener('pagehide',()=>{ if(saveT) flush(); });
@@ -2530,6 +2554,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
               <div class="acts"><button type="button" class="btn ghost" data-pd="1">기본 문구로</button><button type="submit" class="btn primary">저장 · 모든 기기에 적용</button></div>
               <p class="note" role="status"></p></form>`).join('')}
           </section>
+          <section class="card create prof bjp" id="clEdit" data-pane="cl" hidden aria-labelledby="clEditH">
+            <h2 id="clEditH">현장지휘 체크리스트</h2>
+            <p class="note">CH 체크리스트의 단계와 항목을 고칩니다. <b>저장하면 모든 기기의 CH 탭이 바로 바뀝니다</b>(바뀌면 그 기기의 체크 표시는 비워지고 시각 기록은 남습니다). 항목은 한 줄에 하나씩 쓰세요.</p>
+            <div class="cled" id="clEd"><p class="note">불러오는 중…</p></div>
+            <div class="acts cl-acts"><button type="button" class="btn ghost" data-cl="add">＋ 단계 추가</button><button type="button" class="btn ghost" data-cl="def">기본 목록으로</button><button type="button" class="btn primary" data-cl="save">저장 · 모든 기기에 적용</button></div>
+            <p class="note" id="clMsg" role="status"></p>
+          </section>
           <section class="card create prof bjp" data-pane="rep" hidden>
             <h2>보고서 양식 · 관리자 지시사항</h2>
             <p class="note">IL ‘보고서 만들기’의 규칙 초안 틀(■ 항목·순서)과 AI가 따를 지시를 정합니다. 저장하면 서버에 올라가 모든 기기의 새 보고서·AI 작성에 적용됩니다.</p>
@@ -2539,7 +2570,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         $('#profOut').addEventListener('click',profLogout);
         $('#profMenu').addEventListener('click',()=>{ closeBangjae(); const b=$('#menuBtn'); if(b) b.click(); });
         panel.querySelectorAll('[data-bjgo]').forEach(a=>a.addEventListener('click',()=>closeBangjae()));
-        bjTabsBind(panel); aiKeysBind(); pinEditBind(panel);
+        bjTabsBind(panel); aiKeysBind(); pinEditBind(panel); clEditBind(panel);
         return;
       }
       panel.innerHTML=`<div class="dbwrap"><form class="card create prof" id="profForm" autocomplete="off">
@@ -2605,7 +2636,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         if(d.k==='kakao') SRV.kakao=v.replace(/[^0-9a-f]/gi,'').toLowerCase(); if(d.k==='tmap') SRV.tmap=v.replace(/[^0-9A-Za-z]/g,''); if(d.k==='bld') SRV.bld=true; paint(x.j); }
       else { KMSG[d.k]={t:'❌ 등록 안 됨 — '+((x.j&&x.j.error)||(x.ok&&x.j&&!d.has(x.j)?'서버가 이 키를 받지 않았습니다(서버 업데이트 필요할 수 있음)':'서버에 연결하지 못했습니다')),c:'bad'}; if(x.j&&x.j.keys) paint(x.j); else keyCardsPaint(); } }); }
   // V143: 방재실 탭(요약·서버·AI·지도 키·핀 문구·보고서·메뉴 자료) — 한 화면에 늘어놓지 않고 나눠서, 위쪽에 상태 요약
-  const BJ_TABS=[['sum','요약'],['ai','서버·AI'],['map','지도 키'],['pin','핀 문구'],['rep','보고서'],['lib','메뉴 자료']], BJ_TAB_KEY='sachil_bj_tab';
+  const BJ_TABS=[['sum','요약'],['ai','서버·AI'],['map','지도 키'],['pin','핀 문구'],['cl','체크리스트'],['rep','보고서'],['lib','메뉴 자료']], BJ_TAB_KEY='sachil_bj_tab';
   function bjTab(panel,k){ if(!BJ_TABS.some(x=>x[0]===k)) k='sum';
     panel.querySelectorAll('[data-bjt]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.bjt===k)));
     panel.querySelectorAll('.bjp').forEach(x=>{ x.hidden=x.dataset.pane!==k; });
@@ -2626,6 +2657,30 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       ok(`AI <b>${j.provider?esc(AI_NM[j.provider]||j.provider):'없음'}</b>`,j.provider?'good':'bad'), ok(`오늘 AI <b>${j.today||0}${j.limit?'/'+j.limit:''}</b>`),
       ok(`카카오맵 <b>${j.kakao?'등록':'없음'}</b>`,j.kakao?'good':'bad'), ok(`T맵 <b>${j.tmap?'등록':'없음'}</b>`,j.tmap?'good':'bad'), ok(`법제처 <b>${j.law?'연결':'없음'}</b>`,j.law?'good':''), ok(`공공데이터 <b>${j.bld?'연결':'없음'}</b>`,j.bld?'good':''), ok(`자료 <b>${libN}/${libT}</b> 섹션`)].join(''); }
   // V133: 교수 — 대화방 📌 핀 문구 고치기(서버 5.9부터)
+  // V173: 방재실 → 체크리스트 편집(단계 이름 + 항목 한 줄에 하나, 순서 바꾸기·삭제·추가)
+  function clEditBind(panel){
+    const box=panel.querySelector('#clEd'), msg=panel.querySelector('#clMsg'), sec=panel.querySelector('#clEdit'); if(!box) return;
+    let W=CHECKLIST.map(p=>({name:p.name,items:p.items.slice()}));
+    const read=()=>{ W=[...box.querySelectorAll('.clp')].map(d=>({name:d.querySelector('.cln').value, items:d.querySelector('.cli').value.split(/\r?\n/)})); };
+    const draw=()=>{ box.innerHTML=W.map((p,i)=>`<div class="clp" data-i="${i}"><div class="clh"><b class="clno">${i+1}</b><input class="cln" value="${esc(p.name)}" maxlength="40" aria-label="${i+1}단계 이름" placeholder="단계 이름"><span class="clbt"><button type="button" class="btn ghost sm" data-cl="up" aria-label="위로" ${i?'':'disabled'}>↑</button><button type="button" class="btn ghost sm" data-cl="down" aria-label="아래로" ${i<W.length-1?'':'disabled'}>↓</button><button type="button" class="btn ghost sm cl-del" data-cl="del" aria-label="${i+1}단계 삭제">삭제</button></span></div><textarea class="cli" rows="${Math.max(3,Math.min(9,p.items.length+1))}" aria-label="${i+1}단계 항목(한 줄에 하나)" placeholder="항목을 한 줄에 하나씩">${esc(p.items.join('\n'))}</textarea></div>`).join('')+`<p class="note cl-sum">${W.length}단계 · ${W.reduce((n,p)=>n+p.items.filter(x=>String(x).trim()).length,0)}항목</p>`; };
+    draw();
+    clSync(true).then(ch=>{ if(ch&&!box.contains(document.activeElement)){ W=CHECKLIST.map(p=>({name:p.name,items:p.items.slice()})); draw(); } }).catch(()=>{});
+    box.addEventListener('input',e=>{ if(e.target.matches('.cln,.cli')){ read(); const sm=box.querySelector('.cl-sum'); if(sm) sm.textContent=`${W.length}단계 · ${W.reduce((n,p)=>n+p.items.filter(x=>String(x).trim()).length,0)}항목`; } });
+    sec.addEventListener('click',async e=>{ const b=e.target.closest('[data-cl]'); if(!b) return; const a=b.dataset.cl, d=b.closest('.clp'), i=d?+d.dataset.i:-1; read();
+      if(a==='up'&&i>0){ [W[i-1],W[i]]=[W[i],W[i-1]]; draw(); return; }
+      if(a==='down'&&i<W.length-1){ [W[i+1],W[i]]=[W[i],W[i+1]]; draw(); return; }
+      if(a==='del'){ if(!b.dataset.arm){ b.dataset.arm='1'; b.textContent='삭제?'; setTimeout(()=>{ if(b.isConnected){ delete b.dataset.arm; b.textContent='삭제'; } },2500); return; } W.splice(i,1); draw(); return; }
+      if(a==='add'){ W.push({name:'',items:[]}); draw(); const n=box.querySelectorAll('.cln'); if(n.length) n[n.length-1].focus(); return; }
+      if(a==='def'){ W=CL_DEF.map(p=>({name:p.name,items:p.items.slice()})); draw(); msg.textContent='기본 목록을 불러왔습니다 — 저장해야 적용됩니다'; return; }
+      if(a==='save'){ if(!PROF.tok){ msg.textContent='교수 로그인이 필요합니다'; return; }
+        const list=W.map(p=>({name:String(p.name).replace(/\s+/g,' ').trim(), items:p.items.map(x=>String(x).replace(/\s+/g,' ').trim()).filter(Boolean)})).filter(p=>p.name||p.items.length);
+        const bad=list.findIndex(p=>!p.name||!p.items.length); if(bad>=0){ msg.textContent=`${bad+1}단계: 이름과 항목을 하나 이상 넣으세요`; return; }
+        if(!list.length){ msg.textContent='단계를 하나 이상 넣으세요(기본으로 돌리려면 ‘기본 목록으로’ 뒤 저장)'; return; }
+        const same=JSON.stringify(list)===JSON.stringify(CL_DEF);
+        b.disabled=true; const x=await api('/api/admin/ai',{json:{action:'checklist',list:same?[]:list},tok:PROF.tok}); b.disabled=false;
+        if(x.ok&&x.j&&x.j.ok!==false&&'checklist_ts' in x.j){ clApply(x.j.checklist,+x.j.checklist_ts||0); W=CHECKLIST.map(p=>({name:p.name,items:p.items.slice()})); draw(); msg.textContent=x.j.msg||'저장했습니다'; toast(x.j.msg||'저장했습니다'); return; }
+        msg.textContent=x.ok&&x.j&&x.j.ok!==false?'서버가 아직 체크리스트 저장을 모릅니다(서버 9.9 업데이트 필요)':(x.j&&x.j.error)||'저장하지 못했습니다'; } });
+  }
   function pinEditBind(panel){
     rinfoSync(true).then(()=>panel.querySelectorAll('.pinf').forEach(f=>{ const k=f.dataset.kind, L=f.querySelector('textarea[id^="pinL"]'), M=f.querySelector('textarea[id^="pinM"]'); if(L&&L.value===L.defaultValue&&M.value===M.defaultValue&&document.activeElement!==L&&document.activeElement!==M){ L.value=ROOM_INFO[k].lead; M.value=ROOM_INFO[k].more.join('\n'); } }));   // V138: 다른 기기에서 고친 최신 문구로 채움
     panel.querySelectorAll('.pinf').forEach(f=>{ const k=f.dataset.kind, msg=f.querySelector('.note'), L=f.querySelector('textarea[id^="pinL"]'), M=f.querySelector('textarea[id^="pinM"]');
@@ -2979,30 +3034,30 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     }));
   }
   function renderBoard(panel){
-    const phases=CHECKLIST, checks=state.checks;
-    const total=TOTAL_ITEMS, done=Object.keys(checks).length;
+    const phases=CHECKLIST, checks=state.checks, half=Math.ceil(CHECKLIST.length/2);
+    const total=totalItems(), done=Object.keys(checks).length;
     const illo = AS.first;
     panel.innerHTML=`
       <div class="rolecard">
         ${illo?`<img src="${illo}" alt="">`:''}
-        <div class="txt"><span class="eyebrow">CH · CHecklist</span><h2>현장지휘 체크리스트</h2><p>출동부터 지휘소 운영까지 12단계와 시각 기록. 체크하면 시각이 자동으로 남습니다. 항목은 초안 예시이며 교수 승인 후 확정됩니다.</p></div>
+        <div class="txt"><span class="eyebrow">CH · CHecklist</span><h2>현장지휘 체크리스트</h2><p>${esc(phases[0].name)}부터 ${esc(phases[phases.length-1].name)}까지 ${phases.length}단계와 시각 기록. 체크하면 시각이 자동으로 남습니다. 항목은 교수가 SACHIL방재실에서 관리합니다.</p></div>
       </div>
       <div class="board">
         <div class="card timer ${state.timer.running?'live':''}" id="timerBar">
           <div class="chrow"><button type="button" class="btn ghost" id="tmReset" title="체크·시각 기록·타이머를 비웁니다(IL 현장 기록은 그대로)">체크 초기화</button><button type="button" class="jall" id="jumpAll" aria-expanded="${jumpOpen}" aria-controls="jgrid">${jumpOpen?'닫기 ▴':'전체 ▾'}</button><span class="prog" aria-label="진행">${done}/${total}</span></div>
           <nav class="jump" id="jump" aria-label="항목 바로가기">
-            <div class="jl">${phases.slice(0,6).map((p,k)=>{const pi=k, d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}">${pi+1} ${esc(p.name)} <span class="c">${d}/${p.items.length}</span></button>`;}).join('')}</div>
-            <div class="jl">${phases.slice(6).map((p,k)=>{const pi=k+6, d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}">${pi+1} ${esc(p.name)} <span class="c">${d}/${p.items.length}</span></button>`;}).join('')}<button type="button" data-j="sec-log">시각 기록</button></div>
+            <div class="jl">${phases.slice(0,half).map((p,k)=>{const pi=k, d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}">${pi+1} ${esc(p.name)} <span class="c">${d}/${p.items.length}</span></button>`;}).join('')}</div>
+            <div class="jl">${phases.slice(half).map((p,k)=>{const pi=k+half, d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}">${pi+1} ${esc(p.name)} <span class="c">${d}/${p.items.length}</span></button>`;}).join('')}<button type="button" data-j="sec-log">시각 기록</button></div>
           </nav>
           <div class="jgrid" id="jgrid" ${jumpOpen?'':'hidden'} aria-label="전체 항목">
-            <p class="jg-h">12단계 · ${done}/${total}</p>
+            <p class="jg-h">${phases.length}단계 · ${done}/${total}</p>
             <div class="jg">${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}"><b>${pi+1}</b><span class="n">${esc(p.name)}</span><span class="c">${d}/${p.items.length}</span><i class="bar" style="--p:${Math.round(d/p.items.length*100)}%" aria-hidden="true"></i></button>`;}).join('')}</div>
           </div>
         </div>
-        ${done===total?`<div class="card done-card" role="status"><img src="img/board-done.webp" alt="" width="360" height="409" decoding="async" onerror="this.remove()"><div><b>36개 항목 모두 완료</b><p>경과 ${hhmmss(elapsed())} · IL에서 보고서로 정리하세요.</p><a class="btn primary" href="#log">IL 사고보고서로</a></div></div>`:''}
+        ${done===total?`<div class="card done-card" role="status"><img src="img/board-done.webp" alt="" width="360" height="409" decoding="async" onerror="this.remove()"><div><b>${total}개 항목 모두 완료</b><p>경과 ${hhmmss(elapsed())} · IL에서 보고서로 정리하세요.</p><a class="btn primary" href="#log">IL 사고보고서로</a></div></div>`:''}
         <div class="phases">
           ${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length;return `<section class="card phase ${d===p.items.length?'done':''}" id="ph-${pi}">
-              <header><h3><span class="no">${pi+1}</span>${phaseIcon(pi)?`<img src="${phaseIcon(pi)}" alt="">`:''}${esc(p.name)}</h3><span class="cnt">${d}/${p.items.length}</span></header>
+              <header><h3><span class="no">${pi+1}</span>${esc(p.name)}</h3><span class="cnt">${d}/${p.items.length}</span></header>
               <ul class="items">${p.items.map((it,ii)=>{const k=pi+'-'+ii, at=checks[k];return `<li class="item"><label><input type="checkbox" data-k="${k}" ${at?'checked':''}><span class="tx">${esc(it)}</span></label><span class="at">${at?esc(at):''}</span></li>`;}).join('')}</ul>
             </section>`;}).join('')}
         </div>
@@ -3015,6 +3070,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     renderLog();
     startTick();   // 현재 시각은 시작 전에도 흐름
     bindJump(panel);
+    clSync().then(ch=>{ if(ch&&panel.isConnected&&state.route==='board') renderBoard(panel); }).catch(()=>{});   // V173: 교수가 고친 최신 목록
 
     panel.querySelectorAll('.item input[data-k]').forEach(cb=>cb.addEventListener('change',()=>{
       const k=cb.dataset.k;
@@ -3080,7 +3136,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const ph=phases.map((p,pi)=>({name:p.name,
       done:p.items.map((it,ii)=>({it,at:checks[pi+'-'+ii]||''})).filter(x=>x.at),
       undone:p.items.filter((it,ii)=>!checks[pi+'-'+ii])}));
-    const total=TOTAL_ITEMS, done=Object.keys(checks).length;
+    const total=totalItems(), done=Object.keys(checks).length;
     const startLog=chrono.find(l=>l.text==='체크리스트 시작');
     return {started:startLog?startLog.ts:(chrono.length?chrono[0].ts:''), elapsed:hhmmss(elapsed()), elapsedMin:Math.round(elapsed()/60000), running:state.timer.running,
       situ, phases:ph, total, done, log:chrono.map(l=>`${l.ts} (+${l.el}) ${l.text}`)};
@@ -3994,6 +4050,16 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   try{ const j=JSON.parse(localStorage.getItem(RINFO_KEY)||'null'); if(j&&j.info){ rinfoApply(j.info); RINFO.ts=+j.ts||0; } }catch(_){ }
   function roomNoteRedraw(){ document.querySelectorAll('.room-note').forEach(d=>{ const kind=d.dataset.kind; if(!kind) return; const open=d.open; const host=d.parentNode, nx=d.nextElementSibling; d.remove(); const tmp=document.createElement('div'); tmp.innerHTML=roomNoteHtml(kind); const nd=tmp.firstElementChild; nd.open=open; host.insertBefore(nd,nx); roomNoteBind(nd); }); if(window.__fitConvo) window.__fitConvo(); }
   window.__rnRedraw=roomNoteRedraw;
+  // V173: 체크리스트 목록 — 서버에 교수가 고친 목록이 있으면 그것, 없으면 기본 목록
+  const CLS={at:0};
+  function clApply(list,ts){ const before=clSig(), ok=clOk(list); CHECKLIST=ok?list:CL_DEF; CL_TS=ts||0;
+    try{ localStorage.setItem(CL_KEY,JSON.stringify({list:ok?list:null,ts:CL_TS})); }catch(_){ }
+    if(clSig()===before) return false;
+    if(Object.keys(state.checks).length){ state.checks={}; toast('체크리스트 항목이 바뀌어 체크 표시를 비웠습니다(시각 기록은 그대로)'); }
+    save(); return true; }
+  async function clSync(force){ if(!SRV.on||(!force&&Date.now()-CLS.at<60e3)) return false; CLS.at=Date.now();
+    const r=await api('/api/checklist'); if(!(r.ok&&r.j&&r.j.ok)) return false; return clApply(r.j.list,+r.j.ts||0); }
+  window.__clSync=()=>clSync(true).then(ch=>{ if(ch&&state.route==='board') render(); }).catch(()=>{});   // 서버에 연결되면 한 번
   async function rinfoSync(force){
     if(!SRV.on||(!force&&Date.now()-RINFO.at<60e3)) return; RINFO.at=Date.now();
     const my=++RINFO.q; const r=await api('/api/roominfo'); if(!(r.ok&&r.j&&r.j.ok)) return;
@@ -4173,7 +4239,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {go:'debrief', k:'DB', y:true, t:'디브리핑룸', d:'익명으로 개선사항 도출<br>의견 청취로 지휘역량 강화', ic:'<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 7.5C4 5.6 5.6 4 7.5 4h9C18.4 4 20 5.6 20 7.5v5c0 1.9-1.6 3.5-3.5 3.5H10l-4 3.5V16C4.9 15.6 4 14.2 4 12.5v-5Z" fill="#fff" stroke="#244EA2" stroke-width="2" stroke-linejoin="round"/><path d="M22 10.5c1.2.4 2 1.6 2 2.9v4.1c0 1.4-.9 2.6-2 3v3l-3.4-2.9H13c-1.3 0-2.4-.7-3-1.8" fill="none" stroke="#244EA2" stroke-width="2" stroke-linejoin="round"/></svg>'},
     {go:'search', k:'S', t:'Search', d:'SOP·법령·교재·사례 찾기'},
     {go:'ai', k:'A', t:'AI assistant', d:'자료를 근거로 대화하듯 답변'},
-    {go:'board', k:'CH', t:'CHecklist', d:'12단계 지휘 체크·경과 시간'},
+    {go:'board', k:'CH', t:'CHecklist', d:'단계별 지휘 체크·경과 시간'},
     {go:'log', k:'IL', t:'Incident Log', d:'만든 보고서 모아 보기·작성'}
   ];
   const sigK=k=>['S','A','CH','IL'].includes(k)?`<i class="sg sg-${k}" role="img" aria-label="${k}"></i>`:k;   // 시그니처 심벌
@@ -4541,10 +4607,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const mapEl=document.createElement('div'); mapEl.className='mapov'; mapEl.id='mapov'; mapEl.hidden=true; mapEl.setAttribute('role','dialog'); mapEl.setAttribute('aria-modal','true'); mapEl.setAttribute('aria-label','CP 현장 지휘 지도');
   mapEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="지도 닫기">‹</button><div class="mseg" role="group" aria-label="CP·소화전 전환"><span class="seg on" aria-current="page"><svg class="tsym" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 21.5C5 13.6 9.9 7.5 16.5 7.5S28 13.4 28 21.5z" fill="#229ED9" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M16.5 7.5c.9 0 1.6.7 1.6 1.6v12.4h-3.2V9.1c0-.9.7-1.6 1.6-1.6z" fill="#1A7FB0"/><path d="M2.2 21.2h27.3c.9 0 1.2 1.1.5 1.6-1.6 1-3.5 1.6-5.4 1.6H6.2c-2.2 0-4-1.4-4-3.2z" fill="#1A7FB0" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/><path d="M8.6 12.6h4.6v3.6c0 1.6-1.1 2.8-2.3 3.4-1.2-.6-2.3-1.8-2.3-3.4z" fill="#fff"/><path d="M10.9 14.1l.5 1.1 1.2.1-.9.8.3 1.2-1.1-.6-1.1.6.3-1.2-.9-.8 1.2-.1z" fill="#229ED9"/></svg><b>CP</b></span><button type="button" class="seg mtab" data-tab="hyd" aria-label="소화전으로"><svg class="tsym" viewBox="0 0 32 32" aria-hidden="true"><path d="M11 6.6c0-2.3 2.2-4.1 5-4.1s5 1.8 5 4.1V8H11z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="8.6" y="7.8" width="14.8" height="3.4" rx="1.7" fill="#B42318" stroke="#fff" stroke-width="1.5"/><path d="M10.8 11.2h10.4v14.6H10.8z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="4.4" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="21" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="7.4" y="25.4" width="17.2" height="3.6" rx="1.8" fill="#B42318" stroke="#fff" stroke-width="1.5"/><circle cx="16" cy="17.4" r="2.6" fill="#fff"/><circle cx="16" cy="17.4" r="1.1" fill="#B42318"/></svg><b>소화전</b></button></div>
       <form class="msrch" autocomplete="off"><input type="search" placeholder="주소·장소 검색" aria-label="주소·장소 검색" enterkeyhint="search"><button type="submit" class="btn ghost">검색</button></form></div>
-    <ul class="mres" hidden></ul><div class="mbox"><div class="kmap"></div><div class="mjump" aria-label="표시로 바로 가기" hidden></div><div class="msel" role="group" aria-label="고른 표시" hidden></div><div class="mcp" role="menu" aria-label="CP 종류" hidden></div><button type="button" class="mme" aria-label="내 위치로">◎</button></div>
+    <ul class="mres" hidden></ul><div class="mbox"><div class="kmap"></div><div class="mjump" aria-label="표시로 바로 가기" hidden></div><div class="msel" role="group" aria-label="고른 표시" hidden></div><div class="mcp" role="menu" aria-label="CP 종류" hidden></div><button type="button" class="mme" aria-label="내 위치로">◎</button><button type="button" class="mbsel" aria-pressed="false" aria-label="범위 선택 — 끌어서 여러 표시 고르기" title="범위 선택(PC는 Shift+끌기)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 2.5"/><path d="M13 13l6 2.5-2.6 1 -1 2.6z" fill="currentColor"/></svg></button><div class="mlayer" hidden></div><div class="mrect" hidden></div><div class="mmulti" role="group" aria-label="고른 표시 여러 개" hidden></div></div>
     <p class="mmsg" role="status"></p>
     <div class="mtools">${TOOLK.map(k=>{ const v=MAPK[k]; return `<button type="button" class="mt mt-${k}" data-mk="${k}"${k==='icp'?' aria-haspopup="menu" aria-expanded="false"':''}><i>${v.t}</i><span>${k==='icp'?'현장지휘소 ▾':v.n}</span></button>`; }).join('')}</div>
-    <p class="mhint">버튼을 누르면 지도 가운데에 표시가 뜹니다. <b>표시를 끌어서</b> 원하는 곳에 놓으세요(놓으면 저장). <b>방면설정</b>은 누를 때마다 화재 둘레에 A(아래)→B→C→D→E→F 순서로 — 실제 방향으로 끌어 맞추세요. 연소가 확대되면 <b>화재</b>를 다시 눌러 여러 곳(9곳까지). <b>화재</b> 표시를 누르면 위에 <b>초진·완진</b>, <b>CP</b>를 누르면 현장지휘소·유관기관CP·응급의료소(임시·현장)를 고를 수 있어요(CP를 한 번 더 누르면 현장지휘소). 표시를 누르면 <b>🗑</b>(지우기)·✕가 뜹니다. 지도를 옮겼다면 <b>위쪽 바로가기</b>(🔥·CP·S·전체)를 누르면 돌아옵니다.</p>`;
+    <p class="mhint">버튼을 누르면 지도 가운데에 표시가 뜹니다. <b>표시를 끌어서</b> 원하는 곳에 놓으세요(놓으면 저장). <b>방면설정</b>은 누를 때마다 화재 둘레에 A(아래)→B→C→D→E→F 순서로 — 실제 방향으로 끌어 맞추세요. 연소가 확대되면 <b>화재</b>를 다시 눌러 여러 곳(9곳까지). <b>화재</b> 표시를 누르면 위에 <b>초진·완진</b>, <b>CP</b>를 누르면 현장지휘소·유관기관CP·응급의료소(임시·현장)를 고를 수 있어요(CP를 한 번 더 누르면 현장지휘소). 표시를 누르면 <b>🗑</b>(지우기)·✕가 뜹니다. 지도를 옮겼다면 <b>위쪽 바로가기</b>(🔥·CP·S·전체)를 누르면 돌아옵니다. 여러 표시를 한 번에 지우려면 왼쪽 아래 <b>⬚ 범위 선택</b>을 누르고(PC는 Shift를 누른 채) 지도를 넓게 끌어 고른 뒤 <b>🗑 삭제</b>.</p>`;
   document.body.appendChild(mapEl);
   const mq=s=>mapEl.querySelector(s);
   const mmsg=(t,html)=>{ const m=mq('.mmsg'); if(html) m.innerHTML=t; else m.textContent=t||''; };
@@ -4556,10 +4622,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     MAPS.ov.forEach(o=>o.setMap(null)); MAPS.ov=[];
     const it=MAPS.items||{};
     if(MAPS.sel&&!it[MAPS.sel]) mapUnsel();   // 고른 표시를 다른 사람이 지웠으면 막대도 닫는다
+    if(MAPS.multi){ MAPS.multi=MAPS.multi.filter(k=>it[k]); if(!MAPS.multi.length) multiOff(); else multiBar(); }   // V173: 여러 개 고른 것 중 지워진 것은 뺀다
     Object.keys(it).forEach(k=>{
       const v=it[k]; if(!v||k==='sector') return;   // 'sector'는 예전(V106) 자동 방면 — 새 방식은 secA~secF
       const sec=/^sec[A-F]$/.test(k), el=document.createElement('div');
-      el.className='mk '+(sec?'mk-sec':'mk-'+baseK(k))+(k==='secA'?' front':'')+(k===MAPS.sel?' sel':''); el.dataset.k=k; el.setAttribute('role','button'); el.tabIndex=0;
+      el.className='mk '+(sec?'mk-sec':'mk-'+baseK(k))+(k==='secA'?' front':'')+(k===MAPS.sel||(MAPS.multi&&MAPS.multi.includes(k))?' sel':''); el.dataset.k=k; el.setAttribute('role','button'); el.tabIndex=0;
       const fst=/^fire/.test(k)?(FST[v.st]?v.st:''):null; if(fst) el.classList.add('st-'+fst);
       el.innerHTML=sec?`<i>${k.slice(3)}</i><span>방면</span>`:fst!==null?`<i>${flame(FST[fst].c)}</i><span>${esc(mkName(k))}${fst?` <b class="fs">${FST[fst].n}</b>`:''}</span>`:`<i>${esc(MAPK[baseK(k)]?MAPK[baseK(k)].t:'')}</i><span>${esc(mkName(k))}</span>`;
       const ov=new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(v.lat,v.lng), content:el, yAnchor:sec?.5:1.15, zIndex:sec?2:3, clickable:true});
@@ -4641,6 +4708,45 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(kb) setTimeout(()=>{ const f=bar.querySelector('button'); if(f) f.focus(); },0);
     { const sd=v.st_ts?new Date(v.st_ts*1000):null, sx=isF&&cst&&sd?` · ${FST[cst].n} ${pad(sd.getHours())}:${pad(sd.getMinutes())}`:'';
       mmsg(`${mkName(k)}${sx} · ${rel}${v.by||''} ${pad(d.getHours())}:${pad(d.getMinutes())} — ${isF?'초진·완진을 누르거나, ':''}끌어서 옮기거나 🗑로 지우기`); }
+  }
+  // V173: 범위 선택 — [⬚] 버튼을 켜고(또는 PC에서 Shift를 누른 채) 지도를 끌면 네모 안 표시를 모두 골라 한 번에 지우기
+  function multiMode(on){ const b=mq('.mbsel'), L=mq('.mlayer'); if(!b||!L) return; b.setAttribute('aria-pressed',String(!!on)); L.hidden=!on;
+    if(on){ mapUnsel(); mapCpClose(); mmsg('지도를 끌어 네모를 그리면 그 안의 표시를 모두 고릅니다'); } }
+  function multiOff(){ MAPS.multi=null; mq('.mbox').classList.remove('multi'); const m=mq('.mmulti'); if(m){ m.hidden=true; m.innerHTML=''; } mapEl.querySelectorAll('.kmap .mk.sel').forEach(x=>{ if(x.dataset.k!==MAPS.sel) x.classList.remove('sel'); }); }
+  function multiBar(){ const m=mq('.mmulti'), n=(MAPS.multi||[]).length; if(!m) return; if(!n){ m.hidden=true; m.innerHTML=''; return; }
+    mq('.mbox').classList.add('multi'); m.innerHTML=`<span>${n}개 선택</span><button type="button" class="mdel">🗑 ${n}개 삭제</button><button type="button" class="mx" aria-label="선택 해제">✕</button>`; m.hidden=false; }
+  { const L=mq('.mlayer'), R=mq('.mrect'), box=mq('.mbox'); let st=null, shift=false;
+    const rectOf=(a,b)=>({x:Math.min(a.x,b.x), y:Math.min(a.y,b.y), w:Math.abs(a.x-b.x), h:Math.abs(a.y-b.y)});
+    const pt=e=>{ const r=box.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; };
+    L.addEventListener('pointerdown',e=>{ e.preventDefault(); st={a:pt(e)}; try{ L.setPointerCapture(e.pointerId); }catch(_){ } R.hidden=false; Object.assign(R.style,{left:st.a.x+'px',top:st.a.y+'px',width:'0px',height:'0px'}); });
+    L.addEventListener('pointermove',e=>{ if(!st) return; const q=rectOf(st.a,pt(e)); Object.assign(R.style,{left:q.x+'px',top:q.y+'px',width:q.w+'px',height:q.h+'px'}); });
+    const end=e=>{ if(!st) return; const q=rectOf(st.a,pt(e)); st=null; R.hidden=true;
+      if(q.w<8&&q.h<8){ if(!shift) multiMode(false); return; }   // 거의 안 끌고 떼면 선택 끝
+      const it=MAPS.items||{}, kr=mq('.kmap').getBoundingClientRect(), br=box.getBoundingClientRect(), sel=[];
+      mapEl.querySelectorAll('.kmap .mk[data-k]').forEach(el=>{ const r=el.getBoundingClientRect(), cx=r.left+r.width/2-br.left, cy=r.top+r.height/2-br.top;
+        if(it[el.dataset.k]&&cx>=q.x&&cx<=q.x+q.w&&cy>=q.y&&cy<=q.y+q.h) sel.push(el.dataset.k); });
+      multiMode(false);
+      if(!sel.length){ multiOff(); mmsg('네모 안에 표시가 없습니다 — 다시 ⬚를 눌러 넓게 끌어 보세요'); return; }
+      MAPS.multi=sel; mapEl.querySelectorAll('.kmap .mk[data-k]').forEach(x=>x.classList.toggle('sel',sel.includes(x.dataset.k))); multiBar();
+      mmsg(`${sel.length}개 골랐습니다 — 위의 🗑로 한 번에 지우거나 ✕로 해제`); };
+    L.addEventListener('pointerup',end); L.addEventListener('pointercancel',()=>{ st=null; R.hidden=true; });
+    mq('.mbsel').addEventListener('click',()=>{ const on=mq('.mbsel').getAttribute('aria-pressed')!=='true'; multiOff(); multiMode(on); if(!on) mmsg(''); });
+    // PC: Shift를 누르고 있는 동안만 선택 막을 깔아 Shift+끌기로 고르기
+    document.addEventListener('keydown',e=>{ if(e.key==='Shift'&&!mapEl.hidden&&L.hidden&&!e.repeat&&!/input|textarea/i.test((document.activeElement||{}).tagName||'')){ shift=true; L.hidden=false; } });
+    document.addEventListener('keyup',e=>{ if(e.key==='Shift'&&shift){ shift=false; if(!st&&mq('.mbsel').getAttribute('aria-pressed')!=='true') L.hidden=true; } });
+    mq('.mmulti').addEventListener('click',async e=>{
+      if(e.target.closest('.mx')){ multiOff(); mmsg(''); return; }
+      const b=e.target.closest('.mdel'); if(!b) return; const ks=(MAPS.multi||[]).slice(), it=MAPS.items||{}; if(!ks.length) return;
+      if(!b.dataset.arm){ b.dataset.arm='1'; b.textContent=`정말 ${ks.length}개 삭제?`; setTimeout(()=>{ if(b.isConnected&&b.dataset.arm){ delete b.dataset.arm; b.textContent=`🗑 ${ks.length}개 삭제`; } },3000); return; }
+      const keep=ks.map(k=>{ const v=it[k], o={kind:k, lat:v.lat, lng:v.lng}; if(v.st){ o.st=v.st; if(v.st_ts) o.st_ts=v.st_ts; } return o; });
+      multiOff(); b.disabled=true; let ok=0, last=null;
+      for(const k of ks){ const r=await api(`/api/rooms/${MAPS.rid}/map`,{json:{kind:k,clear:1}}); if(r.ok&&r.j.ok){ ok++; last=r.j; } }
+      if(last&&!(last.ts<MAPS.ts)){ MAPS.items=last.items||{}; MAPS.ts=last.ts; } mapDraw();
+      mmsg(ok===ks.length?`${ok}개를 지웠습니다`:`${ok}/${ks.length}개 지웠습니다 — 나머지는 서버에 저장하지 못했습니다`);
+      if(ok) toast(`표시 ${ok}개를 지웠습니다`,async()=>{ let n=0; for(const o of keep){ const cur=MAPS.items||{}; if(cur[o.kind]) continue;   // 그새 같은 칸을 누가 썼으면 덮지 않는다
+          const r=await api(`/api/rooms/${MAPS.rid}/map`,{json:o}); if(r.ok&&r.j.ok){ n++; if(!(r.j.ts<MAPS.ts)){ MAPS.items=r.j.items||{}; MAPS.ts=r.j.ts; } } }
+        mapDraw(); mmsg(`${n}개를 되돌렸습니다`); });
+    });
   }
   function mapUnsel(){ MAPS.sel=null; const bar=mq('.msel'); if(bar){ bar.hidden=true; bar.innerHTML=''; } mapEl.querySelectorAll('.kmap .mk.sel').forEach(x=>x.classList.remove('sel')); }
   mq('.msel').addEventListener('click',e=>{
@@ -4740,13 +4846,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const DSV_KEY=rid=>'sachil_dsview:'+rid;
   function dsSave(){ if(!MAPS.map) return; try{ const c=MAPS.map.getCenter(); localStorage.setItem(DSV_KEY(MAPS.rid),JSON.stringify({lat:c.getLat(),lng:c.getLng(),level:MAPS.map.getLevel(),t:Date.now()})); }catch(_){ } }
   function dsLoad(rid){ try{ const v=JSON.parse(localStorage.getItem(DSV_KEY(rid))||'null'); if(v&&Number.isFinite(v.lat)&&Number.isFinite(v.lng)&&Number.isFinite(v.level)&&Date.now()-v.t<7*86400e3) return v; }catch(_){ } return null; }
-  function closeMap(){ if(mapEl.hidden) return; dsSave(); MAPS.msgH=mq('.mmsg').innerHTML; mapUnsel(); mapCpClose(); mapEl.hidden=true; clearInterval(MAPS.poll); appEl.inert=false; tabbarEl.inert=false; if(mapLast&&mapLast.isConnected&&mapLast.focus) mapLast.focus(); }
+  function closeMap(){ if(mapEl.hidden) return; dsSave(); MAPS.msgH=mq('.mmsg').innerHTML; mapUnsel(); multiMode(false); multiOff(); mapCpClose(); mapEl.hidden=true; clearInterval(MAPS.poll); appEl.inert=false; tabbarEl.inert=false; if(mapLast&&mapLast.isConnected&&mapLast.focus) mapLast.focus(); }
   mq('.mclose').addEventListener('click',closeMap);
   // V134: 카카오 level ↔ T맵 zoom(대략 zoom = 20 - level) — 탭을 바꿔도 같은 자리·같은 크기로
   const k2z=l=>Math.max(6,Math.min(19,20-l)), z2k=z=>Math.max(1,Math.min(14,20-Math.round(z)));
   mq('.mtab').addEventListener('click',()=>{ const rid=MAPS.rid; let v=null; try{ const c=MAPS.map.getCenter(); v={lat:c.getLat(),lng:c.getLng(),zoom:k2z(MAPS.map.getLevel())}; }catch(_){ } closeMap(); openHyd(rid,v); });   // V123: 지도 → 소화전
   document.addEventListener('keydown',e=>{ if(mapEl.hidden||e.key!=='Escape') return;   // V138: 열린 것부터 하나씩 닫기
     if(!mq('.mcp').hidden){ mapCpClose(); const b=mq('.mt-icp'); if(b) b.focus(); return; }
+    if(mq('.mbsel').getAttribute('aria-pressed')==='true'){ multiMode(false); mmsg(''); return; }
+    if(MAPS.multi){ multiOff(); mmsg(''); return; }
     if(!mq('.msel').hidden){ const k=MAPS.sel; mapUnsel(); mmsg(''); const el=k&&mapEl.querySelector(`.kmap .mk[data-k="${k}"]`); if(el) el.focus(); return; }
     if(!mq('.mres').hidden){ mq('.mres').hidden=true; return; }
     closeMap(); });
@@ -4762,7 +4870,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         new kakao.maps.services.Places().keywordSearch(HOME_Q,(res,st)=>{ if(st===kakao.maps.services.Status.OK&&res[0]&&homeOk(+res[0].y,+res[0].x)) fix(res[0].y,res[0].x);
           else new kakao.maps.services.Geocoder().addressSearch(HOME_ADDR,(r2,s2)=>{ if(s2===kakao.maps.services.Status.OK&&r2[0]) fix(r2[0].y,r2[0].x); }); }); }
       MAPS.map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
-      try{ const un=()=>{ if(MAPS.sel){ mapUnsel(); } }; kakao.maps.event.addListener(MAPS.map,'click',()=>{ mapCpClose(); if(MAPS.sel){ mapUnsel(); mmsg(''); } }); ['dragstart','zoom_start'].forEach(ev=>kakao.maps.event.addListener(MAPS.map,ev,un)); }catch(_){ }   // 빈 곳을 누르거나 지도를 움직이면 선택 해제
+      try{ const un=()=>{ if(MAPS.sel){ mapUnsel(); } }; kakao.maps.event.addListener(MAPS.map,'click',()=>{ mapCpClose(); if(MAPS.sel){ mapUnsel(); mmsg(''); } if(MAPS.multi){ multiOff(); mmsg(''); } }); ['dragstart','zoom_start'].forEach(ev=>kakao.maps.event.addListener(MAPS.map,ev,un)); }catch(_){ }   // 빈 곳을 누르거나 지도를 움직이면 선택 해제
       if(window.ResizeObserver) new ResizeObserver(()=>{ if(MAPS.map&&!mapEl.hidden) MAPS.map.relayout(); }).observe(mq('.kmap')); }   // V111: 회전·키보드·안내 줄 바뀜에도 지도 크기 다시 맞춤
     MAPS.map.relayout(); MAPS.ts=-1; MAPS.drag=false; MAPS.down=0; MAPS.okAt=0; mq('.mbox').classList.remove('stale'); await mapLoad();
     const dv=view&&Number.isFinite(view.lat)?view:dsLoad(rid);   // V134: 소화전에서 넘어오면 T맵에서 보던 자리 그대로
@@ -5459,6 +5567,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.roomDb=r.j.room_debrief||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.aiName=String(r.j.ai_name||'').slice(0,20); SRV.kakao=/^[0-9a-f]{32}$/.test(r.j.kakao||'')?r.j.kakao:''; SRV.tmap=/^[0-9A-Za-z]{20,64}$/.test(r.j.tmap||'')?r.j.tmap:''; SRV.bld=!!r.j.bld; SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
       if(PROF.tok) checkProf().then(ok=>{ if(ok&&state.route==='login') render(); });   // 교수로 로그인해 둔 기기면 교수 표시줄 · V143: 확인이 끝나면 교수 화면으로 다시 그림
       if(window.__rtplSync) window.__rtplSync();   // V125: 보고서 양식
+      if(window.__clSync) window.__clSync();   // V173: 교수가 고친 체크리스트
       await loadLib();
       if(ROOMS_R.includes(state.route)){ if(DB.agreed&&!wasWait){ SRV.notice='서버에 연결되어 공유 대화방으로 바뀌었습니다.'+(wasLocal?' 방금 쓴 내용은 이 기기에만 남습니다.':''); DB.enter=true; } render(); }
       else if(SECTIONS.some(x=>x.slug===state.route) || state.route==='login' || (state.route==='search'&&state.query.trim()) || (state.route==='ai'&&!chat.typing)) render();
@@ -5595,7 +5704,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
      d:['메뉴에 올린 자료를 근거로 <b>사람이 말하듯</b> 답합니다.','답변 속 [1] 같은 번호를 누르면 근거가 된 원문 쪽이 열립니다.'],
      n:'AI 답변은 학습용입니다. 중요한 내용은 원문으로 확인하세요.'},
     {k:'CH', t:'체크리스트', get:()=>[pick('.tabbar [data-go="board"]','.top-nav [data-route="board"]')],
-     d:['출동부터 지휘소 운영까지 <b>12단계 체크</b>가 있습니다.','<b>첫 항목을 체크하면</b> 경과 시간이 자동으로 흐르고, 체크한 항목은 시각이 자동으로 남습니다. ‘전체 ▾’로 모든 항목을 한눈에.']},
+     d:['출동부터 최종보고까지 <b>단계별 체크</b>가 있습니다(교수가 항목 관리).','<b>첫 항목을 체크하면</b> 경과 시간이 자동으로 흐르고, 체크한 항목은 시각이 자동으로 남습니다. ‘전체 ▾’로 모든 항목을 한눈에.']},
     {k:'IL', t:'사고보고서', get:()=>[pick('.tabbar [data-go="log"]','.top-nav [data-route="log"]')],
      d:['<b>발생개요·화재 원인·인명 피해·재산 피해</b>를 적고 <b>보고서 만들기</b>를 누르면 체크리스트 기록과 합쳐 보고서가 나옵니다.','만든 보고서는 아래에 모여 고치기, AI로 작성, 복사·저장·공유를 할 수 있어요.'],
      n:'화면을 좌우로 밀면 옆 탭으로 넘어갑니다.'}
