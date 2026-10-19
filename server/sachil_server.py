@@ -2342,7 +2342,7 @@ class DocIndex:
 
     def scan(self):
         """폴더를 훑어 새로 들어오거나 바뀐 파일만 뽑고, 목록이 바뀌었으면 색인을 다시 짠다."""
-        todo, docs = [], []
+        docs = []
         for slug, d in SECTIONS:
             for f in H.lib_files(slug):
                 ext = '.' + f['ext']
@@ -3975,7 +3975,6 @@ def app_link(url):
 
 
 TUNNEL_PROC = [None]
-UPD_LOG = None
 
 
 def upd_log(msg):
