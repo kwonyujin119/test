@@ -19,6 +19,10 @@ html.intro-float .hz-p,html.intro-float .hz-hit,html.intro-float .hz-47[data-s="
 @keyframes appFloatC{from{opacity:0;transform:translate(-50%,calc(-50% + 22px))}to{opacity:1;transform:translate(-50%,-50%)}}
 </style>
 <script>
+/* V168: 첫 화면이 그려지기 전 0.2초 동안 검색 창·바닥글·하단 탭이 잠깐 보이던 현상 — 주소를 먼저 보고 미리 숨김(화면을 그리면 해제) */
+(function(){ try{ var r=(location.hash||'').replace(/^#/,'').split(/[\/?&]/)[0]||'hub', c=document.documentElement.classList; if(r!=='search') c.add('boot-nosearch'); if(r==='hub') c.add('boot-hub'); if(/^(ai|chat|debrief)$/.test(r)) c.add('boot-chat'); }catch(e){} })();
+</script>
+<script>
 (function(){
   var h=location.hash, see=true, root=document.documentElement;
   try{ if(sessionStorage.getItem('sachil_intro')==='1') see=false; sessionStorage.setItem('sachil_intro','1'); }catch(e){}
@@ -126,7 +130,8 @@ body.compact .hero{padding-block:18px 8px;gap:12px}
 .wordmark{margin:0 0 6px;width:min(70%,280px)}
 .wordmark svg{width:100%;height:auto;display:block}
 body.compact .wordmark,body.compact .hint{display:none}
-body.nosearch .hero{display:none}
+body.nosearch .hero,html.boot-nosearch .hero{display:none}
+html.boot-hub footer,html.boot-chat footer{display:none}html.boot-hub .tabbar{display:none!important}
 body.compact:not(.nosearch) .hero{padding-block:18px 10px}
 .tagline{margin:0;color:var(--muted);font-size:15px;max-width:34em;text-wrap:balance}
 .tagline b{color:var(--fg);font-weight:600}
@@ -864,7 +869,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v167</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v168</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1663,8 +1668,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V167', SRV_VER='9.3';
+  const APP_VER='V168', SRV_VER='9.4';
   const UPDATES=[
+    {v:'V168', d:'2026-10-19', t:['앱을 열 때 첫 화면이 그려지기 전 잠깐(0.2초) 검색 창·바닥글·하단 탭이 보이던 현상 없앰(47망·AI 화면으로 바로 열 때 바닥글도)']},
     {v:'V167', d:'2026-10-19', t:['첫 화면: CP·소화전 버튼을 47망 글자와 따로 배치 — 디브리핑룸 말풍선 그림·글과 47망 그림은 원래대로','CP·소화전 버튼은 47망 글 아래 남은 자리의 아래쪽에 세로로, 들어가는 가장 큰 크기로(세로로는 작게만 들어가는 PC 화면은 가로로)']},
     {v:'V166', d:'2026-10-18', t:['첫 화면 47망 칸의 CP·소화전 버튼을 세로로 놓고 1.5배 크게(좁은 휴대폰에서는 47망 그림 대신 버튼에 자리를 줌)']},
     {v:'V165', d:'2026-10-18', t:['첫 화면 47망 칸에 CP·소화전 바로 열기 버튼 — 대화방에 들어가지 않고 바로 지도·소화전으로(47망에 처음이면 대화명을 넣는 즉시 열림)']},
@@ -2192,6 +2198,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     pending=[];
     document.body.classList.toggle('compact', !(r==='search' && !state.query.trim()));
     document.body.classList.toggle('nosearch', r!=='search');
+    document.documentElement.classList.remove('boot-nosearch','boot-hub','boot-chat');   // V168: 미리 숨김 해제(이제 body 클래스가 대신)
     document.body.classList.toggle('home', r==='search' && !state.query.trim());
     document.body.classList.toggle('chatview', r==='ai' || ROOMS_R.includes(r));
     document.body.classList.toggle('hubview', r==='hub');
