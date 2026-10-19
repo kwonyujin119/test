@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '9.9'
-APP_VERSION = 'V173'
+VERSION = '10.0'
+APP_VERSION = 'V174'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -819,6 +819,9 @@ class H(BaseHTTPRequestHandler):
             self.user = self.get_user()
             if path == '/api/report/tpl':   # V125: 교수가 정한 보고서 규칙 초안 양식(모든 기기 공통). 비어 있으면 앱 기본 양식
                 return self.send(200, {'ok': True, 'tpl': str(CONF.get('report_tpl') or ''), 'inst': str(CONF.get('report_inst') or ''), 'ts': CONF.get('report_tpl_ts') or 0}, log=False)   # V136: inst = 관리자 지시사항
+            if path == '/api/ilform':   # V174: IL 화재등 상황 보고서 입력 서식(교수가 방재실에서 고침). 비어 있으면 앱 기본 서식
+                fm = CONF.get('ilform')
+                return self.send(200, {'ok': True, 'form': fm if isinstance(fm, list) and fm else None, 'ts': CONF.get('ilform_ts') or 0}, log=False)
             if path == '/api/checklist':   # V173: CH 현장지휘 체크리스트(교수가 방재실에서 고침). 비어 있으면 앱 기본 목록
                 cl = CONF.get('checklist')
                 return self.send(200, {'ok': True, 'list': cl if isinstance(cl, list) and cl else None, 'ts': CONF.get('checklist_ts') or 0}, log=False)
@@ -1268,6 +1271,50 @@ class H(BaseHTTPRequestHandler):
             CONF['report_tpl_ts'] = time.time()
             write_conf(CONF)
             return self.send(200, dict(status(), tpl=CONF['report_tpl'], inst=str(CONF.get('report_inst') or ''), tpl_ts=CONF['report_tpl_ts'], msg=('규칙 초안 양식' if t.strip() else '기본 양식') + ('·관리자 지시사항' if CONF.get('report_inst') else '') + '을 저장했습니다 — 모든 기기의 새 보고서·AI 작성에 적용'), log=False)
+        if act == 'ilform':   # V174: 상황보고서 서식 저장 — [{id, name, off, fields:[{k, label, type, opts, ...}]}]. 빈 목록 = 앱 기본 서식으로
+            raw = j.get('form') if isinstance(j.get('form'), list) else []
+            T = ('datetime', 'text', 'long', 'one', 'multi', 'injury', 'num', 'level')
+            sx = lambda v, n: re.sub(r'\s+', ' ', str(v or '')).strip()[:n]
+            fm, seen = [], set()
+            for b in raw[:20]:
+                if not isinstance(b, dict):
+                    continue
+                bid = re.sub(r'[^0-9A-Za-z_]', '', str(b.get('id') or ''))[:24]
+                name = sx(b.get('name'), 40)
+                if not bid or not name or bid in seen:
+                    continue
+                seen.add(bid)
+                fs = []
+                for f in (b.get('fields') if isinstance(b.get('fields'), list) else [])[:10]:
+                    if not isinstance(f, dict) or f.get('type') not in T:
+                        continue
+                    k = re.sub(r'[^0-9A-Za-z_]', '', str(f.get('k') or ''))[:24]
+                    if not k:
+                        continue
+                    o = {'k': k, 'label': sx(f.get('label'), 40), 'type': f['type']}
+                    if f['type'] == 'level':
+                        o['opts'] = [[sx(x[0], 20), sx(x[1], 30)] for x in (f.get('opts') or [])[:8] if isinstance(x, list) and len(x) == 2]
+                    elif isinstance(f.get('opts'), list):
+                        o['opts'] = list(dict.fromkeys(sx(x, 40) for x in f['opts'][:30] if sx(x, 40)))
+                    for key, n in (('ph', 120), ('unit', 10), ('dep', 24), ('none', 40)):
+                        if f.get(key):
+                            o[key] = sx(f.get(key), n)
+                    for key in ('other', 'fold'):
+                        if f.get(key):
+                            o[key] = True
+                    fs.append(o)
+                if fs:
+                    fm.append({'id': bid, 'name': name, 'off': bool(b.get('off')), 'fields': fs})
+            if raw and not fm:
+                return self.err(400, '서식이 비어 있습니다')
+            if fm:
+                CONF['ilform'] = fm
+            else:
+                CONF.pop('ilform', None)
+            CONF['ilform_ts'] = time.time()
+            write_conf(CONF)
+            return self.send(200, dict(status(), ilform=fm or None, ilform_ts=CONF['ilform_ts'],
+                                       msg=f'상황보고서 서식을 저장했습니다 — {sum(1 for x in fm if not x["off"])}칸, 모든 기기에 적용' if fm else '기본 서식으로 되돌렸습니다'), log=False)
         if act == 'checklist':   # V173: 체크리스트 저장 — [{name, items:[...]}]. 빈 목록 = 앱 기본 목록으로
             raw = j.get('list') if isinstance(j.get('list'), list) else []
             cl = []
