@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '9.6'
-APP_VERSION = 'V170'
+VERSION = '9.7'
+APP_VERSION = 'V171'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -1322,7 +1322,7 @@ class H(BaseHTTPRequestHandler):
             CONF['pub_ep'] = eps
             write_conf(CONF)
             BLD_CACHE.clear()
-            FFUS_CACHE.clear()
+            ffus_clear()
             return self.send(200, dict(status(), msg='연결 완료 — ' + txt), log=False)
         if act == 'contacts':   # V154: 교수 — 전화 목록 고치기('구분|기관명|번호' 한 줄씩). 빈 값이면 PDF 자동 목록으로
             t = str(j.get('text') or '')[:20000]
@@ -1339,7 +1339,7 @@ class H(BaseHTTPRequestHandler):
             CONF['pub_status'] = res
             write_conf(CONF)
             BLD_CACHE.clear()
-            FFUS_CACHE.clear()
+            ffus_clear()
             n = sum(1 for v in CONF['pub_status'].values() if v[0])
             return self.send(200, dict(status(), msg=f'다시 시험 — {n}/{len(CONF["pub_status"])}개 연결'), log=False)
         if act == 'tmap':   # V113: T맵 앱 키(SK open API) — 소화전 찾기에 씀
@@ -2703,6 +2703,29 @@ FFUS_SIDO = {'서울': '서울특별시', '부산': '부산광역시', '대구':
 
 
 FFUS_URL = 'https://api.data.go.kr/openapi/tn_pubr_public_ffus_wtrcns_api'
+FFUS_DIR = os.path.join(DATA, 'ffus_cache')   # V171: 받은 소방용수 자료를 파일로도 둠 — 서버를 다시 켜도(2시간 정기 재시작) 처음부터 받지 않게
+FFUS_DISK_TTL = 7 * 86400   # 표준데이터는 자주 바뀌지 않음
+
+
+def _ffus_disk(key, val=None):
+    fn = os.path.join(FFUS_DIR, hashlib.sha1(('%s|%s' % key).encode('utf-8')).hexdigest()[:16] + '.json')
+    try:
+        if val is None:
+            with open(fn, encoding='utf-8') as f:
+                j = json.load(f)
+            return (float(j['t']), j['rows']) if isinstance(j.get('rows'), list) else None
+        os.makedirs(FFUS_DIR, exist_ok=True)
+        tmp = fn + '.tmp'
+        with open(tmp, 'w', encoding='utf-8') as f:
+            json.dump({'t': val[0], 'k': list(key), 'rows': val[1]}, f, ensure_ascii=False)
+        os.replace(tmp, fn)
+    except Exception:
+        return None
+
+
+def ffus_clear():
+    FFUS_CACHE.clear()
+    shutil.rmtree(FFUS_DIR, ignore_errors=True)
 
 
 def _ffus_get(params, k=None):
@@ -2763,13 +2786,36 @@ def _ffus_all(sd, sg):
         base['ctprvnNm'] = FFUS_SIDO.get(sd, sd)   # 세종처럼 시군구가 없는 곳
     else:
         return []
-    rows, page, t0 = [], 1, time.time()
-    while page <= 30 and time.time() - t0 < 60:   # 1000건씩, 1분 안에서
-        got, total = _ffus_get(dict(base, pageNo=page))
-        rows += [{k: x[k] for k in FF_KEEP if x.get(k) not in (None, '')} for x in got]   # 쓰는 항목만 남겨 메모리 절약
-        if not got or len(got) < 1000 or (total and len(rows) >= total):
-            break
-        page += 1
+    keep = lambda got: [{k: x[k] for k in FF_KEEP if x.get(k) not in (None, '')} for x in got]   # 쓰는 항목만 남겨 메모리 절약
+    got, total = _ffus_get(dict(base, pageNo=1))
+    rows = keep(got)
+    if got and len(got) >= 1000 and total > len(rows):   # V171: 나머지 쪽은 한꺼번에(4개씩 동시에) 받아 기다림을 줄임
+        pages = list(range(2, min(30, -(-total // 1000)) + 1))
+        res, errs = {}, []
+
+        def one(pg):
+            try:
+                res[pg] = keep(_ffus_get(dict(base, pageNo=pg))[0])
+            except Exception as e:
+                errs.append(e)
+        for i in range(0, len(pages), 4):
+            ts = [threading.Thread(target=one, args=(pg,), daemon=True) for pg in pages[i:i + 4]]
+            for t in ts:
+                t.start()
+            for t in ts:
+                t.join(70)
+        if errs and not res:
+            raise errs[0]
+        for pg in pages:
+            rows += res.get(pg, [])
+    elif got and len(got) >= 1000 and not total:   # 전체 건수를 안 알려 주면 예전처럼 한 쪽씩
+        page, t0 = 2, time.time()
+        while page <= 30 and time.time() - t0 < 60:
+            got, _ = _ffus_get(dict(base, pageNo=page))
+            rows += keep(got)
+            if not got or len(got) < 1000:
+                break
+            page += 1
     want = _sido(sd)
     return [x for x in rows if not want or not x.get('ctprvnNm') or _sido(x['ctprvnNm']) == want]
 
@@ -2778,9 +2824,10 @@ def ffus_near(sd, sg, lat, lng, n=8, within=1000):
     import math
     key = (_sido(sd), sg)
     with FFUS_LOCKS.setdefault(key, threading.Lock()):   # 같은 시군구를 여럿이 동시에 받지 않게
-        c = FFUS_CACHE.get(key)
-        if c and time.time() - c[0] < 86400:
+        c = FFUS_CACHE.get(key) or _ffus_disk(key)
+        if c and time.time() - c[0] < (86400 if key in FFUS_CACHE else FFUS_DISK_TTL):
             rows = c[1]
+            FFUS_CACHE.setdefault(key, c)
         else:
             rows = []
             alias = SG_ALIAS.get(sg.replace(' ', ''))
@@ -2801,6 +2848,8 @@ def ffus_near(sd, sg, lat, lng, n=8, within=1000):
             if len(FFUS_CACHE) > 30:
                 FFUS_CACHE.clear()
             FFUS_CACHE[key] = (time.time(), rows)
+            if rows:
+                _ffus_disk(key, FFUS_CACHE[key])
     out = []
     for x in rows:
         try:
