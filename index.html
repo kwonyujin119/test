@@ -1501,6 +1501,26 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .board .phase .item .at{display:block;text-align:left;padding:0 0 8px 32px;font-size:11px;line-height:1.2}.board .phase .item .at:empty{padding:0 0 6px}
 @media (max-width:339px){ .board .phase .items{grid-template-columns:1fr} }
 @media (max-width:479px){ .board .phase .items[style*="--cols:3"]{grid-template-columns:repeat(2,minmax(0,1fr))} }
+/* V181(chil): CH·IL 화면 다듬기 — 장갑 낀 손가락 기준 터치 44px, 여러 단 첫 줄 구분선, 좁은 폭 시각 기록 */
+.board .phase .item label{min-height:var(--tap);padding:11px 0 4px}.board .phase .item .at:empty{padding:0}
+.board .phase .items[style*="--cols:2"]>.item:nth-child(2),.board .phase .items[style*="--cols:3"]>.item:nth-child(-n+3){border-top:0}
+@media (max-width:479px){ .board .phase .items[style*="--cols:3"]>.item:nth-child(3){border-top:1px solid var(--line)} }
+@media (max-width:339px){ .board .phase .items>.item:nth-child(n+2){border-top:1px solid var(--line)} }
+.timer .chrow #tmReset,.timer .chrow .jall,.ilbar .ilrow .btn,.ilbar .ilrow .reps{min-height:var(--tap)}
+.timer .jump button{min-height:40px}
+.timer .jump .jl{padding:2px 28px 2px 2px;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}   /* 오른쪽이 흐려지면 옆으로 더 있음 */
+.logbox header h3 .lc{margin-left:6px;font-size:12px;font-weight:600;color:var(--muted);font-family:var(--mono)}
+.logbox #copyLog,.logform .btn{min-height:var(--tap)}.logform input{min-height:var(--tap)}
+@media (max-width:599px){ .logbox{padding:14px}
+  .logbox .log li{display:block;position:relative;padding-left:78px;min-height:44px;box-sizing:border-box}
+  .logbox .log .ts{position:absolute;left:0;top:7px;width:auto;white-space:nowrap}.logbox .log .el{position:absolute;left:0;top:26px;width:auto;font-size:11px}.logbox .log .tx{display:block;line-height:1.45} }
+.il2 input,.il2 textarea{scroll-margin-top:calc(var(--hdr,56px) + var(--sat,0px) + 170px);scroll-margin-bottom:calc(var(--bar-h,60px) + 16px)}   /* 입력칸으로 옮겨갈 때 위 고정 띠에 가리지 않게 */
+.reprow .del{font-size:13px;color:var(--muted);border-left:1px solid var(--line)}
+@media (max-width:599px){ .reprow .roomrow{gap:10px;padding:12px 12px 12px 14px}.reprow .roomrow .av{width:36px;height:36px}.reprow .roomrow .meta{display:none}
+  .reprow .roomrow .t{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;line-height:1.35}
+  .reprow .roomrow .t>.tag:first-child{display:block;width:fit-content;margin:0 0 4px}.reprow .del{padding:0 12px} }
+.rph-b button{min-height:36px;font-size:14px}
+.done-card .btn{min-height:var(--tap)}
 .il2{counter-reset:ils}.il2 .ilsec>header h3::before{counter-increment:ils;content:counter(ils);display:inline-grid;place-items:center;min-width:26px;height:26px;margin-right:8px;border-radius:8px;background:var(--navy);color:#fff;font-size:13px;font-weight:800;vertical-align:1px}
 .il2 .ilsec .st.has{background:#ECFDF3;border-color:#ABEFC6;color:#067647}   /* V179: 상단 색 띠 대신 상태 표시만 차분하게 */
 .il2 .ilsub{padding:14px 0 6px;border-top:1px solid var(--line)}.il2 .ilsub:first-of-type{border-top:0;padding-top:4px}
@@ -3151,7 +3171,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
             <div class="jg">${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length; return `<button type="button" data-j="ph-${pi}" class="${d===p.items.length?'full':''}"><b>${pi+1}</b><span class="n">${esc(p.name)}</span><span class="c">${d}/${p.items.length}</span><i class="bar" style="--p:${Math.round(d/p.items.length*100)}%" aria-hidden="true"></i></button>`;}).join('')}</div>
           </div>
         </div>
-        ${done===total?`<div class="card done-card" role="status"><img src="img/board-done.webp" alt="" width="360" height="409" decoding="async" onerror="this.remove()"><div><b>${total}개 항목 모두 완료</b><p>경과 ${hhmmss(elapsed())} · IL에서 보고서로 정리하세요.</p><a class="btn primary" href="#log">IL 사고보고서로</a></div></div>`:''}
+        ${done===total?`<div class="card done-card" role="status"><img src="img/board-done.webp" alt="" width="360" height="409" decoding="async" onerror="this.remove()"><div><b>${total}개 항목 모두 완료</b><p>경과 ${hhmmss(elapsed())} · IL에서 보고서로 정리하세요.</p><a class="btn primary" href="#log">화재등 상황 보고서로</a></div></div>`:''}
         <div class="phases">
           ${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length;return `<section class="card phase ${d===p.items.length?'done':''}" id="ph-${pi}">
               <header><h3><span class="no">${pi+1}</span>${esc(p.name)}</h3><span class="cnt">${d}/${p.items.length}</span><i class="phbar" style="--p:${Math.round(d/p.items.length*100)}%" aria-hidden="true"></i></header>
@@ -3159,7 +3179,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
             </section>`;}).join('')}
         </div>
         <section class="card logbox" id="sec-log">
-          <header><h3>시각 기록</h3><div style="display:flex;gap:6px;align-items:center"><span class="saved">이 기기에 자동 저장</span><button type="button" class="btn ghost" id="copyLog">기록 복사</button></div></header>
+          <header><h3>시각 기록<span class="lc" id="logCnt"></span></h3><div style="display:flex;gap:6px;align-items:center"><span class="saved">이 기기에 자동 저장</span><button type="button" class="btn ghost" id="copyLog">기록 복사</button></div></header>
           <form class="logform" id="logForm"><input id="logText" placeholder="예: 2층 진입 지시, 대응 1단계 건의" aria-label="기록 내용"><button class="btn primary" type="submit">기록</button></form>
           <ul class="log" id="logList"></ul>
         </section>
@@ -3191,7 +3211,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       setTimeout(()=>{ const b=$('#copyLog'); if(b) b.textContent='기록 복사'; },1500);
     });
   }
-  function renderLog(){ const ul=$('#logList'); if(!ul) return; ul.innerHTML=state.log.length?state.log.map(l=>`<li><span class="ts">${esc(l.ts)}</span><span class="el">+${esc(l.el)}</span><span class="tx">${esc(l.text)}</span></li>`).join(''):''; }   // V141: 빈 안내 문구 없앰
+  function renderLog(){ const ul=$('#logList'); if(!ul) return; { const c=$('#logCnt'); if(c) c.textContent=state.log.length?state.log.length+'건':''; } ul.innerHTML=state.log.length?state.log.map(l=>`<li><span class="ts">${esc(l.ts)}</span><span class="el">+${esc(l.el)}</span><span class="tx">${esc(l.text)}</span></li>`).join(''):''; }   // V141: 빈 안내 문구 없앰
   function addLog(text){ state.log.unshift({ts:clock(new Date()), el:mmss(elapsed()), text}); if(state.log.length>200) state.log.length=200; }
 
   // ---------- IL 사고보고서 (원클릭 생성 · 편집 · 목록) ----------
@@ -3629,7 +3649,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(err&&err.text && !prev.ai){ const t=(code==='cancelled'?'※ 중지로 일부만 작성됨\n':'※ 연결이 끊겨 일부만 작성됨\n')+err.text; e.ai=t; e.aiAuto=t; e.aiPartial=true; if(repView==='ai'){ body.value=t; repDocSync(); } e.at=now(); rpsave(); }
       else { Object.assign(e,prev); if(repView==='ai'){ body.value=e.ai||''; repDocSync(); } rpsave(); }
       if(HIDE_AI.includes(code)) CAP.sample=null;
-      st.textContent = code==='cancelled' ? (e.ai?'중지됨 — 일부만 작성 (편집 가능)':'중지됨') : ((err&&err.message)||AI_MSG[code]||AI_MSG.upstream_error); st.classList.add('warn');   // V141: 상태 줄은 작성 중·문제일 때만 보임
+      st.textContent = code==='cancelled' ? (e.ai?'중지됨 — 일부만 작성 (편집 가능)':'중지됨') : ((err&&err.message)||AI_MSG[code]||AI_MSG.upstream_error)+(code!=='cancelled'&&!e.ai?' — 규칙 초안을 보여 드립니다':''); st.classList.add('warn');   // V141: 상태 줄은 작성 중·문제일 때만 보임
     }finally{
       if(repCtl===ctl){ repCtl=null; st.classList.remove('busy'); clearInterval(repBusyIv); $('#repBusy').hidden=true; $('#report').classList.remove('busy'); body.readOnly=!repEditing; $('#repTabAi').disabled=!e.ai; { const msg=st.textContent, w=st.classList.contains('warn'); setRepView(e.ai?repView:'draft'); st.textContent=msg; st.classList.toggle('warn',w); } syncRepUI(true); }   // V138: 작성 중 교수 확인이 끝났어도 편집 버튼이 보이게
     }
@@ -3862,7 +3882,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       ['list','지휘 절차 이행',`${pct}%`,`${f.done||0} / ${f.total||0} 항목`,'#244EA2','#EEF2F8']];
     tiles.forEach(([ic,lb,big,small,col,bg],i)=>{ const x=M+i*(cw+10), h=190; g.fillStyle=bg; rRound(g,x,y,cw,h,20); g.fill(); g.fillStyle=col; rRound(g,x,y,8,h,4); g.fill();
       g.fillStyle=col; g.beginPath(); g.arc(x+46,y+46,26,0,7); g.fill(); rIco(g,ic,x+46,y+46,14,'#fff'); T(lb,x+84,y+46,21,800,col);
-      if(i===3){ const cx=x+cw-62, cy=y+118, rr=44; g.lineWidth=14; g.strokeStyle='#D0D5DD'; g.beginPath(); g.arc(cx,cy,rr,0,7); g.stroke(); g.strokeStyle=col; g.lineCap='round'; g.beginPath(); g.arc(cx,cy,rr,-Math.PI/2,-Math.PI/2+Math.PI*2*pct/100); g.stroke(); g.lineCap='butt'; T(fit(big,46,900,cw-150),x+24,y+112,46,900,'#0B1B3F'); }
+      if(i===3){ const cx=x+cw-62, cy=y+118, rr=44; g.lineWidth=14; g.strokeStyle='#D0D5DD'; g.beginPath(); g.arc(cx,cy,rr,0,7); g.stroke(); g.strokeStyle=col; g.lineCap='round'; g.beginPath(); g.arc(cx,cy,rr,-Math.PI/2,-Math.PI/2+Math.PI*2*pct/100); g.stroke(); g.lineCap='butt'; { let bs=46; g.font=`900 ${bs}px ${RFF}`; while(bs>30&&g.measureText(big).width>cw-150){ bs-=2; g.font=`900 ${bs}px ${RFF}`; } T(big,x+24,y+112,bs,900,'#0B1B3F'); } }   /* V181: 100%가 '10…'으로 잘리지 않게 글자를 줄임 */
       else T(fit(big,46,900,cw-40),x+24,y+112,46,900,'#0B1B3F');
       T(fit(small,18,600,cw-40),x+24,y+160,18,600,'#475467'); });
     // 단계 도식: 화재 성상 · 화재 상황
