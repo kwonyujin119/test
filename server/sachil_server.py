@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '9.8'
-APP_VERSION = 'V172'
+VERSION = '9.9'
+APP_VERSION = 'V173'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -819,6 +819,9 @@ class H(BaseHTTPRequestHandler):
             self.user = self.get_user()
             if path == '/api/report/tpl':   # V125: 교수가 정한 보고서 규칙 초안 양식(모든 기기 공통). 비어 있으면 앱 기본 양식
                 return self.send(200, {'ok': True, 'tpl': str(CONF.get('report_tpl') or ''), 'inst': str(CONF.get('report_inst') or ''), 'ts': CONF.get('report_tpl_ts') or 0}, log=False)   # V136: inst = 관리자 지시사항
+            if path == '/api/checklist':   # V173: CH 현장지휘 체크리스트(교수가 방재실에서 고침). 비어 있으면 앱 기본 목록
+                cl = CONF.get('checklist')
+                return self.send(200, {'ok': True, 'list': cl if isinstance(cl, list) and cl else None, 'ts': CONF.get('checklist_ts') or 0}, log=False)
             if path == '/api/roominfo':   # V133: 47망·디브리핑룸 위 📌 핀 문구(교수가 고침). 비어 있으면 앱 기본 문구
                 return self.send(200, {'ok': True, 'info': CONF.get('room_info') or {}, 'ts': CONF.get('room_info_ts') or 0}, log=False)
             if path == '/api/me':
@@ -1265,6 +1268,27 @@ class H(BaseHTTPRequestHandler):
             CONF['report_tpl_ts'] = time.time()
             write_conf(CONF)
             return self.send(200, dict(status(), tpl=CONF['report_tpl'], inst=str(CONF.get('report_inst') or ''), tpl_ts=CONF['report_tpl_ts'], msg=('규칙 초안 양식' if t.strip() else '기본 양식') + ('·관리자 지시사항' if CONF.get('report_inst') else '') + '을 저장했습니다 — 모든 기기의 새 보고서·AI 작성에 적용'), log=False)
+        if act == 'checklist':   # V173: 체크리스트 저장 — [{name, items:[...]}]. 빈 목록 = 앱 기본 목록으로
+            raw = j.get('list') if isinstance(j.get('list'), list) else []
+            cl = []
+            for ph in raw[:20]:
+                if not isinstance(ph, dict):
+                    continue
+                name = re.sub(r'\s+', ' ', str(ph.get('name') or '')).strip()[:40]
+                its = ph.get('items') if isinstance(ph.get('items'), list) else []
+                its = [re.sub(r'\s+', ' ', str(x)).strip()[:120] for x in its if isinstance(x, (str, int, float)) and str(x).strip()][:15]
+                if name and its:
+                    cl.append({'name': name, 'items': its})
+            if raw and not cl:
+                return self.err(400, '단계 이름과 항목을 한 개 이상 넣으세요')
+            if cl:
+                CONF['checklist'] = cl
+            else:
+                CONF.pop('checklist', None)
+            CONF['checklist_ts'] = time.time()
+            write_conf(CONF)
+            return self.send(200, dict(status(), checklist=cl or None, checklist_ts=CONF['checklist_ts'],
+                                       msg=f'체크리스트를 저장했습니다 — {len(cl)}단계 {sum(len(x["items"]) for x in cl)}항목, 모든 기기에 적용' if cl else '기본 체크리스트로 되돌렸습니다'), log=False)
         if act == 'roominfo':   # V133: 대화방 📌 핀 문구 저장 — kind(net·deb)별 lead(첫 줄) + more(펼치면 보이는 줄들). 빈 글 = 기본 문구로
             kind = str(j.get('kind') or '')
             if kind not in ('net', 'deb'):
