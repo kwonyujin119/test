@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '10.3'
-APP_VERSION = 'V177'
+VERSION = '10.4'
+APP_VERSION = 'V178'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -1146,25 +1146,7 @@ class H(BaseHTTPRequestHandler):
     def ask_stream(self, sysmsg, msgs, max_tokens, mode, sources, st, ck, fallback):
         """V177: AI 답을 SSE(text/event-stream)로 조각조각 보낸다 — 첫 글자가 1~2초 안에 보여 기다림이 짧게 느껴진다.
         마지막에 {done:1, …}로 정리된 전체 답(순서 맞춤)·근거를 보낸다. 스트림이 실패하면 보통 호출(다른 회사 대체)로 이어서."""
-        self.drain()
-        self.send_response(200)
-        self.send_header('Content-Type', 'text/event-stream; charset=utf-8')
-        self.send_header('Cache-Control', 'no-store')
-        self.send_header('X-Accel-Buffering', 'no')
-        self.send_header('X-Content-Type-Options', 'nosniff')
-        self.send_header('Transfer-Encoding', 'chunked')
-        self.end_headers()
-        alive = [True]
-
-        def ev(obj):
-            if not alive[0]:
-                return
-            b = ('data: ' + json.dumps(obj, ensure_ascii=False) + '\n\n').encode('utf-8')
-            try:
-                self.wfile.write(f'{len(b):x}\r\n'.encode() + b + b'\r\n')
-                self.wfile.flush()
-            except Exception:
-                alive[0] = False
+        ev, end = self.sse_open()
         ev({'start': 1, 'sources': sources})
         with AI_BUSY_LOCK:
             AI_BUSY[0] += 1
@@ -1186,12 +1168,64 @@ class H(BaseHTTPRequestHandler):
         if not ans:
             ans, mode = (fallback or ('AI 답변을 만들지 못했습니다: ' + (why or '다시 물어보세요'))), ('extract' if fallback else 'none')
         ev({'done': 1, 'ok': True, 'mode': mode, 'note': note, 'answer': ans, 'sources': sources, 'status': st})
+        end()
+
+    def sse_open(self):
+        self.drain()
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/event-stream; charset=utf-8')
+        self.send_header('Cache-Control', 'no-store')
+        self.send_header('X-Accel-Buffering', 'no')
+        self.send_header('X-Content-Type-Options', 'nosniff')
+        self.send_header('Transfer-Encoding', 'chunked')
+        self.end_headers()
+        alive = [True]
+
+        def ev(obj):
+            if not alive[0]:
+                return
+            b = ('data: ' + json.dumps(obj, ensure_ascii=False) + '\n\n').encode('utf-8')
+            try:
+                self.wfile.write(f'{len(b):x}\r\n'.encode() + b + b'\r\n')
+                self.wfile.flush()
+            except Exception:
+                alive[0] = False
+
+        def end():
+            try:
+                self.wfile.write(b'0\r\n\r\n')
+                self.wfile.flush()
+            except Exception:
+                pass
+            self.alog(200)
+        return ev, end
+
+    def report_stream(self, sysmsg, prompt, key, now):
+        """V178: 보고서 AI를 SSE로 — 쓰는 대로 앱 미리보기에 보이고, 끝에 {done:1, ok, text}."""
+        ev, end = self.sse_open()
+        ev({'start': 1})
+        msgs = [{'role': 'user', 'content': prompt}]
+        with AI_BUSY_LOCK:
+            AI_BUSY[0] += 1
         try:
-            self.wfile.write(b'0\r\n\r\n')
-            self.wfile.flush()
-        except Exception:
-            pass
-        self.alog(200)
+            text, why, code = gemini_stream(sysmsg, msgs, 8000, lambda t: ev({'t': t}), 'medium')
+        finally:
+            with AI_BUSY_LOCK:
+                AI_BUSY[0] -= 1
+        if not text or code:
+            t2, why2, code2 = call_llm(sysmsg, msgs, 8000, 'medium')
+            if t2:
+                text, code = t2, ''
+            else:
+                why, code = why2 or why, code2 or code
+        if text and not code:
+            if len(REPORT_CACHE) > 200:
+                REPORT_CACHE.clear()
+            REPORT_CACHE[key] = (now, text)
+            ev({'done': 1, 'ok': True, 'text': text})
+        else:
+            ev({'done': 1, 'ok': False, 'code': code or 'upstream_error', 'error': why})
+        end()
 
     def report(self):
         """IL 사고보고서 AI 작성: 앱이 만든 지시문(사실 스냅샷 포함)을 Claude로 보내 보고서 본문을 받는다."""
@@ -1221,6 +1255,8 @@ class H(BaseHTTPRequestHandler):
         ok, why = ai_allowed(self.ip(), self.is_prof())
         if not ok:
             return self.send(200, {'ok': False, 'code': 'rate_limited', 'error': why}, log=False)
+        if j.get('stream') and ai_provider() == 'gemini':   # V178: 보고서도 글자가 나오는 대로
+            return self.report_stream(sysmsg, prompt, key, now)
         text, why, code = call_llm(sysmsg, [{'role': 'user', 'content': prompt}], 8000, 'medium')
         if not text:
             return self.send(200, {'ok': False, 'code': code or 'upstream_error', 'error': why}, log=False)
@@ -3649,8 +3685,8 @@ def gemini_stream(system, msgs, max_tokens, on_text, effort='low'):
     body = {'systemInstruction': {'parts': [{'text': system}]},
             'contents': [{'role': 'model' if m['role'] == 'assistant' else 'user', 'parts': [{'text': m['content']}]} for m in msgs],
             'generationConfig': {'maxOutputTokens': max(int(max_tokens), 8192)}}
-    if effort == 'low':
-        body['generationConfig']['thinkingConfig'] = {'thinkingBudget': int(CONF.get('gemini_think') or 0)}
+    if effort in ('low', 'medium'):
+        body['generationConfig']['thinkingConfig'] = {'thinkingBudget': int(CONF.get('gemini_think' if effort == 'low' else 'gemini_think_report') or 0)}
     req = urllib.request.Request(f'{base}/models/{model}:streamGenerateContent?alt=sse', data=json.dumps(body).encode('utf-8'), method='POST',
                                  headers={'x-goog-api-key': CONF.get('gemini_api_key', ''), 'content-type': 'application/json'})
     out = []
@@ -3672,7 +3708,7 @@ def gemini_stream(system, msgs, max_tokens, on_text, effort='low'):
         text = ''.join(out).strip()
         return (text, '', '') if text else ('', 'AI가 내용을 내지 않았습니다', 'empty_completion')
     except urllib.error.HTTPError as e:
-        if e.code == 400 and effort == 'low' and not out:
+        if e.code == 400 and effort in ('low', 'medium') and not out:
             try:
                 if 'thinking' in e.read().decode('utf-8', 'replace').lower():
                     return gemini_stream(system, msgs, max_tokens, on_text, '')
@@ -3692,8 +3728,8 @@ def call_gemini(system, msgs, max_tokens, effort=''):
     body = {'systemInstruction': {'parts': [{'text': system}]},
             'contents': [{'role': 'model' if m['role'] == 'assistant' else 'user', 'parts': [{'text': m['content']}]} for m in msgs],
             'generationConfig': {'maxOutputTokens': max(int(max_tokens), 8192)}}   # 생각(thinking) 몫까지 넉넉히
-    if effort == 'low':   # V177: AI 도우미는 '생각'을 줄여 빨리(gemini_think 설정, 기본 0 = 바로 답) — 모델이 안 받으면 아래에서 빼고 다시
-        body['generationConfig']['thinkingConfig'] = {'thinkingBudget': int(CONF.get('gemini_think') or 0)}
+    if effort in ('low', 'medium'):   # V177: AI 도우미(low)는 gemini_think, V178: 보고서(medium)는 gemini_think_report — 기본 0 = 바로 씀. 모델이 안 받으면 아래에서 빼고 다시
+        body['generationConfig']['thinkingConfig'] = {'thinkingBudget': int(CONF.get('gemini_think' if effort == 'low' else 'gemini_think_report') or 0)}
     req = urllib.request.Request(f'{base}/models/{model}:generateContent', data=json.dumps(body).encode('utf-8'), method='POST',
                                  headers={'x-goog-api-key': CONF.get('gemini_api_key', ''), 'content-type': 'application/json'})
     code, why = 'upstream_error', ''
@@ -3718,7 +3754,7 @@ def call_gemini(system, msgs, max_tokens, effort=''):
         except Exception:
             err = {}
         msg = json.dumps(err, ensure_ascii=False)
-        if e.code == 400 and effort == 'low' and 'thinking' in msg.lower():
+        if e.code == 400 and effort in ('low', 'medium') and 'thinking' in msg.lower():
             return call_gemini(system, msgs, max_tokens, '')   # 생각 줄이기를 모르는 모델 — 그대로 다시
         if 'API_KEY_INVALID' in msg or e.code in (401,):
             why = 'Gemini API 키가 틀렸습니다'
