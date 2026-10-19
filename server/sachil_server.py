@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '10.4'
-APP_VERSION = 'V178'
+VERSION = '10.5'
+APP_VERSION = 'V179'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -824,7 +824,7 @@ class H(BaseHTTPRequestHandler):
                 return self.send(200, {'ok': True, 'form': fm if isinstance(fm, list) and fm else None, 'ts': CONF.get('ilform_ts') or 0}, log=False)
             if path == '/api/checklist':   # V173: CH 현장지휘 체크리스트(교수가 방재실에서 고침). 비어 있으면 앱 기본 목록
                 cl = CONF.get('checklist')
-                return self.send(200, {'ok': True, 'list': cl if isinstance(cl, list) and cl else None, 'ts': CONF.get('checklist_ts') or 0}, log=False)
+                return self.send(200, {'ok': True, 'list': cl if isinstance(cl, list) and cl else None, 'cols': CONF.get('checklist_cols') or 0, 'ts': CONF.get('checklist_ts') or 0}, log=False)
             if path == '/api/roominfo':   # V133: 47망·디브리핑룸 위 📌 핀 문구(교수가 고침). 비어 있으면 앱 기본 문구
                 return self.send(200, {'ok': True, 'info': CONF.get('room_info') or {}, 'ts': CONF.get('room_info_ts') or 0}, log=False)
             if path == '/api/me':
@@ -1401,7 +1401,7 @@ class H(BaseHTTPRequestHandler):
                         o['opts'] = [[sx(x[0], 20), sx(x[1], 30)] for x in (f.get('opts') or [])[:8] if isinstance(x, list) and len(x) == 2]
                     elif isinstance(f.get('opts'), list):
                         o['opts'] = list(dict.fromkeys(sx(x, 40) for x in f['opts'][:30] if sx(x, 40)))
-                    for key, n in (('ph', 120), ('unit', 10), ('dep', 24), ('none', 40)):
+                    for key, n in (('ph', 120), ('unit', 10), ('dep', 24), ('none', 40), ('def', 40)):
                         if f.get(key):
                             o[key] = sx(f.get(key), n)
                     for key in ('other', 'fold'):
@@ -1409,7 +1409,10 @@ class H(BaseHTTPRequestHandler):
                             o[key] = True
                     fs.append(o)
                 if fs:
-                    fm.append({'id': bid, 'name': name, 'off': bool(b.get('off')), 'fields': fs})
+                    fb = {'id': bid, 'name': name, 'off': bool(b.get('off')), 'fields': fs}
+                    if isinstance(b.get('grp'), str):
+                        fb['grp'] = sx(b.get('grp'), 20)   # V179: 묶음 이름(화재 개요·피해 현황 등, 빈 글 = 묶지 않음)
+                    fm.append(fb)
             if raw and not fm:
                 return self.err(400, '서식이 비어 있습니다')
             if fm:
@@ -1430,16 +1433,31 @@ class H(BaseHTTPRequestHandler):
                 its = ph.get('items') if isinstance(ph.get('items'), list) else []
                 its = [re.sub(r'\s+', ' ', str(x)).strip()[:120] for x in its if isinstance(x, (str, int, float)) and str(x).strip()][:15]
                 if name and its:
-                    cl.append({'name': name, 'items': its})
+                    o = {'name': name, 'items': its}
+                    try:
+                        c = int(ph.get('cols') or 0)   # V179: 단계별 단 수(0 = 전체 설정 따름)
+                    except (TypeError, ValueError):
+                        c = 0
+                    if 1 <= c <= 3:
+                        o['cols'] = c
+                    cl.append(o)
             if raw and not cl:
                 return self.err(400, '단계 이름과 항목을 한 개 이상 넣으세요')
             if cl:
                 CONF['checklist'] = cl
             else:
                 CONF.pop('checklist', None)
+            try:
+                cols = int(j.get('cols') or 0)   # V179: CH 항목을 몇 단으로(1~3, 0 = 앱 기본)
+            except (TypeError, ValueError):
+                cols = 0
+            if 1 <= cols <= 3:
+                CONF['checklist_cols'] = cols
+            elif 'cols' in j:
+                CONF.pop('checklist_cols', None)
             CONF['checklist_ts'] = time.time()
             write_conf(CONF)
-            return self.send(200, dict(status(), checklist=cl or None, checklist_ts=CONF['checklist_ts'],
+            return self.send(200, dict(status(), checklist=cl or None, checklist_cols=CONF.get('checklist_cols') or 0, checklist_ts=CONF['checklist_ts'],
                                        msg=f'체크리스트를 저장했습니다 — {len(cl)}단계 {sum(len(x["items"]) for x in cl)}항목, 모든 기기에 적용' if cl else '기본 체크리스트로 되돌렸습니다'), log=False)
         if act == 'roominfo':   # V133: 대화방 📌 핀 문구 저장 — kind(net·deb)별 lead(첫 줄) + more(펼치면 보이는 줄들). 빈 글 = 기본 문구로
             kind = str(j.get('kind') or '')
