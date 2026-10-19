@@ -869,7 +869,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v168</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v169</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1359,6 +1359,7 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .mapov .mh{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--surface)}
 .mapov .mclose{width:var(--tap);height:var(--tap);border:0;background:none;font-size:28px;color:var(--navy);line-height:1}
 .mapov .mh b{white-space:nowrap}
+.mapov .mh .ttl{display:inline-flex;align-items:center;gap:6px}.mapov .tsym{width:24px;height:24px;display:block;flex:none}.mapov .mh .ttl .tsym{width:26px;height:26px}   /* V169: CP 헬멧·새 소화전 그림 */
 .mapov .msrch{flex:1;display:flex;gap:6px;min-width:0}
 .mapov .msrch input{flex:1;min-width:0;min-height:40px;border:1px solid var(--line);border-radius:10px;padding:0 10px;font:inherit;background:var(--surface);color:var(--fg)}
 .mapov .mbox{position:relative;flex:1;min-height:200px}
@@ -1668,8 +1669,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V168', SRV_VER='9.4';
+  const APP_VER='V169', SRV_VER='9.5';
   const UPDATES=[
+    {v:'V169', d:'2026-10-19', t:['CP 지도 창 제목·버튼에 남아 있던 ‘DS’를 CP(소방 헬멧 그림)로','소화전 창·CP 지도 창 안의 소화전 그림도 새 소화전 아이콘으로, 안내 문구의 DS도 CP로']},
     {v:'V168', d:'2026-10-19', t:['앱을 열 때 첫 화면이 그려지기 전 잠깐(0.2초) 검색 창·바닥글·하단 탭이 보이던 현상 없앰(47망·AI 화면으로 바로 열 때 바닥글도)']},
     {v:'V167', d:'2026-10-19', t:['첫 화면: CP·소화전 버튼을 47망 글자와 따로 배치 — 디브리핑룸 말풍선 그림·글과 47망 그림은 원래대로','CP·소화전 버튼은 47망 글 아래 남은 자리의 아래쪽에 세로로, 들어가는 가장 큰 크기로(세로로는 작게만 들어가는 PC 화면은 가로로)']},
     {v:'V166', d:'2026-10-18', t:['첫 화면 47망 칸의 CP·소화전 버튼을 세로로 놓고 1.5배 크게(좁은 휴대폰에서는 47망 그림 대신 버튼에 자리를 줌)']},
@@ -2555,7 +2557,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {k:'law', n:'법제처 OPEN API', pane:'AI', d:'법령 질문에 현행 조문 원문을 근거로 — law.go.kr 마이페이지 → API인증키관리의 ‘현재 API인증키(OC)’', ph:'API인증키(OC)', has:j=>j.law, save:v=>({action:'law',oc:v}), del:{action:'law',oc:''}, test:true, need:j=>'law' in j},
     {k:'bld', n:'공공데이터포털 인증키', pane:'AI', d:'검색창에 주소를 넣으면 건축물대장(용도·구조·층수·연면적)과 가까운 소방용수시설 — data.go.kr 마이페이지 → 데이터활용 → Open API → 활용신청 현황의 일반 인증키(Decoding). 키 하나로 승인받은 API 모두에 쓰입니다', ph:'일반 인증키(Decoding)', has:j=>j.bld, save:v=>({action:'bld',key:v}), del:{action:'bld',key:''}, test:true, need:j=>'bld' in j,
       more:j=>{ const p=j.pub||{}, ks=Object.keys(p); return `<ul class="kapi">${(ks.length?ks:['건축물대장','소방용수시설','위험물정보(소방청)','상수도시설정보(수자원공사)']).map(k=>{ const v=p[k]; return `<li class="${v?(v[0]?'ok':'bad'):''}"><b>${esc(k)}</b> ${v?(v[0]?'✅ 연결':'❌ '+esc(v[1])):'— 아직 시험 전'}${v&&v[0]&&v[1]?` <small>${esc(v[1])}</small>`:''}</li>`; }).join('')}</ul>${'pub' in j?'<button type="button" class="btn ghost sm" data-ka="retest">다시 시험</button>':''}`; }},
-    {k:'kakao', n:'카카오맵', pane:'Map', d:'47망 DS 지도 — developers.kakao.com의 JavaScript 키(32자)', ph:'JavaScript 키 32자', has:j=>j.kakao, save:v=>({action:'kakao',key:v}), del:{action:'kakao',key:''}},
+    {k:'kakao', n:'카카오맵', pane:'Map', d:'47망 CP 지도 — developers.kakao.com의 JavaScript 키(32자)', ph:'JavaScript 키 32자', has:j=>j.kakao, save:v=>({action:'kakao',key:v}), del:{action:'kakao',key:''}},
     {k:'tmap', n:'T맵', pane:'Map', d:'47망 소화전 — openapi.sk.com의 App Key', ph:'App Key', has:j=>j.tmap, save:v=>({action:'tmap',key:v}), del:{action:'tmap',key:''}}];
   const KMSG={}, KOPEN={}; let KJ=null;
   function keyCardHtml(d,j){
@@ -2587,7 +2589,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       KMSG[d.k]={t:d.test?'확인 중… 키가 맞는지 실제로 한 번 시험하고 있어요(최대 1분)':'저장 중…',c:'busy'}; keyCardsPaint();
       const x=await api('/api/admin/ai',{json:d.save(v),tok:PROF.tok});
       if(x.ok&&x.j&&x.j.ok!==false&&x.j.keys&&(!d.need||d.need(x.j))&&d.has(x.j)){ delete KOPEN[d.k];
-        KMSG[d.k]={t:d.test?`✅ 등록 완료 — 시험 통과${x.j.msg?' · '+x.j.msg:''}`:`✅ 등록 완료${d.k==='kakao'?' — DS 지도를 열어 지도가 보이면 정상':d.k==='tmap'?' — 소화전을 열어 지도가 보이면 정상':''}`,c:'ok'};
+        KMSG[d.k]={t:d.test?`✅ 등록 완료 — 시험 통과${x.j.msg?' · '+x.j.msg:''}`:`✅ 등록 완료${d.k==='kakao'?' — CP 지도를 열어 지도가 보이면 정상':d.k==='tmap'?' — 소화전을 열어 지도가 보이면 정상':''}`,c:'ok'};
         if(d.k==='kakao') SRV.kakao=v.replace(/[^0-9a-f]/gi,'').toLowerCase(); if(d.k==='tmap') SRV.tmap=v.replace(/[^0-9A-Za-z]/g,''); if(d.k==='bld') SRV.bld=true; paint(x.j); }
       else { KMSG[d.k]={t:'❌ 등록 안 됨 — '+((x.j&&x.j.error)||(x.ok&&x.j&&!d.has(x.j)?'서버가 이 키를 받지 않았습니다(서버 업데이트 필요할 수 있음)':'서버에 연결하지 못했습니다')),c:'bad'}; if(x.j&&x.j.keys) paint(x.j); else keyCardsPaint(); } }); }
   // V143: 방재실 탭(요약·서버·AI·지도 키·핀 문구·보고서·메뉴 자료) — 한 화면에 늘어놓지 않고 나눠서, 위쪽에 상태 요약
@@ -4524,8 +4526,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       s.onerror=()=>fin(new Error('load')); document.head.appendChild(s); });
     return MAPS.p;
   }
-  const mapEl=document.createElement('div'); mapEl.className='mapov'; mapEl.id='mapov'; mapEl.hidden=true; mapEl.setAttribute('role','dialog'); mapEl.setAttribute('aria-modal','true'); mapEl.setAttribute('aria-label','DS 현장 지도');
-  mapEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="지도 닫기">‹</button><b>DS</b><button type="button" class="mtab sym" data-tab="hyd" aria-label="소화전으로" title="소화전"><svg class="hydsym" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2.5h6v2h.8a1.2 1.2 0 0 1 1.2 1.2V7.5H7V5.7a1.2 1.2 0 0 1 1.2-1.2H9z" fill="#D92D20"/><rect x="5.5" y="7.5" width="13" height="2.2" rx="1.1" fill="#B42318"/><path d="M8 9.7h8V19h1.6a1.1 1.1 0 0 1 0 2.2H6.4a1.1 1.1 0 0 1 0-2.2H8z" fill="#D92D20"/><rect x="3.6" y="11.6" width="4.6" height="3.4" rx="1.2" fill="#B42318"/><rect x="15.8" y="11.6" width="4.6" height="3.4" rx="1.2" fill="#B42318"/><circle cx="12" cy="14.3" r="1.7" fill="#fff"/></svg></button>
+  const mapEl=document.createElement('div'); mapEl.className='mapov'; mapEl.id='mapov'; mapEl.hidden=true; mapEl.setAttribute('role','dialog'); mapEl.setAttribute('aria-modal','true'); mapEl.setAttribute('aria-label','CP 현장 지휘 지도');
+  mapEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="지도 닫기">‹</button><b class="ttl"><svg class="tsym" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 21.5C5 13.6 9.9 7.5 16.5 7.5S28 13.4 28 21.5z" fill="#229ED9" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M16.5 7.5c.9 0 1.6.7 1.6 1.6v12.4h-3.2V9.1c0-.9.7-1.6 1.6-1.6z" fill="#1A7FB0"/><path d="M2.2 21.2h27.3c.9 0 1.2 1.1.5 1.6-1.6 1-3.5 1.6-5.4 1.6H6.2c-2.2 0-4-1.4-4-3.2z" fill="#1A7FB0" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/><path d="M8.6 12.6h4.6v3.6c0 1.6-1.1 2.8-2.3 3.4-1.2-.6-2.3-1.8-2.3-3.4z" fill="#fff"/><path d="M10.9 14.1l.5 1.1 1.2.1-.9.8.3 1.2-1.1-.6-1.1.6.3-1.2-.9-.8 1.2-.1z" fill="#229ED9"/></svg>CP</b><button type="button" class="mtab sym" data-tab="hyd" aria-label="소화전으로" title="소화전"><svg class="tsym" viewBox="0 0 32 32" aria-hidden="true"><path d="M11 6.6c0-2.3 2.2-4.1 5-4.1s5 1.8 5 4.1V8H11z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="8.6" y="7.8" width="14.8" height="3.4" rx="1.7" fill="#B42318" stroke="#fff" stroke-width="1.5"/><path d="M10.8 11.2h10.4v14.6H10.8z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="4.4" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="21" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="7.4" y="25.4" width="17.2" height="3.6" rx="1.8" fill="#B42318" stroke="#fff" stroke-width="1.5"/><circle cx="16" cy="17.4" r="2.6" fill="#fff"/><circle cx="16" cy="17.4" r="1.1" fill="#B42318"/></svg></button>
       <form class="msrch" autocomplete="off"><input type="search" placeholder="주소·장소 검색" aria-label="주소·장소 검색" enterkeyhint="search"><button type="submit" class="btn ghost">검색</button></form></div>
     <ul class="mres" hidden></ul><div class="mbox"><div class="kmap"></div><div class="mjump" aria-label="표시로 바로 가기" hidden></div><div class="msel" role="group" aria-label="고른 표시" hidden></div><div class="mcp" role="menu" aria-label="CP 종류" hidden></div><button type="button" class="mme" aria-label="내 위치로">◎</button></div>
     <p class="mmsg" role="status"></p>
@@ -4831,7 +4833,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   const hydEl=document.createElement('div'); hydEl.className='mapov hydov'; hydEl.id='hydov'; hydEl.hidden=true;
   hydEl.setAttribute('role','dialog'); hydEl.setAttribute('aria-modal','true'); hydEl.setAttribute('aria-label','소화전');
-  hydEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="소화전 닫기">‹</button><b>소화전</b><button type="button" class="mtab dsb" data-tab="map" aria-label="DS 현장 지도로" title="DS(Disaster Site)"><svg class="dssym" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 6.2 9 4l6 2.2 5.5-2.2v13.8L15 20l-6-2.2-5.5 2.2z" fill="#EAF2FF" stroke="#2563EB" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 4v13.8M15 6.2V20" stroke="#2563EB" stroke-width="1.6"/><circle cx="12" cy="11.2" r="2.1" fill="#2563EB"/></svg><span>DS</span></button>
+  hydEl.innerHTML=`<div class="mh"><button type="button" class="mclose" aria-label="소화전 닫기">‹</button><b class="ttl"><svg class="tsym" viewBox="0 0 32 32" aria-hidden="true"><path d="M11 6.6c0-2.3 2.2-4.1 5-4.1s5 1.8 5 4.1V8H11z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="8.6" y="7.8" width="14.8" height="3.4" rx="1.7" fill="#B42318" stroke="#fff" stroke-width="1.5"/><path d="M10.8 11.2h10.4v14.6H10.8z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="4.4" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="21" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="7.4" y="25.4" width="17.2" height="3.6" rx="1.8" fill="#B42318" stroke="#fff" stroke-width="1.5"/><circle cx="16" cy="17.4" r="2.6" fill="#fff"/><circle cx="16" cy="17.4" r="1.1" fill="#B42318"/></svg>소화전</b><button type="button" class="mtab dsb" data-tab="map" aria-label="CP 현장 지휘 지도로" title="CP(현장 지휘)"><svg class="tsym" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 21.5C5 13.6 9.9 7.5 16.5 7.5S28 13.4 28 21.5z" fill="#229ED9" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M16.5 7.5c.9 0 1.6.7 1.6 1.6v12.4h-3.2V9.1c0-.9.7-1.6 1.6-1.6z" fill="#1A7FB0"/><path d="M2.2 21.2h27.3c.9 0 1.2 1.1.5 1.6-1.6 1-3.5 1.6-5.4 1.6H6.2c-2.2 0-4-1.4-4-3.2z" fill="#1A7FB0" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/><path d="M8.6 12.6h4.6v3.6c0 1.6-1.1 2.8-2.3 3.4-1.2-.6-2.3-1.8-2.3-3.4z" fill="#fff"/><path d="M10.9 14.1l.5 1.1 1.2.1-.9.8.3 1.2-1.1-.6-1.1.6.3-1.2-.9-.8 1.2-.1z" fill="#229ED9"/></svg><span>CP</span></button>
       <form class="msrch hsrch" autocomplete="off"><input type="search" placeholder="주소·장소 검색" aria-label="주소·장소 검색" enterkeyhint="search"><button type="submit" class="btn ghost">검색</button></form></div>
     <ul class="hres" hidden></ul>
     <div class="hbase" role="group" aria-label="기준 위치와 소화전 검색"></div>
@@ -4927,7 +4929,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   hq('.hbase').addEventListener('click',e=>{
     if(e.target.closest('.hgo')){ hydGo(); return; }
     const t=e.target.closest('[data-b]'); if(!t) return; const v=t.dataset.b;
-    if(v==='none'){ hmsg('47망 지도에 화재 표시가 없습니다 — 47망 → DS에서 🔥 화재를 놓으세요'); return; }
+    if(v==='none'){ hmsg('47망 지도에 화재 표시가 없습니다 — 47망 → CP에서 🔥 화재를 놓으세요'); return; }
     if(v!=='me'){ const b=HYD.fires[+v]; if(b) hydPick(b); return; }
     if(!navigator.geolocation){ hmsg('이 기기에서 위치를 쓸 수 없습니다'); return; }
     hmsg('내 위치를 찾는 중…');
@@ -4998,7 +5000,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!HYD.fires.length&&hm.est) tmapFind(HOME_Q).then(l=>{ const p=(l||[]).find(x=>homeOk(x.lat,x.lng)); if(p&&homeSave(p.lat,p.lng)&&HYD.map&&!HYD.base){ const m=mapC(); if(!m||distM(m,hm)<50){ try{ HYD.map.setCenter(new Tmapv2.LatLng(p.lat,p.lng)); }catch(_){ } } } }).catch(()=>{});   // 처음 위치 좌표 맞추기
     if(st){ hydDraw(); hydMarkBase(); hmsg(HYD.msgH||'직전에 보던 곳입니다',true); return; }   // V160: 직전 결과 그대로(소화전 표시 다시 그림)
     if(HYD.fires.length&&!vw) hydPick(HYD.fires[0],true);   // 화재가 있으면 열자마자 한 번 찾아 둔다(DS에서 넘어오면 그 자리 그대로)
-    else if(vw) hmsg('DS에서 보던 자리입니다 — ‘소화전 검색’을 누르면 가운데(+) 둘레를 찾습니다');
+    else if(vw) hmsg('CP에서 보던 자리입니다 — ‘소화전 검색’을 누르면 가운데(+) 둘레를 찾습니다');
     else hmsg('47망 지도에 화재 표시가 없습니다 — 주소를 검색하거나 ◎ 내 위치를 누른 뒤 ‘소화전 검색’을 누르세요');
   }
   window.__closeHyd=closeHyd;
