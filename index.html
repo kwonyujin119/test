@@ -324,6 +324,40 @@ html.sheet-lock,html.sheet-lock body{overflow:hidden}
 .shmenu button{display:grid;gap:1px;text-align:left;min-height:52px;padding:6px 12px;border:0;border-radius:10px;background:none;font:inherit;color:var(--fg)}
 .shmenu button:hover,.shmenu button:focus-visible{background:var(--surface-2)}.shmenu b{font-size:15px}.shmenu span{font-size:12px;color:var(--muted)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.rtov{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(11,27,63,.55)}
+.rtov[hidden]{display:none}
+.rtbox{width:min(720px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:var(--surface,#fff);border-radius:20px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.rtbox header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.rtbox header b{font-size:19px;font-weight:800;color:var(--navy)}
+.rtbox .close{width:40px;height:40px;border:0;border-radius:50%;background:var(--surface-2);font-size:22px;cursor:pointer}
+.rtcards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:560px){ .rtcards{grid-template-columns:1fr} .rtc{display:grid!important;grid-template-columns:86px 1fr;column-gap:12px;text-align:left!important;align-items:center} .rtc .rtv{grid-row:1/4;margin:0!important} }
+.rtc{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:14px 10px;border:2px solid var(--line);border-radius:16px;background:var(--surface,#fff);font:inherit;cursor:pointer;color:var(--fg);transition:border-color .12s,box-shadow .12s,transform .12s}
+.rtc b{font-size:16px;font-weight:800;color:var(--navy)}.rtc span{font-size:13px;color:var(--muted);line-height:1.35}.rtc em{font-style:normal;font-size:12px;font-weight:700;color:#B54708}
+.rtc[aria-checked="true"]{border-color:var(--navy);box-shadow:0 0 0 3px rgba(36,78,162,.18);background:#F5F8FF}
+.rtc:hover{transform:translateY(-1px)}
+.rtv{position:relative;display:block;width:86px;height:110px;margin-bottom:6px;border-radius:6px;background:#fff;border:1px solid #D0D5DD;box-shadow:0 2px 6px rgba(16,24,40,.12);overflow:hidden}
+.rtv::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:linear-gradient(#0B1B3F 60%,#FDD000 60%)}
+.rtv s,.rtv u,.rtv q{position:absolute;display:block;border-radius:2px}
+.rtv-brief s:nth-child(1){left:8px;right:8px;top:14px;height:6px;background:#0B1B3F}
+.rtv-brief s:nth-child(2){left:8px;right:8px;top:28px;height:8px;background:#DCE3F1}.rtv-brief s:nth-child(3){left:8px;right:30px;top:42px;height:4px;background:#98A2B3;box-shadow:0 8px 0 #98A2B3,0 16px 0 #98A2B3}
+.rtv-brief u{left:8px;right:8px;top:70px;height:14px;border:1px solid #98A2B3;background:repeating-linear-gradient(90deg,#fff 0 12px,#98A2B3 12px 13px)}
+.rtv-brief s:nth-child(5){left:8px;right:8px;top:90px;height:8px;background:#DCE3F1}
+.rtv-info s{top:14px;width:15px;height:18px}.rtv-info s:nth-child(1){left:7px;background:#FDA29B}.rtv-info s:nth-child(2){left:26px;background:#A6F4C5}.rtv-info s:nth-child(3){left:45px;background:#FEDF89}.rtv-info s:nth-child(4){left:64px;background:#B2CCFF}
+.rtv-info u{left:8px;right:8px;top:40px;height:10px;background:linear-gradient(90deg,#D92D20 0 30%,#F2F4F7 30% 32%,#244EA2 32% 60%,#F2F4F7 60% 62%,#D0D5DD 62%)}
+.rtv-info q{left:8px;top:58px;width:40px;height:44px;background:linear-gradient(#244EA2,#244EA2) 0 6px/90% 6px no-repeat,linear-gradient(#244EA2,#244EA2) 0 18px/60% 6px no-repeat,linear-gradient(#244EA2,#244EA2) 0 30px/75% 6px no-repeat}
+.rtv-info q::after{content:"";position:absolute;left:46px;top:4px;width:30px;height:30px;border-radius:50%;border:6px solid #244EA2;border-right-color:#D0D5DD;box-sizing:border-box}
+.rtv-photo s{width:33px;height:30px;background:linear-gradient(135deg,#F79009,#7A271A)}.rtv-photo s:nth-child(1){left:7px;top:16px}.rtv-photo s:nth-child(2){left:45px;top:16px}.rtv-photo s:nth-child(3){left:7px;top:58px}.rtv-photo s:nth-child(4){left:45px;top:58px}
+.rtv-photo s::after{content:"";position:absolute;left:0;right:0;top:32px;height:4px;background:#98A2B3}
+.rtwarn{margin:12px 0 0;padding:8px 12px;border-radius:10px;background:#FFFAEB;color:#93370D;font-size:13px;font-weight:700}
+.rtacts{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.rtacts .btn{min-height:46px}
+.tag.rt-brief{background:#EEF2F8;color:#244EA2}.tag.rt-info{background:#ECFDF3;color:#067647}.tag.rt-photo{background:#FFFAEB;color:#B54708}
+.rep-ph{margin:0 0 10px;padding:12px;border-radius:14px;background:var(--surface-2,#F2F4F7);border:1px solid var(--line)}
+.rph-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.rph-h b{font-size:15px;color:var(--navy)}.rph-h span{flex:1 1 200px;font-size:12.5px;color:var(--muted)}.rph-h label{cursor:pointer}
+.rph-l{display:flex;flex-direction:column;gap:8px;margin-top:10px}.rph-l:empty{display:none}
+.rph-i{display:grid;grid-template-columns:88px 1fr auto;gap:10px;align-items:start;padding:8px;border-radius:12px;background:var(--surface,#fff);border:1px solid var(--line)}
+.rph-i img{width:88px;height:66px;object-fit:cover;border-radius:8px;background:#E9EDF3}
+.rph-t{display:flex;flex-direction:column;gap:6px;min-width:0}.rph-t input,.rph-t textarea{width:100%;box-sizing:border-box;font:inherit;font-size:14px;padding:7px 9px;border:1px solid var(--line);border-radius:8px}.rph-t input{font-weight:700}
+.rph-b{display:flex;flex-direction:column;gap:4px}.rph-b button{min-width:44px;min-height:30px;border:1px solid var(--line);border-radius:8px;background:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
 .rep-busy{position:relative;display:flex;align-items:center;gap:12px;margin:0 0 10px;padding:14px 14px 18px;border-radius:14px;background:#0B1B3F;color:#fff;overflow:hidden;box-shadow:0 6px 18px rgba(11,27,63,.28)}
 .rep-busy b{display:block;font-size:16px;font-weight:800;letter-spacing:-.01em}.rep-busy small{display:block;margin-top:2px;font-size:12.5px;color:#C7D2FE}
 .rep-busy>div{flex:1;min-width:0}.rep-busy .btn{flex:none;background:#fff;color:#0B1B3F;border-color:#fff}
@@ -883,7 +917,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v175</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v176</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -917,9 +951,10 @@ footer b{color:var(--muted);font-weight:600}
         <button type="button" role="tab" id="repTabDraft" aria-selected="true">규칙 초안</button>
         <button type="button" role="tab" id="repTabAi" aria-selected="false" disabled>AI 작성본</button>
       </div>
-      <div class="right"><span class="rep-status" id="repStatus" aria-live="polite"></span><button type="button" class="btn ghost sm" id="repRegen" hidden>초안 새로 생성</button><button type="button" class="btn ghost sm" id="repTpl" hidden>양식·지시사항</button><label class="btn ghost sm rep-img" id="repImg" hidden><input type="file" accept="image/*" hidden id="repImgIn">📷 사진 넣기</label><button type="button" class="btn ghost sm" id="repImgDel" hidden>사진 빼기</button></div>
+      <div class="right"><span class="rep-status" id="repStatus" aria-live="polite"></span><button type="button" class="btn ghost sm" id="repRegen" hidden>초안 새로 생성</button><button type="button" class="btn ghost sm" id="repTpl" hidden>양식·지시사항</button></div>
     </div>
     <div class="rep-busy" id="repBusy" role="status" aria-live="polite" hidden><span class="rb-spin" aria-hidden="true"></span><div><b>AI가 보고서를 작성하고 있습니다</b><small id="repBusyT">IL 입력·체크·시각 기록을 읽는 중 · 보통 10~40초</small></div><button type="button" class="btn ghost sm" id="repBusyStop">중지</button><i class="rb-bar" aria-hidden="true"></i></div>
+    <div class="rep-ph" id="repPh" hidden></div>
     <textarea class="rep-body" id="repBody" spellcheck="false" aria-label="보고서 본문" hidden></textarea>
     <div class="rep-doc" id="repDoc" tabindex="0" aria-label="보고서 미리보기"></div>
     <div class="rep-foot">
@@ -1561,6 +1596,18 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .hz-k b{font-size:calc(21px*var(--fs));font-weight:800;line-height:1.15}
 .hz-k .hd{font-size:calc(11.5px*var(--fs));line-height:1.4;font-weight:600;color:#4a3d00;letter-spacing:-.02em}
 .hz-k .hd.n{display:none}
+.board .phase header{position:relative;padding-bottom:10px}
+.board .phase .phbar{position:absolute;left:0;right:0;bottom:0;height:4px;border-radius:2px;background:var(--surface-2,#EEF1F5);overflow:hidden}
+.board .phase .phbar::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--p);background:linear-gradient(90deg,#244EA2,#3D6BD1);border-radius:2px;transition:width .25s}
+.board .phase.done .phbar::after{background:#067647}
+.board .phase .items{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px}   /* V176: 항목을 두 줄로 나눠 오른쪽 빈자리에도 체크 */
+.board .phase .item{display:flex;flex-direction:column;align-items:stretch;gap:0}
+.board .phase .item label{align-items:flex-start;min-width:0;padding:9px 0 4px;min-height:0}.board .phase .item label input{margin-top:1px}
+.board .phase .item .tx{word-break:keep-all;overflow-wrap:anywhere;line-height:1.35}
+.board .phase .item .at{display:block;text-align:left;padding:0 0 8px 32px;font-size:11px;line-height:1.2}.board .phase .item .at:empty{padding:0 0 6px}
+@media (max-width:339px){ .board .phase .items{grid-template-columns:1fr} }
+.il2{counter-reset:ils}.il2 .ilsec>header h3::before{counter-increment:ils;content:counter(ils);display:inline-grid;place-items:center;min-width:26px;height:26px;margin-right:8px;border-radius:8px;background:var(--navy);color:#fff;font-size:13px;font-weight:800;vertical-align:1px}
+.il2 .ilsec{border-top:4px solid var(--navy)}.il2 .ilsec:has(.st.has){border-top-color:#067647}
 .il2 .ilsec>header{flex-wrap:wrap;row-gap:8px}.il2 .ilsec>header h3{white-space:nowrap;flex:1 1 auto}.il2 .ilsec>header .lvl{order:3;flex:1 1 100%;display:flex;gap:6px}.il2 .ilsec>header .lvl button{flex:1 1 0;min-width:0}
 .il2 .ilfs{display:flex;flex-direction:column;gap:14px;padding:2px 0 4px}
 .ilfield{display:flex;flex-direction:column;gap:6px;min-width:0}.ilfield.off{opacity:.5}
@@ -1589,6 +1636,7 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .ilefh small{flex:none;color:var(--muted);font-size:12px}
 .ilp.ioff{opacity:.55}.ilen{margin:6px 0 0}
 .ilp .ilo,.ilp .ilph,.ilp .ilnn{width:100%;box-sizing:border-box;font:inherit;font-size:14px;line-height:1.5;padding:6px 8px;border:1px solid var(--line);border-radius:8px}
+.cl-warn{margin:0;padding:10px 12px;border-radius:10px;background:#FFFAEB;border:1px solid #FEC84B;color:#93370D;font-weight:700}
 .cled{display:flex;flex-direction:column;gap:10px;margin:10px 0;min-width:0;max-width:100%}
 .clp{min-width:0;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface,#fff)}
 .clh{display:flex;align-items:center;gap:6px;margin-bottom:6px}
@@ -1738,8 +1786,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V175', SRV_VER='10.1';
+  const APP_VER='V176', SRV_VER='10.2';
   const UPDATES=[
+    {v:'V176', d:'2026-10-19', t:['보고서 만들기 → 종류부터 고르기: 신속 브리핑형(A4 1쪽·표·아이콘) / 인포그래픽 요약형(숫자 타일·차트·단계 도식) / 사진기록 리포트형(사진 6장까지·캡션·설명·나란히 비교)','보고서 사진: 여러 장 넣고 순서 바꾸기·캡션·설명(사진기록형), 신속 브리핑형은 첫 사진이 발생개요 옆에','IL 재산피해에 ‘조사 중’ 버튼','방재실 체크리스트·상황보고서 서식: 서버가 옛 버전이거나 꺼져 있어도 이 기기에 저장해 두고, 서버가 업데이트·연결되면 자동으로 모든 기기에 적용(지금 서버 버전 안내)','CH: 항목을 두 줄로 나눠 오른쪽 빈자리에도 체크, 단계마다 진행 막대 · IL: 칸 번호·입력 완료 색 표시']},
     {v:'V175', d:'2026-10-19', t:['보고서 AI 작성 중 표시를 크게: 남색 띠에 돌아가는 표시·움직이는 막대·경과 초·받은 글자 수, 바로 중지 버튼','보고서 서식: 1 발생개요(오른쪽에 사진) · 2 화재 상황(성상·상황·원인) · 3 피해 현황(인명·재산을 표로) · 4 조치 사항 | 5 향후 전망(좌우 나란히)','IL에 재산피해 칸 추가(추정 피해액 만원 → 1억 5,000만원처럼 표시, 피해 내용)','보고서 ‘편집’에서 📷 사진 넣기·바꾸기·빼기 — 1 발생개요 오른쪽 빈자리에 들어가고 A4 한 장에 맞춤']},
     {v:'V174', d:'2026-10-19', t:['IL ‘사고보고서’ → ‘화재등 상황 보고서’로 이름 변경','입력을 누르기만 하면 되게: 발생개요(일시 ‘지금’·장소·처종·타는 것) / 화재 성상 / 화재 상황(+수기작성) / 인명피해(해당없음·경상·중상·심정지 −/+ 인원, 고르면 인명구조 칸이 켜짐) / 화재 원인 / 조치 사항 / 향후 전망','SACHIL방재실에 ‘상황보고서’ 탭 신설 — 교수가 칸 이름·선택지·안내 문구를 고치고 칸을 켜고 끄거나 새로 만들면 모든 기기에 바로 적용','보고서 만들기: A4 한 장에 꽉 맞게 간격·글자 크기를 자동으로 맞추고(넘치면 줄이고 남으면 넓힘), 이름 칸·값 칸이 나뉜 표 모양 디자인. 미리보기가 실제 A4 그대로이고 누르면 크게 보기']},
     {v:'V173', d:'2026-10-19', t:['CH 체크리스트를 새 13단계(출동중 → 상황전파 → 도착 → 전략 결정 → … → 최종보고, 52항목)로 바꿈','SACHIL방재실에 ‘체크리스트’ 탭 신설 — 교수가 단계 이름·항목을 고치고 순서 바꾸기·추가·삭제, 저장하면 모든 기기의 CH 탭이 바로 바뀜(항목이 바뀌면 그 기기의 체크 표시는 비우고 시각 기록은 남김)','CP 지도: 왼쪽 아래 ⬚ 범위 선택을 누르고(PC는 Shift를 누른 채) 지도를 끌면 네모 안 표시를 모두 골라 한 번에 삭제(되돌리기 가능)']},
@@ -1971,7 +2020,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {id:'life', name:'인명피해', fields:[{k:'life',label:'인명피해',type:'injury',none:'현재까지 해당없음',opts:['경상','중상','심정지']},
       {k:'rescue',label:'인명구조',type:'num',unit:'명',dep:'life'},
       {k:'rescue_note',label:'구조 내용',type:'text',dep:'life',ph:'예: 3층 요구조자 2명 구조·이송'}]},
-    {id:'prop', name:'재산피해', fields:[{k:'prop_est',label:'추정 피해액',type:'num',unit:'만원',max:9999999},
+    {id:'prop', name:'재산피해', fields:[{k:'prop_st',label:'',type:'one',opts:['조사 중']},{k:'prop_est',label:'추정 피해액',type:'num',unit:'만원',max:9999999},
       {k:'prop_note',label:'피해 내용',type:'text',ph:'예: 공장 1동 2층 일부 소실, 설비 피해 추정'}]},
     {id:'cause', name:'화재 원인', fields:[{k:'cause_est',label:'추정 발화 요인',type:'one',opts:['전기적 요인','기계적 요인','화학적 요인','가스 누출','부주의','방화 의심','자연적 요인','조사 중','미상']},
       {k:'cause_txt',label:'직접 입력',type:'text',ph:'예: 2층 분전반 부근 발화 추정(관계자 진술)'}]},
@@ -2736,7 +2785,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const box=panel.querySelector('#clEd'), msg=panel.querySelector('#clMsg'), sec=panel.querySelector('#clEdit'); if(!box) return;
     let W=CHECKLIST.map(p=>({name:p.name,items:p.items.slice()}));
     const read=()=>{ W=[...box.querySelectorAll('.clp')].map(d=>({name:d.querySelector('.cln').value, items:d.querySelector('.cli').value.split(/\r?\n/)})); };
-    const draw=()=>{ box.innerHTML=W.map((p,i)=>`<div class="clp" data-i="${i}"><div class="clh"><b class="clno">${i+1}</b><input class="cln" value="${esc(p.name)}" maxlength="40" aria-label="${i+1}단계 이름" placeholder="단계 이름"><span class="clbt"><button type="button" class="btn ghost sm" data-cl="up" aria-label="위로" ${i?'':'disabled'}>↑</button><button type="button" class="btn ghost sm" data-cl="down" aria-label="아래로" ${i<W.length-1?'':'disabled'}>↓</button><button type="button" class="btn ghost sm cl-del" data-cl="del" aria-label="${i+1}단계 삭제">삭제</button></span></div><textarea class="cli" rows="${Math.max(3,Math.min(9,p.items.length+1))}" aria-label="${i+1}단계 항목(한 줄에 하나)" placeholder="항목을 한 줄에 하나씩">${esc(p.items.join('\n'))}</textarea></div>`).join('')+`<p class="note cl-sum">${W.length}단계 · ${W.reduce((n,p)=>n+p.items.filter(x=>String(x).trim()).length,0)}항목</p>`; };
+    const vnote=()=>!SRV.on?'<p class="note cl-warn">서버에 연결되지 않았습니다 — 저장하면 이 기기에 맡겨 두고, 서버가 켜지면 자동으로 올립니다</p>':(SRV.ver&&verLt(SRV.ver,'9.9'))?`<p class="note cl-warn">지금 서버 ${esc(SRV.ver)} — 체크리스트를 모든 기기에 적용하려면 서버 9.9 이상이 필요합니다(저장은 이 기기에 맡겨 두고, 업데이트되면 자동으로 올림)</p>`:clPend()?'<p class="note cl-warn">이 기기에 맡겨 둔 목록이 있습니다 — 서버에 올리는 중…</p>':'';
+    const draw=()=>{ box.innerHTML=vnote()+W.map((p,i)=>`<div class="clp" data-i="${i}"><div class="clh"><b class="clno">${i+1}</b><input class="cln" value="${esc(p.name)}" maxlength="40" aria-label="${i+1}단계 이름" placeholder="단계 이름"><span class="clbt"><button type="button" class="btn ghost sm" data-cl="up" aria-label="위로" ${i?'':'disabled'}>↑</button><button type="button" class="btn ghost sm" data-cl="down" aria-label="아래로" ${i<W.length-1?'':'disabled'}>↓</button><button type="button" class="btn ghost sm cl-del" data-cl="del" aria-label="${i+1}단계 삭제">삭제</button></span></div><textarea class="cli" rows="${Math.max(3,Math.min(9,p.items.length+1))}" aria-label="${i+1}단계 항목(한 줄에 하나)" placeholder="항목을 한 줄에 하나씩">${esc(p.items.join('\n'))}</textarea></div>`).join('')+`<p class="note cl-sum">${W.length}단계 · ${W.reduce((n,p)=>n+p.items.filter(x=>String(x).trim()).length,0)}항목</p>`; };
     draw();
     clSync(true).then(ch=>{ if(ch&&!box.contains(document.activeElement)){ W=CHECKLIST.map(p=>({name:p.name,items:p.items.slice()})); draw(); } }).catch(()=>{});
     box.addEventListener('input',e=>{ if(e.target.matches('.cln,.cli')){ read(); const sm=box.querySelector('.cl-sum'); if(sm) sm.textContent=`${W.length}단계 · ${W.reduce((n,p)=>n+p.items.filter(x=>String(x).trim()).length,0)}항목`; } });
@@ -2753,7 +2803,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         const same=JSON.stringify(list)===JSON.stringify(CL_DEF);
         b.disabled=true; const x=await api('/api/admin/ai',{json:{action:'checklist',list:same?[]:list},tok:PROF.tok}); b.disabled=false;
         if(x.ok&&x.j&&x.j.ok!==false&&'checklist_ts' in x.j){ clApply(x.j.checklist,+x.j.checklist_ts||0); W=CHECKLIST.map(p=>({name:p.name,items:p.items.slice()})); draw(); msg.textContent=x.j.msg||'저장했습니다'; toast(x.j.msg||'저장했습니다'); return; }
-        msg.textContent=x.ok&&x.j&&x.j.ok!==false?'서버가 아직 체크리스트 저장을 모릅니다(서버 9.9 업데이트 필요)':(x.j&&x.j.error)||'저장하지 못했습니다'; } });
+        if(x.status===403){ msg.textContent=(x.j&&x.j.error)||'교수 로그인이 다시 필요합니다'; return; }
+        if(x.status===400){ msg.textContent=(x.j&&x.j.error)||'저장하지 못했습니다'; return; }
+        clApply(same?null:list,Date.now()/1000,true); W=CHECKLIST.map(p=>({name:p.name,items:p.items.slice()})); draw();   // V176: 옛 서버·연결 끊김 → 이 기기에 저장 + 업데이트되면 자동으로 올림
+        msg.textContent=x.status===0||!SRV.on?'서버에 연결되지 않아 이 기기에 저장했습니다 — 서버가 켜지면 자동으로 모든 기기에 적용':`서버(${SRV.ver||'옛 버전'})가 아직 체크리스트 저장을 몰라 이 기기에 저장했습니다 — 서버를 9.9 이상으로 업데이트하면 자동으로 모든 기기에 적용`;
+        toast('이 기기에 저장했습니다(서버 업데이트 후 자동 적용)'); } });
   }
   // V174: 방재실 → 상황보고서 서식 편집
   const IL_TN={datetime:'일시(지금 버튼)',text:'글 한 줄',long:'글 여러 줄(누르면 펼침)',one:'하나 고르기',multi:'여러 개 고르기',injury:'인명피해(인원)',num:'숫자(−/+)'};
@@ -2764,7 +2818,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const read=()=>{ box.querySelectorAll('.ilp').forEach(d=>{ const b=W[+d.dataset.i]; if(!b) return; b.name=d.querySelector('.cln').value;
       d.querySelectorAll('.ilef').forEach(r=>{ const f=b.fields[+r.dataset.fi]; if(!f) return; const L=r.querySelector('.ilfl'), O=r.querySelector('.ilo'), P=r.querySelector('.ilph'), N=r.querySelector('.ilnn');
         if(L) f.label=L.value; if(O) f.opts=[...new Set(O.value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean))]; if(P) f.ph=P.value; if(N) f.none=N.value; }); }); };
-    const draw=()=>{ box.innerHTML=W.map((b,i)=>`<div class="clp ilp${b.off?' ioff':''}" data-i="${i}"><div class="clh"><b class="clno">${i+1}</b><input class="cln" value="${esc(b.name)}" maxlength="40" aria-label="${i+1}번 칸 이름" placeholder="칸 이름"><span class="clbt"><button type="button" class="btn ghost sm" data-ile="up" aria-label="위로" ${i?'':'disabled'}>↑</button><button type="button" class="btn ghost sm" data-ile="down" aria-label="아래로" ${i<W.length-1?'':'disabled'}>↓</button>${isDef(b.id)?`<button type="button" class="btn ghost sm" data-ile="off" aria-pressed="${!b.off}">${b.off?'꺼짐':'켜짐'}</button>`:`<button type="button" class="btn ghost sm cl-del" data-ile="del">삭제</button>`}</span></div>
+    const vnote=()=>!SRV.on?'<p class="note cl-warn">서버에 연결되지 않았습니다 — 저장하면 이 기기에 맡겨 두고, 서버가 켜지면 자동으로 올립니다</p>':(SRV.ver&&verLt(SRV.ver,'10.0'))?`<p class="note cl-warn">지금 서버 ${esc(SRV.ver)} — 서식을 모든 기기에 적용하려면 서버 10.0 이상이 필요합니다(저장은 이 기기에 맡겨 두고, 업데이트되면 자동으로 올림)</p>`:ilPend()?'<p class="note cl-warn">이 기기에 맡겨 둔 서식이 있습니다 — 서버에 올리는 중…</p>':'';
+    const draw=()=>{ box.innerHTML=vnote()+W.map((b,i)=>`<div class="clp ilp${b.off?' ioff':''}" data-i="${i}"><div class="clh"><b class="clno">${i+1}</b><input class="cln" value="${esc(b.name)}" maxlength="40" aria-label="${i+1}번 칸 이름" placeholder="칸 이름"><span class="clbt"><button type="button" class="btn ghost sm" data-ile="up" aria-label="위로" ${i?'':'disabled'}>↑</button><button type="button" class="btn ghost sm" data-ile="down" aria-label="아래로" ${i<W.length-1?'':'disabled'}>↓</button>${isDef(b.id)?`<button type="button" class="btn ghost sm" data-ile="off" aria-pressed="${!b.off}">${b.off?'꺼짐':'켜짐'}</button>`:`<button type="button" class="btn ghost sm cl-del" data-ile="del">삭제</button>`}</span></div>
         ${b.fields.map((f,j)=>f.type==='level'?`<p class="note ilen">· 제목 옆 대응단계 버튼(대형·대응1~3단계)</p>`:`<div class="ilef" data-fi="${j}"><div class="ilefh"><input class="ilfl" value="${esc(f.label||'')}" maxlength="40" placeholder="세부 칸 이름" aria-label="세부 칸 이름"><small>${IL_TN[f.type]||f.type}</small></div>${f.type==='injury'?`<input class="ilnn" value="${esc(f.none||'')}" maxlength="40" placeholder="‘해당없음’ 버튼 글" aria-label="해당없음 버튼 글">`:''}${['one','multi','injury'].includes(f.type)?`<textarea class="ilo" rows="${Math.max(2,Math.min(8,(f.opts||[]).length))}" aria-label="선택지(한 줄에 하나)" placeholder="선택지를 한 줄에 하나씩">${esc((f.opts||[]).join('\n'))}</textarea>`:''}${['text','long'].includes(f.type)?`<input class="ilph" value="${esc(f.ph||'')}" maxlength="120" placeholder="입력 칸 안내(예: …)" aria-label="안내 문구">`:''}</div>`).join('')}</div>`).join('')+`<p class="note cl-sum">켜진 칸 ${W.filter(b=>!b.off).length}개 / 전체 ${W.length}개</p>`; };
     draw();
     ilSync(true).then(ch=>{ if(ch&&!box.contains(document.activeElement)){ W=clone(IL_ALL); draw(); } }).catch(()=>{});
@@ -2783,7 +2838,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         const same=JSON.stringify(W)===JSON.stringify(IL_DEF);
         t.disabled=true; const x=await api('/api/admin/ai',{json:{action:'ilform',form:same?[]:W},tok:PROF.tok}); t.disabled=false;
         if(x.ok&&x.j&&x.j.ok!==false&&'ilform_ts' in x.j){ ilApply(x.j.ilform,+x.j.ilform_ts||0); W=clone(IL_ALL); draw(); msg.textContent=x.j.msg||'저장했습니다'; toast(x.j.msg||'저장했습니다'); return; }
-        msg.textContent=x.ok&&x.j&&x.j.ok!==false?'서버가 아직 서식 저장을 모릅니다(서버 10.0 업데이트 필요)':(x.j&&x.j.error)||'저장하지 못했습니다'; } });
+        if(x.status===403){ msg.textContent=(x.j&&x.j.error)||'교수 로그인이 다시 필요합니다'; return; }
+        if(x.status===400){ msg.textContent=(x.j&&x.j.error)||'저장하지 못했습니다'; return; }
+        ilApply(same?null:clone(W),Date.now()/1000,true); W=clone(IL_ALL); draw();   // V176: 옛 서버·연결 끊김 → 이 기기에 저장 + 업데이트되면 자동으로 올림
+        msg.textContent=x.status===0||!SRV.on?'서버에 연결되지 않아 이 기기에 저장했습니다 — 서버가 켜지면 자동으로 모든 기기에 적용':`서버(${SRV.ver||'옛 버전'})가 아직 서식 저장을 몰라 이 기기에 저장했습니다 — 서버를 10.0 이상으로 업데이트하면 자동으로 모든 기기에 적용`;
+        toast('이 기기에 저장했습니다(서버 업데이트 후 자동 적용)'); } });
   }
   function pinEditBind(panel){
     rinfoSync(true).then(()=>panel.querySelectorAll('.pinf').forEach(f=>{ const k=f.dataset.kind, L=f.querySelector('textarea[id^="pinL"]'), M=f.querySelector('textarea[id^="pinM"]'); if(L&&L.value===L.defaultValue&&M.value===M.defaultValue&&document.activeElement!==L&&document.activeElement!==M){ L.value=ROOM_INFO[k].lead; M.value=ROOM_INFO[k].more.join('\n'); } }));   // V138: 다른 기기에서 고친 최신 문구로 채움
@@ -3104,7 +3163,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const box=panel.querySelector('.il2'); if(!box) return;
     const done=soft=>{ save(); renderLog(); if(!soft) return redraw();   // 글자 칸은 다시 그리지 않음(바로 이어 누른 칩이 사라지지 않게) — 상태 표시만
       SITU.forEach(b=>{ const st=situStatus(b), sec=panel.querySelector(`#sec-${b.id} .st`); if(sec){ sec.className='st '+st.cls; sec.textContent=st.t; } situDot(b,st); }); };
-    const tag=(b,f)=>`[${b.name}] `+(f.label&&f.label!==b.name?f.label+': ':'');
+    const tag=(b,f)=>`[${b.name}] `+(f.label&&f.label!==b.name?f.label+': ':(!f.label?b.name+' ':''));   // 이름표 없는 칩(재산피해 조사 중)은 칸 이름을 붙여 시간 기록에서도 알아보게
     box.addEventListener('click',e=>{ const t=e.target.closest('button'); if(!t) return; const d=t.dataset;
       if(d.lvl){ const k=d.lvl, v=d.v, {b}=ilFind(k), on=state.situ.fields[k]===v;   // V133: 대응단계 — 다시 누르면 해제
         if(on){ delete state.situ.fields[k]; if(chipLog(k)) addLog(`[${b.name}] 대응단계 해제`); } else { state.situ.fields[k]=v; chipLog(k); chipAdd(k, `[${b.name}] 대응단계: ${v} 발령`); }
@@ -3163,7 +3222,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         ${done===total?`<div class="card done-card" role="status"><img src="img/board-done.webp" alt="" width="360" height="409" decoding="async" onerror="this.remove()"><div><b>${total}개 항목 모두 완료</b><p>경과 ${hhmmss(elapsed())} · IL에서 보고서로 정리하세요.</p><a class="btn primary" href="#log">IL 사고보고서로</a></div></div>`:''}
         <div class="phases">
           ${phases.map((p,pi)=>{const d=p.items.filter((_,ii)=>checks[pi+'-'+ii]).length;return `<section class="card phase ${d===p.items.length?'done':''}" id="ph-${pi}">
-              <header><h3><span class="no">${pi+1}</span>${esc(p.name)}</h3><span class="cnt">${d}/${p.items.length}</span></header>
+              <header><h3><span class="no">${pi+1}</span>${esc(p.name)}</h3><span class="cnt">${d}/${p.items.length}</span><i class="phbar" style="--p:${Math.round(d/p.items.length*100)}%" aria-hidden="true"></i></header>
               <ul class="items">${p.items.map((it,ii)=>{const k=pi+'-'+ii, at=checks[k];return `<li class="item"><label><input type="checkbox" data-k="${k}" ${at?'checked':''}><span class="tx">${esc(it)}</span></label><span class="at">${at?esc(at):''}</span></li>`;}).join('')}</ul>
             </section>`;}).join('')}
         </div>
@@ -3220,7 +3279,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const str=(v,n)=>typeof v==='string'?v.slice(0,n):'';
     return {id:str(r.id,40)||('r'+Date.now().toString(36)), ts:TSISO.test(String(r.ts))?String(r.ts).slice(0,40):new Date().toISOString(), place:str(r.place,120),
       done:fin(r.done,0), total:fin(r.total,0), elapsed:/^\d{2,}:\d{2}:\d{2}$/.test(String(r.elapsed))?r.elapsed:'', facts:(r.facts&&typeof r.facts==='object'&&Array.isArray(r.facts.situ)&&Array.isArray(r.facts.phases)&&Array.isArray(r.facts.log))?r.facts:null,
-      draftAuto:str(r.draftAuto,8000), draft:str(r.draft,8000), draftEdited:!!r.draftEdited, ai:str(r.ai,8000), aiAuto:str(r.aiAuto,8000), aiEdited:!!r.aiEdited, aiSrc:str(r.aiSrc,20), at:/^\d{2}:\d{2}$/.test(String(r.at))?r.at:'', img:/^data:image\/(jpeg|png|webp);base64,/.test(String(r.img||''))&&String(r.img).length<600000?r.img:''};
+      draftAuto:str(r.draftAuto,8000), draft:str(r.draft,8000), draftEdited:!!r.draftEdited, ai:str(r.ai,8000), aiAuto:str(r.aiAuto,8000), aiEdited:!!r.aiEdited, aiSrc:str(r.aiSrc,20), at:/^\d{2}:\d{2}$/.test(String(r.at))?r.at:'', img:/^data:image\/(jpeg|png|webp);base64,/.test(String(r.img||''))&&String(r.img).length<600000?r.img:'', type:['brief','info','photo'].includes(r.type)?r.type:'brief',
+      photos:Array.isArray(r.photos)?r.photos.filter(x=>x&&/^data:image\/(jpeg|png|webp);base64,/.test(String(x.img||''))&&String(x.img).length<600000).slice(0,6).map(x=>({img:x.img,cap:str(x.cap,60),desc:str(x.desc,300)})):[]};
   }
   function rpload(){
     try{ const a=JSON.parse(localStorage.getItem(RLKEY)||'[]'); if(Array.isArray(a)) reports=a.filter(r=>r&&typeof r==='object').map(cleanRep).slice(0,MAX_REPORTS); }catch(_){ reports=[]; }
@@ -3286,8 +3346,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const known=none||Object.keys(c).length>0, cell=k=>known?((c[k]||0)?`${c[k]}명`:'-'):'파악 중', sum=opts.reduce((a,k)=>a+(c[k]||0),0);
       out.push(`○ ${life.name}`, `| ${opts.join(' | ')} | 계 | ${res?res.label:'인명구조'} |`, `| ${opts.map(cell).join(' | ')} | ${known?sum+'명':'파악 중'} | ${res&&res.value?res.value:(known?'-':'파악 중')} |`);
       if(none) out.push(`※ ${inj.none||'현재까지 해당없음'}`); if(note) out.push(`- ${note.label}: ${note.value}`); }
-    if(prop){ const amt=prop.fields.find(x=>x.type==='num'), txt=prop.fields.find(x=>x.type==='text');
-      out.push(`○ ${prop.name}`, `| ${amt?amt.label:'추정 피해액'} | ${txt?txt.label:'피해 내용'} |`, `| ${amt&&amt.value?amt.value:'파악 중'} | ${txt&&txt.value?String(txt.value).replace(/\|/g,'/'):'파악 중'} |`); }
+    if(prop){ const amt=prop.fields.find(x=>x.type==='num'), txt=prop.fields.find(x=>x.type==='text'), inv=prop.fields.find(x=>x.type==='one'&&x.value);   // V176: '조사 중'을 고르면 값이 없는 칸은 조사 중
+      const dflt=inv?String(inv.value):'파악 중';
+      out.push(`○ ${prop.name}`, `| ${amt?amt.label:'추정 피해액'} | ${txt?txt.label:'피해 내용'} |`, `| ${amt&&amt.value?amt.value:dflt} | ${txt&&txt.value?String(txt.value).replace(/\|/g,'/'):dflt} |`); }
     return out.length?out:['- 파악 중']; }
   const RTPL_KEYS=()=>[['작성시각','보고서 만든 시각'],['경과','경과 시간'],['경과표시','경과(진행 중 표시)'],['시작','체크리스트 시작 시각'],['이행','이행 n/전체'],...SITU.map(b=>[ilKey(b),b.name+' 칸']),['화재현황','화재 성상·상황·원인 묶음'],['피해현황','인명·재산 피해 표'],['지휘활동','단계별 이행 항목·시각'],['미이행','미이행 항목'],['시간기록','시간대별 기록'],['확인요청','확인 필요 사항(자동)']];
   const RTPL_LS='sachil_report_tpl';
@@ -3376,7 +3437,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     body.readOnly = !repEditing || (!!repCtl && v==='ai'); repDocSync();   // 편집은 교수 로그인 + '초안 편집'일 때만(V83)
     { const tb=$('#repTpl'); if(tb) tb.hidden=!isProf()||repEditing; }
     { const eb=$('#repEdit'); if(eb){ eb.hidden=!!repCtl; eb.textContent=repEditing?'편집 저장':'편집'; eb.classList.toggle('accent',repEditing); } }
-    { const ib=$('#repImg'), idl=$('#repImgDel'); if(ib){ ib.hidden=!repEditing; ib.lastChild.textContent=cur.img?'📷 사진 바꾸기':'📷 사진 넣기'; } if(idl) idl.hidden=!repEditing||!cur.img; }   // V175: 1 발생개요 오른쪽 사진(편집할 때)
+    repPhDraw();   // V176: 사진 칸(편집할 때 · 사진기록형은 늘)
     $('#repRegen').hidden = !(v==='draft' && cur.draftEdited && cur.facts);
     $('#repStatus').textContent=repStatusText(); $('#repStatus').classList.remove('warn'); repToolsFit();
   }
@@ -3386,15 +3447,38 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const any=[...t.querySelectorAll('button,.seg,label.btn')].some(x=>!x.hidden&&!x.closest('[hidden]'))||st.classList.contains('busy')||st.classList.contains('warn'); t.hidden=!any; }
   function syncRepUI(keepStatus){
     const b=$('#repAi'); if(!b) return;
-    b.hidden=!(cur && cur.facts); b.classList.toggle('off', !CAP.sample); if(cur) $('#repTabAi').closest('.seg').hidden=!repDraftOk()||!(CAP.sample || cur.ai || repCtl); if(b.dataset.arm!=='1') b.textContent = repCtl ? '중지' : 'AI로 작성';
+    b.hidden=!(cur && cur.facts) || repType(cur)!=='brief'; b.classList.toggle('off', !CAP.sample);   // V176: AI 작성은 신속 브리핑형(글)만 if(cur) $('#repTabAi').closest('.seg').hidden=!repDraftOk()||!(CAP.sample || cur.ai || repCtl); if(b.dataset.arm!=='1') b.textContent = repCtl ? '중지' : 'AI로 작성';
     if(cur&&cur.ai&&!repCtl&&!cur.aiPartial) b.hidden=true;   // V133: '다시 작성' 없앰 — 작성본이 있으면 버튼을 숨김(V138: 일부만 작성됐으면 다시 쓸 수 있게)
     if(!keepStatus && !$('#report').hidden && !repCtl) $('#repStatus').textContent=repStatusText();
   }
-  function newReport(){
+  // V176: 보고서 종류 고르기 — 신속 브리핑형 / 인포그래픽 요약형 / 사진기록 리포트형
+  const REP_TN={brief:'신속 브리핑형', info:'인포그래픽 요약형', photo:'사진기록 리포트형'}, RT_KEY='sachil_rep_type';
+  const rtEl=document.createElement('div'); rtEl.className='rtov'; rtEl.hidden=true; rtEl.setAttribute('role','dialog'); rtEl.setAttribute('aria-modal','true'); rtEl.setAttribute('aria-labelledby','rtH');
+  rtEl.innerHTML=`<div class="rtbox"><header><b id="rtH">어떤 보고서로 만들까요?</b><button type="button" class="close" data-rt="x" aria-label="닫기">×</button></header>
+    <div class="rtcards" role="radiogroup" aria-label="보고서 종류">
+      <button type="button" class="rtc" role="radio" data-rtt="brief"><i class="rtv rtv-brief" aria-hidden="true"><s></s><s></s><s></s><u></u><s></s></i><b>신속 브리핑형</b><span>A4 1쪽 요약 · 핵심만 · 표와 아이콘</span><em>상급자 보고·무전 브리핑</em></button>
+      <button type="button" class="rtc" role="radio" data-rtt="info"><i class="rtv rtv-info" aria-hidden="true"><s></s><s></s><s></s><s></s><u></u><q></q></i><b>인포그래픽 요약형</b><span>숫자 타일 · 차트 · 단계 도식 · 아이콘</span><em>한눈에 보는 현황판</em></button>
+      <button type="button" class="rtc" role="radio" data-rtt="photo"><i class="rtv rtv-photo" aria-hidden="true"><s></s><s></s><s></s><s></s></i><b>사진기록 리포트형</b><span>사진·캡션 중심 · 사진별 설명 · 나란히 비교</span><em>현장 사진 정리·전후 비교</em></button>
+    </div>
+    <p class="rtwarn" id="rtWarn" hidden></p>
+    <div class="rtacts"><button type="button" class="btn ghost" data-rt="x">취소</button><button type="button" class="btn primary" data-rt="go" disabled>보고서 만들기</button></div></div>`;
+  document.body.appendChild(rtEl);
+  let rtSel='', rtLast=null;
+  const rtPick=t=>{ rtSel=t; rtEl.querySelectorAll('[data-rtt]').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.rtt===t))); const go=rtEl.querySelector('[data-rt="go"]'); go.disabled=!t; go.textContent=t?`${REP_TN[t]}으로 만들기`:'보고서 만들기'; };
+  function openRepType(){ if(!$('#report').hidden) return; rtLast=document.activeElement; let t=''; try{ t=localStorage.getItem(RT_KEY)||''; }catch(_){ } rtPick(REP_TN[t]?t:'');
+    const miss=SITU.filter(x=>!situStatus(x).cls).length, full=reports.length>=MAX_REPORTS, w=rtEl.querySelector('#rtWarn');
+    w.hidden=!(miss||full); w.textContent=[miss?`아직 비어 있는 칸 ${miss}곳 — ‘파악 중’으로 들어갑니다`:'', full?`보고서가 ${MAX_REPORTS}건이라 가장 오래된 1건이 지워집니다`:''].filter(Boolean).join(' · ');
+    rtEl.hidden=false; appEl.inert=true; tabbarEl.inert=true; setTimeout(()=>{ const b=rtEl.querySelector(rtSel?`[data-rtt="${rtSel}"]`:'[data-rtt]'); if(b) b.focus(); },30); }
+  const closeRepType=()=>{ if(rtEl.hidden) return; rtEl.hidden=true; appEl.inert=false; tabbarEl.inert=false; if(rtLast&&rtLast.focus) rtLast.focus(); };
+  rtEl.addEventListener('click',e=>{ if(e.target===rtEl) return closeRepType(); const c=e.target.closest('[data-rtt]'); if(c) return rtPick(c.dataset.rtt);
+    const b=e.target.closest('[data-rt]'); if(!b) return; if(b.dataset.rt==='x') return closeRepType();
+    if(b.dataset.rt==='go'&&rtSel){ try{ localStorage.setItem(RT_KEY,rtSel); }catch(_){ } const t=rtSel; rtEl.hidden=true; appEl.inert=false; tabbarEl.inert=false; newReport(t); } });
+  rtEl.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.stopPropagation(); closeRepType(); } if(e.key==='Enter'&&e.target.closest('[data-rtt]')){ e.preventDefault(); rtPick(e.target.closest('[data-rtt]').dataset.rtt); } });
+  function newReport(type){
     if(!$('#report').hidden) return;   // 연타로 같은 보고서가 두 번 생기지 않게(V99)
     const facts=reportFacts(), ts=new Date().toISOString();
     const e={id:'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), ts, place:([state.situ.fields.place,state.situ.fields.burn].filter(Boolean).join(' · ')||'').slice(0,120), done:facts.done, total:facts.total, elapsed:facts.elapsed, facts,
-      draftAuto:'', draft:'', draftEdited:false, ai:'', aiAuto:'', aiEdited:false, at:''};
+      draftAuto:'', draft:'', draftEdited:false, ai:'', aiAuto:'', aiEdited:false, at:'', type:['brief','info','photo'].includes(type)?type:'brief', photos:[]};
     e.draftAuto=e.draft=reportDraft(facts, fmtTs(ts));
     const dropped=reports.length>=MAX_REPORTS; reports.unshift(e); const saved=rpsave(); openReport(e, saved?(dropped?'dropped':true):'nosave');
   }
@@ -3402,13 +3486,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     cur=e; repEditing=false;
     const dlg=$('#report'); dlg.hidden=false; document.body.style.overflow='hidden'; appEl.inert=true; tabbarEl.inert=true;
     repLast=document.activeElement;
-    $('#repSub').textContent=`${e.place?e.place+' · ':''}이행 ${e.done}/${e.total} · 경과 ${e.elapsed||'—'} · ${fmtTs(e.ts)}${fresh===true?' · IL 화재등 상황 보고서에 저장됨':fresh==='dropped'?' · 저장됨 (최대 30건 — 가장 오래된 보고서 1건 삭제)':fresh==='nosave'?' · 저장 공간 부족 — 이 세션에만 유지':''}`;
+    $('#repSub').textContent=`${REP_TN[repType(e)]} · ${e.place?e.place+' · ':''}이행 ${e.done}/${e.total} · 경과 ${e.elapsed||'—'} · ${fmtTs(e.ts)}${fresh===true?' · IL 화재등 상황 보고서에 저장됨':fresh==='dropped'?' · 저장됨 (최대 30건 — 가장 오래된 보고서 1건 삭제)':fresh==='nosave'?' · 저장 공간 부족 — 이 세션에만 유지':''}`;
     $('#repStatus').classList.remove('busy');
     setRepView(e.ai ? 'ai' : 'draft'); syncRepUI();
     $('#repBody').scrollTop=0;
     setTimeout(()=>{ if(mqNarrow.matches) $('#repClose').focus(); else { const d=$('#repDoc'); if(d&&!d.hidden){ d.focus({preventScroll:true}); d.scrollTop=0; } } },40);
     // 원클릭: AI를 쓸 수 있고 작성본이 없으면 바로 작성 (같은 사실이면 5분간 재사용 → 사용량 추가 없음). 기록이 비어 있으면 생략.
-    if(CAP.sample && !e.ai && e.facts){ if(repEmpty(e)) $('#repStatus').textContent='기록이 없어 AI 작성을 생략했습니다 — 체크·기록 후 "AI로 작성"'; else runAi(false); }
+    if(CAP.sample && !e.ai && e.facts && repType(e)==='brief'){ if(repEmpty(e)) $('#repStatus').textContent='기록이 없어 AI 작성을 생략했습니다 — 체크·기록 후 "AI로 작성"'; else runAi(false); }
   }
 
   // ---------- PDF 뷰어 (서버 모드: 서버가 함께 내보내는 /vendor/pdfjs 로 앱 안에서 넘겨 본다) ----------
@@ -3646,11 +3730,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   // V174: 미리보기 = 실제 A4 출력 그림(PDF와 같은 모양). AI가 쓰는 중에는 가벼운 글 미리보기
   let repPvT=0, repPvN=0;
+  // V176: 보고서 종류별 그리기 — brief(신속 브리핑, 글 양식) · info(인포그래픽) · photo(사진기록)
+  const repType=e=>(e&&['brief','info','photo'].includes(e.type))?e.type:'brief';
+  const repPhotos=e=>(e&&Array.isArray(e.photos)&&e.photos.length)?e.photos:(e&&e.img?[{img:e.img,cap:'',desc:''}]:[]);
+  function repRender(text,mode,e){ e=e||cur; const t=repType(e); if(t==='info') return repInfo(e,mode); if(t==='photo') return repPhoto(Object.assign({},e,{photos:repPhotos(e)}),mode); const p0=repPhotos(e)[0]; return repPdf(text,mode,p0&&p0.img); }
   function repDocSync(){ const d=$('#repDoc'), b=$('#repBody'); if(!d||!b) return; b.hidden=!repEditing; d.hidden=repEditing; if(repEditing) return;
     if(repCtl){ repPvN++; clearTimeout(repPvT); d.innerHTML=`<article class="rdoc">${repDocHtml(b.value)}</article>`; return; }
     if(!d.querySelector('.rpages')) d.innerHTML=`<article class="rdoc">${repDocHtml(b.value)}</article>`;
     clearTimeout(repPvT); const my=++repPvN, txt=b.value;
-    repPvT=setTimeout(async()=>{ try{ const cs=await repPdf(txt,'canvas',cur&&cur.img); if(my!==repPvN||repEditing||repCtl) return;
+    repPvT=setTimeout(async()=>{ try{ const cs=await repRender(txt,'canvas'); if(my!==repPvN||repEditing||repCtl) return;
       const w=document.createElement('div'); w.className='rpages'; w.setAttribute('role','img'); w.setAttribute('aria-label','A4 보고서 미리보기 '+cs.length+'쪽');
       cs.forEach((c,i)=>{ c.className='rpage'; c.title='누르면 크게 보기'; c.addEventListener('click',()=>openLightbox(c.toDataURL('image/png'),`화재등 상황 보고서 ${i+1}/${cs.length}쪽`)); w.appendChild(c); });   // 휴대폰에서는 눌러 크게(두 손가락 확대) const hid=document.createElement('div'); hid.className='sr-only'; hid.innerHTML=repDocHtml(txt); w.appendChild(hid);
       d.innerHTML=''; d.appendChild(w); }catch(_){ } },120); }
@@ -3667,14 +3755,26 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     catch(_){ btn.textContent=legacyCopy(txt)?'복사됨':'복사 실패'; }
     setTimeout(()=>{ if(btn.isConnected) btn.textContent=label; },1500);
   }
-  // V175: 사진 한 장 — 긴 변 720px JPEG로 줄여 이 보고서에 저장(A4 1번 항목 오른쪽에 들어감)
-  $('#repImgIn').addEventListener('change',async e=>{ const fl=e.target.files&&e.target.files[0]; e.target.value=''; if(!fl||!cur) return;
-    try{ const url=URL.createObjectURL(fl), im=await new Promise((ok,no)=>{ const x=new Image(); x.onload=()=>ok(x); x.onerror=no; x.src=url; });
-      const sc=Math.min(1,720/Math.max(im.naturalWidth,im.naturalHeight)), c=document.createElement('canvas'); c.width=Math.round(im.naturalWidth*sc); c.height=Math.round(im.naturalHeight*sc);
-      const g=c.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height); g.drawImage(im,0,0,c.width,c.height); URL.revokeObjectURL(url);
-      cur.img=c.toDataURL('image/jpeg',0.78); const ok=rpsave(); setRepView(repView); toast(ok?'사진을 넣었습니다 — ‘편집 저장’을 누르면 보고서에서 보입니다':'저장 공간이 부족해 사진을 저장하지 못했습니다(오래된 보고서를 지워 주세요)'); }
-    catch(_){ toast('사진을 읽지 못했습니다(다른 사진으로 해 보세요)'); } });
-  $('#repImgDel').addEventListener('click',()=>{ if(!cur) return; const old=cur.img; cur.img=''; rpsave(); setRepView(repView); toast('사진을 뺐습니다',()=>{ cur.img=old; rpsave(); setRepView(repView); }); });
+  // V176: 보고서 사진(최대 6장) — 긴 변 720px JPEG로 줄여 이 보고서에 저장. 사진마다 캡션·설명. 신속 브리핑형은 첫 장이 1번 항목 오른쪽, 사진기록형은 전부
+  function repPhDraw(){ const box=$('#repPh'); if(!box) return; const t=repType(cur), show=!!cur&&!repCtl&&t!=='info'&&(repEditing||t==='photo'); box.hidden=!show; if(!show){ box.innerHTML=''; return; }
+    const ph=repPhotos(cur), mx=t==='brief'?1:6;
+    box.innerHTML=`<div class="rph-h"><b>📷 사진 ${ph.length}/${mx}</b><span>${t==='brief'?'첫 사진 1장이 ‘1. 발생개요’ 오른쪽에 들어갑니다':'사진마다 캡션·설명을 적으면 A4에 그대로 들어갑니다 — 같은 줄 두 장은 나란히 비교'}</span>${ph.length<mx?`<label class="btn primary sm">＋ 사진 ${ph.length?'더 ':''}추가<input type="file" accept="image/*" ${mx>1?'multiple':''} hidden data-phin="1"></label>`:''}</div>
+      <div class="rph-l">${ph.map((p,i)=>`<div class="rph-i" data-i="${i}"><img src="${p.img}" alt="사진 ${i+1}"><div class="rph-t"><input class="rph-c" maxlength="60" placeholder="캡션 (예: 도착 시 전경)" value="${esc(p.cap||'')}" aria-label="사진 ${i+1} 캡션">${t==='photo'?`<textarea class="rph-d" rows="2" maxlength="300" placeholder="설명 (예: 2층 창문 화염 분출, 연소 확대 중)" aria-label="사진 ${i+1} 설명">${esc(p.desc||'')}</textarea>`:''}</div><div class="rph-b">${mx>1?`<button type="button" data-ph="up" aria-label="앞으로" ${i?'':'disabled'}>↑</button><button type="button" data-ph="down" aria-label="뒤로" ${i<ph.length-1?'':'disabled'}>↓</button>`:''}<button type="button" data-ph="del" aria-label="사진 ${i+1} 빼기">빼기</button></div></div>`).join('')}</div>`; }
+  const repPhMine=()=>{ if(!Array.isArray(cur.photos)||!cur.photos.length){ cur.photos=repPhotos(cur).map(x=>Object.assign({},x)); } cur.img=''; return cur.photos; };
+  let repPhT=0; const repPhRefresh=soft=>{ rpsaveSoon(); clearTimeout(repPhT); repPhT=setTimeout(()=>{ if(!repEditing) repDocSync(); },soft?500:0); if(!soft) repPhDraw(); };
+  $('#repPh').addEventListener('change',async e=>{ const inp=e.target.closest('[data-phin]'); if(!inp||!cur) return; const files=[...(inp.files||[])]; inp.value=''; const ph=repPhMine(), mx=repType(cur)==='brief'?1:6;
+    for(const fl of files){ if(ph.length>=mx){ toast(`사진은 ${mx}장까지입니다`); break; }
+      try{ const url=URL.createObjectURL(fl), im=await new Promise((ok,no)=>{ const x=new Image(); x.onload=()=>ok(x); x.onerror=no; x.src=url; });
+        const sc=Math.min(1,720/Math.max(im.naturalWidth,im.naturalHeight)), c=document.createElement('canvas'); c.width=Math.round(im.naturalWidth*sc); c.height=Math.round(im.naturalHeight*sc);
+        const g=c.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height); g.drawImage(im,0,0,c.width,c.height); URL.revokeObjectURL(url); ph.push({img:c.toDataURL('image/jpeg',0.74),cap:'',desc:''}); }
+      catch(_){ toast('사진을 읽지 못했습니다(다른 사진으로 해 보세요)'); } }
+    const ok=rpsave(); if(!ok) toast('저장 공간이 부족합니다 — 오래된 보고서나 사진을 지워 주세요'); repPhRefresh(); });
+  $('#repPh').addEventListener('input',e=>{ const it=e.target.closest('.rph-i'); if(!it||!cur) return; const p=repPhMine()[+it.dataset.i]; if(!p) return;
+    if(e.target.matches('.rph-c')) p.cap=e.target.value.slice(0,60); if(e.target.matches('.rph-d')) p.desc=e.target.value.slice(0,300); repPhRefresh(true); });
+  $('#repPh').addEventListener('click',e=>{ const b=e.target.closest('[data-ph]'); if(!b||!cur) return; const ph=repPhMine(), i=+b.closest('.rph-i').dataset.i, a=b.dataset.ph;
+    if(a==='up'&&i>0) [ph[i-1],ph[i]]=[ph[i],ph[i-1]]; else if(a==='down'&&i<ph.length-1) [ph[i+1],ph[i]]=[ph[i],ph[i+1]];
+    else if(a==='del'){ const old=ph.splice(i,1)[0]; toast('사진을 뺐습니다',()=>{ ph.splice(i,0,old); rpsave(); repPhRefresh(); }); }
+    rpsave(); repPhRefresh(); });
   $('#repBusyStop').addEventListener('click',()=>{ if(repCtl) runAi(true); });
   $('#repEdit').addEventListener('click',()=>{
     if(!cur||repCtl) return;   // V140: 교수가 아니어도 결과(보이는 본문)를 고칠 수 있다
@@ -3771,6 +3871,114 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     push(`trailer\n<< /Size ${size} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
     return new Blob(parts,{type:'application/pdf'});
   }
+  // V176: 보고서 그림용 아이콘(캔버스 도형) — 글꼴·이모지 없이 어느 기기에서나 같은 모양
+  function rIco(g,kind,cx,cy,r,col){ g.save(); g.fillStyle=col||'#fff'; g.strokeStyle=col||'#fff'; g.lineWidth=Math.max(1.5,r*0.18); g.lineCap='round'; g.lineJoin='round';
+    const P=(pts)=>{ g.beginPath(); pts.forEach(([x,y],i)=>i?g.lineTo(cx+x*r,cy+y*r):g.moveTo(cx+x*r,cy+y*r)); };
+    if(kind==='fire'){ g.beginPath(); g.moveTo(cx,cy-r); g.bezierCurveTo(cx+r*0.9,cy-r*0.2,cx+r*0.8,cy+r,cx,cy+r); g.bezierCurveTo(cx-r*0.8,cy+r,cx-r*0.9,cy+r*0.1,cx-r*0.35,cy-r*0.35); g.bezierCurveTo(cx-r*0.2,cy,cx,cy-r*0.1,cx,cy-r); g.fill(); }
+    else if(kind==='person'){ g.beginPath(); g.arc(cx,cy-r*0.45,r*0.38,0,7); g.fill(); g.beginPath(); g.arc(cx,cy+r*0.95,r*0.75,Math.PI,0); g.fill(); }
+    else if(kind==='pin'){ g.beginPath(); g.arc(cx,cy-r*0.25,r*0.6,Math.PI*0.85,Math.PI*2.15); g.lineTo(cx,cy+r); g.closePath(); g.fill(); g.fillStyle='rgba(0,0,0,.25)'; g.beginPath(); g.arc(cx,cy-r*0.25,r*0.22,0,7); g.fill(); }
+    else if(kind==='cal'){ g.strokeRect(cx-r*0.75,cy-r*0.6,r*1.5,r*1.4); g.fillRect(cx-r*0.75,cy-r*0.6,r*1.5,r*0.4); P([[-0.4,-0.9],[-0.4,-0.5]]); g.stroke(); P([[0.4,-0.9],[0.4,-0.5]]); g.stroke(); }
+    else if(kind==='alert'){ P([[0,-0.95],[0.95,0.8],[-0.95,0.8]]); g.closePath(); g.fill(); g.fillStyle='rgba(0,0,0,.35)'; g.fillRect(cx-r*0.09,cy-r*0.35,r*0.18,r*0.6); g.beginPath(); g.arc(cx,cy+r*0.48,r*0.11,0,7); g.fill(); }
+    else if(kind==='check'){ P([[-0.65,0.05],[-0.2,0.5],[0.7,-0.5]]); g.lineWidth=r*0.3; g.stroke(); }
+    else if(kind==='arrow'){ P([[-0.75,0],[0.6,0]]); g.lineWidth=r*0.28; g.stroke(); P([[0.15,-0.5],[0.7,0],[0.15,0.5]]); g.stroke(); }
+    else if(kind==='clock'){ g.beginPath(); g.arc(cx,cy,r*0.85,0,7); g.stroke(); P([[0,-0.5],[0,0],[0.4,0.25]]); g.stroke(); }
+    else if(kind==='list'){ for(let k=-1;k<=1;k++){ g.fillRect(cx-r*0.8,cy+k*r*0.55-r*0.1,r*0.22,r*0.22); g.fillRect(cx-r*0.4,cy+k*r*0.55-r*0.08,r*1.2,r*0.16); } }
+    else if(kind==='won'){ g.font=`900 ${Math.round(r*1.6)}px sans-serif`; g.textAlign='center'; g.textBaseline='middle'; g.fillText('₩',cx,cy+r*0.05); }
+    else if(kind==='rescue'){ g.beginPath(); g.arc(cx,cy,r*0.85,0,7); g.lineWidth=r*0.35; g.stroke(); g.lineWidth=r*0.18; for(let k=0;k<4;k++){ const a=k*Math.PI/2+Math.PI/4; P([[Math.cos(a)*0.55,Math.sin(a)*0.55],[Math.cos(a)*1.0,Math.sin(a)*1.0]]); g.stroke(); } }
+    else if(kind==='camera'){ g.fillRect(cx-r*0.9,cy-r*0.45,r*1.8,r*1.2); g.fillRect(cx-r*0.35,cy-r*0.7,r*0.7,r*0.3); g.fillStyle='rgba(0,0,0,.3)'; g.beginPath(); g.arc(cx,cy+r*0.15,r*0.38,0,7); g.fill(); }
+    else { g.beginPath(); g.arc(cx,cy,r*0.35,0,7); g.fill(); }
+    g.restore(); }
+  const rIcoFor=t=>/개요/.test(t)?'pin':/화재|성상/.test(t)?'fire':/피해/.test(t)?'person':/조치/.test(t)?'check':/전망|계획/.test(t)?'arrow':/지휘/.test(t)?'list':/시간/.test(t)?'clock':/확인/.test(t)?'alert':/사진/.test(t)?'camera':'dot';
+  // 보고서 사실(facts)에서 칸 값 꺼내기
+  const fxv=(f,k)=>{ for(const b of (f.situ||[])) for(const x of (b.fields||[])) if(x.k===k) return x; return null; };
+  const fxs=(f,k)=>{ const x=fxv(f,k); return x&&x.value?String(x.value):''; };
+  const RFF='"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif';
+  function rWrap(g,t,lim){ const r=[]; let rest=String(t||''); while(rest.length){ let n=rest.length; if(g.measureText(rest).width>lim){ n=1; while(n<rest.length&&g.measureText(rest.slice(0,n+1)).width<=lim) n++; const sp=rest.lastIndexOf(' ',n); if(sp>n*0.55) n=sp+1; } r.push(rest.slice(0,n).trim()); rest=rest.slice(n).replace(/^\s+/,''); } return r; }
+  function rRound(g,x,y,w,h,r){ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
+  function rHead(g,W,M,title,sub,meta){ g.fillStyle='#fff'; g.fillRect(0,0,W,1754); g.fillStyle='#0B1B3F'; g.fillRect(0,0,W,14); g.fillStyle='#FDD000'; g.fillRect(0,14,W,5);
+    g.textBaseline='middle'; g.font=`800 46px ${RFF}`; g.fillStyle='#0B1B3F'; g.fillText(title,M,96); const tw=g.measureText(title).width;
+    g.font=`800 22px ${RFF}`; const sw=g.measureText(sub).width+32; g.fillStyle='#FDD000'; rRound(g,M+tw+18,78,sw,36,18); g.fill(); g.fillStyle='#0B1B3F'; g.fillText(sub,M+tw+34,97);
+    g.font=`500 21px ${RFF}`; g.fillStyle='#475467'; const mw=g.measureText(meta).width; g.fillText(meta,W-M-mw,140); g.fillStyle='#0B1B3F'; g.fillRect(M,160,W-2*M,3); }
+  function rFoot(g,W,M,p,n){ const d=new Date(), sd=`${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; g.fillStyle='#D0D5DD'; g.fillRect(M,1622,W-2*M,1);
+    g.font=`500 18px ${RFF}`; g.fillStyle='#667085'; g.textBaseline='middle'; g.fillText(`SACHIL:47 지휘역량강화 플랫폼 · 출력 ${sd}`,M,1648); const pn=`${p} / ${n}`; g.fillText(pn,W-M-g.measureText(pn).width,1648); }
+  async function rOut(cvs,mode){   // 쪽 캔버스들 → canvas·png·pdf
+    if(mode==='canvas') return cvs;
+    if(mode==='png'){ const W=1240,H=1754, sc=Math.min(1,Math.sqrt(15e6/(W*H*cvs.length))), out=document.createElement('canvas'); out.width=Math.round(W*sc); out.height=Math.round(H*sc*cvs.length); const o=out.getContext('2d'); o.fillStyle='#E9EDF3'; o.fillRect(0,0,out.width,out.height); cvs.forEach((c,i)=>o.drawImage(c,0,Math.round(i*H*sc),Math.round(W*sc),Math.round(H*sc))); return await new Promise(ok=>out.toBlob(ok,'image/png')); }
+    const pages=[]; for(const c of cvs){ const b=await new Promise(ok=>c.toBlob(ok,'image/jpeg',0.92)); pages.push({w:c.width,h:c.height,data:new Uint8Array(await b.arrayBuffer())}); } return pdfFromJpegs(pages); }
+  const rLoadImg=src=>new Promise(ok=>{ if(!src) return ok(null); const im=new Image(); im.onload=()=>ok(im); im.onerror=()=>ok(null); im.src=src; });
+  // ---------- 인포그래픽 요약형: 숫자 타일·단계 도식·막대 차트·도넛·시간 흐름 ----------
+  async function repInfo(e, mode){
+    try{ if(document.fonts&&document.fonts.ready) await Promise.race([document.fonts.ready, sleep(1500)]); }catch(_){ }
+    const f=e.facts||{situ:[],phases:[],log:[]}, W=1240, M=84, cv=document.createElement('canvas'); cv.width=W; cv.height=1754; const g=cv.getContext('2d'); g.textBaseline='middle';
+    const T=(t,x,y,sz,w,c,al)=>{ g.font=`${w||500} ${sz}px ${RFF}`; g.fillStyle=c||'#1A1A1A'; g.textAlign=al||'left'; g.fillText(t,x,y); g.textAlign='left'; };
+    const fit=(t,sz,w,lim)=>{ g.font=`${w} ${sz}px ${RFF}`; let s2=String(t||''); if(g.measureText(s2).width<=lim) return s2; while(s2.length>1&&g.measureText(s2+'…').width>lim) s2=s2.slice(0,-1); return s2+'…'; };
+    rHead(g,W,M,'화재등 상황 보고서','인포그래픽 요약',`보고일시 ${fmtTs(e.ts)} · 경과 ${f.elapsed||'-'}`);
+    // 기본 정보 줄
+    let y=186; const cw=(W-2*M-30)/4, info=[['cal','일시',fxs(f,'dt')||'파악 중'],['pin','장소',fxs(f,'place')||'파악 중'],['fire','처종 · 타는 것',[fxs(f,'kind'),fxs(f,'burn')].filter(Boolean).join(' · ')||'파악 중'],['alert','대응단계',fxs(f,'level')||'-']];
+    info.forEach(([ic,lb,v],i)=>{ const x=M+i*(cw+10); g.fillStyle='#F2F4F7'; rRound(g,x,y,cw,96,16); g.fill(); g.fillStyle='#244EA2'; g.beginPath(); g.arc(x+38,y+48,24,0,7); g.fill(); rIco(g,ic,x+38,y+48,13,'#fff');
+      T(lb,x+72,y+26,17,700,'#667085'); g.font=`800 20px ${RFF}`; const vl=rWrap(g,String(v).replace(/^\d{4}-/,''),cw-84); if(vl.length>1){ T(vl[0],x+72,y+52,20,800,'#0B1B3F'); T(fit(vl.slice(1).join(' '),20,800,cw-84),x+72,y+76,20,800,'#0B1B3F'); } else T(vl[0]||'',x+72,y+60,20,800,'#0B1B3F'); });
+    // 숫자 타일
+    y+=122; const life=fxv(f,'life'), raw=String(life&&life.raw||''), c={}; raw.split('|').forEach(x=>{ const m=x.match(/^(.+)=(\d+)$/); if(m) c[m[1]]=+m[2]; });
+    const kinds=(life&&life.opts)||['경상','중상','심정지'], sum=kinds.reduce((a,k)=>a+(c[k]||0),0), known=raw==='none'||sum>0;
+    const resc=fxs(f,'rescue'), propSt=fxs(f,'prop_st'), propRaw=(fxv(f,'prop_est')||{}).raw, pct=f.total?Math.round(f.done/f.total*100):0;
+    const tiles=[['person','인명피해',known?`${sum}명`:'파악 중',raw==='none'?(life&&life.none)||'해당없음':kinds.filter(k=>c[k]).map(k=>`${k} ${c[k]}`).join(' · '),'#D92D20','#FEF3F2'],
+      ['rescue','인명구조',resc||'-','구조 인원','#067647','#ECFDF3'],
+      ['won','재산피해',propRaw?wonTxt(+propRaw):(propSt||'파악 중'),fxs(f,'prop_note')||'추정 피해액','#B54708','#FFFAEB'],
+      ['list','지휘 절차 이행',`${pct}%`,`${f.done||0} / ${f.total||0} 항목`,'#244EA2','#EEF2F8']];
+    tiles.forEach(([ic,lb,big,small,col,bg],i)=>{ const x=M+i*(cw+10), h=190; g.fillStyle=bg; rRound(g,x,y,cw,h,20); g.fill(); g.fillStyle=col; rRound(g,x,y,8,h,4); g.fill();
+      g.fillStyle=col; g.beginPath(); g.arc(x+46,y+46,26,0,7); g.fill(); rIco(g,ic,x+46,y+46,14,'#fff'); T(lb,x+84,y+46,21,800,col);
+      if(i===3){ const cx=x+cw-62, cy=y+118, rr=44; g.lineWidth=14; g.strokeStyle='#D0D5DD'; g.beginPath(); g.arc(cx,cy,rr,0,7); g.stroke(); g.strokeStyle=col; g.lineCap='round'; g.beginPath(); g.arc(cx,cy,rr,-Math.PI/2,-Math.PI/2+Math.PI*2*pct/100); g.stroke(); g.lineCap='butt'; T(fit(big,46,900,cw-150),x+24,y+112,46,900,'#0B1B3F'); }
+      else T(fit(big,46,900,cw-40),x+24,y+112,46,900,'#0B1B3F');
+      T(fit(small,18,600,cw-40),x+24,y+160,18,600,'#475467'); });
+    // 단계 도식: 화재 성상 · 화재 상황
+    y+=218; const chain=(lab,opts,cur,yy,col)=>{ T(lab,M,yy,22,800,'#0B1B3F'); const x0=M+170, w=(W-M-x0)/opts.length, idx=opts.indexOf(cur);
+      opts.forEach((o,i)=>{ const x=x0+i*w, on=i===idx, past=idx>=0&&i<idx; g.fillStyle=on?col:past?'#D0D5DD':'#F2F4F7'; g.beginPath(); g.moveTo(x,yy-30); g.lineTo(x+w-22,yy-30); g.lineTo(x+w-4,yy); g.lineTo(x+w-22,yy+30); g.lineTo(x,yy+30); g.lineTo(x+18,yy); g.closePath(); g.fill();
+        T(fit(o,o.length>8?17:20,800,w-48),x+w/2+2,yy+1,o.length>8?17:20,800,on?'#fff':past?'#344054':'#98A2B3','center'); }); if(idx<0&&cur) T(fit('· '+cur,18,600,400),x0,yy+48,18,600,'#475467'); };
+    chain('화재 성상',['초기','성장기','최성기','감쇠기'],fxs(f,'phase'),y+32,'#D92D20'); chain('화재 상황',['연소확대','연소확대 저지(방어선 구축)','초진','완진'],fxs(f,'fstat'),y+112,'#244EA2');
+    { const cs=[fxs(f,'cause_est'),fxs(f,'cause_txt')].filter(Boolean).join(' / ')||'파악 중'; y+=170; g.fillStyle='#FFFAEB'; rRound(g,M,y,W-2*M,58,14); g.fill(); g.fillStyle='#B54708'; g.beginPath(); g.arc(M+32,y+29,18,0,7); g.fill(); rIco(g,'fire',M+32,y+29,10,'#fff'); T('화재 원인',M+62,y+29,20,800,'#B54708'); T(fit(cs,21,600,W-2*M-200),M+180,y+29,21,600,'#1A1A1A'); }
+    // 차트: 인명피해 막대 · 단계별 이행
+    y+=86; const half=(W-2*M-30)/2; g.fillStyle='#fff'; g.strokeStyle='#E4E7EC'; g.lineWidth=2; rRound(g,M,y,half,380,18); g.stroke(); rRound(g,M+half+30,y,half,380,18); g.stroke();
+    T('인명피해 유형별',M+24,y+34,22,800,'#0B1B3F'); { const mx=Math.max(1,...kinds.map(k=>c[k]||0)), bw=half-200, gapY=Math.min(86,240/Math.max(1,kinds.length)); kinds.forEach((k,i)=>{ const yy=y+104+i*gapY, n=c[k]||0; T(k,M+24,yy,21,800,'#344054'); g.fillStyle='#F2F4F7'; rRound(g,M+110,yy-22,bw,44,10); g.fill(); if(n){ g.fillStyle=['#F79009','#D92D20','#7A271A'][i%3]; rRound(g,M+110,yy-22,Math.max(18,bw*n/mx),44,10); g.fill(); } T(known?`${n}명`:'-',M+122+bw,yy,21,800,'#0B1B3F'); });
+      if(known&&raw!=='none'){ g.fillStyle='#E4E7EC'; g.fillRect(M+24,y+316,half-48,1); T(`계 ${sum}명`,M+24,y+344,20,800,'#D92D20'); T(resc?`인명구조 ${resc}`:'',M+half-24,y+344,20,800,'#067647','right'); }
+      if(raw==='none') T(`※ ${(life&&life.none)||'해당없음'}`,M+24,y+344,18,600,'#067647'); else if(!known) T('※ 인명피해 파악 중',M+24,y+344,18,600,'#B54708'); }
+    { const x0=M+half+54; T('지휘 절차 단계별 이행',x0,y+34,22,800,'#0B1B3F'); const ph=f.phases||[], n=ph.length||1, rh=Math.min(24,300/n), bw=half-250;
+      ph.forEach((p,i)=>{ const yy=y+74+i*rh+rh/2, tot=p.done.length+p.undone.length, r2=tot?p.done.length/tot:0; T(fit(`${i+1} ${p.name}`,14,600,150),x0,yy,14,600,'#344054'); g.fillStyle='#F2F4F7'; g.fillRect(x0+160,yy-rh*0.32,bw,rh*0.64); if(r2){ g.fillStyle=r2===1?'#067647':'#244EA2'; g.fillRect(x0+160,yy-rh*0.32,bw*r2,rh*0.64); } T(`${p.done.length}/${tot}`,x0+170+bw,yy,13,700,'#475467'); }); }
+    // 조치 · 전망 칩
+    y+=404; const chips=(lab,ic,list,x,w,col)=>{ T(lab,x,y+20,22,800,'#0B1B3F'); let cx=x, cy=y+62; g.font=`700 18px ${RFF}`; (list.length?list:['파악 중']).slice(0,10).forEach(t=>{ const tw=g.measureText(t).width+58; if(cx+tw>x+w){ cx=x; cy+=50; } if(cy>y+190) return; g.fillStyle=list.length?col+'1A':'#F2F4F7'; rRound(g,cx,cy-20,tw,40,20); g.fill(); g.fillStyle=col; g.beginPath(); g.arc(cx+20,cy,11,0,7); g.fill(); rIco(g,ic,cx+20,cy,6,'#fff'); T(t,cx+38,cy,18,700,'#1A1A1A'); cx+=tw+8; }); };
+    chips('조치 사항','check',fxs(f,'acts').split(MULTI_SEP).filter(Boolean),M,half,'#067647'); chips('향후 전망','arrow',fxs(f,'outlook').split(MULTI_SEP).filter(Boolean),M+half+30,half,'#244EA2');
+    // 시간 흐름(현장 사건 8건)
+    y+=200; T('시간 흐름 (현장 사건)',M,y,22,800,'#0B1B3F'); { const IR=INPUT_LOG_F(), ev=(f.log||[]).filter(l=>!IR.test(String(l))).map(l=>String(l).match(/^(\d{1,2}:\d{2})(?::\d{2})?\s+\(\+[^)]*\)\s+(.*)$/)).filter(m=>m&&(/^\[/.test(m[2])||m[2]==='체크리스트 시작')).map(m=>[m[1],m[2]==='체크리스트 시작'?'지휘 개시':m[2].replace(/^\[[^\]]+\]\s*/,'').replace(/\s*✔$/,'')]).slice(0,8);   /* CH 체크 항목·칸에 적은 글은 빼고 */
+      const x0=M+20, x1=W-M-20, ly=y+92; g.fillStyle='#D0D5DD'; g.fillRect(x0,ly-2,x1-x0,4);
+      if(!ev.length) T('기록 없음',x0,ly+40,18,600,'#98A2B3');
+      ev.forEach(([tm,tx],i)=>{ const x=ev.length>1?x0+(x1-x0)*i/(ev.length-1):x0+(x1-x0)/2, up=i%2===0; g.fillStyle='#244EA2'; g.beginPath(); g.arc(x,ly,9,0,7); g.fill(); g.fillStyle='#fff'; g.beginPath(); g.arc(x,ly,4,0,7); g.fill();
+        const al=i===0?'left':i===ev.length-1&&ev.length>1?'right':'center', bx=al==='left'?x-8:al==='right'?x+8:x; T(tm,bx,up?ly-50:ly+38,17,800,'#244EA2',al); T(fit(tx,16,600,170),bx,up?ly-26:ly+62,16,600,'#344054',al); }); }
+    rFoot(g,W,M,1,1); return rOut([cv],mode); }
+  // ---------- 사진기록 리포트형: 사진·캡션·설명 중심, 같은 크기 칸으로 나란히(비교) ----------
+  async function repPhoto(e, mode){
+    try{ if(document.fonts&&document.fonts.ready) await Promise.race([document.fonts.ready, sleep(1500)]); }catch(_){ }
+    const f=e.facts||{situ:[],phases:[],log:[]}, W=1240, M=84, ph=(e.photos||[]).filter(x=>x&&x.img).slice(0,6), ims=await Promise.all(ph.map(x=>rLoadImg(x.img)));
+    const cv=document.createElement('canvas'); cv.width=W; cv.height=1754; const g=cv.getContext('2d'); g.textBaseline='middle';
+    const T=(t,x,y,sz,w,c,al)=>{ g.font=`${w||500} ${sz}px ${RFF}`; g.fillStyle=c||'#1A1A1A'; g.textAlign=al||'left'; g.fillText(t,x,y); g.textAlign='left'; };
+    rHead(g,W,M,'화재등 상황 보고서','사진기록 리포트',`보고일시 ${fmtTs(e.ts)} · 사진 ${ph.length}장`);
+    let y=184; { const parts=[['cal',fxs(f,'dt')||'일시 파악 중'],['pin',fxs(f,'place')||'장소 파악 중'],['fire',[fxs(f,'kind'),fxs(f,'burn')].filter(Boolean).join(' · ')||'처종 파악 중'],['alert',fxs(f,'level')||'대응단계 -']];
+      g.fillStyle='#F2F4F7'; rRound(g,M,y,W-2*M,64,16); g.fill(); let x=M+20; parts.forEach(([ic,t])=>{ g.font=`700 19px ${RFF}`; const w=Math.min(g.measureText(t).width,270); g.fillStyle='#244EA2'; g.beginPath(); g.arc(x+14,y+32,14,0,7); g.fill(); rIco(g,ic,x+14,y+32,8,'#fff'); g.save(); g.beginPath(); g.rect(x+34,y,w+4,64); g.clip(); T(t,x+36,y+32,19,700,'#0B1B3F'); g.restore(); x+=w+64; }); }
+    y+=88; const sumH=210, area=1600-y-sumH-20, n=ph.length;
+    if(!n){ g.strokeStyle='#98A2B3'; g.setLineDash([12,10]); g.lineWidth=3; rRound(g,M,y,W-2*M,area,24); g.stroke(); g.setLineDash([]); rIco(g,'camera',W/2,y+area/2-50,46,'#98A2B3'); T('사진이 아직 없습니다',W/2,y+area/2+30,30,800,'#475467','center'); T('보고서 창 ‘편집’ → ‘＋ 사진 추가’로 넣고 사진마다 캡션·설명을 적으세요',W/2,y+area/2+76,20,600,'#667085','center'); }
+    else { const cols=n===1?1:2, rows=Math.ceil(n/cols), gap=24, cw=(W-2*M-gap*(cols-1))/cols, chh=(area-gap*(rows-1))/rows, capH=Math.min(150,Math.max(104,chh*0.3)), imH=chh-capH;
+      ph.forEach((p,i)=>{ const col=i%cols, row=Math.floor(i/cols), x=M+col*(cw+gap), yy=y+row*(chh+gap), im=ims[i];
+        g.fillStyle='#fff'; g.strokeStyle='#D0D5DD'; g.lineWidth=2; rRound(g,x,yy,cw,chh,18); g.fill(); g.stroke();
+        g.save(); rRound(g,x,yy,cw,imH,18); g.clip(); g.fillStyle='#E9EDF3'; g.fillRect(x,yy,cw,imH); if(im){ const sc=Math.min(cw/im.naturalWidth,imH/im.naturalHeight), w=im.naturalWidth*sc, h=im.naturalHeight*sc; g.drawImage(im,x+(cw-w)/2,yy+(imH-h)/2,w,h); } g.restore();
+        g.fillStyle='#0B1B3F'; g.beginPath(); g.arc(x+34,yy+34,22,0,7); g.fill(); T(String(i+1),x+34,yy+35,22,900,'#FDD000','center');
+        const cap=p.cap||`사진 ${i+1}`; g.font=`800 24px ${RFF}`; let cp=cap; while(cp.length>1&&g.measureText(cp).width>cw-40) cp=cp.slice(0,-1); if(cp!==cap) cp+='…'; T(cp,x+20,yy+imH+30,24,800,'#0B1B3F');
+        g.font=`500 19px ${RFF}`; const dl=rWrap(g,p.desc||'',cw-40), maxL=Math.max(1,Math.floor((capH-58)/26)); dl.slice(0,maxL).forEach((t,k)=>T(k===maxL-1&&dl.length>maxL?t.slice(0,-1)+'…':t,x+20,yy+imH+62+k*26,19,500,'#344054'));
+        if(cols===2&&col===0&&ph[i+1]){ const ax=x+cw+gap/2, ay=yy+imH/2; g.fillStyle='#FDD000'; g.beginPath(); g.arc(ax,ay,18,0,7); g.fill(); rIco(g,'arrow',ax,ay,10,'#0B1B3F'); }   /* 같은 줄 두 장 = 비교(→) */
+      }); }
+    // 아래 요약 3칸
+    { const yy=1600-sumH, w3=(W-2*M-40)/3, life=fxv(f,'life'), raw=String(life&&life.raw||''), c={}; raw.split('|').forEach(x=>{ const m=x.match(/^(.+)=(\d+)$/); if(m) c[m[1]]=+m[2]; });
+      const boxes=[['fire','화재 상황',[fxs(f,'phase'),fxs(f,'fstat'),fxs(f,'cause_est')].filter(Boolean)],['person','피해 현황',[raw==='none'?((life&&life.none)||'인명피해 해당없음'):Object.keys(c).length?Object.keys(c).map(k=>`${k} ${c[k]}명`).join(' · '):'인명피해 파악 중', fxs(f,'rescue')?`인명구조 ${fxs(f,'rescue')}`:'', (fxv(f,'prop_est')||{}).raw?`재산 ${wonTxt(+(fxv(f,'prop_est')||{}).raw)}`:fxs(f,'prop_st')?`재산 ${fxs(f,'prop_st')}`:''].filter(Boolean)],['check','조치 사항',fxs(f,'acts').split(MULTI_SEP).filter(Boolean)]];
+      boxes.forEach(([ic,lb,ls],i)=>{ const x=M+i*(w3+20); g.fillStyle='#F8FAFC'; g.strokeStyle='#E4E7EC'; g.lineWidth=2; rRound(g,x,yy,w3,sumH-10,16); g.fill(); g.stroke(); g.fillStyle='#244EA2'; g.beginPath(); g.arc(x+30,yy+32,17,0,7); g.fill(); rIco(g,ic,x+30,yy+32,9,'#fff'); T(lb,x+56,yy+32,20,800,'#0B1B3F');
+        g.font=`500 18px ${RFF}`; const lines=(ls.length?ls:['파악 중']).flatMap(t=>rWrap(g,'· '+t,w3-36)).slice(0,5); lines.forEach((t,k)=>T(t,x+20,yy+72+k*26,18,500,'#344054')); }); }
+    rFoot(g,W,M,1,1); return rOut([cv],mode); }
   // V174·V175: 화재등 상황 보고서 A4 — 머리 띠·제목·보고일시, ■ 항목 띠, '- 이름: 값'은 이름 칸+값 칸, '|' 줄은 표, [[나란히]]는 좌우 두 단, 첫 항목 오른쪽에 사진(편집에서 넣음)
   //   한 쪽에 꽉 맞게: 넘치면 글자를 줄이고(68%까지) 남으면 간격을 넓힌다(1.45배까지)
   async function repPdf(text, mode, img){
@@ -3844,7 +4052,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         const st=B[l.k]; g.font=L.fnt(l.k); g.fillStyle=st.c;
         if(l.k==='title'){ const w=g.measureText(l.t).width; g.fillText(l.t,x0+(width-w)/2,cy-4*f); g.fillStyle='#0B1B3F'; g.fillRect(x0,yy+h-6*f,width,3*f); g.fillRect(x0,yy+h-1*f,width,1); }
         else if(l.k==='meta'){ const w=g.measureText(l.t).width; g.fillText(l.t,x0+width-w,cy); }
-        else if(l.k==='sec'){ const bh=Math.min(h-4,46*f*Math.min(sp,1.15)), by=cy-bh/2; g.fillStyle='#EEF2F8'; g.fillRect(x0,by,width,bh); g.fillStyle='#244EA2'; g.fillRect(x0,by,7*f,bh); g.fillStyle=st.c; g.fillText(l.t,x0+24*f,cy); }
+        else if(l.k==='sec'){ const bh=Math.min(h-4,46*f*Math.min(sp,1.15)), by=cy-bh/2, ir=bh*0.34, icx=x0+22*f+ir; g.fillStyle='#EEF2F8'; g.fillRect(x0,by,width,bh); g.fillStyle='#244EA2'; g.fillRect(x0,by,7*f,bh); g.beginPath(); g.arc(icx,cy,ir,0,7); g.fill(); rIco(g,rIcoFor(l.t),icx,cy,ir*0.56,'#fff'); g.font=L.fnt('sec'); g.fillStyle=st.c; g.fillText(l.t,icx+ir+12*f,cy); }   /* V176: 항목 띠 아이콘 */
         else if(l.k==='sub'){ g.fillStyle='#244EA2'; g.beginPath(); g.arc(x0+L.BX+5*f,cy,5*f,0,7); g.fill(); g.fillStyle=st.c; g.fillText(l.t,x0+L.BX+20*f,cy); }
         else if(l.k==='item'){
           if(l.lb!==undefined){ g.fillStyle='#98A2B3'; g.fillRect(x0+L.BX,cy-2.5*f,6*f,5*f); g.font=L.fnt('item',700); g.fillStyle='#344054'; g.fillText(l.lb,x0+L.BX+18*f,cy); g.font=L.fnt('item'); }
@@ -3908,17 +4116,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       ['word/document.xml',doc]]);
   }
   const REP_PDF={key:'', file:null};
-  async function repPdfFile(){ const t=repText(), k=(cur&&cur.id)+'|'+t+'|'+((cur&&cur.img)||'').length;
-    if(REP_PDF.key!==k||!REP_PDF.file){ REP_PDF.file=new File([await repPdf(t,undefined,cur&&cur.img)], repPdfName(), {type:'application/pdf'}); REP_PDF.key=k; }
+  async function repPdfFile(){ const t=repText(), k=(cur&&cur.id)+'|'+t+'|'+repType(cur)+'|'+JSON.stringify(repPhotos(cur).map(x=>[x.img.length,x.cap,x.desc]));
+    if(REP_PDF.key!==k||!REP_PDF.file){ REP_PDF.file=new File([await repRender(t)], repPdfName(), {type:'application/pdf'}); REP_PDF.key=k; }
     return REP_PDF.file; }
   function pdfDown(file){ const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=file.name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500); }
   // V144: 공유 — 누르면 PDF·PNG·DOCX 중 고르기. 공유 시트를 못 쓰는 기기는 그 파일을 받기로
   const REP_F={};
-  async function repFile(kind){ const t=repText(), k=(cur&&cur.id)+'|'+t+'|'+((cur&&cur.img)||'').length, c=REP_F[kind];
+  async function repFile(kind){ const t=repText(), k=(cur&&cur.id)+'|'+t+'|'+repType(cur)+'|'+JSON.stringify(repPhotos(cur).map(x=>[x.img.length,x.cap,x.desc])), c=REP_F[kind];
     if(c&&c.k===k) return c.f;
     const base=repPdfName().replace(/\.pdf$/,''); let f;
     if(kind==='pdf') f=await repPdfFile();
-    else if(kind==='png') f=new File([await repPdf(t,'png',cur&&cur.img)], base+'.png', {type:'image/png'});
+    else if(kind==='png') f=new File([await repRender(t,'png')], base+'.png', {type:'image/png'});
     else f=new File([repDocx(t)], base+'.docx', {type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
     REP_F[kind]={k,f}; return f; }
   const shMenu=document.createElement('div'); shMenu.className='shmenu'; shMenu.hidden=true; shMenu.setAttribute('role','menu');
@@ -3950,7 +4158,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const rows=reports.map((r,idx)=>`<div class="reprow">
         <button type="button" class="roomrow" data-rep="${esc(r.id)}">
           <span class="av">${esc(String(idx+1))}</span>
-          <span class="body"><span class="t">${esc(r.place||'화재등 상황 보고서')}${r.ai?' <span class="tag">AI 작성본</span>':''}${(r.draftEdited||r.aiEdited)?' <span class="tag">편집됨</span>':''}</span><span class="d">${esc(fmtTs(r.ts))} · 이행 ${r.done}/${r.total}${r.elapsed?' · 경과 '+esc(r.elapsed):''}${r.facts?'':' · 이전 버전'}</span></span>
+          <span class="body"><span class="t"><span class="tag rt-${repType(r)}">${REP_TN[repType(r)]}</span> ${esc(r.place||'화재등 상황 보고서')}${r.ai?' <span class="tag">AI 작성본</span>':''}${(r.draftEdited||r.aiEdited)?' <span class="tag">편집됨</span>':''}</span><span class="d">${esc(fmtTs(r.ts))} · 이행 ${r.done}/${r.total}${r.elapsed?' · 경과 '+esc(r.elapsed):''}${r.facts?'':' · 이전 버전'}</span></span>
           <span class="meta"><span class="arrow">›</span></span>
         </button>
         <button type="button" class="del" data-del="${esc(r.id)}" aria-label="보고서 삭제">삭제</button>
@@ -3968,12 +4176,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       <div class="card replist">${rows || `<div class="rep-empty">${AS.ilEmpty?`<img src="${AS.ilEmpty}" alt="">`:''}<p>아직 보고서가 없습니다. 위 현장 기록과 <b>CH 체크리스트</b>를 채우고 <b>보고서 만들기</b>를 누르면 여기에 쌓입니다.</p><a class="btn" href="#board">체크리스트 열기</a></div>`}</div>
       <p class="hint-row" style="margin:10px 4px 0;font-size:12px;color:var(--muted-2)">보고서는 이 기기에만 저장됩니다 · ${reports.length}건 (최대 ${MAX_REPORTS}건)${storageFull?' · <b>저장 공간 부족</b>':''}</p>`;
     panel.querySelectorAll('[data-rep]').forEach(b=>b.addEventListener('click',()=>{ const r=reports.find(x=>x.id===b.dataset.rep); if(r) openReport(r); }));
-    $('#mkReport').addEventListener('click',()=>{   // V99: 미기재 섹션·30건 꽉 참이면 한 번 더 눌러 확인
-      const b=$('#mkReport'), miss=SITU.filter(x=>!situStatus(x).cls).length, full=reports.length>=MAX_REPORTS;
-      if(b.dataset.arm!=='1' && (miss||full)) return arm(b, full?'오래된 1건 지우고 만들기':`미기재 ${miss}곳 · 그래도 만들기`, newReport);
-      if(b.dataset.arm==='1') return arm(b,'',newReport);
-      newReport();
-    });
+    $('#mkReport').addEventListener('click',()=>openRepType());   // V176: 종류부터 고른 뒤 만들기
     $('#ilReps').addEventListener('click',()=>jumpTo('sec-reps'));
     $('#ilReset').addEventListener('click',()=>{ const b=$('#ilReset'); arm(b,'현장 기록 지움?',()=>{
       const old=JSON.parse(JSON.stringify(state.situ));
@@ -4260,19 +4463,27 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   window.__rnRedraw=roomNoteRedraw;
   // V173: 체크리스트 목록 — 서버에 교수가 고친 목록이 있으면 그것, 없으면 기본 목록
   const CLS={at:0};
-  function clApply(list,ts){ const before=clSig(), ok=clOk(list); CHECKLIST=ok?list:CL_DEF; CL_TS=ts||0;
-    try{ localStorage.setItem(CL_KEY,JSON.stringify({list:ok?list:null,ts:CL_TS})); }catch(_){ }
+  const clPend=()=>{ try{ return !!(JSON.parse(localStorage.getItem(CL_KEY)||'null')||{}).pend; }catch(_){ return false; } };
+  function clApply(list,ts,pend){ const before=clSig(), ok=clOk(list); CHECKLIST=ok?list:CL_DEF; CL_TS=ts||0;
+    try{ localStorage.setItem(CL_KEY,JSON.stringify({list:ok?list:null,ts:CL_TS,pend:!!pend})); }catch(_){ }   // V176: pend = 서버가 옛 버전이라 이 기기에 맡겨 둔 목록(서버가 업데이트되면 자동으로 올림)
     if(clSig()===before) return false;
     if(Object.keys(state.checks).length){ state.checks={}; toast('체크리스트 항목이 바뀌어 체크 표시를 비웠습니다(시각 기록은 그대로)'); }
     save(); return true; }
   async function clSync(force){ if(!SRV.on||(!force&&Date.now()-CLS.at<60e3)) return false; CLS.at=Date.now();
+    if(clPend()){ if(!isProf()) CLS.at=0; if(isProf()&&PROF.tok){ const same=JSON.stringify(CHECKLIST)===JSON.stringify(CL_DEF), x=await api('/api/admin/ai',{json:{action:'checklist',list:same?[]:CHECKLIST},tok:PROF.tok});
+        if(x.ok&&x.j&&x.j.ok!==false&&'checklist_ts' in x.j){ clApply(x.j.checklist,+x.j.checklist_ts||0); toast('이 기기에 맡겨 둔 체크리스트를 서버에 올렸습니다 — 모든 기기에 적용'); } }
+      return false; }   // 맡겨 둔 목록이 있으면 서버 것으로 덮지 않음
     const r=await api('/api/checklist'); if(!(r.ok&&r.j&&r.j.ok)) return false; return clApply(r.j.list,+r.j.ts||0); }
   // V174: 상황보고서 서식 — 서버에 교수가 고친 서식이 있으면 그것, 없으면 기본 서식
   const ILS={at:0};
-  function ilApply(form,ts){ const before=JSON.stringify(IL_ALL), ok=ilOk(form); IL_ALL=ok?form:IL_DEF; SITU=IL_ALL.filter(b=>!b.off);
-    try{ localStorage.setItem(IL_KEY,JSON.stringify({form:ok?form:null,ts:ts||0})); }catch(_){ }
+  const ilPend=()=>{ try{ return !!(JSON.parse(localStorage.getItem(IL_KEY)||'null')||{}).pend; }catch(_){ return false; } };
+  function ilApply(form,ts,pend){ const before=JSON.stringify(IL_ALL), ok=ilOk(form); IL_ALL=ok?form:IL_DEF; SITU=IL_ALL.filter(b=>!b.off);
+    try{ localStorage.setItem(IL_KEY,JSON.stringify({form:ok?form:null,ts:ts||0,pend:!!pend})); }catch(_){ }
     return JSON.stringify(IL_ALL)!==before; }
   async function ilSync(force){ if(!SRV.on||(!force&&Date.now()-ILS.at<60e3)) return false; ILS.at=Date.now();
+    if(ilPend()){ if(!isProf()) ILS.at=0; if(isProf()&&PROF.tok){ const same=JSON.stringify(IL_ALL)===JSON.stringify(IL_DEF), x=await api('/api/admin/ai',{json:{action:'ilform',form:same?[]:IL_ALL},tok:PROF.tok});
+        if(x.ok&&x.j&&x.j.ok!==false&&'ilform_ts' in x.j){ ilApply(x.j.ilform,+x.j.ilform_ts||0); toast('이 기기에 맡겨 둔 상황보고서 서식을 서버에 올렸습니다 — 모든 기기에 적용'); } }
+      return false; }
     const r=await api('/api/ilform'); if(!(r.ok&&r.j&&r.j.ok)) return false; return ilApply(r.j.form,+r.j.ts||0); }
   window.__ilSync=()=>ilSync(true).then(ch=>{ if(ch&&state.route==='log') render(); }).catch(()=>{});
   window.__clSync=()=>clSync(true).then(ch=>{ if(ch&&state.route==='board') render(); }).catch(()=>{});   // 서버에 연결되면 한 번
@@ -5781,7 +5992,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const wasWait=attempt>0&&!!(TOKS['']||TOKS[':deb']); SRV.probing=false; SRV.retry=false; SRV.on=true; SRV.me=r.j.user||null; SRV.ver=String(r.j.version||'');
       if(r.j.ai && !CAP.sample){ CAP.sample=serverSample; CAP.ready=true; syncRepUI(); }   // 보고서 AI: Claude 화면 밖에서는 SACHIL 서버(AI 키)로 작성
       SRV.retention=r.j.retention_days||0; SRV.room=r.j.room||0; SRV.roomDb=r.j.room_debrief||0; SRV.requireCode=!!r.j.require_code; SRV.trim=r.j.trim_ratio||0; SRV.ai=!!r.j.ai; SRV.aiName=String(r.j.ai_name||'').slice(0,20); SRV.kakao=/^[0-9a-f]{32}$/.test(r.j.kakao||'')?r.j.kakao:''; SRV.tmap=/^[0-9A-Za-z]{20,64}$/.test(r.j.tmap||'')?r.j.tmap:''; SRV.bld=!!r.j.bld; SRV.idx=r.j.index||null; if(Number.isFinite(r.j.max_files)) MAX_FILES=Math.max(1,Math.min(10,r.j.max_files));
-      if(PROF.tok) checkProf().then(ok=>{ if(ok&&state.route==='login') render(); });   // 교수로 로그인해 둔 기기면 교수 표시줄 · V143: 확인이 끝나면 교수 화면으로 다시 그림
+      if(PROF.tok) checkProf().then(ok=>{ if(ok&&state.route==='login') render(); if(ok){ if(window.__clSync) window.__clSync(); if(window.__ilSync) window.__ilSync(); } });   // V176: 교수 확인 뒤 맡겨 둔 체크리스트·서식 올리기   // 교수로 로그인해 둔 기기면 교수 표시줄 · V143: 확인이 끝나면 교수 화면으로 다시 그림
       if(window.__rtplSync) window.__rtplSync();   // V125: 보고서 양식
       if(window.__clSync) window.__clSync();   // V173: 교수가 고친 체크리스트
       if(window.__ilSync) window.__ilSync();   // V174: 교수가 고친 상황보고서 서식
