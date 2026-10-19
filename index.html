@@ -869,7 +869,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v171</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v172</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1678,8 +1678,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V171', SRV_VER='9.7';
+  const APP_VER='V172', SRV_VER='9.8';
   const UPDATES=[
+    {v:'V172', d:'2026-10-19', t:['SACHIL 시그니처 안내 그림: SIG-002·WM-002의 소문자 i를 대문자 I로 바로잡음(SACHIL)','시그니처 컬러 설명 고침 — White: 태극기의 바탕색, 대한민국 상징 / Incheon Ocean: 인천광역시의 바다 색, 인천광역시 상징 / Symbol Yellow: 소방청 심벌 컬러, 용맹한 소방관 상징']},
     {v:'V171', d:'2026-10-19', t:['소화전 창이 더 빨리 뜸: 지도 프로그램·화재 위치·소화전 자료를 차례로 기다리지 않고 한꺼번에 불러옴','지도가 뜨기 전에도 소화전 목록(아래 한 줄)이 먼저 나옴','47망에 들어와 있으면 소화전 지도를 미리 받아 두어, 누르면 바로 열림','서버가 소방청 소화전 자료를 파일로 저장해 둠 — 서버를 다시 켠 뒤에도 처음부터 받지 않음']},
     {v:'V170', d:'2026-10-19', t:['CP 지도·소화전 창 맨 윗줄을 똑같이: ‹ [헬멧 CP | 소화전] 검색창 검색','지금 보고 있는 쪽(CP 또는 소화전)은 노란 바탕·진한 테두리, 다른 쪽은 흐린 회색으로 확실히 구분']},
     {v:'V169', d:'2026-10-19', t:['CP 지도 창 제목·버튼에 남아 있던 ‘DS’를 CP(소방 헬멧 그림)로','소화전 창·CP 지도 창 안의 소화전 그림도 새 소화전 아이콘으로, 안내 문구의 DS도 CP로']},
@@ -1858,14 +1859,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   { const u=SECTIONS.find(x=>x.slug==='updates'); if(u) u.icon=UPD_ICON; }
   { const g=SECTIONS.find(x=>x.slug==='signature'); if(g) g.icon='icons/icon-96.png'; }
   // SACHIL 시그니처(13번째 섹션) — 시그니처 안내 한 장(V67). 누르면 크게 보기
-  const SIG_ALT='SACHIL47 시그니처 안내. 시그니처 컬러: White #FFFFFF(태극기의 바탕색으로 밝음·순수·평화를 사랑하는 민족성), Incheon Ocean #244EA2(인천의 바다, 국제 관문도시로서의 연결과 확장), Symbol Yellow #FDD000(소방청 공식 심벌의 시그니처 컬러로서 예방·경계·용맹과 신속한 인명구조를 나타내는 상징). 핵심 스타일: 빠른 필획, 우측 진행감, 둥근 획 끝, 단순한 인식성. 시그니처 컬러는 자랑스럽고 용감한 대한민국 인천 소방을 상징합니다. 시그니처 자산: ICON-001 47시그니처 아이콘, SIG-001 47 기본형, SIG-001B 47 볼드형, SIG-002 SACHIL 기본형, SIG-003 S, SIG-004 A, SIG-005 CH, SIG-006 IL, WM-001 SACHIL 워터마크, WM-002 SACHIL 박스형, WM-003 SACHIL:47 박스형, UI-001 Search, UI-002 Menu.';
+  const SIG_ALT='SACHIL47 시그니처 안내. 시그니처 컬러: White #FFFFFF(태극기의 바탕색으로 밝음·순수·평화를 사랑하는 민족성이며 대한민국을 상징), Incheon Ocean #244EA2(인천광역시의 바다 색이며, 인천광역시를 상징), Symbol Yellow #FDD000(소방청 공식 심벌의 시그니처 컬러로서 용맹한 소방관을 상징). 핵심 스타일: 빠른 필획, 우측 진행감, 둥근 획 끝, 단순한 인식성. 시그니처 컬러는 자랑스럽고 용감한 대한민국 인천 소방을 상징합니다. 시그니처 자산: ICON-001 47시그니처 아이콘, SIG-001 47 기본형, SIG-001B 47 볼드형, SIG-002 SACHIL 기본형, SIG-003 S, SIG-004 A, SIG-005 CH, SIG-006 IL, WM-001 SACHIL 워터마크, WM-002 SACHIL 박스형, WM-003 SACHIL:47 박스형, UI-001 Search, UI-002 Menu.';
   function renderSignature(panel,s){
     panel.innerHTML=`
       <div class="card sig-sheet">
-        <button type="button" class="sig-img" id="sigImg" aria-label="${esc(s.title)} 크게 보기"><img src="img/signature.webp" alt="${esc(SIG_ALT)}" width="1055" height="1491" decoding="async"></button>
+        <button type="button" class="sig-img" id="sigImg" aria-label="${esc(s.title)} 크게 보기"><img src="img/signature.webp?v=172" alt="${esc(SIG_ALT)}" width="1055" height="1491" decoding="async"></button>
         <p class="sig-note">그림을 누르면 크게 볼 수 있어요.</p>
       </div>`;
-    $('#sigImg').addEventListener('click',()=>openLightbox('img/signature.webp',s.title));
+    $('#sigImg').addEventListener('click',()=>openLightbox('img/signature.webp?v=172',s.title));
   }
   const phaseIcon = pi => AS.phases[pi] || '';
   // 체크리스트 — 역할 구분 없이 출동부터 지휘소 운영까지 12단계 한 줄기. 항목은 초안 예시(교관 승인 전).
