@@ -908,7 +908,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v180</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v181</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1771,8 +1771,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V180', SRV_VER='10.6';
+  const APP_VER='V181', SRV_VER='10.7';
   const UPDATES=[
+    {v:'V181', d:'2026-10-19', t:['앱 용량 약 18% 줄임(안 쓰는 그림·코드 정리) — 처음 여는 속도 개선','휴대폰에서 누르는 버튼·체크 칸을 손가락 크기(44px)로 키움(CH·IL·지도·방재실·AI)','폰 화면에서 카드 밖으로 삐져나오던 입력칸 바로잡음(47망·디브리핑룸 입장, 교수 로그인, AI 입장코드, 방재실 키)','AI 오류는 노란 경고로 보이고 ‘다시 묻기’ 버튼 추가, 기다리는 동안 ‘자료를 찾아 답을 쓰는 중’ 표시','검색 결과가 없을 때 다음에 할 일 안내, 공공데이터 조회 안내는 결과 아래로','방재실 탭이 한눈에 보이게 2줄로, CH 시각 기록이 휴대폰에서 덜 접히게','인포그래픽 보고서의 100%가 잘리던 문제 바로잡음, PC에서 업데이트 내역 모양이 빠지던 문제 바로잡음']},
     {v:'V180', d:'2026-10-19', t:['Search: 동네 이름만(예: 구월동) 검색해도 공공데이터포털에서 그 동네 소방용수시설을 바로 조회','Search: 주소·건물이 아닌 검색어에도 ‘공공데이터 조회는 주소·건물 이름·동네로’ 안내와 예시 버튼 표시','Search: 건물 이름의 주소를 못 찾으면 조용히 사라지지 않고 이유를 알려 줌']},
     {v:'V179', d:'2026-10-19', t:['방재실 체크리스트에서 CH 항목을 1단·2단·3단으로 나눠 보이게 설정(전체 또는 단계마다)','IL: 박스 위 파란·초록 띠를 없애고 차분하게 정리','IL: ‘화재 개요’(화재 성상·화재 상황·화재 원인), ‘피해 현황’(인명피해·재산피해)으로 묶음','IL: 재산피해는 처음부터 ‘조사 중’이 눌려 있음(다시 누르면 해제)','보고서도 같은 순서로: 1 발생개요 · 2 화재 개요 · 3 피해 현황 · 4 조치 사항 · 5 향후 전망']},
     {v:'V178', d:'2026-10-19', t:['AI 보고서도 쓰는 대로 바로 보임(다 쓸 때까지 기다리지 않음)','AI 보고서의 ‘깊은 생각’ 단계를 줄이고, AI에 보내는 자료를 절반 가까이 줄여(빈 칸·중복 빼기) 작성 시간 단축','보고서 작성 전 양식 확인 기다림 3초 → 0.6초']},
