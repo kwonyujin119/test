@@ -974,7 +974,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v190</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v191</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1261,6 +1261,8 @@ body.chatview .panel{padding-bottom:6px}
 .act-sheet.at .box{position:fixed;width:200px;margin:0;padding:6px;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.22);border:1px solid var(--line)}
 .act-sheet.at button{min-height:38px;font-size:14px;padding:0 12px}
 .act-sheet.at .pv{margin:2px 6px 4px}
+.act-sheet.selcopy .box{width:min(100%,520px)}.act-sheet.selcopy textarea{width:100%;min-height:180px;max-height:50vh;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:16px;line-height:1.55;resize:vertical;background:var(--surface);color:var(--fg);user-select:text;-webkit-user-select:text}
+.act-sheet.selcopy .scb{display:flex;gap:6px;margin-top:6px}.act-sheet.selcopy .scb button{flex:1;text-align:center;border:1px solid var(--line)}.act-sheet.selcopy .scb .pri{background:var(--navy);border-color:var(--navy);color:#fff}
 .act-sheet.at button.cancel{display:none}
 .act-sheet button.cancel{text-align:center;color:var(--muted);border-top:1px solid var(--line);border-radius:0 0 10px 10px}
 /* 가로 아이폰: 노치·둥근 모서리에 내용이 잘리지 않게 */
@@ -1841,8 +1843,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V190', SRV_VER='11.6';
+  const APP_VER='V191', SRV_VER='11.7';
   const UPDATES=[
+    {v:'V191', d:'2026-10-20', t:['AI 도우미: AI가 멈춰 답이 안 오면 끝없이 기다리지 않음 — 서버는 25초 뒤 다른 AI로 넘기고, 앱은 오래 멈추면 ‘다시 묻기’','말풍선을 길게 누르면(PC는 오른쪽 클릭) 복사 · 선택 복사 · 공유 — AI 도우미와 47망·디브리핑룸 모두','공유: 47망으로 · 디브리핑룸으로(그 방 입력창에 넣어 두고 확인 뒤 보내기) · 카카오톡으로 · 다른 앱']},
     {v:'V190', d:'2026-10-20', t:['47망·디브리핑룸: 사진을 잠깐 못 불러와도 저절로 두 번 더 받아 봄(깨진 그림·파일 이름만 뜨던 문제)','그래도 안 되면 ‘사진을 불러오지 못했습니다 · 눌러서 다시 시도’ 칸 — 서버에 없는 사진이면 그렇게 알려 줌','서버: 올리는 중 끊긴 반쪽 사진은 저장하지 않고 다시 보내게']},
     {v:'V189', d:'2026-10-20', t:['AI 도우미가 근거 목록 없이 짧게 바로 답함 — 법제처·공공데이터 조회를 기다리지 않아 더 빠름','답마다 ‘Search에서 근거 찾기’ 버튼 — 눌러서 원문·조문·자료 쪽을 확인','근거까지 필요하면 ‘근거와 함께 다시 묻기(느림)’']},
     {v:'V188', d:'2026-10-20', t:['CP 지도: 현장지휘소·유관기관CP·응급의료소·차량대기소를 여러 곳(각 9곳) — 버튼을 다시 누르면 다음 곳(현장지휘소2, 차량대기소2…)','방면은 A~F를 3벌까지 — 화재가 여러 곳이면 그 화재로 지도를 옮긴 뒤 누르면 그 둘레에','CP 메뉴에 종류별 몇 곳인지, 바로가기에 ‘차량대기소 n곳’ 칩']},
@@ -3914,6 +3917,41 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const ta=document.createElement('textarea'); ta.value=txt; ta.contentEditable='true'; ta.style.position='fixed'; ta.style.top='0'; ta.style.opacity='0'; ta.style.fontSize='16px'; document.body.appendChild(ta);
     let ok=false; try{ ta.focus(); ta.select(); ta.setSelectionRange(0,txt.length); ok=document.execCommand('copy'); }catch(_){ ok=false; } ta.remove(); return ok;
   }
+  // V191: 말풍선 메뉴 — 복사 · 선택 복사 · 공유(47망·디브리핑룸·카카오톡·다른 앱). 대화방과 AI 도우미가 같이 쓴다
+  async function copyPlain(t){ try{ await navigator.clipboard.writeText(t); toast('복사했습니다'); }catch(_){ toast(legacyCopy(t)?'복사했습니다':'복사하지 못했습니다'); } }
+  function actSheet(title, acts, at, onPick){ const old=$('#actSheet'); if(old) old.remove();
+    const sh=document.createElement('div'); sh.className='act-sheet'; sh.id='actSheet'; sh.setAttribute('role','dialog'); sh.setAttribute('aria-modal','true'); sh.setAttribute('aria-label','말풍선 메뉴');
+    sh.innerHTML=`<div class="box">${title?`<p class="pv">${title}</p>`:''}${acts.map(([k,l,c])=>`<button type="button" data-a="${k}" class="${c||''}">${l}</button>`).join('')}<button type="button" data-a="close" class="cancel">닫기</button></div>`;
+    document.body.appendChild(sh);
+    if(at){ sh.classList.add('at'); const bx=sh.querySelector('.box'), w=bx.offsetWidth, h=bx.offsetHeight; bx.style.left=Math.max(8,Math.min(at.x+2, innerWidth-w-8))+'px'; bx.style.top=Math.max(8, at.y+h+8>innerHeight?at.y-h-2:at.y+2)+'px'; }
+    sh.addEventListener('click',e=>{ if(e.target===sh){ sh.remove(); return; } const a=e.target.closest('[data-a]'); if(!a) return; if(a.dataset.a==='close'){ sh.remove(); return; } onPick(a.dataset.a,a,()=>sh.remove()); });
+    sh.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.stopPropagation(); sh.remove(); } });
+    setTimeout(()=>{ const f=sh.querySelector('button'); if(f) f.focus({preventScroll:true}); },30); return sh; }
+  function selCopy(text){   // 글 일부만 골라 복사 — 손가락으로 범위를 잡고 '선택한 부분 복사'
+    const ov=document.createElement('div'); ov.className='act-sheet selcopy'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','선택 복사');
+    ov.innerHTML=`<div class="box"><p class="pv"><b>선택 복사</b> — 복사할 부분을 길게 눌러 범위를 잡으세요</p><textarea readonly rows="8">${esc(text)}</textarea><div class="scb"><button type="button" data-a="all">전체 선택</button><button type="button" data-a="copy" class="pri">선택한 부분 복사</button><button type="button" data-a="close" class="cancel">닫기</button></div></div>`;
+    document.body.appendChild(ov); const ta=ov.querySelector('textarea'); setTimeout(()=>{ ta.focus(); ta.setSelectionRange(0,0); },40);
+    ov.addEventListener('click',async e=>{ if(e.target===ov){ ov.remove(); return; } const a=e.target.closest('[data-a]'); if(!a) return; const k=a.dataset.a;
+      if(k==='close'){ ov.remove(); return; } if(k==='all'){ ta.focus(); ta.select(); return; }
+      const t=ta.selectionEnd>ta.selectionStart?ta.value.slice(ta.selectionStart,ta.selectionEnd):ta.value; ov.remove(); await copyPlain(t); });
+    ov.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.stopPropagation(); ov.remove(); } }); }
+  let FWD=null;   // 47망·디브리핑룸으로 넘길 글·사진(그 방 입력창에 넣어 두고, 확인 뒤 보내기)
+  function fwdApply(kind){ if(!FWD||FWD.kind!==kind) return; const f=FWD; FWD=null; const t=$('#chatText'); if(t){ t.value=f.text||''; t.dispatchEvent(new Event('input')); t.focus(); }
+    if(f.files&&f.files.length&&addPendingFiles) addPendingFiles(f.files); toast(`${ROOM_NAME[kind]||'대화방'} 입력창에 넣었습니다 — 확인하고 보내기를 누르세요`); }
+  async function shareMenu(text, getFiles, at){
+    actSheet('<b>공유</b> — 어디로 보낼까요?', [['net','47망으로'],['deb','디브리핑룸으로'],['kakao','카카오톡으로'],['os','다른 앱(공유 시트)']], at, async(k,btn,close)=>{
+      if(k==='net'||k==='deb'){ if(!SRV.on){ toast('서버에 연결됐을 때 보낼 수 있습니다'); return; } btn.textContent='준비 중…'; const files=getFiles?await getFiles():[]; close();
+        FWD={kind:k, text:String(text||''), files}; const r=k==='deb'?'debrief':'chat'; if(state.route===r) fwdApply(k); else go(r); return; }
+      const files=getFiles?await getFiles():[]; close();
+      if(k==='kakao'&&/Android/i.test(navigator.userAgent)&&!files.length&&text){ location.href='intent:#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT='+encodeURIComponent(text)+';package=com.kakao.talk;end'; return; }   // 안드로이드: 카카오톡 공유 화면으로 바로
+      try{
+        if(files.length&&navigator.canShare&&navigator.canShare({files})) await navigator.share({files, text:text||undefined});
+        else if(navigator.share&&text) await navigator.share({text});
+        else if(text){ await copyPlain(text); toast(k==='kakao'?'복사했습니다 — 카카오톡 대화창에 붙여넣으세요':'이 브라우저는 공유를 지원하지 않아 복사했습니다'); }
+        else toast('이 브라우저는 파일 공유를 지원하지 않습니다. 저장을 이용하세요');
+      }catch(err){ if(!(err&&err.name==='AbortError')) toast('공유하지 못했습니다'); } }); }
+  function textActs(text, at){ if(!text) return; actSheet(`${esc(trunc(String(text).replace(/\s+/g,' '),36))}`, [['copy','복사'],['sel','선택 복사'],['share','공유']], at, (k,btn,close)=>{ close();
+    if(k==='copy') copyPlain(text); else if(k==='sel') selCopy(text); else if(k==='share') shareMenu(text,null,at); }); }
   async function copyText(txt, btn, label){
     try{ await navigator.clipboard.writeText(txt); btn.textContent='복사됨'; }
     catch(_){ btn.textContent=legacyCopy(txt)?'복사됨':'복사 실패'; }
@@ -4774,8 +4812,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(m.fast||m.mode==='fast') return `<div class="fast-src"><span>근거·원문은 <b>Search</b>에서 확인하세요</span><button type="button" class="btn ghost sm to-srch" data-srch="${esc(srchQ(u.text))}">Search에서 근거 찾기 →</button><button type="button" class="full-ask" data-full="${i}">근거와 함께 다시 묻기(느림)</button></div>`;   // V189
       return (m.mode==='ai'||m.mode==='extract'||m.mode==='general') ? `<button type="button" class="to-srch" data-srch="${esc(u.text)}">Search에서 원문 더 찾기 →</button>` : ''; };
     const srchQ=t=>{ const k=String(t).replace(/[?？!.]+$/,'').replace(/\s*(은|는|이|가|을|를|에서|에|의|와|과|도|좀|요)(?=\s|$)/g,' ').replace(/(무엇인가요|뭔가요|어떻게 하나요|어떻게 해야 하나요|알려줘|알려 주세요|설명해 ?줘|인가요|인지|하나요|되나요|할까요|나요)$/,'').replace(/\s+/g,' ').trim(); return k.length>=2?k.slice(0,60):String(t).slice(0,60); };   /* 질문 → 검색 낱말(조사·물음 끝 빼기) */
-    const msgsHtml = chat.msgs.length ? chat.msgs.map((m,i)=> m.who==='me' ? msgMeHtml(m) : `
-      <div class="msg bot">${avHtml()}
+    const msgsHtml = chat.msgs.length ? chat.msgs.map((m,i)=> m.who==='me' ? msgMeHtml(m).replace('<div class="msg me"',`<div class="msg me" data-mi="${i}"`) : `
+      <div class="msg bot" data-mi="${i}">${avHtml()}
         <div class="bub${i===aiErrAt?' ai-err':''}">${botTextHtml(m)}${botSrcHtml(m)}${botModeHtml(m)}${toSrch(m,i)}${i===aiErrAt&&chat.msgs[i-1]&&chat.msgs[i-1].who==='me'&&chat.msgs[i-1].text?'<button type="button" class="ai-retry" data-retry>다시 묻기</button>':''}${m.cards&&m.cards.length?`<ul class="mini">${m.cards.map(c=>`<li><a href="#${esc(c.slug)}"><span class="tag">${esc(c.type)}</span><span>${esc(c.title)}</span><span class="arrow">→</span></a></li>`).join('')}</ul>`:''}</div>
         <span class="t">${esc(m.t)}</span>
       </div>`).join('') : '';
@@ -4806,14 +4844,18 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         let acc='', raf=0; const paint=()=>{ raf=0; if((chat.gen||0)!==g0||chat.room!=='bot'||state.route!=='ai') return; const tb=panel.querySelector('.bub.typing,.bub.streaming'); if(!tb) return;
           if(tb.classList.contains('typing')){ tb.classList.remove('typing'); tb.classList.add('streaming'); tb.removeAttribute('aria-label'); }
           tb.textContent=acc.replace(/\*\*/g,''); const cv=panel.querySelector('.convo'); if(cv&&cv.scrollHeight-cv.scrollTop-cv.clientHeight<160) cv.scrollTop=cv.scrollHeight; };
-        (full?Promise.race([geoFor(v).catch(()=>null),sleep(6000).then(()=>null)]):Promise.resolve(null)).then(geo=>askStream({q:v,history:hist,code:aiCode(),stream:true,...(full?{}:{fast:1}),...(geo?{geo}:{})}, t=>{ acc+=t; if(!raf) raf=requestAnimationFrame(paint); })).then(r=>{
+        // V191: 답이 안 오면 끝없이 기다리지 않게 — 첫 글자 45초·글이 멈추고 30초면 끊고 '다시 묻기'
+        const ctl=new AbortController(); let lastT=Date.now(); const wd=setInterval(()=>{ if(Date.now()-lastT>(acc?30000:45000)) ctl.abort(); },1000);
+        (full?Promise.race([geoFor(v).catch(()=>null),sleep(6000).then(()=>null)]):Promise.resolve(null)).then(geo=>askStream({q:v,history:hist,code:aiCode(),stream:true,...(full?{}:{fast:1}),...(geo?{geo}:{})}, t=>{ lastT=Date.now(); acc+=t; if(t&&!raf) raf=requestAnimationFrame(paint); }, ctl.signal)).then(r=>{
+          clearInterval(wd);
           if((chat.gen||0)!==g0) return;   // 그사이 '대화 비우기' — 이전 질문의 답은 버림
           chat.typing=false;
+          if(r.aborted||(!r.ok&&r.j&&r.j.text)){ const part=String((r.j&&r.j.text)||acc||'').trim(); push('bot', part?part.replace(/\*\*/g,'')+'\n\n(답이 중간에 멈췄습니다 — 다시 묻기를 눌러 주세요)':'AI 응답이 늦어 멈췄습니다. 잠시 뒤 ‘다시 묻기’를 눌러 주세요.',[]); aiErrAt=chat.msgs.length-1; csave(); if(chat.room==='bot'&&state.route==='ai') renderBotRoom(panel,room); return; }
           if(r.status===403&&r.j&&r.j.code==='need_code'){ chat.msgs.pop(); csave(); setAiCode(''); SRV.aiGate=true; if(chat.room==='bot'&&state.route==='ai') aiGate(panel,room); return; }   // 코드가 바뀜 → 다시 입력
           if(r.ok&&r.j.ok){ push('bot',(r.j.fast||r.j.mode==='fast')?String(r.j.answer||'').replace(/\n+근거\s*\n[\s\S]*$/,'').replace(/\s*\[(?:\d{1,2}|근거 부족)\]/g,''):String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.cached=!!r.j.cached; m.fast=!!r.j.fast||r.j.mode==='fast'; m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,art:String(x.art||'').slice(0,60),snip:String(x.snippet||'').slice(0,180),url:/^https:\/\/(?:www\.law\.go\.kr|map\.kakao\.com)\//.test(String(x.url||''))?String(x.url):''})); csave(); }
           else{ push('bot', r.status===0?'서버에 연결할 수 없습니다. 잠시 뒤 다시 물어보세요.':(r.j.error||'답변을 만들지 못했습니다.'),[]); aiErrAt=chat.msgs.length-1; }
           if(chat.room==='bot'&&state.route==='ai'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp&&window.innerWidth>=600) inp.focus(); }
-        }).catch(()=>{ if((chat.gen||0)!==g0) return; chat.typing=false; push('bot','답변을 만들지 못했습니다. 다시 물어보세요.',[]); aiErrAt=chat.msgs.length-1; if(chat.room==='bot'&&state.route==='ai') renderBotRoom(panel,room); });
+        }).catch(()=>{ clearInterval(wd); if((chat.gen||0)!==g0) return; chat.typing=false; push('bot','답변을 만들지 못했습니다. 다시 물어보세요.',[]); aiErrAt=chat.msgs.length-1; if(chat.room==='bot'&&state.route==='ai') renderBotRoom(panel,room); });
         return;
       }
       const delay=window.matchMedia('(prefers-reduced-motion: reduce)').matches?80:520;
@@ -4823,6 +4865,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(SRV.on&&SRV.bld&&SRV.kakao) loadKakao(SRV.kakao).catch(()=>{});   // V154: 주소 질문이 빨리 가도록 미리 불러 둠
     { const ti=$('#chatText'), kh=$('#kwHint'); if(ti&&kh){ const sync=()=>{ kh.hidden=!isKeyword(ti.value); if(window.__fitConvo) window.__fitConvo(); }; ti.addEventListener('input',sync); $('#kwGo').addEventListener('click',()=>toSearch(ti.value)); } }
     panel.querySelectorAll('.to-srch').forEach(b=>b.addEventListener('click',()=>toSearch(b.dataset.srch)));
+    // V191: AI 도우미 말풍선도 길게 누르면(PC는 오른쪽 클릭) 복사 · 선택 복사 · 공유
+    { const cv=panel.querySelector('#convo'); let lp=null; const txtOf=b=>{ const w=b.closest('[data-mi]'), m=w&&chat.msgs[+w.dataset.mi]; return m?String(m.text||''):''; };
+      if(cv){ cv.addEventListener('pointerdown',e=>{ const b=e.target.closest('.msg[data-mi] .bub'); if(!b||e.button>0||e.target.closest('a,button,input')) return; clearTimeout(lp&&lp.t);
+          lp={x:e.clientX,y:e.clientY,t:setTimeout(()=>{ lp=null; try{ navigator.vibrate&&navigator.vibrate(15); }catch(_){ } const t=txtOf(b); if(t) textActs(t); },480)}; });
+        const cancel=e=>{ if(!lp) return; if(e&&e.type==='pointermove'&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)<10) return; clearTimeout(lp.t); lp=null; };
+        ['pointermove','pointerup','pointercancel'].forEach(t=>cv.addEventListener(t,cancel,{passive:true})); cv.addEventListener('scroll',()=>cancel(),{passive:true});
+        cv.addEventListener('contextmenu',e=>{ const b=e.target.closest('.msg[data-mi] .bub'); if(!b) return; const t=txtOf(b); if(!t) return; e.preventDefault(); cancel(); textActs(t, matchMedia('(hover:hover) and (pointer:fine)').matches?{x:e.clientX,y:e.clientY}:null); }); } }
     panel.querySelectorAll('[data-full]').forEach(b=>b.addEventListener('click',()=>{ const u=chat.msgs[+b.dataset.full-1]; if(chat.typing||!u||u.who!=='me') return; send(u.text,[],true); }));   // V189: 근거까지 필요할 때만
     { const rb=panel.querySelector('[data-retry]'); if(rb) rb.addEventListener('click',()=>{ const i=aiErrAt, u=chat.msgs[i-1]; if(chat.typing||!u||u.who!=='me') return; const t=u.text; chat.msgs.splice(i-1,2); aiErrAt=-1; csave(); send(t,[]); }); }   /* V181: 실패한 질문을 한 번에 다시 */
     { const qb=$('#quick');
@@ -5075,7 +5124,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   const verLt=(a,b)=>{ const x=String(a).split('.').map(Number), y=String(b).split('.').map(Number); for(let i=0;i<Math.max(x.length,y.length);i++){ const d=(x[i]||0)-(y[i]||0); if(d) return d<0; } return false; };
   // V177: AI 도우미 스트리밍 — 서버가 text/event-stream으로 주면 조각마다 onText, 끝 이벤트(done)를 api()와 같은 모양으로 돌려줌
-  const askStream=(body,onText)=>sseCall('/api/ask',body,isProf()&&PROF.tok?PROF.tok:'',onText);
+  const askStream=(body,onText,signal)=>sseCall('/api/ask',body,isProf()&&PROF.tok?PROF.tok:'',onText,signal);
   async function sseCall(path, body, tok, onText, signal, cum){   // cum: onText에 지금까지 모은 글 전체를 넘김
     const init={method:'POST', credentials:SRVBASE?'omit':'same-origin', headers:{'X-SACHIL':'1','Content-Type':'application/json'}, body:JSON.stringify(body)};
     if(tok) init.headers['Authorization']='Bearer '+tok; else if(SRVTOK) init.headers['Authorization']='Bearer '+SRVTOK;
@@ -5089,7 +5138,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         let k; while((k=buf.indexOf('\n\n'))>=0){ const blk=buf.slice(0,k); buf=buf.slice(k+2);
           const d=blk.split('\n').filter(l=>l.startsWith('data:')).map(l=>l.slice(5).trim()).join(''); if(!d) continue;
           let o=null; try{ o=JSON.parse(d); }catch(_){ continue; }
-          if(o.t){ acc+=String(o.t); onText(cum?acc:String(o.t)); } else if(o.done) fin=o; } }
+          if(o.t){ acc+=String(o.t); onText(cum?acc:String(o.t)); } else if(o.done) fin=o; else if(o.wait&&onText) onText(cum?acc:''); } }   // wait: 서버가 다른 AI로 넘기는 중(살아 있음)
       return fin?{ok:true, status:200, j:fin}:{ok:false, status:0, j:{error:'답변이 중간에 끊겼습니다. 다시 해 보세요.', text:acc}};
     }catch(e){ return {ok:false, status:0, aborted:e&&e.name==='AbortError', j:{error:'서버에 연결할 수 없습니다', text:acc}}; }
   }
@@ -5958,6 +6007,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     };
     bindComposer((v,att)=>{ const ui=sendUi(v,att); sendQ=sendQ.then(()=>sendOne(v,att,ui)).catch(()=>{ if(ui) ui.fail('전송 실패'); }); });   // 빠르게 여러 번 보내도 차례대로
     { const ct=$('#chatText'); if(ct) ct.maxLength=1000; }   // 서버 한도와 같게
+    setTimeout(()=>fwdApply(kind),0);   // V191: 다른 말풍선에서 '공유 → 이 방'으로 넘어온 글·사진
     // ＋ 버튼: 최근 사진 3장 · 앨범 · 카메라 · 파일
     const comp=$('#composer'), plus=comp.querySelector('.attach');
     // V121: ＋ = 카카오톡식 사진 시트 — 카메라 칸 + 최근 사진(이 기기에서 고르거나 보낸 사진, 모자라면 이 방 사진) 고르기(순서 번호) + 전송,
@@ -6123,7 +6173,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const old=$('#actSheet'); if(old) old.remove();
       let pre=null; const preP=(m.files||[]).length?fileBlobs(m).then(f=>{ pre=f; return f; }):Promise.resolve(pre=[]);
       const deleted=m.text==='(삭제된 메시지)'&&!(m.files||[]).length;
-      const acts=[['reply','답장'], m.text&&!deleted?['copy','복사']:null, !deleted?['share','공유']:null, (m.files||[]).length?['save','저장']:null, m.can_delete&&!deleted?['del','삭제']:null].filter(Boolean);
+      const acts=[['reply','답장'], m.text&&!deleted?['copy','복사']:null, m.text&&!deleted?['sel','선택 복사']:null, !deleted?['share','공유']:null, (m.files||[]).length?['save','저장']:null, m.can_delete&&!deleted?['del','삭제']:null].filter(Boolean);
       const sh=document.createElement('div'); sh.className='act-sheet'; sh.id='actSheet'; sh.setAttribute('role','dialog'); sh.setAttribute('aria-modal','true'); sh.setAttribute('aria-label','메시지 메뉴');
       sh.innerHTML=`<div class="box"><p class="pv"><b>${esc(m.mine?'나':m.name)}</b> ${esc(msgSnip(m,30))}</p>${acts.map(([k,l])=>`<button type="button" data-a="${k}" class="${k==='del'?'danger':''}">${l}</button>`).join('')}<button type="button" data-a="close" class="cancel">닫기</button></div>`;
       document.body.appendChild(sh);
@@ -6133,11 +6183,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       sh.addEventListener('click',async e=>{
         if(e.target===sh){ close(); return; }
         const a=e.target.closest('[data-a]'); if(!a) return; const k=a.dataset.a;
-        if((k==='share'||k==='save') && pre===null){ a.textContent='파일 준비 중…'; await preP; a.textContent=k==='share'?'공유':'저장'; return; }   // 준비되면 한 번 더 누르게(누르는 순간 바로 공유해야 아이폰이 허용)
+        if(k==='save' && pre===null){ a.textContent='파일 준비 중…'; await preP; a.textContent='저장'; return; }   // 준비되면 한 번 더 누르게(누르는 순간 바로 공유해야 아이폰이 허용)
         close();
         if(k==='reply') setReply(m);
         else if(k==='copy'){ try{ await navigator.clipboard.writeText(m.text); toast('복사했습니다'); }catch(_){ toast(legacyCopy(m.text)?'복사했습니다':'복사하지 못했습니다'); } }
-        else if(k==='share'){
+        else if(k==='sel') selCopy(m.text);
+        else if(k==='share'){ shareMenu(m.text&&m.text!=='(삭제된 메시지)'?m.text:'', ()=>preP, at); }
+        else if(k==='share_os'){
           const files=pre||[];
           try{
             if(files.length&&navigator.canShare&&navigator.canShare({files})) await navigator.share({files, text:m.text||undefined});
