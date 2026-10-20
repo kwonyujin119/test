@@ -669,6 +669,7 @@ body:not(.nosearch) #panel .card.empty.srch-none{padding:20px 16px;margin-bottom
 /* 첨부 */
 .composer .attach{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;color:var(--navy);background:var(--surface-2);border:1px solid var(--line);cursor:pointer;flex:none}
 .composer .attach:hover{border-color:var(--navy)}
+.composer.noatt textarea{padding-left:14px}   /* V192: AI 입력창은 + 없이 */
 .composer .attach svg{width:20px;height:20px}
 .pending{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:-4px}
 .pchip{display:inline-flex;align-items:center;gap:4px;padding:2px 2px 2px 4px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);font-size:12px;max-width:100%}
@@ -974,7 +975,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v191</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v192</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1095,6 +1096,7 @@ body.chatview footer{display:none}   /* A·47망: 바닥글이 화면을 늘려 
 .roomhead .l > div{min-width:0}
 .roomhead .eyebrow{display:none}
 .roomhead h2{font-size:17px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roomhead h2.aih{white-space:normal;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px}.roomhead h2 .aidesc{font-size:12.5px;font-weight:600;color:var(--muted);white-space:nowrap}
 .roomhead .back{width:32px;height:32px;font-size:24px;margin-left:-8px;flex:none}
 .roomhead .sub{grid-column:1;grid-row:2;font-size:12px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .roomhead:has(.back) .sub{padding-left:26px}
@@ -1843,8 +1845,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V191', SRV_VER='11.7';
+  const APP_VER='V192', SRV_VER='11.8';
   const UPDATES=[
+    {v:'V192', d:'2026-10-20', t:['AI: 답이 나오는 동안 위로 올려 보면 아래로 끌려 내려가던 문제 바로잡음 — 답이 끝나도 보던 자리 그대로','AI 입력창의 ＋(첨부) 버튼 없앰','AI 화면 제목을 ‘AI assistant’로, 옆에 ‘사용자가 질문하면 AI가 답합니다’']},
     {v:'V191', d:'2026-10-20', t:['AI 도우미: AI가 멈춰 답이 안 오면 끝없이 기다리지 않음 — 서버는 25초 뒤 다른 AI로 넘기고, 앱은 오래 멈추면 ‘다시 묻기’','말풍선을 길게 누르면(PC는 오른쪽 클릭) 복사 · 선택 복사 · 공유 — AI 도우미와 47망·디브리핑룸 모두','공유: 47망으로 · 디브리핑룸으로(그 방 입력창에 넣어 두고 확인 뒤 보내기) · 카카오톡으로 · 다른 앱']},
     {v:'V190', d:'2026-10-20', t:['47망·디브리핑룸: 사진을 잠깐 못 불러와도 저절로 두 번 더 받아 봄(깨진 그림·파일 이름만 뜨던 문제)','그래도 안 되면 ‘사진을 불러오지 못했습니다 · 눌러서 다시 시도’ 칸 — 서버에 없는 사진이면 그렇게 알려 줌','서버: 올리는 중 끊긴 반쪽 사진은 저장하지 않고 다시 보내게']},
     {v:'V189', d:'2026-10-20', t:['AI 도우미가 근거 목록 없이 짧게 바로 답함 — 법제처·공공데이터 조회를 기다리지 않아 더 빠름','답마다 ‘Search에서 근거 찾기’ 버튼 — 눌러서 원문·조문·자료 쪽을 확인','근거까지 필요하면 ‘근거와 함께 다시 묻기(느림)’']},
@@ -4394,7 +4397,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // ---------- 채팅 (AI 도우미: 검색 인덱스 기반 규칙 응답. AI·교관 연결 전) ----------
   const CKEY='ictc_chat_v10';
   const chat={room:null, msgs:[], typing:false};
-  const ROOMS=[{id:'bot',ab:'AI',title:'AI 도우미'}];
+  const ROOMS=[{id:'bot',ab:'AI',title:'AI assistant'}];   // V192: 제목 ‘AI 도우미’ → ‘AI assistant’
   // 추천 질문(V100): 자주·이전 검색이 아니라, 메뉴 자료 범위에서 물어볼 만한 질문을 무작위로 골라 수시로 바꿔 띄운다
   const QUICK_POOL=[
     '선착대장이 도착하면 가장 먼저 무엇을 보고해야 하나요?','지휘권 이양은 어떤 절차로 하나요?','지휘권 선언은 언제 해야 하나요?','현장지휘소는 어디에 설치하나요?',
@@ -4602,7 +4605,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 
   // 작성창(첨부 포함) — 봇 방과 개설 방이 같이 쓴다
   let pending=[];
-  const composerHtml=(ph)=>`
+  const composerHtml=(ph,noAtt)=>noAtt?`
+        <form class="composer noatt" id="composer" autocomplete="off">
+          <textarea id="chatText" rows="1" placeholder="${ph}" aria-label="메시지" enterkeyhint="send" maxlength="500"></textarea>
+          <button type="submit" class="send" aria-label="보내기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12 20 4l-4 16-4-7z"/></svg></button>
+        </form>`:`
         <div class="pending" id="pending" ${pending.length?'':'hidden'}></div>
         <form class="composer" id="composer" autocomplete="off">
           <label class="attach" for="fileIn" aria-label="사진·PDF 첨부" title="사진·PDF 첨부 — 입력창에서 Ctrl+V로 이미지 붙여넣기도 됩니다"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></label>
@@ -4641,14 +4648,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const msgs=[]; if(bad) msgs.push(`사진·PDF만 첨부할 수 있습니다 (${bad}개 제외)`); if(all.length>room) msgs.push(`한 번에 최대 ${MAX_FILES}개까지입니다`);
       if(msgs.length) pendNote(msgs.join(' · ')); else renderPending();
     };
-    fi.addEventListener('change',()=>{ const all=[...fi.files]; fi.value=''; addPendingFiles(all); });
+    if(fi) fi.addEventListener('change',()=>{ const all=[...fi.files]; fi.value=''; addPendingFiles(all); });
     $('#composer').addEventListener('submit',e=>{ e.preventDefault(); const inp=$('#chatText'); const v=inp.value.trim(); if(!v&&!pending.length) return; const att=pending; pending=[]; inp.value=''; fitChatText(); renderPending(); onSend(v,att); });
     // V120: Enter = 보내기, Shift+Enter = 줄바꿈(한글 조합 중 Enter는 글자 확정만). 줄이 늘면 입력칸도 6줄까지 커짐
     { const inp=$('#chatText');
       inp.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&e.keyCode!==229){ e.preventDefault(); const f=$('#composer'); if(f.requestSubmit) f.requestSubmit(); else f.dispatchEvent(new Event('submit',{cancelable:true})); } });
       inp.addEventListener('input',fitChatText);
       // V182: 입력창에서 Ctrl+V(⌘V)로 캡처·복사한 이미지를 바로 첨부 — 글자는 그대로 붙여넣기
-      inp.addEventListener('paste',e=>{ const cd=e.clipboardData; if(!cd) return;
+      inp.addEventListener('paste',e=>{ const cd=e.clipboardData; if(!cd||!fi) return;   /* 첨부가 없는 입력창(AI)은 글자만 */
         const ims=[...(cd.items||[])].filter(it=>it.kind==='file'&&/^image\//.test(it.type)).map(it=>it.getAsFile()).filter(Boolean); if(!ims.length) return;
         const hasText=!!cd.getData('text/plain'); if(!hasText) e.preventDefault();
         const t=new Date(), st=`${String(t.getHours()).padStart(2,'0')}${String(t.getMinutes()).padStart(2,'0')}${String(t.getSeconds()).padStart(2,'0')}`;
@@ -4721,7 +4728,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 
   const roomHead=(room,sub,extra)=>`
       <div class="panel-head roomhead">
-        <div class="l">${room.id==='bot'?'':'<a class="back" href="#hub" aria-label="첫 화면으로">‹</a>'}<div><span class="eyebrow">${room.id==='bot'?'A · AI assistant':'디브리핑룸'}</span><h2>${esc(room.title)}${room.cnt?`<span class="cnt" id="onlineN"> - …명</span>`:''}</h2></div></div>
+        <div class="l">${room.id==='bot'?'':'<a class="back" href="#hub" aria-label="첫 화면으로">‹</a>'}<div><span class="eyebrow">${room.id==='bot'?'A · AI assistant':'디브리핑룸'}</span><h2${room.id==='bot'?' class="aih"':''}>${esc(room.title)}${room.id==='bot'?'<small class="aidesc">사용자가 질문하면 AI가 답합니다</small>':''}${room.cnt?`<span class="cnt" id="onlineN"> - …명</span>`:''}</h2></div></div>
         <div class="r">${sub?`<span class="sub">${sub}</span>`:''}${extra||''}</div>
       </div>`;
   const msgMeHtml=m=>`<div class="msg me"><span class="t">${esc(m.t)}</span><div class="bub ${m.text?'':'only-att'}">${m.text?`<p>${esc(m.text)}</p>`:''}${attHtml(m.att)}</div></div>`;
@@ -4807,7 +4814,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   let aiErrAt=-1;   /* V181: 방금 실패한 AI 답의 위치(화면 표시용 · 저장 안 함) */
   function renderBotRoom(panel, room){
-    if(!aiCode()&&SRV.aiGate){ aiGate(panel,room); return; }   // V124: AI 도우미 공개 — 서버가 입장코드를 요구할 때만(403 need_code) 코드 화면
+    if(!aiCode()&&SRV.aiGate){ aiGate(panel,room); return; }
+    const pc0=panel.querySelector('#convo'), keepY=pc0&&pc0._stick===false?pc0.scrollTop:null;   // V192: 위로 올려 보던 중이면 답이 끝나도 그 자리 그대로   // V124: AI 도우미 공개 — 서버가 입장코드를 요구할 때만(403 need_code) 코드 화면
     const toSrch=(m,i)=>{ const u=chat.msgs[i-1]; if(!(u&&u.who==='me'&&u.text)) return '';
       if(m.fast||m.mode==='fast') return `<div class="fast-src"><span>근거·원문은 <b>Search</b>에서 확인하세요</span><button type="button" class="btn ghost sm to-srch" data-srch="${esc(srchQ(u.text))}">Search에서 근거 찾기 →</button><button type="button" class="full-ask" data-full="${i}">근거와 함께 다시 묻기(느림)</button></div>`;   // V189
       return (m.mode==='ai'||m.mode==='extract'||m.mode==='general') ? `<button type="button" class="to-srch" data-srch="${esc(u.text)}">Search에서 원문 더 찾기 →</button>` : ''; };
@@ -4827,15 +4835,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           <div class="quick" id="quick" aria-label="추천 질문">${quickHtml()}</div>
         </div>
         <div class="xhint sm" id="kwHint" hidden><span>낱말 찾기는 <b>Search</b>가 더 빠르고 원문 그대로입니다.</span><button type="button" class="btn ghost" id="kwGo">Search에서 찾기</button></div>
-        ${composerHtml('상황·질문을 물어보세요')}
+        ${composerHtml('상황·질문을 물어보세요',true)}
         <div class="chat-foot"><span>대화는 이 기기에만 저장 · ${fmtSize(storageUse())}${storageFull?' · <b class="warn">저장 공간 부족</b>':''}</span><span class="r"></span></div>
       </div>`;
     bindAtts(panel);
-    if(chat.msgs.length) scrollEndOf(panel);
+    if(keepY!==null){ const c=fitConvo(); if(c){ c._stick=false; c.scrollTop=keepY; } }
+    else if(chat.msgs.length) scrollEndOf(panel);
     if(chatPrefill){ const inp=$('#chatText'); if(inp){ inp.value=chatPrefill; if(window.innerWidth>=600) inp.focus(); } chatPrefill=''; }
     const send=(text,att,full)=>{   // V189: 기본은 빠른 답(근거 없이) — full이면 근거(자료·법제처·공공데이터)까지
       const v=String(text||'').trim(); att=att||[]; if(!v&&!att.length) return;
       if(chat.typing){ const ti=$('#chatText'); if(ti&&!ti.value) ti.value=v; if(att.length){ pending=att.concat(pending); renderPending(); } toast('앞 질문의 답을 기다리는 중입니다'); return; }   // V154: 기다리는 동안 보낸 글을 지우지 않음
+      { const c0=$('#convo'); if(c0) c0._stick=true; }   // 새로 물으면 맨 아래로
       push('me',v,[],att); aiErrAt=-1; chat.typing=true; renderBotRoom(panel,room);
       if(SRV.on && v && !localIntent(v)){
         const hist=[]; for(let i=chat.msgs.length-2;i>0&&hist.length<2;i--){ const b=chat.msgs[i], u=chat.msgs[i-1]; if(b.who==='bot'&&(b.mode==='ai'||b.mode==='general'||b.mode==='fast')&&u.who==='me'&&u.text) hist.unshift({q:u.text,a:b.text}); }
@@ -4843,7 +4853,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         // V177: 답을 글자가 나오는 대로 받아 '입력 중' 말풍선에 바로 보여 줌(서버 10.3+ · Gemini). 옛 서버·저장된 답은 한 번에
         let acc='', raf=0; const paint=()=>{ raf=0; if((chat.gen||0)!==g0||chat.room!=='bot'||state.route!=='ai') return; const tb=panel.querySelector('.bub.typing,.bub.streaming'); if(!tb) return;
           if(tb.classList.contains('typing')){ tb.classList.remove('typing'); tb.classList.add('streaming'); tb.removeAttribute('aria-label'); }
-          tb.textContent=acc.replace(/\*\*/g,''); const cv=panel.querySelector('.convo'); if(cv&&cv.scrollHeight-cv.scrollTop-cv.clientHeight<160) cv.scrollTop=cv.scrollHeight; };
+          tb.textContent=acc.replace(/\*\*/g,''); const cv=panel.querySelector('.convo'); if(cv&&cv._stick!==false&&Date.now()-(cv._userAt||0)>1200&&cv.scrollHeight-cv.scrollTop-cv.clientHeight<160) cv.scrollTop=cv.scrollHeight; };   // V192: 사용자가 위로 올려 보는 중이면 끌어내리지 않음
         // V191: 답이 안 오면 끝없이 기다리지 않게 — 첫 글자 45초·글이 멈추고 30초면 끊고 '다시 묻기'
         const ctl=new AbortController(); let lastT=Date.now(); const wd=setInterval(()=>{ if(Date.now()-lastT>(acc?30000:45000)) ctl.abort(); },1000);
         (full?Promise.race([geoFor(v).catch(()=>null),sleep(6000).then(()=>null)]):Promise.resolve(null)).then(geo=>askStream({q:v,history:hist,code:aiCode(),stream:true,...(full?{}:{fast:1}),...(geo?{geo}:{})}, t=>{ lastT=Date.now(); acc+=t; if(t&&!raf) raf=requestAnimationFrame(paint); }, ctl.signal)).then(r=>{
