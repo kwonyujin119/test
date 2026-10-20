@@ -670,6 +670,7 @@ body:not(.nosearch) #panel .card.empty.srch-none{padding:20px 16px;margin-bottom
 .composer .attach{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;color:var(--navy);background:var(--surface-2);border:1px solid var(--line);cursor:pointer;flex:none}
 .composer .attach:hover{border-color:var(--navy)}
 .composer.noatt textarea{padding-left:14px}   /* V192: AI 입력창은 + 없이 */
+.chat.dropping{position:relative}.chat.dropping::after{content:'여기에 놓으면 첨부됩니다 (사진·PDF)';position:absolute;inset:0;z-index:20;display:grid;place-items:center;border:3px dashed var(--navy);border-radius:16px;background:rgba(36,78,162,.10);color:var(--navy);font-size:17px;font-weight:800;pointer-events:none}
 .composer .attach svg{width:20px;height:20px}
 .pending{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:-4px}
 .pchip{display:inline-flex;align-items:center;gap:4px;padding:2px 2px 2px 4px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);font-size:12px;max-width:100%}
@@ -975,7 +976,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v195</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v196</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1845,8 +1846,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V195', SRV_VER='12.2';
+  const APP_VER='V196', SRV_VER='12.3';
   const UPDATES=[
+    {v:'V196', d:'2026-10-20', t:['47망·디브리핑룸: 사진 파일 이름이 보이지 않게(크게 보기 위쪽·첨부 칸·메뉴) — 저장할 때만 원래 이름','PC에서 사진·PDF를 대화 화면에 끌어다 놓으면 바로 첨부(보내기를 누르면 올라감)']},
     {v:'V195', d:'2026-10-20', t:['47망·디브리핑룸 사진에서 오른쪽 클릭: 이미지 복사(바로 붙여넣기) · 저장 · 공유(47망·디브리핑룸·카카오톡·다른 앱)','사진을 크게 볼 때도 오른쪽 클릭으로 같은 메뉴']},
     {v:'V194', d:'2026-10-20', t:['교수(관리자)로 로그인한 기기는 47망·디브리핑룸에서 다른 사람 글도 길게 눌러 ‘삭제(관리자)’ — 한 번 더 확인 후 모두의 화면에서 ‘삭제된 메시지’로','관리자 삭제는 서버 접속 기록에 남음']},
     {v:'V193', d:'2026-10-20', t:['47망·디브리핑룸 1000명 동시 접속 대비 — 예전에는 200명이 넘으면 새로 들어온 사람이 연결되지 않았음','1000명 시험: 모든 글이 1000명 모두에게 도착(가운데값 약 1초), 연결 실패 0건','사진은 대화에 작은 미리보기(수십 KB)를 보여 주고, 누르면 원본 — 많은 사람이 같은 사진을 받아도 빠르게','사람이 많은 방은 ‘안 읽은 수’가 몇 초 늦게 바뀜(서버 부담을 줄이려고)']},
@@ -3962,7 +3964,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   async function imgFile(src,name){ const r=await fetch(src); if(!r.ok) throw new Error('get'); const bl=await r.blob(); return new File([bl], name||'사진.jpg', {type:bl.type||'image/jpeg'}); }
   async function toPng(bl){ if(bl.type==='image/png') return bl; const bm=await createImageBitmap(bl); const c=document.createElement('canvas'); c.width=bm.width; c.height=bm.height; c.getContext('2d').drawImage(bm,0,0); if(bm.close) bm.close(); return await new Promise(r=>c.toBlob(r,'image/png')); }
   function imgActs(src,name,at){ if(!src) return;
-    actSheet(`<b>사진</b> ${esc(trunc(String(name||''),28))}`, [['icopy','이미지 복사'],['isave','저장'],['ishare','공유']], at, async(k,btn,close)=>{
+    actSheet('<b>사진</b>', [['icopy','이미지 복사'],['isave','저장'],['ishare','공유']], at, async(k,btn,close)=>{
       if(k==='icopy'){ btn.textContent='복사 중…';
         try{ if(!(navigator.clipboard&&window.ClipboardItem)) throw new Error('nosupport'); const f=await imgFile(src,name);
           await navigator.clipboard.write([new ClipboardItem({'image/png':toPng(f)})]); close(); toast('이미지를 복사했습니다 — 붙여넣기(Ctrl+V)로 쓰세요'); }   /* 크롬은 PNG만 받는다 — 바로 변환(약속으로 넘겨 클릭 허용 시간 안에) */
@@ -4560,13 +4562,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function attHtml(list){
     if(!list||!list.length) return '';
     return `<div class="atts">${list.map(a=>a.kind==='image'
-      ? `<button type="button" class="att-img" data-view="${esc(a.id)}" aria-label="${esc(a.name)} 크게 보기"><img src="${a.data||''}" alt="${esc(a.name)}" ${a.w&&a.h?`width="${a.w}" height="${a.h}"`:''}></button>`
+      ? `<button type="button" class="att-img" data-view="${esc(a.id)}" aria-label="사진 크게 보기"><img src="${a.data||''}" alt="사진" ${a.w&&a.h?`width="${a.w}" height="${a.h}"`:''}></button>`
       : `<div class="att-pdf"><span class="ico">PDF</span><span class="nm">${esc(a.name)}</span><span class="sz">${fmtSize(a.size)}</span>${(a.data||volatile[a.id])?`<button type="button" class="btn" data-pdf="${esc(a.id)}">열기</button>`:`<span class="tag">원본 없음</span>`}</div>`).join('')}</div>`;
   }
   const allAtts=()=>{ const out={}; Object.values(roomMsgs).forEach(l=>l.forEach(m=>(m.att||[]).forEach(a=>out[a.id]=a))); chat.msgs.forEach(m=>(m.att||[]).forEach(a=>out[a.id]=a)); return out; };
   function bindAtts(panel){
     const map=allAtts();
-    panel.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{ const a=map[b.dataset.view]; if(a&&a.data) openLightbox(a.data,a.name); }));
+    panel.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{ const a=map[b.dataset.view]; if(a&&a.data) openLightbox(a.data,a.name,null,true); }));
     panel.querySelectorAll('[data-pdf]').forEach(b=>b.addEventListener('click',async()=>{
       const a=map[b.dataset.pdf]; if(!a) return;
       let url=volatile[a.id];
@@ -4580,16 +4582,16 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 사진 넘기기(V88): 왼쪽→오른쪽으로 끌면 이전(먼저 올린) 사진, 오른쪽→왼쪽은 다음 사진. 사진을 한 번 더 누르면 위에 반투명 줄 + 갤러리
   const LB={list:[], i:-1}, LB_WIN=matchMedia('(min-width:900px) and (hover:hover) and (pointer:fine)');   // V119: PC는 카카오톡처럼 가운데 창
   let lbLast=null;
-  lb.addEventListener('contextmenu',e=>{ const im=e.target.closest('img'); if(!im||im.hidden||!im.src) return; e.preventDefault(); imgActs(im.src, lb.querySelector('.cap').textContent||'사진.jpg', {x:e.clientX,y:e.clientY}); });   // V195: 크게 보기에서도
+  lb.addEventListener('contextmenu',e=>{ const im=e.target.closest('img'); if(!im||im.hidden||!im.src) return; e.preventDefault(); imgActs(im.src, LB.name||lb.querySelector('.cap').textContent||'사진.jpg', {x:e.clientX,y:e.clientY}); });   // V195: 크게 보기에서도
   function lbShow(){ if(lb.hidden){ lbLast=document.activeElement; appEl.inert=true; tabbarEl.inert=true; } lb.hidden=false; lb.querySelector('.close').focus(); }
-  function openLightbox(src,name,list){
-    LB.list=list||[]; LB.i=LB.list.findIndex(x=>x.src===src);
+  function openLightbox(src,name,list,noCap){   // V196: noCap — 대화방 사진은 파일 이름을 위에 띄우지 않음(저장할 때 이름으로만 씀)
+    LB.list=list||[]; LB.i=LB.list.findIndex(x=>x.src===src); LB.noCap=!!noCap; LB.name=name||'';
     lb.querySelector('.lbbar').hidden=true; lb.classList.remove('bar'); lb.querySelector('.lbg').hidden=true;
-    lb.querySelector('iframe').hidden=true; lb.querySelector('iframe').src='about:blank'; const im=lb.querySelector('img'); im.hidden=false; im.src=src; lb.querySelector('.cap').textContent=name||''; lbNum(); lbShow(); }
+    lb.querySelector('iframe').hidden=true; lb.querySelector('iframe').src='about:blank'; const im=lb.querySelector('img'); im.hidden=false; im.src=src; lb.querySelector('.cap').textContent=LB.noCap?'':(name||''); lbNum(); lbShow(); }
   function lbNum(){ lb.querySelector('.lbn').textContent=LB.i>=0?`${LB.i+1} / ${LB.list.length}`:''; lb.querySelector('.lbgal').hidden=LB.i<0;
     lb.querySelector('.lbarr.prev').hidden=!(LB.i>0); lb.querySelector('.lbarr.next').hidden=!(LB.i>=0&&LB.i<LB.list.length-1); }   // V119: PC 창의 좌우 화살표
   function lbGo(i,dir){ if(LB.i<0) return; if(i<0||i>=LB.list.length){ toast(i<0?'처음 사진입니다':'마지막 사진입니다'); return; }
-    LB.i=i; const it=LB.list[i], im=lb.querySelector('img'); im.src=it.src; lb.querySelector('.cap').textContent=it.name; lbNum();
+    LB.i=i; const it=LB.list[i], im=lb.querySelector('img'); im.src=it.src; LB.name=it.name||''; lb.querySelector('.cap').textContent=LB.noCap?'':it.name; lbNum();
     if(dir){ im.classList.remove('sl','sr'); void im.offsetWidth; im.classList.add(dir<0?'sl':'sr'); } }
   function lbGallery(){
     const gl=lb.querySelector('.lbg'), days=new Map();
@@ -4643,7 +4645,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(pending.some(a=>a.shrunk)) notes.push('사진은 1280px로 줄여 보냅니다');
     if(!SRV.on&&pending.some(a=>a.kind==='pdf'&&!a.data)) notes.push('큰 PDF는 이 세션에서만 열립니다');
     if(pendMsg) notes.unshift(pendMsg);
-    el.innerHTML=pending.map(a=>`<span class="pchip">${a.kind==='image'?`<img src="${a.data}" alt="">`:`<span class="ico">PDF</span>`}<span class="nm">${esc(trunc(a.name,18))}</span>${!SRV.on&&a.kind==='pdf'&&!a.data?'<span class="tag">세션만</span>':''}<button type="button" class="x" data-rm="${esc(a.id)}" aria-label="첨부 제거">×</button></span>`).join('')+(pending.length?`<span class="pcount">${pending.length}/${MAX_FILES}</span>`:'')+(SRV.on&&state.route==='chat'&&pending.filter(a=>a.kind==='image').length>1?`<label class="bundle"><input type="checkbox" id="bundleChk" ${bundlePref?'checked':''}> 묶어 보내기</label>`:'')+(notes.length?`<span class="pnote" aria-live="polite">${esc(notes.join(' · '))}</span>`:'');
+    el.innerHTML=pending.map(a=>`<span class="pchip">${a.kind==='image'?`<img src="${a.data}" alt="">`:`<span class="ico">PDF</span>`}${a.kind==='image'?'':`<span class="nm">${esc(trunc(a.name,18))}</span>`}${!SRV.on&&a.kind==='pdf'&&!a.data?'<span class="tag">세션만</span>':''}<button type="button" class="x" data-rm="${esc(a.id)}" aria-label="첨부 제거">×</button></span>`).join('')+(pending.length?`<span class="pcount">${pending.length}/${MAX_FILES}</span>`:'')+(SRV.on&&state.route==='chat'&&pending.filter(a=>a.kind==='image').length>1?`<label class="bundle"><input type="checkbox" id="bundleChk" ${bundlePref?'checked':''}> 묶어 보내기</label>`:'')+(notes.length?`<span class="pnote" aria-live="polite">${esc(notes.join(' · '))}</span>`:'');
     el.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click',()=>{ pending=pending.filter(a=>a.id!==b.dataset.rm); renderPending(); }));
     const bc=el.querySelector('#bundleChk'); if(bc) bc.addEventListener('change',()=>{ bundlePref=bc.checked; try{ localStorage.setItem('sachil_bundle',bundlePref?'1':'0'); }catch(_){ } });
   }
@@ -4664,6 +4666,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(msgs.length) pendNote(msgs.join(' · ')); else renderPending();
     };
     if(fi) fi.addEventListener('change',()=>{ const all=[...fi.files]; fi.value=''; addPendingFiles(all); });
+    // V196: 파일을 대화 화면에 끌어다 놓으면 첨부(사진·PDF) — 첨부가 되는 입력창(47망·디브리핑룸)에서만
+    if(fi){ const zone=$('#composer').closest('.chat')||$('#composer').parentElement; let dep=0;
+      const hasFiles=e=>e.dataTransfer&&[...(e.dataTransfer.types||[])].includes('Files');
+      zone.addEventListener('dragenter',e=>{ if(!hasFiles(e)) return; e.preventDefault(); dep++; zone.classList.add('dropping'); });
+      zone.addEventListener('dragover',e=>{ if(!hasFiles(e)) return; e.preventDefault(); e.dataTransfer.dropEffect='copy'; });
+      zone.addEventListener('dragleave',e=>{ if(!hasFiles(e)) return; dep=Math.max(0,dep-1); if(!dep) zone.classList.remove('dropping'); });
+      zone.addEventListener('drop',e=>{ if(!hasFiles(e)) return; e.preventDefault(); dep=0; zone.classList.remove('dropping'); const fs=[...(e.dataTransfer.files||[])]; if(fs.length) addPendingFiles(fs); const t=$('#chatText'); if(t) t.focus(); }); }
     $('#composer').addEventListener('submit',e=>{ e.preventDefault(); const inp=$('#chatText'); const v=inp.value.trim(); if(!v&&!pending.length) return; const att=pending; pending=[]; inp.value=''; fitChatText(); renderPending(); onSend(v,att); });
     // V120: Enter = 보내기, Shift+Enter = 줄바꿈(한글 조합 중 Enter는 글자 확정만). 줄이 늘면 입력칸도 6줄까지 커짐
     { const inp=$('#chatText');
@@ -5284,8 +5293,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     // V193: 대화에는 작은 미리보기(th, 약 40KB)를, 크게 볼 때만 원본 — 1000명이 같은 사진을 받아도 PC 회선이 버티게(옛 글은 th 없음 → 원본)
     const TU=f=>FURL(f.th&&/^[a-f0-9]{24}$/.test(f.th)?f.th:f.id);
     const g=f=>`data-gsrc="${esc(FURL(f.id))}" data-tsrc="${esc(TU(f))}" data-name="${esc(f.name)}" data-ts="${Number(ts)||0}"`;
-    const img=f=>`<button type="button" class="att-img srv" data-sview="${esc(FURL(f.id))}" ${g(f)} aria-label="${esc(f.name)} 크게 보기"><img src="${esc(TU(f))}" alt="${esc(f.name)}" loading="lazy"></button>`;
-    const bundle=a=>`<div class="att-bundle" aria-label="사진 ${a.length}장"><button type="button" class="att-img srv bmain" data-sview="${esc(FURL(a[0].id))}" data-name="${esc(a[0].name)}" aria-label="사진 ${a.length}장 중 1번째 크게 보기"><img src="${esc(TU(a[0]))}" alt="${esc(a[0].name)}" loading="lazy"></button>`
+    const img=f=>`<button type="button" class="att-img srv" data-sview="${esc(FURL(f.id))}" ${g(f)} aria-label="사진 크게 보기"><img src="${esc(TU(f))}" alt="사진" loading="lazy"></button>`;   // V196: 파일 이름은 보이지 않게(못 불러올 때도)
+    const bundle=a=>`<div class="att-bundle" aria-label="사진 ${a.length}장"><button type="button" class="att-img srv bmain" data-sview="${esc(FURL(a[0].id))}" data-name="${esc(a[0].name)}" aria-label="사진 ${a.length}장 중 1번째 크게 보기"><img src="${esc(TU(a[0]))}" alt="사진" loading="lazy"></button>`
       +`<div class="bstrip">${a.map((f,i)=>i<5?`<button type="button" class="bt${i?'':' on'}" data-bi="${i}" ${g(f)} aria-label="${i+1}번째 사진 보기"><img src="${esc(TU(f))}" alt="" loading="lazy">${i===4&&a.length>5?`<b>+${a.length-5}</b>`:''}</button>`:`<i hidden ${g(f)}></i>`).join('')}</div></div>`;
     const pdf=f=>`<div class="att-pdf"><span class="ico">PDF</span><span class="nm">${esc(f.name)}</span><span class="sz">${fmtSize(f.size)}</span><a class="btn" href="${esc(FURL(f.id))}" target="_blank" rel="noopener" data-pdfv="${esc(f.name)}">열기</a></div>`;
     const imgs=files.filter(f=>f.kind==='image'), docs=files.filter(f=>f.kind!=='image');
@@ -6197,12 +6206,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const g=e.target.closest('[data-goto]'); if(g){ const t=convo.querySelector(`.msg[data-mid="${CSS.escape(g.dataset.goto)}"]`); if(t){ t.scrollIntoView({block:'center',behavior:'smooth'}); t.classList.add('flash'); setTimeout(()=>t.classList.remove('flash'),1200); } else toast('원래 메시지가 화면에 없습니다(오래된 대화)'); return; }
       const bt=e.target.closest('.bstrip [data-bi]');
       if(bt){ const bd=bt.closest('.att-bundle'), mb=bd.querySelector('.bmain'), im=mb.querySelector('img');
-        mb.dataset.sview=bt.dataset.gsrc; mb.dataset.name=bt.dataset.name; im.src=bt.dataset.tsrc||bt.dataset.gsrc; im.removeAttribute('data-osrc'); im.dataset.tries='0'; im.alt=bt.dataset.name;
+        mb.dataset.sview=bt.dataset.gsrc; mb.dataset.name=bt.dataset.name; im.src=bt.dataset.tsrc||bt.dataset.gsrc; im.removeAttribute('data-osrc'); im.dataset.tries='0'; im.alt='사진';
         mb.setAttribute('aria-label',`사진 ${bd.querySelectorAll('[data-gsrc]').length}장 중 ${+bt.dataset.bi+1}번째 크게 보기`);
         bd.querySelectorAll('.bt').forEach(x=>x.classList.toggle('on',x===bt)); return; }
       const b=e.target.closest('[data-sview]');
       if(b){ const list=[...convo.querySelectorAll('[data-gsrc]')].map(x=>({src:x.dataset.gsrc, name:x.dataset.name||'', ts:+x.dataset.ts||0}));
-        openLightbox(b.dataset.sview,b.dataset.name,list); }
+        openLightbox(b.dataset.sview,b.dataset.name,list,true); }
     },true);
     async function fileBlobs(m){ const out=[]; for(const f of (m.files||[])){ try{ const bl=await (await fetch(FURL(f.id))).blob(); out.push(new File([bl], f.name, {type:bl.type||(f.kind==='image'?'image/jpeg':'application/pdf')})); }catch(_){ } } return out; }
     function openActs(m,at){
