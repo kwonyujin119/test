@@ -1,4 +1,153 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><style>:root{color-scheme:light;box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest?v=112"><link rel="icon" href="icons/icon-rounded-48.png?v=112" type="image/png" sizes="48x48"><link rel="icon" href="icons/icon-rounded-192.png?v=112" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=84"><meta name="theme-color" content="#FDD000"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SACHIL:47"></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><style>:root{color-scheme:light;box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest?v=112"><link rel="icon" href="icons/icon-rounded-48.png?v=112" type="image/png" sizes="48x48"><link rel="icon" href="icons/icon-rounded-192.png?v=112" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=84"><meta name="theme-color" content="#FDD000"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SACHIL:47">
+<style id="v198-etc">
+/* V198 나머지(etc): 공통 토큰·헤더·하단 탭·첫 화면·사용법·알림·설치·방재실·화면 틀.
+   이 블록은 문서 앞(</head> 앞)에 있어 뒤쪽 규칙보다 먼저 읽힌다 → 선택자 앞에 :root 를 붙여 우선순위를 한 단계 올린다(값만 바꾸고 변수 이름은 그대로). */
+html:root{
+  --navy-deep:#0B1B3F; --navy-ink:#13285A;
+  --danger:#D92D20; --caution:#F79009; --ok:#067647;
+  --bg:#F3F4F6; --surface-2:#F8F9FB;
+  --line:#E2E5EA; --line-2:#C5CBD4;
+  --fg:#14181F; --ink:#14181F; --muted:#4F5663; --muted-2:#5F6672;
+  --shadow:0 1px 2px rgba(11,27,63,.06),0 2px 8px rgba(11,27,63,.06);
+  --elev-2:0 2px 4px rgba(11,27,63,.08),0 12px 32px rgba(11,27,63,.16);
+  --top-h:56px; --focus:#244EA2;
+}
+:root body{letter-spacing:-.005em}
+:root :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* ── 상단 바: 흰 바탕 + 얇은 선으로 늘 또렷하게(햇빛·스크롤과 무관) ── */
+:root .top{background:var(--surface);border-bottom:1px solid var(--line)}
+:root .top .wrap{min-height:var(--top-h)}
+:root .help-btn{width:32px;height:32px;border-color:var(--navy-deep);color:var(--navy-deep);font-size:16px}
+:root .help-btn:hover{background:var(--ember)}
+:root .top-right .ico{border-radius:12px}
+:root .top-right .ico:hover{background:var(--navy-soft)}
+:root #chatBtn[aria-current="page"],:root #dbBtn[aria-current="page"]{background:var(--navy-soft);box-shadow:inset 0 0 0 2px var(--navy)}
+/* 주요 기능(S·A·CH·IL): 고른 것만 노랑 칩 + 아래 남색 막대(머티리얼 탭 표시), 나머지는 칩 바탕 없이 */
+:root .top-nav a{color:#3A4150;font-weight:600}
+:root .top-nav a b{background:transparent}
+:root .top-nav a:hover{background:var(--navy-soft);color:var(--navy-deep)}
+:root .top-nav a[aria-current="page"]{color:var(--navy-deep);font-weight:800}
+:root .top-nav a[aria-current="page"] b{background:var(--ember)}
+:root .top-nav a[aria-current="page"]::after{content:"";position:absolute;left:10px;right:10px;bottom:calc((var(--tap) - var(--top-h)) / 2);height:3px;border-radius:3px 3px 0 0;background:var(--navy)}
+/* 47망·디브리핑룸: 넓은 화면은 이름도 함께(아이콘만으로는 처음 쓰는 사람이 모름) */
+@media (min-width:1200px),(min-width:600px) and (max-width:1023px) and (pointer:coarse){
+  :root #chatBtn,:root #dbBtn{width:auto;gap:7px;padding:0 10px 0 7px}
+  :root #chatBtn::after,:root #dbBtn::after{content:attr(title);font-size:14px;font-weight:700;color:var(--fg);white-space:nowrap}
+}
+@media (min-width:1024px){
+  html:root{--top-h:60px}
+  :root .top-nav{margin-left:4px;padding-left:10px;border-left:1px solid var(--line)}
+}
+/* 교수 모드 띠: 진한 남색으로 일반 화면과 확실히 구분 */
+:root .profbar{background:var(--navy-deep)}
+:root body.prof .top{box-shadow:inset 0 -3px 0 var(--ember)}
+
+/* ── 하단 탭(휴대폰·터치 태블릿 세로): 머티리얼 3 내비게이션 바 — 고른 탭은 노랑 알약 + 굵은 남색 글자 ── */
+:root .tabbar{background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -1px 0 rgba(11,27,63,.02)}
+:root .tabbar button{gap:3px;color:var(--muted-2);font-size:11.5px;font-weight:600;letter-spacing:-.02em}
+:root .tabbar .k{min-width:56px;height:30px;border-radius:15px;background:transparent;transition:background .15s}
+:root .tabbar .k .sg{height:18px}
+:root .tabbar button[aria-current="page"]{color:var(--navy-deep);font-weight:800}
+:root .tabbar button[aria-current="page"] .k{background:var(--ember)}
+:root .tabbar button:active .k{background:var(--navy-soft)}
+:root .tabbar button[aria-current="page"]:active .k{background:var(--ember-2)}
+:root .tabbar button:focus-visible{outline-offset:-3px;border-radius:12px}
+
+/* ── 터치 태블릿 세로·폴드 펼침(600~1023, 손가락): 위쪽 작은 칩 대신 아래 탭(엄지로 닿는 자리) + 휴대폰과 같은 앱 틀 ── */
+@media (min-width:600px) and (max-width:1023px) and (pointer:coarse){
+  html:root{--bar-h:64px;--top-h:60px}
+  :root .top-nav{display:none}
+  :root .top-right{gap:6px}
+  html:root,:root body{height:100%;overflow:hidden}
+  :root body{display:flex;flex-direction:column;min-height:0}
+  :root .app{flex:1 1 auto;min-height:0;height:auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+  :root .tabbar{display:block;position:static;flex:none}
+  :root .tabbar .in{max-width:640px;margin:0 auto}
+  :root .tabbar button{font-size:13px;gap:4px}
+  :root .tabbar .k{min-width:64px;height:32px;border-radius:16px}
+  :root .tabbar .k .sg{height:19px}
+  :root footer{padding-bottom:12px}
+  :root body.hubview.touring .tabbar{display:block!important;position:fixed;left:0;right:0;bottom:0;z-index:31;box-shadow:0 -10px 28px rgba(0,0,0,.22)}
+}
+/* 터치 태블릿 가로(1024 이상, 손가락): 위쪽 내비 유지 — 누르는 높이 48px·글자 크게 */
+@media (min-width:1024px) and (pointer:coarse){
+  html:root{--top-h:64px}
+  :root .top-nav a{min-height:48px;padding:0 12px;font-size:15px}
+  :root .top-nav a[aria-current="page"]::after{bottom:calc((48px - var(--top-h)) / 2)}
+  :root .top-right .ico{width:48px;height:48px}
+  :root .help-btn{width:36px;height:36px}
+}
+/* PC 마우스: 내비 글자 위에 올리면 바로 반응 */
+@media (hover:hover) and (pointer:fine){
+  :root .top-nav a{transition:color .12s,background .12s}
+}
+
+/* ── 알림(토스트): 진한 남색 바탕·14px·헤더 아래(교수 띠가 있어도 가리지 않게) ── */
+:root .toast{top:calc(var(--hdr,56px) + var(--sat,0px) + 10px);background:var(--navy-deep);font-size:14px;font-weight:600;line-height:1.45;padding:11px 18px;border-radius:14px;box-shadow:var(--elev-2);max-width:min(520px,calc(100vw - 32px))}
+:root .toast button{min-height:32px;color:var(--ember);background:rgba(255,255,255,.14)}
+
+/* ── 첫 화면 6칸: 테두리 대비 올림·그림자 짧게(흐릿한 떠 있는 카드 느낌 줄임) ── */
+:root .hz-p{stroke:#B7BFCB;filter:drop-shadow(0 1px 2px rgba(11,27,63,.14))}
+:root .hz-p.y{stroke:#E5BC00}
+:root .hub.hz [data-hov].hz-p{filter:drop-shadow(0 8px 14px rgba(11,27,63,.2))}
+:root .hz-svg a:focus-visible .hz-p{stroke:var(--navy-deep);stroke-width:3.5}
+:root .hz-l b{color:var(--navy-deep)}
+:root .hz-k b{color:var(--fg)}
+:root .hz-k .hd{color:#3D3200}
+
+/* ── 사용법(?) 말풍선: 또렷한 테두리·큰 버튼(장갑 손가락 44px) ── */
+:root .tour .tip{border-radius:14px;border:1px solid rgba(11,27,63,.12);box-shadow:var(--elev-2);padding:16px 16px 12px}
+:root .tour .tip .st{color:var(--muted-2);letter-spacing:.04em}
+:root .tour .tip h3{font-size:17px;color:var(--navy-deep)}
+:root .tour .tip p{font-size:14px}
+:root .tour .tip button{min-height:44px;padding:0 16px}
+:root .tour .tip button.next{background:var(--navy-deep);border-color:var(--navy-deep)}
+:root .tour .tip .dots i.on{background:var(--navy-deep)}
+@media (min-width:600px){ :root .tour .tip{width:min(360px,calc(100vw - 24px))} }
+
+/* ── 앱 설치 묻기: 토큰 색·버튼 높이 ── */
+:root .inst{border-radius:20px 20px 0 0}
+:root .inst .hd b{font-size:19px;font-weight:800;color:var(--navy-deep)}
+:root .inst li i{background:var(--ember);color:var(--navy-deep)}
+:root .inst ol li::before{background:var(--navy-deep)}
+:root .inst .go{border-radius:12px;color:var(--navy-deep)}
+:root .inst .later{min-height:48px}
+@media (min-width:600px){ :root .inst{border-radius:20px;max-width:460px} }
+
+/* ── SACHIL방재실 ── */
+:root #profForm .pf-hd{display:flex;align-items:flex-start;gap:14px;margin-bottom:4px}
+:root #profForm .pf-mk{flex:none;display:grid;place-items:center;width:48px;height:48px;border-radius:12px;background:var(--navy-deep);color:var(--ember);font-family:var(--mono);font-weight:800;font-size:17px;letter-spacing:.02em}
+:root #profForm .pf-hd h2{margin:2px 0 4px;font-size:20px;color:var(--navy-deep)}
+:root #profForm .pf-hd .note{margin:0}
+:root #profForm #profCode{font-size:16px;min-height:48px;letter-spacing:.1em}
+:root .bjqb .bji{display:grid;place-items:center;width:40px;height:40px;border-radius:10px;background:var(--navy-soft);color:var(--navy)}
+:root .bjqb .bji svg{width:22px;height:22px}
+:root .bjqb:hover{border-color:var(--navy);background:var(--surface-2)}
+@media (min-width:381px) and (max-width:599px){ :root .bjqb{grid-template-columns:1fr;grid-template-rows:auto;row-gap:4px;align-content:start;padding:12px 12px 14px} :root .bjqb .bji{grid-row:auto;width:34px;height:34px;margin-bottom:4px} :root .bjqb .bji svg{width:20px;height:20px} }
+:root .kst .kdot{display:inline-block;width:9px;height:9px;margin-right:6px;border-radius:50%;background:var(--line-2);vertical-align:1px}
+:root .kc.on .kst .kdot{background:var(--ok)}
+:root .bj2 .bjtabs button[aria-selected="true"]{background:var(--navy-deep);border-color:var(--navy-deep)}
+:root .bjsum .chip{min-height:32px}
+/* 넓은 화면(PC·태블릿 가로): 리니어 설정 화면처럼 왼쪽 세로 메뉴 + 오른쪽 내용 */
+@media (min-width:1000px){
+  :root #panel > .dbwrap.bj2{max-width:1000px;grid-template-columns:220px minmax(0,1fr);column-gap:24px;align-items:start}
+  :root #panel > .dbwrap.bj2 > *{grid-column:2}
+  :root #panel > .dbwrap.bj2 > .bjtabs{grid-column:1;grid-row:1 / span 2;position:sticky;top:calc(var(--hdr,60px) + 16px);display:flex;flex-direction:column;gap:2px;padding:8px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+  :root #panel > .dbwrap.bj2 > .bjtabs button{justify-content:flex-start;text-align:left;min-height:44px;padding:0 14px;border:0;border-radius:10px;background:transparent;font-size:14.5px;color:#3A4150}
+  :root #panel > .dbwrap.bj2 > .bjtabs button:hover{background:var(--navy-soft);color:var(--navy-deep)}
+  :root #panel > .dbwrap.bj2 > .bjtabs button[aria-selected="true"]{background:var(--navy-soft);color:var(--navy-deep);box-shadow:inset 3px 0 0 var(--navy)}
+  :root #panel > .dbwrap.bj2 > .bjtabs::before{content:"SACHIL방재실";display:block;padding:6px 14px 8px;font-size:12px;font-weight:800;letter-spacing:.02em;color:var(--muted-2)}
+  :root #panel > .dbwrap.bj2 > .bjsum{padding:2px 0}
+  :root #panel > .dbwrap.bj2 .kcs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  :root #panel > .dbwrap.bj2 .bjq{grid-template-columns:repeat(4,minmax(0,1fr))}
+  :root #panel > .dbwrap.bj2 .bjqb{grid-template-columns:1fr;grid-template-rows:auto auto auto;row-gap:6px;align-content:start}
+  :root #panel > .dbwrap.bj2 .bjqb .bji{grid-row:auto}
+}
+/* 태블릿 세로(600~999): 탭 8개를 4칸 2줄 그대로, 키 카드는 2칸 */
+@media (min-width:720px) and (max-width:999px){ :root #panel > .dbwrap.bj2{max-width:720px} :root #panel > .dbwrap.bj2 .kcs{grid-template-columns:repeat(2,minmax(0,1fr))} }
+</style>
+</head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
 <style>
@@ -2777,10 +2926,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           <section class="card create prof bjp" data-pane="sum">
             <h2>바로 하기</h2>
             <div class="bjq">
-              <button type="button" class="bjqb" data-q="menu"><i>📚</i><b>메뉴 자료 올리기</b><span>섹션을 열어 자료 올리기·지우기</span></button>
-              <button type="button" class="bjqb" data-q="tpl"><i>📝</i><b>보고서 양식·지시사항</b><span>AI 보고서가 따를 틀과 지시</span></button>
-              <button type="button" class="bjqb" data-q="pin"><i>📌</i><b>핀 문구 바꾸기</b><span>47망·디브리핑룸 위 안내</span></button>
-              <button type="button" class="bjqb" data-q="upd"><i>🔄</i><b>서버 업데이트 확인</b><span>새 버전이 있으면 곧바로 교체</span></button>
+              <button type="button" class="bjqb" data-q="menu"><i class="bji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6H9l2 2h8.5A1.5 1.5 0 0 1 21 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z"/><path d="M12 16.5v-5M9.5 14l2.5-2.5 2.5 2.5"/></svg></i><b>메뉴 자료 올리기</b><span>섹션을 열어 자료 올리기·지우기</span></button>
+              <button type="button" class="bjqb" data-q="tpl"><i class="bji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V8z"/><path d="M14 3v5h5M8.5 13h7M8.5 17h5"/></svg></i><b>보고서 양식·지시사항</b><span>AI 보고서가 따를 틀과 지시</span></button>
+              <button type="button" class="bjqb" data-q="pin"><i class="bji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6l-1 6 4 4H6l4-4z"/><path d="M12 13v8"/></svg></i><b>핀 문구 바꾸기</b><span>47망·디브리핑룸 위 안내</span></button>
+              <button type="button" class="bjqb" data-q="upd"><i class="bji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 4v4h4M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 20v-4h-4"/></svg></i><b>서버 업데이트 확인</b><span>새 버전이 있으면 곧바로 교체</span></button>
             </div>
             <div class="acts"><button type="button" class="btn ghost" id="profOut">교수 로그아웃</button><button type="button" class="btn primary" id="profMenu">메뉴 열기</button></div>
           </section>
@@ -2857,7 +3006,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         return;
       }
       panel.innerHTML=`<div class="dbwrap"><form class="card create prof" id="profForm" autocomplete="off">
-          <span class="eyebrow">교수 로그인</span>
+          <div class="pf-hd"><span class="pf-mk" aria-hidden="true">S:47</span><div><span class="eyebrow">SACHIL방재실</span><h2>교수 로그인</h2><p class="note">자료 올리기·질의응답 답변·체크리스트와 상황보고서 서식 관리는 교수 전용입니다.</p></div></div>
           <div class="row"><label for="profCode">관리자 코드</label><input id="profCode" type="password" maxlength="40" required enterkeyhint="go" autocomplete="off"></div>
           ${SRV.on?'':'<p class="note">서버에 연결되어야 로그인할 수 있습니다.</p>'}
           <p class="note err" id="profErr" role="alert" hidden></p>
@@ -2890,7 +3039,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const tail=d.has(j), m=KMSG[d.k], open=!tail||KOPEN[d.k], old=d.need&&!d.need(j);
     const extra=['gemini','groq','claude'].includes(d.k)&&tail?(j.provider===d.k?' · 지금 사용':(j.order||[]).includes(d.k)?' · 예비':''):'';
     return `<div class="kc ${tail?'on':'off'}" data-k="${d.k}">
-      <div class="kch"><b>${d.n}</b><span class="kst">${old?'서버 업데이트 필요':tail?`✅ 등록 완료 <small>${esc(String(tail))}${extra}</small>`:'⚪ 미등록'}</span></div>
+      <div class="kch"><b>${d.n}</b><span class="kst">${old?'서버 업데이트 필요':tail?`<i class="kdot" aria-hidden="true"></i>등록 완료 <small>${esc(String(tail))}${extra}</small>`:'<i class="kdot" aria-hidden="true"></i>미등록'}</span></div>
       <p class="kdesc">${esc(d.d)}</p>
       ${tail&&!KOPEN[d.k]?`<div class="kact"><button type="button" class="btn ghost sm" data-ka="edit">변경</button><button type="button" class="btn ghost sm" data-ka="del">지우기</button></div>`:''}
       ${open&&!old?`<form class="kform" data-k="${d.k}" autocomplete="off"><input type="${['gemini','groq','claude','bld'].includes(d.k)?'password':'text'}" maxlength="300" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${esc(d.ph)}" aria-label="${esc(d.n)} 키"><button type="submit" class="btn primary sm">${tail?'바꾸기':'등록'}</button>${tail?'<button type="button" class="btn ghost sm" data-ka="cancel">취소</button>':''}</form>`:''}
