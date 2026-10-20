@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '11.5'
-APP_VERSION = 'V189'
+VERSION = '11.6'
+APP_VERSION = 'V190'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -2155,6 +2155,9 @@ class H(BaseHTTPRequestHandler):
             return self.err(429, '오늘 올릴 수 있는 양(200MB)을 넘었습니다. 내일 다시 올려 주세요')
         data = self.rfile.read(n)
         self._body_read = True
+        if len(data) != n:   # V190: 올리는 중 연결이 끊기면 반쪽 파일이 남아 사진이 깨져 보였다 — 저장하지 않고 다시 올리게
+            self.close_connection = True
+            return self.err(400, '전송이 중간에 끊겼습니다. 다시 보내 주세요')
         kind = sniff(data[:16])
         if not kind:
             return self.err(415, '사진(JPG·PNG·WEBP·GIF)과 PDF만 올릴 수 있습니다')
