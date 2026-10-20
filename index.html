@@ -975,7 +975,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v194</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v195</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1252,7 +1252,7 @@ body.chatview .panel{padding-bottom:6px}
 .pedit .pens button.on{border:3px solid #fff;transform:scale(1.12)}
 .pedit .pens{align-items:center;flex-wrap:wrap}.pedit .pens button{width:36px;height:36px}.pedit .pens .er{width:auto;height:36px;border-radius:18px;padding:0 12px;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.14);color:#fff;font:inherit;font-size:13px;font-weight:700}.pedit .pens .er svg{width:18px;height:18px}.pedit .pens .er.on{transform:none;background:#fff;color:#111}
 .pedit .done{margin-left:auto;color:var(--ember)}
-.act-sheet{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.35);display:flex;align-items:flex-end;justify-content:center}
+.act-sheet{position:fixed;inset:0;z-index:72;background:rgba(0,0,0,.35);display:flex;align-items:flex-end;justify-content:center}
 .act-sheet .box{width:min(100%,420px);margin:0 8px calc(8px + var(--sab));background:var(--surface);border-radius:16px;padding:8px;display:grid;gap:2px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 @media (min-width:600px){ .act-sheet{align-items:center} .act-sheet .box{margin:0} }
 .act-sheet .pv{margin:4px 8px 6px;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1845,8 +1845,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V194', SRV_VER='12.1';
+  const APP_VER='V195', SRV_VER='12.2';
   const UPDATES=[
+    {v:'V195', d:'2026-10-20', t:['47망·디브리핑룸 사진에서 오른쪽 클릭: 이미지 복사(바로 붙여넣기) · 저장 · 공유(47망·디브리핑룸·카카오톡·다른 앱)','사진을 크게 볼 때도 오른쪽 클릭으로 같은 메뉴']},
     {v:'V194', d:'2026-10-20', t:['교수(관리자)로 로그인한 기기는 47망·디브리핑룸에서 다른 사람 글도 길게 눌러 ‘삭제(관리자)’ — 한 번 더 확인 후 모두의 화면에서 ‘삭제된 메시지’로','관리자 삭제는 서버 접속 기록에 남음']},
     {v:'V193', d:'2026-10-20', t:['47망·디브리핑룸 1000명 동시 접속 대비 — 예전에는 200명이 넘으면 새로 들어온 사람이 연결되지 않았음','1000명 시험: 모든 글이 1000명 모두에게 도착(가운데값 약 1초), 연결 실패 0건','사진은 대화에 작은 미리보기(수십 KB)를 보여 주고, 누르면 원본 — 많은 사람이 같은 사진을 받아도 빠르게','사람이 많은 방은 ‘안 읽은 수’가 몇 초 늦게 바뀜(서버 부담을 줄이려고)']},
     {v:'V192', d:'2026-10-20', t:['AI: 답이 나오는 동안 위로 올려 보면 아래로 끌려 내려가던 문제 바로잡음 — 답이 끝나도 보던 자리 그대로','AI 입력창의 ＋(첨부) 버튼 없앰','AI 화면 제목을 ‘AI assistant’로, 옆에 ‘사용자가 질문하면 AI가 답합니다’']},
@@ -3957,6 +3958,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       }catch(err){ if(!(err&&err.name==='AbortError')) toast('공유하지 못했습니다'); } }); }
   function textActs(text, at){ if(!text) return; actSheet(`${esc(trunc(String(text).replace(/\s+/g,' '),36))}`, [['copy','복사'],['sel','선택 복사'],['share','공유']], at, (k,btn,close)=>{ close();
     if(k==='copy') copyPlain(text); else if(k==='sel') selCopy(text); else if(k==='share') shareMenu(text,null,at); }); }
+  // V195: 사진 메뉴(오른쪽 클릭) — 이미지 복사 · 저장 · 공유
+  async function imgFile(src,name){ const r=await fetch(src); if(!r.ok) throw new Error('get'); const bl=await r.blob(); return new File([bl], name||'사진.jpg', {type:bl.type||'image/jpeg'}); }
+  async function toPng(bl){ if(bl.type==='image/png') return bl; const bm=await createImageBitmap(bl); const c=document.createElement('canvas'); c.width=bm.width; c.height=bm.height; c.getContext('2d').drawImage(bm,0,0); if(bm.close) bm.close(); return await new Promise(r=>c.toBlob(r,'image/png')); }
+  function imgActs(src,name,at){ if(!src) return;
+    actSheet(`<b>사진</b> ${esc(trunc(String(name||''),28))}`, [['icopy','이미지 복사'],['isave','저장'],['ishare','공유']], at, async(k,btn,close)=>{
+      if(k==='icopy'){ btn.textContent='복사 중…';
+        try{ if(!(navigator.clipboard&&window.ClipboardItem)) throw new Error('nosupport'); const f=await imgFile(src,name);
+          await navigator.clipboard.write([new ClipboardItem({'image/png':toPng(f)})]); close(); toast('이미지를 복사했습니다 — 붙여넣기(Ctrl+V)로 쓰세요'); }   /* 크롬은 PNG만 받는다 — 바로 변환(약속으로 넘겨 클릭 허용 시간 안에) */
+        catch(_){ close(); toast('이 브라우저는 이미지 복사를 지원하지 않습니다 — 저장을 이용하세요'); } return; }
+      if(k==='isave'){ btn.textContent='준비 중…'; try{ const f=await imgFile(src,name); close(); const u=URL.createObjectURL(f), x=document.createElement('a'); x.href=u; x.download=f.name; document.body.appendChild(x); x.click(); setTimeout(()=>{ URL.revokeObjectURL(u); x.remove(); },1000); toast('저장했습니다'); }catch(_){ close(); toast('사진을 가져오지 못했습니다'); } return; }
+      if(k==='ishare'){ close(); let fp=null; shareMenu('', ()=>fp||(fp=imgFile(src,name).then(f=>[f]).catch(()=>[])), at); } }); }
   async function copyText(txt, btn, label){
     try{ await navigator.clipboard.writeText(txt); btn.textContent='복사됨'; }
     catch(_){ btn.textContent=legacyCopy(txt)?'복사됨':'복사 실패'; }
@@ -4568,6 +4580,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 사진 넘기기(V88): 왼쪽→오른쪽으로 끌면 이전(먼저 올린) 사진, 오른쪽→왼쪽은 다음 사진. 사진을 한 번 더 누르면 위에 반투명 줄 + 갤러리
   const LB={list:[], i:-1}, LB_WIN=matchMedia('(min-width:900px) and (hover:hover) and (pointer:fine)');   // V119: PC는 카카오톡처럼 가운데 창
   let lbLast=null;
+  lb.addEventListener('contextmenu',e=>{ const im=e.target.closest('img'); if(!im||im.hidden||!im.src) return; e.preventDefault(); imgActs(im.src, lb.querySelector('.cap').textContent||'사진.jpg', {x:e.clientX,y:e.clientY}); });   // V195: 크게 보기에서도
   function lbShow(){ if(lb.hidden){ lbLast=document.activeElement; appEl.inert=true; tabbarEl.inert=true; } lb.hidden=false; lb.querySelector('.close').focus(); }
   function openLightbox(src,name,list){
     LB.list=list||[]; LB.i=LB.list.findIndex(x=>x.src===src);
@@ -6175,7 +6188,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const cancelLp=e=>{ if(!lp) return; if(e&&e.type==='pointermove'&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)<10) return; clearTimeout(lp.t); lp=null; };
     ['pointermove','pointerup','pointercancel'].forEach(t=>convo.addEventListener(t,cancelLp,{passive:true}));
     convo.addEventListener('scroll',()=>cancelLp(),{passive:true});
-    convo.addEventListener('contextmenu',e=>{ const m=msgOf(e.target); if(!m) return; e.preventDefault(); cancelLp(); if(!$('#actSheet')) openActs(m, matchMedia('(hover:hover) and (pointer:fine)').matches?{x:e.clientX,y:e.clientY}:null); });   // V120: 마우스 우클릭은 커서 자리에
+    convo.addEventListener('contextmenu',e=>{ const ib=e.target.closest('.att-img[data-sview],.bt[data-gsrc]');
+      if(ib&&!ib.classList.contains('broken')){ e.preventDefault(); cancelLp(); imgActs(ib.dataset.sview||ib.dataset.gsrc, ib.dataset.name||'사진.jpg', {x:e.clientX,y:e.clientY}); return; }   // V195: 사진에서 오른쪽 클릭 = 사진 메뉴
+      const m=msgOf(e.target); if(!m) return; e.preventDefault(); cancelLp(); if(!$('#actSheet')) openActs(m, matchMedia('(hover:hover) and (pointer:fine)').matches?{x:e.clientX,y:e.clientY}:null); });   // V120: 마우스 우클릭은 커서 자리에
     convo.addEventListener('click',e=>{
       if(eat){ e.preventDefault(); e.stopPropagation(); eat=false; return; }
       { const bk=e.target.closest('.att-img.broken,.bt.broken'); if(bk){ e.preventDefault(); e.stopPropagation(); imgRetry(bk.querySelector('img'),true); return; } }   // V190: 못 불러온 사진은 눌러서 다시
