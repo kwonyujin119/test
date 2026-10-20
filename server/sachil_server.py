@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '11.6'
-APP_VERSION = 'V190'
+VERSION = '11.7'
+APP_VERSION = 'V191'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -1186,6 +1186,7 @@ class H(BaseHTTPRequestHandler):
             with AI_BUSY_LOCK:
                 AI_BUSY[0] -= 1
         if not text or code:   # 스트림 실패 → 보통 호출(재시도·다른 회사)로
+            ev({'wait': 1})   # V191: 앱에 '아직 살아 있음'(다른 AI로 넘기는 중)
             t2, why2, _c = call_llm(sysmsg, msgs, max_tokens, 'low', CONF.get('ai_assist_model') or 'claude-haiku-5-5')
             if t2:
                 text, why = t2, ''
@@ -3755,7 +3756,7 @@ def gemini_stream(system, msgs, max_tokens, on_text, effort='low'):
                                  headers={'x-goog-api-key': CONF.get('gemini_api_key', ''), 'content-type': 'application/json'})
     out = []
     try:
-        with urllib.request.urlopen(req, timeout=120) as r:
+        with urllib.request.urlopen(req, timeout=int(CONF.get('ai_stream_timeout') or 25)) as r:   # V191: 25초 동안 한 글자도 안 오면 끊고 다른 AI로(예전 120초 — 앱이 '입력 중'으로 멈춰 보였다)
             for raw in r:
                 line = raw.decode('utf-8', 'replace').strip()
                 if not line.startswith('data:'):
