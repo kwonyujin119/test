@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '12.0'
-APP_VERSION = 'V193'
+VERSION = '12.1'
+APP_VERSION = 'V194'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -2248,6 +2248,8 @@ class H(BaseHTTPRequestHandler):
             return self.err(404, '없는 메시지입니다')
         if r['author'] != self.user['id'] and self.user['role'] != 'admin':
             return self.err(403, '본인 메시지만 지울 수 있습니다')
+        if r['author'] != self.user['id']:
+            self.alog(200, f'admin-del msg {mid} by-author {r["author"]}')   # V194: 관리자가 남의 글을 지운 기록(접속 기록 파일)
         for fid in file_ids(r['files']):
             try:
                 os.remove(os.path.join(FILES, fid))
