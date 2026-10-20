@@ -1,4 +1,161 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><style>:root{color-scheme:light;box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest?v=112"><link rel="icon" href="icons/icon-rounded-48.png?v=112" type="image/png" sizes="48x48"><link rel="icon" href="icons/icon-rounded-192.png?v=112" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=84"><meta name="theme-color" content="#FDD000"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SACHIL:47"></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><style>:root{color-scheme:light;box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest?v=112"><link rel="icon" href="icons/icon-rounded-48.png?v=112" type="image/png" sizes="48x48"><link rel="icon" href="icons/icon-rounded-192.png?v=112" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=84"><meta name="theme-color" content="#FDD000"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SACHIL:47">
+<style id="v198-menu">
+/* V198 메뉴(담당: menu) — 메뉴 시트·섹션 화면·PDF 뷰어. 선택자는 #sheet / #panel .sx / #pdfv 로 한정(본문 아래쪽 기본 규칙보다 앞서도 이기게 ID로 시작) */
+/* ── 메뉴 시트: 단단한 칸(흰 바탕·또렷한 선), 묶음 이름, 지금 화면 = 노랑 막대 ── */
+#sheet{background:var(--surface)}
+#sheet header{padding-bottom:8px;border-bottom:1px solid var(--line)}
+#sheet .close{color:var(--fg);font-size:24px}
+#sheet .close:hover{background:var(--navy-soft)}
+#sheet .sheet-sep{color:var(--navy);font-size:12px;font-weight:800;letter-spacing:.02em;margin:10px 0 0}
+#sheet .sheet-sep:first-child{margin-top:2px}
+#sheet .sheet-sep::before{flex:0 0 4px;height:12px;border-radius:1px;background:var(--ember)}
+#sheet .sheet-sep::after{background:var(--line)}
+#sheet .sheet-grid a{position:relative;background:var(--surface);border:1px solid var(--line-2);border-radius:10px;color:var(--fg);text-decoration:none;transition:border-color .12s,background .12s}
+#sheet .sheet-grid a .tt{font-weight:700;letter-spacing:-.01em}
+#sheet .sheet-grid a .dd{color:var(--muted);-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media (min-height:621px){ #sheet:not(.full) .sheet-grid a .dd{display:-webkit-box} }
+@media (min-height:901px){ #sheet.full .sheet-grid a .dd{display:-webkit-box} }
+#sheet .sheet-grid a .ab{background:var(--navy-soft);border-radius:8px}
+#sheet .sheet-grid a[aria-current="page"]{border-color:var(--navy);background:var(--navy-soft);box-shadow:inset 4px 0 0 var(--ember)}
+#sheet .sheet-grid a[aria-current="page"] .tt{color:var(--navy)}
+#sheet .sheet-grid a:active{background:var(--navy-soft)}
+#sheet .sheet-grid a:focus-visible,#sheet .close:focus-visible,#sheet .grip:focus-visible,#sheet .foot a:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
+@media (hover:hover) and (pointer:fine){ #sheet .sheet-grid a:hover{border-color:var(--navy);background:var(--navy-soft)} }
+#sheet .foot{border-top:1px solid var(--line);padding-top:6px}
+#sheet .foot a{color:var(--navy)}
+/* 휴대폰(바텀 시트): 설명 2줄까지, 칸 높이를 고르게 */
+@media (max-width:599px){
+  #sheet{border-radius:16px 16px 0 0}
+  #sheet .sheet-grid{gap:8px}
+  #sheet:not(.full) .sheet-grid a{min-height:58px}
+}
+/* 태블릿 세로·작은 창(600~999, 높이 넉넉): 4열 타일 — 아이콘 위·이름 아래(손가락으로 누르기 쉬운 큰 칸) */
+@media (min-width:600px) and (max-width:999px) and (min-height:700px){
+  #sheet{width:min(760px,calc(100% - 40px));max-height:calc(100dvh - 32px);padding:18px 22px 16px}
+  #sheet .sheet-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  #sheet .sheet-grid a{flex-direction:column;align-items:flex-start;gap:8px;min-height:112px;padding:12px}
+  #sheet .sheet-grid a .ab{width:44px;height:44px}
+  #sheet .sheet-grid a .tt{font-size:15px}
+  #sheet .sheet-grid a .dd{font-size:12px;margin-top:3px}
+}
+/* PC·태블릿 가로(1000+): 넓은 창 4열 — 첫 묶음 4칸이 한 줄, 스크롤 없이 한 화면 */
+@media (min-width:1000px) and (min-height:621px){
+  #sheet{width:min(980px,calc(100% - 64px));max-height:calc(100dvh - 32px);padding:18px 24px 14px}
+  #sheet .sheet-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+  #sheet .sheet-grid a{min-height:64px;padding:10px 12px}
+  #sheet .sheet-grid a .tt{font-size:14.5px}
+}
+@media (min-width:1000px) and (min-height:621px) and (max-height:760px){ #sheet .sheet-grid a{min-height:54px;padding:6px 10px} #sheet .sheet-grid a .dd{-webkit-line-clamp:1} }
+/* 가로 휴대폰·낮은 창: 한 화면에 다 들어가게 첫 묶음 이름·구분선은 생략(기존 4열·설명 숨김 유지) */
+@media (min-width:600px) and (max-height:620px){ #sheet .sheet-sep:first-child{display:none} #sheet header{padding-bottom:0;border-bottom:0} #sheet .foot{border-top:0;padding-top:0} #sheet .sheet-sep{margin:0;font-size:11px;line-height:1.1} #sheet .sheet-sep::before{height:8px} }
+@media (prefers-reduced-motion:reduce){ #sheet,#sheet .sheet-grid a{transition:none!important} }
+
+/* ── 섹션 화면: 넓으면 왼쪽 섹션 목록(노션·컨플루언스 사이드바처럼) + 본문, 문서는 격자 ── */
+#panel .sx{container-type:inline-size;container-name:sx}
+#panel .sx-nav{display:none}
+#panel .sx-main{min-width:0}
+#panel .sx .card.prep{padding:20px 18px 22px;text-align:left;justify-items:stretch;gap:12px}
+#panel .sx .sx-head{display:flex;align-items:center;gap:14px;padding-bottom:14px;border-bottom:2px solid var(--fg)}
+#panel .sx .sx-head img.big{width:56px;height:56px;flex:none}
+#panel .sx .sx-ht{min-width:0}
+#panel .sx .sx-head h2{margin:0;font-size:22px;line-height:1.3;letter-spacing:-.02em;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+#panel .sx .sx-head h2 .badge{font-size:11.5px;padding:2px 9px;background:var(--ember-soft);color:var(--ember-text);border:1px solid var(--ember)}
+#panel .sx .sx-head p{margin:4px 0 0;color:var(--muted);font-size:14px;max-width:none;text-wrap:pretty}
+#panel .sx .sx-head p.sx-meta{margin-top:6px;font-family:var(--mono);font-size:12px;color:var(--muted-2)}
+#panel .sx .lib{max-width:none;margin-top:0}
+#panel .sx .lib h4{font-size:12.5px;font-weight:800;color:var(--fg);letter-spacing:.02em;margin-top:4px}
+#panel .sx .libgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+#panel .sx .libcell{display:grid;align-content:start}
+#panel .sx .libcell .lib-del{margin:6px 0 0 auto;min-height:36px;border:1px solid var(--line-2);color:#B42318}
+#panel .sx .libfile{border-color:var(--line-2);border-radius:10px;text-decoration:none;min-height:64px}
+#panel .sx .libfile .nm b{font-weight:700}
+#panel .sx .libfile .go{display:inline-grid;place-items:center;min-width:52px;min-height:36px;padding:0 10px;border:1px solid var(--navy);border-radius:8px}
+#panel .sx .libfile:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
+@media (hover:hover) and (pointer:fine){ #panel .sx .libfile:hover{border-color:var(--navy);background:var(--navy-soft)} #panel .sx .libfile:hover .go{background:var(--navy);color:#fff} }
+#panel .sx .lib .none{text-align:left;padding:14px;border:1px dashed var(--line-2);border-radius:10px;background:var(--surface-2)}
+#panel .sx .laws{margin:0}
+#panel .sx .ct{margin:6px 0 0;padding-top:14px;border-top:1px solid var(--line)}
+#panel .sx .ct h4{text-align:left}
+#panel .sx .ctl a{border-color:var(--line-2);border-radius:10px;min-height:52px;text-decoration:none}
+#panel .sx .ctl a b{color:#067647}
+@media (hover:hover) and (pointer:fine){ #panel .sx .ctl a:hover{border-color:#067647;background:#ECFDF3} }
+#panel .sx .qna{margin-top:6px}
+#panel .sx .prof-up{margin:0;padding:10px 12px;border:2px dashed var(--navy);border-radius:10px;background:var(--navy-soft)}
+#panel .sx .prof-up .pu-drop{display:none;font-size:13px;color:var(--navy);font-weight:600}
+#panel .sx .prof-up.drop{background:var(--ember-soft);border-color:var(--ember-2)}
+@media (hover:hover) and (pointer:fine){ #panel .sx .prof-up .pu-drop{display:inline} }
+#panel .sx .links{justify-content:flex-start;margin-top:2px}
+#panel .sx .card.upd,#panel .sx .card.sig-sheet{margin:0}
+/* 이전·다음 섹션 */
+#panel .sx-pager{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+#panel .sx-pager a{display:grid;gap:2px;min-height:56px;padding:8px 14px;border:1px solid var(--line-2);border-radius:10px;background:var(--surface);color:var(--fg);text-decoration:none;align-content:center}
+#panel .sx-pager a.next{text-align:right}
+#panel .sx-pager small{font-size:12px;color:var(--muted);font-weight:600}
+#panel .sx-pager b{font-size:14.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#panel .sx-pager a:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
+@media (hover:hover) and (pointer:fine){ #panel .sx-pager a:hover{border-color:var(--navy);background:var(--navy-soft)} }
+/* 중간 폭(태블릿 세로 등): 문서 2열 격자 */
+@container sx (min-width:620px){
+  #panel .sx .card.prep{padding:24px 26px 26px}
+  #panel .sx .sx-head img.big{width:64px;height:64px}
+  #panel .sx .sx-head h2{font-size:24px}
+  #panel .sx .libgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* 넓은 폭(태블릿 가로·PC): 왼쪽 섹션 목록 + 본문 */
+@container sx (min-width:900px){
+  #panel .sx-in{display:grid;grid-template-columns:228px minmax(0,1fr);gap:20px;align-items:start}
+  #panel .sx-nav{display:block;position:sticky;top:calc(var(--hdr,56px) + var(--sat,0px) + 12px);max-height:calc(100dvh - var(--hdr,56px) - var(--sat,0px) - 24px);overflow:auto;overscroll-behavior:contain;padding:8px 6px 10px;margin-top:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+  #panel .sx-nav .sx-nl{display:flex;align-items:center;gap:6px;margin:10px 8px 4px;font-size:11.5px;font-weight:800;color:var(--navy);letter-spacing:.02em}
+  #panel .sx-nav .sx-nl:first-child{margin-top:4px}
+  #panel .sx-nav .sx-nl::before{content:"";width:4px;height:11px;border-radius:1px;background:var(--ember)}
+  #panel .sx-nav ul{list-style:none;margin:0;padding:0;display:grid;gap:1px}
+  #panel .sx-nav a{display:flex;align-items:center;gap:9px;min-height:36px;padding:4px 8px;border-radius:8px;color:var(--fg);text-decoration:none;font-size:13.5px;font-weight:600}
+  #panel .sx-nav a .ab{flex:none;width:26px;height:26px;display:grid;place-items:center;border-radius:6px;background:var(--navy-soft);color:var(--navy);font-size:9.5px;font-weight:800;overflow:hidden}
+  #panel .sx-nav a .ab img{width:100%;height:100%;object-fit:contain}
+  #panel .sx-nav a .tt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #panel .sx-nav a .n{flex:none;min-width:20px;padding:0 6px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center}
+  #panel .sx-nav a[aria-current="page"]{background:var(--navy);color:#fff;box-shadow:inset 4px 0 0 var(--ember)}
+  #panel .sx-nav a[aria-current="page"] .ab{background:#fff}
+  #panel .sx-nav a[aria-current="page"] .n{background:transparent;border-color:rgba(255,255,255,.5);color:#fff}
+  #panel .sx-nav a:focus-visible{outline:3px solid var(--navy);outline-offset:1px}
+  #panel .sx-main{padding-top:12px}
+}
+@media (hover:hover) and (pointer:fine){ #panel .sx-nav a:not([aria-current]):hover{background:var(--navy-soft)} }
+@media (pointer:coarse){ #panel .sx-nav a{min-height:44px} }
+@container sx (min-width:1180px){ #panel .sx .libgrid{grid-template-columns:repeat(3,minmax(0,1fr))} }
+
+/* ── PDF 뷰어: 어두운 바탕에 흰 쪽(책 읽기 앱처럼), 위 도구 묶음, 아래 쪽 이동 막대 ── */
+#pdfv{background:#2B2F36}
+#pdfv .pv-bar{gap:4px;padding:4px 8px;border-bottom:1px solid var(--line)}
+#pdfv .pv-bar button,#pdfv .pv-bar a{border-radius:8px}
+#pdfv .pv-bar button:focus-visible,#pdfv .pv-bar a:focus-visible,#pdfv .pv-foot input:focus-visible{outline:3px solid var(--navy);outline-offset:1px}
+#pdfv .pv-t b{font-size:15px}
+#pdfv .pv-grp{flex:none;display:inline-flex;align-items:center;border:1px solid var(--line-2);border-radius:10px;padding:1px;gap:0}
+#pdfv .pv-grp button{min-width:42px;height:40px;font-size:19px}
+#pdfv .pv-z{min-width:58px!important;font-family:var(--mono);font-size:12.5px!important;color:var(--fg)!important}
+#pdfv .pv-z:disabled{opacity:1!important;color:var(--muted)!important}
+#pdfv .pv-fit{min-width:0!important;padding:0 12px!important;font-size:13.5px!important;border:1px solid var(--line-2)!important;height:42px!important}
+#pdfv .pv-fit[aria-pressed="true"]{background:var(--navy)!important;color:#fff!important;border-color:var(--navy)!important}
+#pdfv .pv-body{padding:14px 10px 28px}
+#pdfv .pv-page{box-shadow:0 2px 10px rgba(0,0,0,.45);margin-bottom:14px}
+#pdfv .pv-page .pn{background:rgba(11,27,63,.82);color:#fff;font-size:11.5px;padding:2px 7px}
+#pdfv .pv-body.pinch .pv-page{transform:scale(var(--pz,1));transform-origin:50% 0}
+#pdfv .pv-msg{border-radius:12px}
+#pdfv .pv-foot{flex:none;display:flex;align-items:center;gap:12px;min-height:48px;padding:4px 16px calc(4px + var(--sab,0px));background:var(--surface);border-top:1px solid var(--line)}
+#pdfv .pv-foot[hidden]{display:none}
+#pdfv .pv-seek{flex:1;min-width:0;display:flex}
+#pdfv .pv-seek input{flex:1;min-width:0;height:44px;margin:0;accent-color:var(--navy);cursor:pointer}
+#pdfv .pv-foot output{flex:none;min-width:72px;text-align:right;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--fg)}
+#pdfv .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* 휴대폰: 도구는 꼭 필요한 것만(쪽 이동은 아래 막대·스크롤) */
+@media (max-width:599px){
+  #pdfv .pv-nav,#pdfv .pv-fit,#pdfv .pv-z{display:none!important}
+  #pdfv .pv-grp{border:0}
+  #pdfv .pv-body{padding:10px 6px 20px}
+}
+@media (min-width:600px) and (max-width:759px){ #pdfv .pv-nav{display:none} }
+</style>
+</head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
 <style>
@@ -2043,23 +2200,23 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   ];
   const UPD_ICON='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="12" y="6" width="40" height="52" rx="6" fill="#fff" stroke="#111" stroke-width="4"/><path d="M20 20h24M20 30h24M20 40h12" stroke="#111" stroke-width="4" stroke-linecap="round"/><circle cx="46" cy="46" r="12" fill="#FDD000" stroke="#111" stroke-width="4"/><path d="M41 46l4 4 7-8" fill="none" stroke="#111" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>');
   function renderUpdates(panel,s){
-    panel.innerHTML=`
+    panel.innerHTML=secShell(s,`
       <div class="card upd">
         <div class="upd-h"><img src="${UPD_ICON}" alt=""><div><h2>${esc(s.title)}</h2><p>현재 <b>앱 ${APP_VER}</b> · 서버 ${SRV_VER}</p></div></div>
         <ol class="upd-list">${UPDATES.map((u,k)=>`<li class="${k===0?'new':''}"><div class="vh"><b>${esc(u.v)}</b>${u.d?`<span>${esc(u.d)}</span>`:''}${k===0?'<em>최신</em>':''}</div><ul>${u.t.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></li>`).join('')}</ol>
         <p class="upd-note">V28~V55의 날짜는 이 앱(github.io) 반영 기준입니다. V27 이전은 작업 기록·당시 화면을 바탕으로 정리했습니다.</p>
-      </div>`;
+      </div>`); secNavSync(panel);
   }
   { const u=SECTIONS.find(x=>x.slug==='updates'); if(u) u.icon=UPD_ICON; }
   { const g=SECTIONS.find(x=>x.slug==='signature'); if(g) g.icon='icons/icon-96.png'; }
   // SACHIL 시그니처(13번째 섹션) — 시그니처 안내 한 장(V67). 누르면 크게 보기
   const SIG_ALT='SACHIL47 시그니처 안내. 시그니처 컬러: White #FFFFFF(태극기의 바탕색으로 밝음·순수·평화를 사랑하는 민족성이며 대한민국을 상징), Incheon Ocean #244EA2(인천광역시의 바다 색이며, 인천광역시를 상징), Symbol Yellow #FDD000(소방청 공식 심벌의 시그니처 컬러로서 용맹한 소방관을 상징). 핵심 스타일: 빠른 필획, 우측 진행감, 둥근 획 끝, 단순한 인식성. 시그니처 컬러는 자랑스럽고 용감한 대한민국 인천 소방을 상징합니다. 시그니처 자산: ICON-001 47시그니처 아이콘, SIG-001 47 기본형, SIG-001B 47 볼드형, SIG-002 SACHIL 기본형, SIG-003 S, SIG-004 A, SIG-005 CH, SIG-006 IL, WM-001 SACHIL 워터마크, WM-002 SACHIL 박스형, WM-003 SACHIL:47 박스형, UI-001 Search, UI-002 Menu.';
   function renderSignature(panel,s){
-    panel.innerHTML=`
+    panel.innerHTML=secShell(s,`
       <div class="card sig-sheet">
         <button type="button" class="sig-img" id="sigImg" aria-label="${esc(s.title)} 크게 보기"><img src="img/signature.webp?v=172" alt="${esc(SIG_ALT)}" width="1055" height="1491" decoding="async"></button>
         <p class="sig-note">그림을 누르면 크게 볼 수 있어요.</p>
-      </div>`;
+      </div>`); secNavSync(panel);
     $('#sigImg').addEventListener('click',()=>openLightbox('img/signature.webp?v=172',s.title));
   }
   // 체크리스트 — 출동부터 최종보고까지 한 줄기. V173: 교수가 SACHIL방재실 → 체크리스트에서 고치면 서버(/api/checklist)를 거쳐 모든 기기에 적용(없으면 아래 기본 목록)
@@ -2189,7 +2346,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 
   // ---------- 메뉴 시트 (12개 섹션) ----------
   const sheetGrid=$('#sheetGrid');
-  const SHEET_SEP={sop:'현장 대응', signature:'SACHIL'};   // V154: 위(일정·평가·질의응답·법령) / 가운데(현장 자료) / 아래(시그니처·방재실·업데이트) 구분선
+  const SHEET_SEP={'ictc-schedule':'교육 · 법령', sop:'현장 대응', signature:'SACHIL'};   // V154: 위(일정·평가·질의응답·법령) / 가운데(현장 자료) / 아래(시그니처·방재실·업데이트) 구분선
   SECTIONS.forEach(s=>{
     if(SHEET_SEP[s.slug]){ const d=document.createElement('div'); d.className='sheet-sep'; d.setAttribute('role','separator'); d.innerHTML=`<span>${esc(SHEET_SEP[s.slug])}</span>`; sheetGrid.appendChild(d); }
     const g=document.createElement('a'); g.href='#'+s.slug; g.dataset.slug=s.slug;
@@ -2205,6 +2362,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function openSheet(){ if(sheet.classList.contains('open')) return; lastFocus=document.activeElement; sheet.classList.add('open'); sheetBack.classList.add('open'); sheet.setAttribute('aria-hidden','false'); appEl.inert=true; tabbarEl.inert=true; document.documentElement.classList.add('sheet-lock'); $('#menuBtn').setAttribute('aria-expanded','true'); setTimeout(()=>$('#sheetClose').focus(),60); }
   function closeSheet(){ if(!sheet.classList.contains('open')) return; sheet.classList.remove('open','full'); sheet.style.maxHeight=''; sheet.style.transform=''; $('#sheetGrip').setAttribute('aria-expanded','false'); sheetBack.classList.remove('open'); sheet.setAttribute('aria-hidden','true'); appEl.inert=false; tabbarEl.inert=false; document.documentElement.classList.remove('sheet-lock'); $('#menuBtn').setAttribute('aria-expanded','false'); syncTabbar(); if(lastFocus && lastFocus.focus) lastFocus.focus(); }
   sheet.addEventListener('keydown',e=>{ if(e.key!=='Tab') return; const f=[...sheet.querySelectorAll('a,button,[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null); if(!f.length) return; const first=f[0], last=f[f.length-1]; if(e.shiftKey&&document.activeElement===first){ e.preventDefault(); last.focus(); } else if(!e.shiftKey&&document.activeElement===last){ e.preventDefault(); first.focus(); } });
+  /* V198: 메뉴 칸 사이를 화살표 키로(위·아래·왼쪽·오른쪽 — 보이는 자리 기준), Home·End = 처음·끝 */
+  sheetGrid.addEventListener('keydown',e=>{ const k=e.key; if(!/^(Arrow(Up|Down|Left|Right)|Home|End)$/.test(k)) return; const cur=e.target.closest&&e.target.closest('#sheetGrid a'); if(!cur) return;
+    const all=[...sheetGrid.querySelectorAll('a')].filter(a=>a.offsetParent!==null); if(!all.length) return; let nx=null;
+    if(k==='Home') nx=all[0]; else if(k==='End') nx=all[all.length-1];
+    else { const r=cur.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2; let best=1e9;
+      all.forEach(a=>{ if(a===cur) return; const q=a.getBoundingClientRect(), x=q.left+q.width/2, y=q.top+q.height/2, dx=x-cx, dy=y-cy;
+        const ok=k==='ArrowDown'?dy>4:k==='ArrowUp'?dy<-4:k==='ArrowRight'?(dx>4&&Math.abs(dy)<r.height/2):(dx<-4&&Math.abs(dy)<r.height/2); if(!ok) return;
+        const sc=(k==='ArrowDown'||k==='ArrowUp')?Math.abs(dy)*1+Math.abs(dx)*2:Math.abs(dx)+Math.abs(dy)*3; if(sc<best){ best=sc; nx=a; } }); }
+    if(nx){ e.preventDefault(); nx.focus(); } });
   sheetBack.addEventListener('click',closeSheet); $('#sheetClose').addEventListener('click',closeSheet);
   // V184: 회색 바 끌기 — 위로 = 크게(화면 위까지), 아래로 = 원래 크기 → 한 번 더 아래로 = 닫기. 눌러도 크게/원래로 바뀜
   { const grip=$('#sheetGrip'); let d=null;
@@ -2708,7 +2874,21 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   async function loadLib(){ const r=await api('/api/lib'); if(r.ok&&r.j.lib){ SRV.lib=r.j.lib; SRV.libErr=false; syncSheetFoot(); return true; }
     if(!SRV.on){ try{ const x=await fetch('lib/index.json',{cache:'no-cache'}); if(x.ok){ const j=await x.json(); if(j&&j.lib){ SRV.lib=j.lib; SRV.libStatic=true; SRV.libErr=false; syncSheetFoot(); return true; } } }catch(_){ } }
     SRV.libErr=true; return false; }
-  const hasOwn=s=>s.slug==='law' || (s.slug==='faq'&&SRV.on);   // 파일이 없어도 내용이 있는 섹션(V90: '준비중' 표시 안 함)
+  const hasOwn=s=>s.slug==='law' || (s.slug==='faq'&&SRV.on);
+  /* V198: 섹션 화면 틀 — 넓은 화면(태블릿 가로·PC)은 왼쪽에 섹션 목록(사이드바), 아래에 이전·다음 섹션. 좁은 화면은 사이드바를 숨기고 본문만 */
+  function secNavHtml(cur){
+    let h='', open=false;
+    SECTIONS.filter(x=>!x.prof).forEach(x=>{ const lab=SHEET_SEP[x.slug]; if(lab){ h+=`${open?'</ul>':''}<p class="sx-nl">${esc(lab)}</p><ul>`; open=true; } else if(!open){ h+='<ul>'; open=true; }
+      const n=(SRV.lib&&!x.local)?(SRV.lib[x.slug]||[]).length:0;
+      h+=`<li><a href="#${x.slug}"${x.slug===cur?' aria-current="page"':''}><span class="ab" aria-hidden="true">${x.icon?`<img src="${x.icon}" alt="">`:esc(x.ab)}</span><span class="tt">${esc(x.title)}</span>${n?`<span class="n" aria-label="자료 ${n}개">${n}</span>`:''}</a></li>`; });
+    return `<nav class="sx-nav" aria-label="메뉴 섹션">${h}${open?'</ul>':''}</nav>`;
+  }
+  function secPager(cur){ const l=SECTIONS.filter(x=>!x.prof), i=l.findIndex(x=>x.slug===cur); if(i<0) return ''; const p=l[i-1], n=l[i+1];
+    return `<nav class="sx-pager" aria-label="이전·다음 섹션">${p?`<a class="prev" href="#${p.slug}"><small>‹ 이전</small><b>${esc(p.title)}</b></a>`:'<span></span>'}${n?`<a class="next" href="#${n.slug}"><small>다음 ›</small><b>${esc(n.title)}</b></a>`:'<span></span>'}</nav>`; }
+  function secShell(s,inner){ return `<div class="sx" data-sx="${esc(s.slug)}"><div class="sx-in">${secNavHtml(s.slug)}<div class="sx-main">${inner}${secPager(s.slug)}</div></div></div>`; }
+  function secNavSync(panel){ const nav=panel.querySelector('.sx-nav'), a=nav&&nav.querySelector('a[aria-current]'); if(!a||nav.scrollHeight<=nav.clientHeight) return; const t=a.offsetTop-nav.clientHeight/2+a.offsetHeight/2; nav.scrollTop=Math.max(0,t); }
+  function secHead(s,art,badge,meta){ return `<header class="sx-head">${art}<div class="sx-ht"><h2>${esc(s.title)}${badge?' '+badge:''}</h2><p>${esc(s.desc)}</p>${meta?`<p class="sx-meta">${meta}</p>`:''}</div></header>`; }
+  $('#panel').addEventListener('click',e=>{ const a=e.target.closest&&e.target.closest('.sx-nav a,.sx-pager a'); if(!a||e.ctrlKey||e.metaKey||e.shiftKey) return; if(a.getAttribute('href')==='#'+state.route){ e.preventDefault(); return; } setTimeout(()=>rootScrollTo(0),0); });   // 파일이 없어도 내용이 있는 섹션(V90: '준비중' 표시 안 함)
   function renderPrep(panel, s){
     if(s.slug==='updates'){ renderUpdates(panel,s); return; }
     if(s.slug==='bangjae'){ renderProf(panel); return; }   // 주소로 바로 열면 화면에(보통은 메뉴에서 떠 있는 창으로)
@@ -2717,19 +2897,16 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const docs=DOCS.filter(d=>d.sec===s.slug);
     const focus=state.focusDoc; state.focusDoc=null;
     const art = s.icon ? `<img class="big" src="${s.icon}" alt="">` : '';
-    panel.innerHTML=`
+    panel.innerHTML=secShell(s,`
       <div class="card prep">
-        ${art}
-        ${hasOwn(s)?'':'<span class="badge">준비중</span>'}
-        <h2>${esc(s.title)}</h2>
-        <p>${esc(s.desc)}</p>
+        ${secHead(s,art,hasOwn(s)?'':'<span class="badge">준비중</span>','')}
         ${s.slug==='law'?lawLinksHtml():''}
         ${docs.length?`<div class="docs"><h4>예정 문서 ${docs.length}</h4><ul>${docs.map(d=>`<li class="${d.title===focus?'hit':''}"><span>${esc(d.title)}</span><span class="tag">${esc(d.type)}</span></li>`).join('')}</ul></div>`:''}
         <div class="links">
           <a class="btn" href="#search">검색으로 돌아가기</a>
           <a class="btn ghost" href="#board">체크리스트 열기</a>
         </div>
-      </div>`;
+      </div>`); secNavSync(panel);
   }
 
   // ---------- 교수 로그인(V79): 관리자 코드로 들어와 메뉴 자료 올리기·지우기, 질의응답 답변 ----------
@@ -3153,7 +3330,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(a==='cancel'){ CT.edit=false; redraw(); return; }
       if(a==='auto'){ const r=await api('/api/admin/ai',{json:{action:'contacts',auto:true},tok:PROF.tok}); if(ta) ta.value=(r.j&&r.j.text)||''; toast(r.ok?'PDF에서 뽑은 목록을 불러왔습니다 — 고친 뒤 저장하세요':'불러오지 못했습니다'); return; }
       if(a==='save'){ b.disabled=true; const r=await api('/api/admin/ai',{json:{action:'contacts',text:ta?ta.value:''},tok:PROF.tok}); b.disabled=false; if(r.ok&&r.j&&r.j.ok!==false){ toast(r.j.msg||'저장했습니다'); CT.edit=false; await ctLoad(true); redraw(); } else toast((r.j&&r.j.error)||'저장하지 못했습니다(서버 업데이트가 필요할 수 있음)'); } }); }
-  function profLibBar(slug){ return isProf()&&SRV.on?`<div class="prof-up"><label class="btn primary"><input type="file" id="libUp" multiple hidden>자료 올리기</label><span class="pu-st" id="libUpSt" aria-live="polite"></span></div>`:''; }
+  function profLibBar(slug){ return isProf()&&SRV.on?`<div class="prof-up"><label class="btn primary"><input type="file" id="libUp" multiple hidden>자료 올리기</label><span class="pu-drop">또는 파일을 여기로 끌어다 놓기</span><span class="pu-st" id="libUpSt" aria-live="polite"></span></div>`:''; }
   async function profUpload(slug,files,done){
     const st=$('#libUpSt'); let ok=0;
     for(let i=0;i<files.length;i++){ const f=files[i]; if(st) st.textContent=`올리는 중 ${i+1}/${files.length} · ${f.name}`;
@@ -3199,34 +3376,37 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const art = s.icon ? `<img class="big" src="${s.icon}" alt="">` : '';
     const draw=()=>{
       const files=(SRV.lib&&SRV.lib[s.slug])||null;
-      panel.innerHTML=`
+      const last=Array.isArray(files)&&files.length?Math.max(...files.map(f=>f.mtime||0)):0;
+      panel.innerHTML=secShell(s,`
       <div class="card prep">
-        ${art}
-        ${Array.isArray(files)&&!files.length&&!SRV.libErr&&!hasOwn(s)?'<span class="badge">준비중</span>':''}
-        <h2>${esc(s.title)}</h2>
-        <p>${esc(s.desc)}</p>
+        ${secHead(s,art,Array.isArray(files)&&!files.length&&!SRV.libErr&&!hasOwn(s)?'<span class="badge">준비중</span>':'',Array.isArray(files)&&files.length?`자료 ${files.length}개${last?` · 최근 ${fmtDate(last)}`:''}`:'')}
         ${s.slug==='law'?lawLinksHtml():''}
+        ${profLibBar(s.slug)}
         <div class="lib" aria-live="polite">
           ${files===null?(SRV.libErr?`<p class="none">${AS.offline?`<img class="st-illo" src="${AS.offline}" alt="">`:''}자료 목록을 불러오지 못했습니다. 서버 연결을 확인하세요. <button type="button" class="btn ghost" id="libRetry">다시 시도</button></p>`:'<p class="none">자료를 불러오는 중…</p>')
-            : files.length?`<h4>자료 ${files.length}</h4>${files.map(f=>libRow(s.slug,f)).join('')}${SRV.libErr?'<p class="none"><b>서버 연결 끊김 — 마지막으로 받은 목록입니다</b> <button type="button" class="btn ghost" id="libRetry">다시 시도</button></p>':''}`
+            : files.length?`<h4>자료 ${files.length}</h4><div class="libgrid">${files.map(f=>libRow(s.slug,f)).join('')}</div>${SRV.libErr?'<p class="none"><b>서버 연결 끊김 — 마지막으로 받은 목록입니다</b> <button type="button" class="btn ghost" id="libRetry">다시 시도</button></p>':''}`
             : `<p class="none">${SRV.libErr&&AS.offline?`<img class="st-illo" src="${AS.offline}" alt="">`:''}${SRV.libErr?'서버 연결이 끊겨 자료 목록을 확인하지 못했습니다. <button type="button" class="btn ghost" id="libRetry">다시 시도</button>':'아직 올라온 자료가 없습니다.'}</p>`}
         </div>
         ${s.slug==='ersp'?ctHtml():''}
-        ${profLibBar(s.slug)}
         ${s.slug==='faq'?qnaHtml(qItems):''}
         <div class="links">
           <a class="btn" href="#search">검색으로 돌아가기</a>
           <a class="btn ghost" href="#board">체크리스트 열기</a>
         </div>
-      </div>`;
+      </div>`); secNavSync(panel);
       bindExtra();
     };
     let qItems=null;
     const bindExtra=()=>{
       if(s.slug==='ersp') ctBind(panel,()=>{ if(SRV.gen===gen) draw(); });
       const up=$('#libUp'); if(up) up.addEventListener('change',()=>{ const fs=[...up.files]; up.value=''; if(fs.length) profUpload(s.slug,fs,()=>{ if(SRV.gen===gen){ draw(); thumbsIn(panel); } }); });
+      { const pu=panel.querySelector('.prof-up'); if(pu){ let dep=0; const has=e=>e.dataTransfer&&[...(e.dataTransfer.types||[])].includes('Files');   /* V198: PC는 파일을 끌어다 놓아도 올라감(구글 드라이브처럼) */
+        pu.addEventListener('dragenter',e=>{ if(!has(e)) return; e.preventDefault(); dep++; pu.classList.add('drop'); });
+        pu.addEventListener('dragover',e=>{ if(has(e)) e.preventDefault(); });
+        pu.addEventListener('dragleave',()=>{ if(--dep<=0){ dep=0; pu.classList.remove('drop'); } });
+        pu.addEventListener('drop',e=>{ if(!has(e)) return; e.preventDefault(); dep=0; pu.classList.remove('drop'); const fs=[...(e.dataTransfer.files||[])]; if(fs.length) profUpload(s.slug,fs,()=>{ if(SRV.gen===gen){ draw(); thumbsIn(panel); } }); }); } }
       if(isProf()) panel.querySelectorAll('.lib .libfile').forEach(a=>{ const nm=decodeURIComponent((a.getAttribute('href')||'').split('/').pop().split('?')[0]); const del=document.createElement('button'); del.type='button'; del.className='btn ghost lib-del'; del.textContent='지우기';
-        a.after(del); del.addEventListener('click',()=>arm(del,'정말 지우기',async()=>{ const r=await api(`/api/lib/${s.slug}/${encodeURIComponent(nm)}`,{method:'DELETE',tok:PROF.tok}); if(r.ok){ if(SRV.lib) SRV.lib[s.slug]=r.j.files; draw(); thumbsIn(panel); toast('지웠습니다(서버 data\\trash에 보관)'); } else toast(r.j.error||'지우지 못했습니다'); })); });
+        const cell=document.createElement('div'); cell.className='libcell'; a.before(cell); cell.append(a,del); del.addEventListener('click',()=>arm(del,'정말 지우기',async()=>{ const r=await api(`/api/lib/${s.slug}/${encodeURIComponent(nm)}`,{method:'DELETE',tok:PROF.tok}); if(r.ok){ if(SRV.lib) SRV.lib[s.slug]=r.j.files; draw(); thumbsIn(panel); toast('지웠습니다(서버 data\\trash에 보관)'); } else toast(r.j.error||'지우지 못했습니다'); })); });
       const qf=$('#qnaForm'); if(qf) qf.addEventListener('submit',async e=>{ e.preventDefault(); const qv=$('#qnaQ').value.trim(); if(qv.length<2) return; const btn=qf.querySelector('button'); btn.disabled=true;
         const r=await api('/api/qna',{json:{q:qv,name:$('#qnaName').value.trim()}}); btn.disabled=false;
         if(r.ok){ qItems=r.j.items; toast('질문을 올렸습니다'); draw(); } else toast(r.j.error||'올리지 못했습니다'); });
@@ -3678,12 +3858,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   pv.innerHTML=`<div class="pv-bar">
       <button type="button" id="pvClose" aria-label="닫기">‹</button>
       <div class="pv-t"><b id="pvTitle"></b><small id="pvPage" aria-live="polite">불러오는 중…</small></div>
-      <button type="button" id="pvOut" aria-label="축소">−</button>
-      <button type="button" id="pvIn" aria-label="확대">+</button>
+      <span class="pv-grp pv-nav"><button type="button" id="pvPrev" aria-label="이전 쪽" disabled>↑</button><button type="button" id="pvNext" aria-label="다음 쪽" disabled>↓</button></span>
+      <span class="pv-grp"><button type="button" id="pvOut" aria-label="축소">−</button><button type="button" id="pvZ" class="pv-z" aria-label="100%로 되돌리기">100%</button><button type="button" id="pvIn" aria-label="확대">+</button></span>
+      <button type="button" id="pvFit" class="pv-fit" aria-pressed="false" title="한 쪽 전체 보기">쪽 맞춤</button>
       <a id="pvNew" href="#" target="_blank" rel="noopener" aria-label="새 탭에서 열기·내려받기">↗</a>
-    </div><div class="pv-body" id="pvBody" tabindex="-1"></div>`;
+    </div><div class="pv-body" id="pvBody" tabindex="-1"></div>
+    <div class="pv-foot" id="pvFoot" hidden><label class="pv-seek"><span class="sr">쪽 이동</span><input type="range" id="pvSeek" min="1" max="1" value="1" step="1"></label><output id="pvSeekN" for="pvSeek">1 / 1</output></div>`;
   document.body.appendChild(pv);
-  const PV={doc:null, task:null, gen:0, zoom:1, last:null, base:0, ratio:1.414, n:0, obs:null, live:[], pushed:false, loading:null};
+  const PV={doc:null, task:null, gen:0, zoom:1, last:null, base:0, ratio:1.414, n:0, obs:null, live:[], pushed:false, loading:null, fit:'width', cur:1};
   const ZOOMS=[0.75,1,1.25,1.5,2,2.5,3];
   const PDFJS=()=>(SRV.on&&!SRVBASE)?'/vendor/pdfjs/':'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
   function loadPdfJs(){
@@ -3702,10 +3884,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function pvLayout(){
     const body=pvBody(); if(!PV.doc||!body) return;
     const avail=Math.max(200, body.clientWidth-16);
-    PV.base=Math.min(avail, 900);
+    PV.base=PV.fit==='page'?Math.max(160,Math.min(avail, Math.floor((body.clientHeight-28)/PV.ratio))):Math.min(avail, 900);   /* V198: '쪽 맞춤' = 한 쪽이 화면 높이에 다 들어오게(태블릿 가로·PC) */
     const w=Math.round(PV.base*PV.zoom), h=Math.round(w*PV.ratio);
     body.querySelectorAll('.pv-page').forEach(el=>{ el.style.width=w+'px'; el.style.height=(el.dataset.r?Math.round(w*Number(el.dataset.r)):h)+'px'; });
     $('#pvOut').disabled=PV.zoom<=ZOOMS[0]; $('#pvIn').disabled=PV.zoom>=ZOOMS[ZOOMS.length-1];
+    $('#pvZ').textContent=Math.round(PV.zoom*100)+'%'; $('#pvZ').disabled=PV.zoom===1;
+    const fb=$('#pvFit'); fb.setAttribute('aria-pressed',String(PV.fit==='page')); fb.textContent=PV.fit==='page'?'폭 맞춤':'쪽 맞춤'; fb.title=PV.fit==='page'?'화면 폭에 맞추기':'한 쪽 전체 보기';
   }
   function pvUnrender(el){ const c=el.querySelector('canvas'); if(c){ c.width=0; c.height=0; c.remove(); } el.dataset.done=''; }
   async function pvRender(el){
@@ -3740,7 +3924,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const mid=body.scrollTop+body.clientHeight/3; let cur=1;
     for(const el of body.querySelectorAll('.pv-page')){ if(el.offsetTop<=mid) cur=Number(el.dataset.p); else break; }
     $('#pvPage').textContent=`${cur} / ${PV.n} 쪽 · ${Math.round(PV.zoom*100)}%`;
+    PV.cur=cur; $('#pvPrev').disabled=cur<=1; $('#pvNext').disabled=cur>=PV.n;
+    const sk=$('#pvSeek'); $('#pvFoot').hidden=PV.n<2; sk.max=String(PV.n); if(!PV.seeking) sk.value=String(cur); $('#pvSeekN').textContent=`${PV.seeking?sk.value:cur} / ${PV.n}`;
   }
+  /* V198: 쪽 이동(이전·다음 버튼·아래 막대·← → 키), 쪽 맞춤, 두 손가락 확대·축소 — 태블릿에서 책 읽듯 */
+  function pvGo(n){ const body=pvBody(); if(!PV.n) return; n=Math.max(1,Math.min(PV.n,n)); const el=body.querySelector(`.pv-page[data-p="${n}"]`); if(el){ body.scrollTop=Math.max(0,el.offsetTop-8); pvCurrent(); } }
+  function pvRelayout(keep){ PV.live.forEach(pvUnrender); PV.live=[]; pvLayout(); pvGo(keep); pvObserve(); pvCurrent(); }
   function pvZoom(dir){
     const i=ZOOMS.indexOf(PV.zoom), j=Math.max(0,Math.min(ZOOMS.length-1,i+dir)); if(j===i) return;
     const body=pvBody(), ratio=body.scrollTop/Math.max(1,body.scrollHeight);
@@ -3749,7 +3938,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   async function openPdf(url,name,page){
     PV.gen++; const gen=PV.gen;
-    PV.last=document.activeElement; PV.zoom=1; PV.n=0; PV.live=[];
+    PV.last=document.activeElement; PV.zoom=1; PV.n=0; PV.live=[]; PV.cur=1;
+    $('#pvFoot').hidden=true; $('#pvPrev').disabled=true; $('#pvNext').disabled=true; $('#pvZ').textContent='100%'; $('#pvZ').disabled=true;
     $('#pvTitle').textContent=String(name||'PDF').replace(/\.pdf$/i,'');
     $('#pvPage').textContent='불러오는 중…';
     const nw=$('#pvNew'); nw.href=url;
@@ -3831,6 +4021,18 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   $('#pvClose').addEventListener('click',()=>closePdf());
   $('#pvIn').addEventListener('click',()=>pvZoom(1));
   $('#pvOut').addEventListener('click',()=>pvZoom(-1));
+  $('#pvZ').addEventListener('click',()=>{ const i=ZOOMS.indexOf(PV.zoom); if(i>=0&&PV.zoom!==1) pvZoom(ZOOMS.indexOf(1)-i); });
+  $('#pvPrev').addEventListener('click',()=>pvGo(PV.cur-1));
+  $('#pvNext').addEventListener('click',()=>pvGo(PV.cur+1));
+  $('#pvFit').addEventListener('click',()=>{ if(!PV.doc) return; const c=PV.cur; PV.fit=PV.fit==='page'?'width':'page'; if(PV.fit==='page'&&PV.zoom!==1) PV.zoom=1; pvRelayout(c); });
+  { const sk=$('#pvSeek'); sk.addEventListener('input',()=>{ PV.seeking=true; $('#pvSeekN').textContent=`${sk.value} / ${PV.n}`; pvGo(Number(sk.value)); PV.seeking=false; }); }
+  pv.addEventListener('keydown',e=>{ if(e.isComposing||e.target.matches('input[type=range]')) return; if(e.key==='ArrowRight'){ e.preventDefault(); pvGo(PV.cur+1); } else if(e.key==='ArrowLeft'){ e.preventDefault(); pvGo(PV.cur-1); } });
+  { const body=pvBody(); let pz=null; const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+    body.addEventListener('touchstart',e=>{ if(e.touches.length===2&&PV.doc) pz={d:dist(e.touches)||1,s:1}; },{passive:true});
+    body.addEventListener('touchmove',e=>{ if(!pz||e.touches.length!==2) return; e.preventDefault(); pz.s=Math.max(.5,Math.min(3,dist(e.touches)/pz.d)); body.classList.add('pinch'); body.style.setProperty('--pz',pz.s.toFixed(3)); },{passive:false});
+    const pend=()=>{ if(!pz) return; const sc=pz.s; pz=null; body.classList.remove('pinch'); body.style.removeProperty('--pz'); if(Math.abs(sc-1)<.12) return;
+      const want=PV.zoom*sc; let j=0; ZOOMS.forEach((z,k)=>{ if(Math.abs(z-want)<Math.abs(ZOOMS[j]-want)) j=k; }); const i=ZOOMS.indexOf(PV.zoom); if(j!==i) pvZoom(j-i); };
+    body.addEventListener('touchend',e=>{ if(e.touches.length<2) pend(); }); body.addEventListener('touchcancel',pend); }
   pvBody().addEventListener('scroll',()=>{ if(!PV.pvT){ PV.pvT=requestAnimationFrame(()=>{ PV.pvT=0; pvCurrent(); }); } },{passive:true});
   window.addEventListener('resize',()=>{ if(pv.hidden) return; pvPlace(); if(PV.doc){ PV.live.forEach(pvUnrender); PV.live=[]; pvLayout(); pvObserve(); } });
   document.addEventListener('click',e=>{
