@@ -301,6 +301,139 @@ body[data-room="deb"] .srv-wait b{font-size:16px}
 @media (max-width:599px){ #report .rep-ph,#report .rep-busy{margin:0 8px 8px} }
 @media (prefers-reduced-motion:reduce){ #panel .il-pvc{transition:none} .rtov .rtc:hover{transform:none} }
 </style>
+<style id="v198-ai">
+/* V198(ai): A · AI assistant 화면 — 현장 지휘 도구다운 답 카드. #panel .botchat 안에서만 */
+#panel .botchat{--ai-col:800px;--ai-ink:#0B1B3F}
+/* 읽기 칸: 태블릿·PC는 가운데 한 줄 폭(약 50자)으로, 입력창도 같은 폭에 고정 */
+@media (min-width:700px){
+  #panel .botchat .convo{padding-left:max(16px,calc((100% - var(--ai-col)) / 2));padding-right:max(16px,calc((100% - var(--ai-col)) / 2))}
+  #panel .botchat > .card .quick{padding-left:max(16px,calc((100% - var(--ai-col)) / 2));padding-right:max(16px,calc((100% - var(--ai-col)) / 2))}
+  #panel .botchat > .composer,#panel .botchat > .xhint,#panel .botchat > .chat-foot{width:100%;max-width:calc(var(--ai-col) + 32px);justify-self:center;box-sizing:border-box}
+}
+/* AI 말: 프로필 + (이름·답 카드) / 시각은 카드 아래 — 폰에서도 카드가 화면 폭을 다 씀 */
+#panel .botchat .msg.bot{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:8px;row-gap:2px;align-items:start}
+#panel .botchat .msg.bot > .av{grid-row:1 / span 2;width:36px;height:36px;border-radius:10px}
+#panel .botchat .msg.bot > .col{grid-column:2;max-width:none;min-width:0}
+#panel .botchat .msg.bot > .t{grid-column:2;justify-self:start;padding:2px 2px 0}
+#panel .botchat .msg.bot .who{font-weight:700;color:var(--ai-ink);font-size:12px;letter-spacing:.02em}
+#panel .botchat .msg.bot .bub{align-self:flex-start;max-width:100%;box-sizing:border-box;background:var(--surface,#fff);border:1px solid #CBD5E1;border-radius:4px 12px 12px 12px;padding:12px 14px;font-size:15px;line-height:1.62;color:var(--fg);word-break:keep-all;overflow-wrap:anywhere;transition:transform .12s,box-shadow .12s}
+#panel .botchat .msg.me .bub{max-width:min(80%,560px);font-size:15px;line-height:1.5;word-break:keep-all;overflow-wrap:anywhere}
+#panel .botchat .bub p{margin:0}
+#panel .botchat .bub > p + p{margin-top:6px}
+/* 답 덩어리: 이름표는 작은 머리글(네모 표지), 내용은 그 아래 */
+#panel .botchat .bub .as{margin-top:12px}
+#panel .botchat .bub .as:first-child{margin-top:0}
+#panel .botchat .bub p.ab{margin:0}
+#panel .botchat .bub .lbl{display:flex;align-items:center;gap:6px;width:max-content;margin:0 0 4px;padding:0;border-radius:0;background:none;color:var(--ai-ink);font-size:12px;font-weight:800;letter-spacing:.04em;vertical-align:baseline}
+#panel .botchat .bub .lbl::before{content:"";width:8px;height:8px;background:currentColor;flex:none}
+/* 결론: 진한 남색 지시 상자 — 한눈에 */
+#panel .botchat .bub .as-k{background:var(--ai-ink);color:#fff;border-radius:8px;padding:10px 12px 11px;font-size:1.04em;font-weight:600;line-height:1.55}
+#panel .botchat .bub .as-k .lbl{color:var(--ember)}
+#panel .botchat .bub .as-k p.ali::before{background:var(--ember)}
+/* 현장에서: 노란 띠 + 네모 체크 표지 — 현장에서 할 일 */
+#panel .botchat .bub .as-f{border-left:4px solid var(--ember);padding:2px 0 2px 12px}
+#panel .botchat .bub .as-f p.ali::before{width:9px;height:9px;top:.52em;left:0;border-radius:2px;background:none;border:2px solid var(--ai-ink);box-sizing:border-box}
+#panel .botchat .bub .as-f p.ali{padding-left:18px}
+#panel .botchat .bub .as-c{border-left:4px solid #F79009;padding:2px 0 2px 12px}
+#panel .botchat .bub .as-g .lbl,#panel .botchat .bub .as-w .lbl{color:var(--muted)}
+#panel .botchat .bub .as-w{font-size:.92em;color:var(--muted)}
+#panel .botchat .bub p.ali{margin:4px 0 0;padding-left:14px;font-size:1em}
+#panel .botchat .bub p.ali::before{border-radius:1px;background:var(--ai-ink);top:.66em}
+/* 근거 번호: 노란 네모(눌러서 원문) */
+#panel .botchat .bub a.ref{border-radius:3px;min-width:20px;height:20px;font-weight:800;color:var(--ai-ink)}
+/* 근거 자료 목록 — 번호 · 자료명 · 쪽 */
+#panel .botchat .bub .src-h{margin-top:14px;padding-top:10px;border-top:1px solid #DDE3EA;font-size:12px;font-weight:800;letter-spacing:.04em;color:var(--ai-ink)}
+#panel .botchat .bub ol.src{gap:6px}
+#panel .botchat .bub ol.src li{background:#F3F6FA;border:1px solid #DDE3EA;border-radius:6px;padding:2px 10px}
+#panel .botchat .bub ol.src a{min-height:40px;align-items:center;color:var(--navy);font-size:13px}
+#panel .botchat .bub ol.src a b{display:inline-grid;place-items:center;min-width:26px;height:20px;border-radius:3px;background:var(--ember);color:var(--ai-ink);font-size:11px}
+#panel .botchat .bub ol.src q.snip{margin-bottom:6px}
+/* 답 정보 줄과 행동 줄(Search · 근거와 함께 다시 묻기 · 복사) */
+#panel .botchat .bub .mode{margin-top:12px;padding-top:9px;border-top:1px solid #DDE3EA;font-size:12px;line-height:1.5;color:#4A5563}
+#panel .botchat .bub .mode.warn{color:#8A4B00}
+#panel .botchat .ans-act{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;padding-top:0;border-top:0;font-size:13px}
+#panel .botchat .ans-act > span{display:none}
+#panel .botchat .ans-act .to-srch,#panel .botchat .ans-act .full-ask,#panel .botchat .ans-act .ai-copy,#panel .botchat .ai-retry{display:inline-flex;align-items:center;justify-content:center;min-height:40px;margin:0;padding:0 14px;border-radius:8px;font:inherit;font-size:13.5px;font-weight:700;line-height:1.2;text-decoration:none;cursor:pointer;white-space:nowrap}
+#panel .botchat .ans-act .to-srch{background:var(--ai-ink);border:1px solid var(--ai-ink);color:#fff}
+#panel .botchat .ans-act .to-srch:hover{background:var(--navy)}
+#panel .botchat .ans-act .full-ask{background:var(--surface,#fff);border:1px solid var(--ai-ink);color:var(--ai-ink)}
+#panel .botchat .ans-act .full-ask:hover{background:var(--navy-soft)}
+#panel .botchat .ans-act .ai-copy{margin-left:auto;background:none;border:1px solid transparent;color:#4A5563;padding:0 10px}
+#panel .botchat .ans-act .ai-copy:hover{border-color:#CBD5E1;color:var(--ai-ink)}
+/* 실패: 주황 띠 + '다시 묻기'는 남색 단추 */
+#panel .botchat .msg.bot .bub.ai-err{background:#FFF8E6;border-color:#F5C26B;border-left:4px solid #F79009}
+#panel .botchat .bub.ai-err p::before{content:none}
+#panel .botchat .bub.ai-err > p:first-child{font-weight:700;color:#5C3300}
+#panel .botchat .ai-retry{margin-top:10px;background:var(--ai-ink);border:1px solid var(--ai-ink);color:#fff;padding:0 18px}
+#panel .botchat .ai-retry:hover{background:var(--navy)}
+/* 기다림·글이 나오는 중 */
+#panel .botchat .msg.bot .bub.typing{display:inline-flex;align-items:center;gap:5px;padding:12px 14px;border-left:4px solid var(--ember)}
+#panel .botchat .bub.typing i{width:7px;height:7px;border-radius:1px;background:var(--ai-ink)}
+#panel .botchat .bub.typing::after{margin-left:8px;font-size:13px;font-weight:700;color:var(--ai-ink)}
+#panel .botchat .msg.bot .bub.streaming{border-left:4px solid var(--ember);white-space:pre-wrap}
+#panel .botchat .bub.streaming::after{color:var(--ai-ink)}
+/* 길게 누르는 중 */
+#panel .botchat .msg.bot .bub.lp,#panel .botchat .msg.me .bub.lp{transform:scale(.985);box-shadow:0 0 0 3px var(--navy-soft-2,#D5E0F3)}
+/* 추천 질문: '추천 질문' 머리글 + 네모진 칩 */
+#panel .botchat > .card .quick{gap:8px;align-items:center;padding-top:8px;padding-bottom:12px;border-top:1px solid rgba(11,27,63,.08)}
+#panel .botchat > .card .quick::before{content:"추천 질문";flex:none;font-size:12px;font-weight:800;letter-spacing:.04em;color:var(--ai-ink);padding-right:2px}
+#panel .botchat > .card .quick button{min-height:40px;padding:0 14px;border-radius:8px;border:1px solid #C3CEDB;background:var(--surface,#fff);color:var(--ai-ink);font-size:13.5px;font-weight:600;text-align:left;cursor:pointer}
+#panel .botchat > .card .quick button:hover{border-color:var(--ai-ink);background:var(--navy-soft)}
+@media (min-width:700px){ #panel .botchat > .card .quick::before{flex-basis:100%} }
+/* 태블릿 가로·노트북(낮은 화면): 대화 중에는 추천 질문을 한 줄로 — 답 칸을 더 넓게 */
+@media (min-width:700px) and (max-height:920px){
+  #panel .botchat > .card:has(.msg[data-mi]) .quick{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;padding-bottom:10px}
+  #panel .botchat > .card:has(.msg[data-mi]) .quick::before{flex-basis:auto}
+  #panel .botchat > .card:has(.msg[data-mi]) .quick button{flex:none;white-space:nowrap}
+}
+/* 처음(대화 없음): 추천 질문을 세로 목록으로 — 한 손으로 바로 누르기 */
+#panel .botchat > .card:not(:has(.msg[data-mi])) .quick{flex-direction:column;flex-wrap:nowrap;align-items:stretch;overflow:visible;gap:6px}
+#panel .botchat > .card:not(:has(.msg[data-mi])) .quick::before{flex-basis:auto;padding:0 0 2px}
+#panel .botchat > .card:not(:has(.msg[data-mi])) .quick button{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:none;min-height:var(--tap,44px);white-space:normal;line-height:1.35;padding:8px 14px}
+#panel .botchat > .card:not(:has(.msg[data-mi])) .quick button::after{content:"→";flex:none;color:var(--navy);font-weight:700}
+/* 키보드 포커스 */
+#panel .botchat button:focus-visible,#panel .botchat a:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
+#panel .botchat > .card .quick button:focus-visible{outline-offset:1px}
+/* 터치(폰·갤럭시탭): 누르는 칸 44px */
+@media (pointer:coarse){
+  #panel .botchat .ans-act .to-srch,#panel .botchat .ans-act .full-ask,#panel .botchat .ans-act .ai-copy,#panel .botchat .ai-retry,#panel .botchat > .card .quick button{min-height:var(--tap,44px)}
+  #panel .botchat .bub ol.src a{min-height:44px}
+}
+/* 폰: 프로필 작게, 카드 여백 줄여 글 칸 넓게 */
+@media (max-width:599px){
+  #panel .botchat .convo{padding-left:10px;padding-right:10px}
+  #panel .botchat .msg.bot{column-gap:6px}
+  #panel .botchat .msg.bot > .av{width:30px;height:30px;border-radius:9px}
+  #panel .botchat .msg.bot .bub{padding:11px 12px;font-size:15px}
+  #panel .botchat .msg.me .bub{max-width:84%}
+  #panel .botchat .ans-act .to-srch,#panel .botchat .ans-act .full-ask{flex:1 1 auto}
+  #panel .botchat .ans-act .ai-copy{margin-left:0}
+}
+@media (max-width:380px){
+  #panel .botchat .msg.bot > .av{width:26px;height:26px;border-radius:8px}
+  #panel .botchat .msg.bot .bub{padding:10px 11px;font-size:14.5px}
+  #panel .botchat .bub .as-k{padding:9px 10px 10px}
+}
+/* 태블릿·PC: 글자 조금 크게 */
+@media (min-width:700px){
+  #panel .botchat .msg.bot .bub{padding:14px 18px;font-size:15.5px}
+  #panel .botchat .msg.bot > .av{width:40px;height:40px;border-radius:12px}
+}
+/* 입장코드 화면: 남색 머리띠 · 큰 입력칸 · 오류는 빨간 띠 */
+#panel .ai-gate{border-top:4px solid #0B1B3F;border-radius:12px}
+#panel .ai-gate .eyebrow{color:#0B1B3F;font-weight:800;letter-spacing:.04em;text-transform:none}
+#panel .ai-gate .gate-h{font-size:19px;color:#0B1B3F}
+#panel .ai-gate input{min-height:48px;font-size:18px;letter-spacing:.2em}
+#panel .ai-gate .note.err{margin:0;padding:8px 12px;border-left:4px solid #D92D20;background:#FEF3F2;color:#B42318;font-weight:700;border-radius:0 6px 6px 0}
+#panel .ai-gate .acts .btn{min-height:var(--tap,44px)}
+#panel .ai-gate .acts .btn.primary{background:#0B1B3F;border-color:#0B1B3F;color:#fff}
+@media (min-width:700px){ #panel .dbwrap:has(> .ai-gate){padding-top:6vh} #panel .ai-gate{max-width:520px;margin-inline:auto;padding:24px 28px} }
+@media (prefers-reduced-motion:reduce){
+  #panel .botchat .msg.bot .bub,#panel .botchat .msg.me .bub{transition:none}
+  #panel .botchat .bub.lp{transform:none}
+  #panel .botchat .bub.streaming::after,#panel .botchat .bub.typing i{animation:none}
+}
+</style>
 </head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
@@ -4961,12 +5094,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function botTextHtml(m){
     const ref=l=>l.replace(/\[근거 부족\]/g,'<span class="nb">근거 부족</span>').replace(/\[(\d{1,2})\]/g,(x,n)=>{ const sc=m.src&&m.src[Number(n)-1]; return sc?`<a class="ref" href="${esc(srcHref(sc))}" target="_blank" rel="noopener"${srcPdf(sc)} aria-label="근거 ${n}: ${esc(pdfName(sc.name))} ${srcPg(sc)}">${n}</a>`:x; });
     // V98 답 형식: 결론 → 설명 → 현장에서 → 근거(- 줄) → 근거 부족. AI가 다른 순서로 써도(이전 대화를 따라 하는 경우 등) 여기서 다시 줄 세운다
-    return orderAns(esc(deGlyph(m.text)).split('\n').filter(l=>l.trim())).map(l=>{
+    /* V198(ai): 이름표마다 한 덩어리(<div class="as as-…">)로 묶어 결론·현장에서를 눈에 띄게. 내용 없는 이름표(빠른 답 끝의 '근거' 등)는 숨김 */
+    const ls=orderAns(esc(deGlyph(m.text)).split('\n').filter(l=>l.trim())), SK={'결론':'k','설명':'x','현장에서':'f','확인할 점':'c','근거':'g','근거 부족':'w'};
+    let out='', open=false;
+    ls.forEach((l,i)=>{
       const lb=ansLb(l);
-      if(lb) return `<p class="ab ab-${lb[1]==='결론'?'k':lb[1]==='근거 부족'?'w':lb[1]==='근거'?'g':'x'}"><b class="lbl">${lb[1]}</b>${lb[2]?' '+ref(lb[2]):''}</p>`;
+      if(lb){ if(open){ out+='</div>'; open=false; } const nx=ls[i+1]; if(!lb[2]&&(!nx||ansLb(nx))) return;
+        out+=`<div class="as as-${SK[lb[1]]||'x'}"><p class="ab ab-${lb[1]==='결론'?'k':lb[1]==='근거 부족'?'w':lb[1]==='근거'?'g':'x'}"><b class="lbl">${lb[1]}</b>${lb[2]?' '+ref(lb[2]):''}</p>`; open=true; return; }
       const li=l.match(/^\s*[-•·]\s+(.*)$/);
-      return li?`<p class="ali">${ref(li[1])}</p>`:`<p>${ref(l)}</p>`;
-    }).join('');
+      out+=li?`<p class="ali">${ref(li[1])}</p>`:`<p>${ref(l)}</p>`;
+    });
+    return out+(open?'</div>':'');
   }
   function botSrcHtml(m){
     if(!m.src||!m.src.length) return '';
@@ -5307,7 +5445,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const setAiCode=v=>{ try{ if(v) localStorage.setItem(AICODE_KEY,v); else localStorage.removeItem(AICODE_KEY); }catch(_){ } };
   function aiGate(panel,room){
     panel.innerHTML=`<div class="dbwrap"><form class="card create ai-gate" id="aiGate" autocomplete="off">
-        <span class="eyebrow">AI 도우미</span>
+        <span class="eyebrow">A · AI assistant</span>
         <h2 class="gate-h">입장코드를 넣어 주세요</h2>
         <p class="note">교육 담당 교수에게 받은 코드입니다. 이 기기에서 한 번 맞히면 다음부터는 묻지 않습니다.</p>
         <div class="row"><label for="aiCodeIn">입장코드</label><input id="aiCodeIn" type="password" inputmode="numeric" maxlength="20" required enterkeyhint="go" autocomplete="off"></div>
@@ -5334,8 +5472,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!aiCode()&&SRV.aiGate){ aiGate(panel,room); return; }
     const pc0=panel.querySelector('#convo'), keepY=pc0&&pc0._stick===false?pc0.scrollTop:null;   // V192: 위로 올려 보던 중이면 답이 끝나도 그 자리 그대로   // V124: AI 도우미 공개 — 서버가 입장코드를 요구할 때만(403 need_code) 코드 화면
     const toSrch=(m,i)=>{ const u=chat.msgs[i-1]; if(!(u&&u.who==='me'&&u.text)) return '';
-      if(m.fast||m.mode==='fast') return `<div class="fast-src"><span>근거·원문은 <b>Search</b>에서 확인하세요</span><button type="button" class="btn ghost sm to-srch" data-srch="${esc(srchQ(u.text))}">Search에서 근거 찾기 →</button><button type="button" class="full-ask" data-full="${i}">근거와 함께 다시 묻기(느림)</button></div>`;   // V189
-      return (m.mode==='ai'||m.mode==='extract'||m.mode==='general') ? `<button type="button" class="to-srch" data-srch="${esc(u.text)}">Search에서 원문 더 찾기 →</button>` : ''; };
+      const cp='<button type="button" class="ai-copy" data-copy aria-label="이 답 복사">복사</button>';   /* V198(ai): 답 아래 복사(길게 누르기·오른쪽 클릭 메뉴와 같은 복사) */
+      if(m.fast||m.mode==='fast') return `<div class="fast-src ans-act"><span>근거·원문은 <b>Search</b>에서 확인하세요</span><button type="button" class="btn ghost sm to-srch" data-srch="${esc(srchQ(u.text))}">Search에서 근거 찾기 →</button><button type="button" class="full-ask" data-full="${i}">근거와 함께 다시 묻기(느림)</button>${cp}</div>`;   // V189
+      return (m.mode==='ai'||m.mode==='extract'||m.mode==='general') ? `<div class="ans-act"><button type="button" class="to-srch" data-srch="${esc(u.text)}">Search에서 원문 더 찾기 →</button>${cp}</div>` : ''; };
     const srchQ=t=>{ const k=String(t).replace(/[?？!.]+$/,'').replace(/\s*(은|는|이|가|을|를|에서|에|의|와|과|도|좀|요)(?=\s|$)/g,' ').replace(/(무엇인가요|뭔가요|어떻게 하나요|어떻게 해야 하나요|알려줘|알려 주세요|설명해 ?줘|인가요|인지|하나요|되나요|할까요|나요)$/,'').replace(/\s+/g,' ').trim(); return k.length>=2?k.slice(0,60):String(t).slice(0,60); };   /* 질문 → 검색 낱말(조사·물음 끝 빼기) */
     const msgsHtml = chat.msgs.length ? chat.msgs.map((m,i)=> m.who==='me' ? msgMeHtml(m).replace('<div class="msg me"',`<div class="msg me" data-mi="${i}"`) : `
       <div class="msg bot" data-mi="${i}">${avHtml()}
@@ -5395,14 +5534,18 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     // V191: AI 도우미 말풍선도 길게 누르면(PC는 오른쪽 클릭) 복사 · 선택 복사 · 공유
     { const cv=panel.querySelector('#convo'); let lp=null; const txtOf=b=>{ const w=b.closest('[data-mi]'), m=w&&chat.msgs[+w.dataset.mi]; return m?String(m.text||''):''; };
       if(cv){ cv.addEventListener('pointerdown',e=>{ const b=e.target.closest('.msg[data-mi] .bub'); if(!b||e.button>0||e.target.closest('a,button,input')) return; clearTimeout(lp&&lp.t);
-          lp={x:e.clientX,y:e.clientY,t:setTimeout(()=>{ lp=null; try{ navigator.vibrate&&navigator.vibrate(15); }catch(_){ } const t=txtOf(b); if(t) textActs(t); },480)}; });
-        const cancel=e=>{ if(!lp) return; if(e&&e.type==='pointermove'&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)<10) return; clearTimeout(lp.t); lp=null; };
+          b.classList.add('lp');   /* V198(ai): 누르고 있는 말풍선 표시 */
+          lp={x:e.clientX,y:e.clientY,b,t:setTimeout(()=>{ b.classList.remove('lp'); lp=null; try{ navigator.vibrate&&navigator.vibrate(15); }catch(_){ } const t=txtOf(b); if(t) textActs(t); },480)}; });
+        const cancel=e=>{ if(!lp) return; if(e&&e.type==='pointermove'&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)<10) return; clearTimeout(lp.t); lp.b.classList.remove('lp'); lp=null; };
+        cv.addEventListener('click',e=>{ const c=e.target.closest('[data-copy]'); if(!c) return; const t=txtOf(c); if(t) copyPlain(t); });
         ['pointermove','pointerup','pointercancel'].forEach(t=>cv.addEventListener(t,cancel,{passive:true})); cv.addEventListener('scroll',()=>cancel(),{passive:true});
         cv.addEventListener('contextmenu',e=>{ const b=e.target.closest('.msg[data-mi] .bub'); if(!b) return; const t=txtOf(b); if(!t) return; e.preventDefault(); cancel(); textActs(t, matchMedia('(hover:hover) and (pointer:fine)').matches?{x:e.clientX,y:e.clientY}:null); }); } }
     panel.querySelectorAll('[data-full]').forEach(b=>b.addEventListener('click',()=>{ const u=chat.msgs[+b.dataset.full-1]; if(chat.typing||!u||u.who!=='me') return; send(u.text,[],true); }));   // V189: 근거까지 필요할 때만
     { const rb=panel.querySelector('[data-retry]'); if(rb) rb.addEventListener('click',()=>{ const i=aiErrAt, u=chat.msgs[i-1]; if(chat.typing||!u||u.who!=='me') return; const t=u.text; chat.msgs.splice(i-1,2); aiErrAt=-1; csave(); send(t,[]); }); }   /* V181: 실패한 질문을 한 번에 다시 */
     { const qb=$('#quick');
       qb.addEventListener('click',e=>{ const b=e.target.closest('button[data-q]'); if(b) send(b.dataset.q,[]); });
+      /* V198(ai): 추천 질문 줄 높이가 바뀌면(글꼴이 늦게 옴·질문이 바뀜·화면 돌림) 대화 칸을 다시 맞춰 입력창이 바닥에 붙어 있게 */
+      if(window.ResizeObserver){ let qh=-1; const ro=new ResizeObserver(()=>{ if(!qb.isConnected){ ro.disconnect(); return; } const h=qb.offsetHeight; if(h===qh) return; const first=qh<0; qh=h; if(!first&&window.__fitConvo) window.__fitConvo(); }); ro.observe(qb); }
       // 3분마다 새 질문으로(보고 있는 중·입력 중·누르려는 중·화면 숨김·움직임 줄이기 설정이면 건너뜀)
       clearInterval(quickT);
       quickT=setInterval(()=>{
