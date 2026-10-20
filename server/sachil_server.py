@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '11.3'
-APP_VERSION = 'V187'
+VERSION = '11.4'
+APP_VERSION = 'V188'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -1267,7 +1267,10 @@ class H(BaseHTTPRequestHandler):
 
     # --- 현장 지도(V106): 방마다 화재대상·현장지휘소·방면·차량대기소 하나씩. 방 참여자 모두가 같은 지도를 본다
     MAP_KINDS = ('fire', 'fire2', 'fire3', 'fire4', 'fire5', 'fire6', 'fire7', 'fire8', 'fire9', 'icp', 'acp', 'emt', 'ems',
-                 'sector', 'staging', 'secA', 'secB', 'secC', 'secD', 'secE', 'secF')   # V108: 방면 A~F · V111: 화재 여러 곳 · V133: 화재 9곳, 유관기관CP, 응급의료소(임시·현장)
+                 'sector', 'staging', 'secA', 'secB', 'secC', 'secD', 'secE', 'secF')
+    # V188: 현장지휘소·유관기관CP·응급의료소·차량대기소도 여러 곳(각 9곳: icp·icp2…icp9), 방면은 3벌(secA·secA2·secA3 …)
+    MAP_KINDS = MAP_KINDS + tuple(f'{b}{n}' for b in ('icp', 'acp', 'emt', 'ems', 'staging') for n in range(2, 10)) \
+        + tuple(f'sec{l}{n}' for n in (2, 3) for l in 'ABCDEF')   # V108: 방면 A~F · V111: 화재 여러 곳 · V133: 화재 9곳, 유관기관CP, 응급의료소(임시·현장)
 
     def map_get(self, rid):
         if not q('SELECT id FROM rooms WHERE id=?', (rid,), one=True):
