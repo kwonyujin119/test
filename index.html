@@ -679,6 +679,19 @@ body:not(.nosearch) #panel .card.empty.srch-none{padding:20px 16px;margin-bottom
 .bub.only-att{padding:6px;background:transparent;border-color:transparent}
 .bub.only-att .atts{margin-top:0}
 .msg.me .bub.only-att{background:transparent;border-color:transparent}
+/* V187: 보내는 중 말풍선 */
+.msg.me.sending .bub{background:var(--surface);border:1.5px dashed var(--ember);color:var(--fg);min-width:200px;max-width:min(78%,300px)}
+.msg.sending .snd-th{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:4px;margin-bottom:6px}
+.msg.sending .snd-th span{position:relative;display:block;aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--surface-2)}
+.msg.sending .snd-th img{width:100%;height:100%;object-fit:cover;opacity:.6;filter:saturate(.7)}
+.msg.sending .snd-th b{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.45);color:#fff;font-size:15px}
+.msg.sending .snd-th .pdf{aspect-ratio:auto;padding:8px;font-size:12px;font-weight:700}
+.msg.sending .snd-bar{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden;margin:6px 0 4px}
+.msg.sending .snd-bar i{display:block;height:100%;background:var(--ember);border-radius:3px;transition:width .2s}
+.msg.sending .snd-t{display:flex;align-items:center;gap:6px;margin:0;font-size:12.5px;font-weight:700;color:var(--fg)}
+.msg.sending .snd-t .spin{width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--navy);border-radius:50%;animation:sndSpin .8s linear infinite;flex:none}
+@keyframes sndSpin{to{transform:rotate(360deg)}}
+.msg.sending.failed .bub{border-color:#D92D20;border-style:solid}.msg.sending.failed .snd-bar{display:none}.msg.sending.failed .snd-t{color:#B42318}
 .att-img{display:block;border:0;padding:0;background:transparent;cursor:zoom-in;border-radius:12px;overflow:hidden;max-width:100%}
 .att-img.srv{min-height:64px;min-width:64px;background:var(--navy-soft)}
 .att-img img{display:block;width:auto;max-width:min(100%,160px);max-height:160px;height:auto;border-radius:12px;background:var(--navy-soft)}   /* 채팅 속 사진은 작게(누르면 크게) */
@@ -951,7 +964,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v186</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v187</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1817,8 +1830,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V186', SRV_VER='11.2';
+  const APP_VER='V187', SRV_VER='11.3';
   const UPDATES=[
+    {v:'V187', d:'2026-10-20', t:['47망·디브리핑룸: 사진·파일을 보내는 동안 대화 맨 아래에 ‘보내는 중’ 말풍선 — 사진 미리보기·진행 막대·몇 %·몇 번째 장','다 올라가면 실제 글로 바뀌고, 실패하면 빨간 말풍선으로 이유를 보여 주고 사진은 입력창에 되돌림']},
     {v:'V186', d:'2026-10-20', t:['47망·디브리핑룸을 누르면 ‘불러오는 중’ 없이 바로 열림 — 대화명을 이 기기에 기억하고 서버 확인은 뒤에서','앱을 막 열었을 때도 자료 목록을 기다리지 않고 대화방부터 열림','글을 보내고 바로 나가도 다음에 들어오면 마지막 대화가 바로 보임']},
     {v:'V185', d:'2026-10-20', t:['사진 보내기: 미리보기(편집) 화면에서 ←(또는 휴대폰 뒤로)를 누르면 닫히지 않고 바로 앞 사진 고르기 화면으로 — 고른 사진·번호는 그대로','미리보기에서 고르기를 풀면 앞 화면 전송 수에도 반영']},
     {v:'V184', d:'2026-10-20', t:['Search: 다른 화면에 갔다 와도 마지막 검색 결과·보던 자리·펼친 결과가 그대로(지우기는 ✕)','Search: 결과를 보는 동안 검색창이 위에 고정 — 누르면 전체 선택돼 바로 새 검색','Search: 최근 검색(이 기기에만, 하나씩·모두 지우기), 결과 묶음 바로가기 칩, 늦거나 실패하면 ‘다시 시도’','Search: 돌아올 때 같은 조회를 다시 하지 않아 빠르고 공공데이터 한도도 아낌','메뉴: 위 회색 바를 위로 끌면(또는 누르면) 화면 위까지 펼쳐 모든 메뉴가 한 화면에, 아래로 끌면 원래 크기→닫기','메뉴: PC는 3열, 가로 휴대폰은 4열로 모든 메뉴가 한 화면에']},
@@ -5064,6 +5078,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       return {ok:r.ok, status:r.status, j:j||{}};
     }catch(e){ return {ok:false, status:0, aborted:e&&e.name==='AbortError', j:{error:'서버에 연결할 수 없습니다'}}; }
   }
+  // V187: 파일 올리기 — 진행률(%)을 알 수 있게 XHR로(api()와 같은 머리글·응답 모양)
+  function apiUp(path, blob, headers, onProg){ return new Promise(ok=>{ const x=new XMLHttpRequest();
+    x.open('POST',SURL(path)); x.withCredentials=false; x.setRequestHeader('X-SACHIL','1'); if(SRVTOK) x.setRequestHeader('Authorization','Bearer '+SRVTOK);
+    Object.entries(headers||{}).forEach(([k,v])=>x.setRequestHeader(k,v));
+    if(x.upload&&onProg) x.upload.onprogress=e=>{ if(e.lengthComputable) onProg(e.loaded,e.total); };
+    x.onload=()=>{ let j={}; try{ j=JSON.parse(x.responseText||'{}'); }catch(_){ } if(x.status===401) SRV.me=null; ok({ok:x.status>=200&&x.status<300, status:x.status, j:j||{}}); };
+    x.onerror=x.ontimeout=()=>ok({ok:false,status:0,j:{error:'서버에 연결할 수 없습니다'}}); x.timeout=180000; x.send(blob); }); }
   const hm=ts=>{ if(!Number.isFinite(ts)) return ''; const d=new Date(ts*1000), h=d.getHours(); return `${h<12?'오전':'오후'} ${(h%12)||12}:${pad(d.getMinutes())}`; };   // 카카오톡처럼 '오후 3:05'(날짜는 날짜 줄로)
   const srvFoot=()=>`대화명 <b>${esc(SRV.me?SRV.me.name:'')}</b>${SRV.me&&SRV.me.role==='admin'?' · 관리자':''} · ${SRV.trim?'오래된 대화는 매주 정리, 최근 대화는 유지':SRV.retention+'일 뒤 자동 삭제'}`;
   function toChat(){ go(ROOMS_R.includes(state.route)?state.route:'chat'); }   // 지금 있는 방(47망·디브리핑룸)을 다시 그림   // 같은 주소면 hashchange가 없으므로 직접 다시 그림
@@ -5847,21 +5868,33 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const i=$('#chatText'); if(i) i.focus();
     }
     let sendQ=Promise.resolve();
-    const sendOne=async(v,att)=>{
-      const ids=[];
+    // V187: 사진·파일을 보내는 동안 대화 맨 아래에 '보내는 중' 말풍선(미리보기·진행률) — 끝나면 실제 글로 바뀌고, 실패하면 이유를 보여 준다
+    const sendUi=(v,att)=>{ const c=$('#convo'); if(!c||!att.length) return null;
+      const imgs=att.filter(a=>a.kind==='image'&&a.data), n=att.length, el=document.createElement('div'); el.className='msg me sending'; el.setAttribute('role','status');
+      el.innerHTML=`<div class="bub"><div class="snd-th">${imgs.slice(0,4).map((a,i)=>`<span><img src="${esc(a.data)}" alt="">${i===3&&n>4?`<b>+${n-4}</b>`:''}</span>`).join('')}${att.filter(a=>!(a.kind==='image'&&a.data)).slice(0,2).map(a=>`<span class="pdf">${esc(trunc(a.name,14))}</span>`).join('')}</div>${v?`<p>${esc(trunc(v,80))}</p>`:''}<div class="snd-bar"><i style="width:0%"></i></div><p class="snd-t"><span class="spin" aria-hidden="true"></span><span class="tx">보낼 준비 중…</span></p></div>`;
+      c.appendChild(el); requestAnimationFrame(toEnd);
+      const tx=el.querySelector('.tx'), bar=el.querySelector('.snd-bar i');
+      return { set(t,p){ tx.textContent=t; if(p!=null) bar.style.width=Math.max(2,Math.min(100,p))+'%'; },
+        done(){ el.remove(); },
+        fail(t){ el.classList.add('failed'); el.querySelector('.snd-t').innerHTML=`<span aria-hidden="true">⚠</span><span>${esc(t)} — 입력창에 되돌렸습니다. 다시 보내 주세요</span>`; setTimeout(()=>el.remove(),6000); } }; };
+    const sendOne=async(v,att,ui)=>{
+      const ids=[], n=att.length, kindTxt=att.every(a=>a.kind==='image')?'사진':'파일';
+      const sizes=att.map(a=>(a._file&&a._file.size)||a.size||1), total=sizes.reduce((x,y)=>x+y,0)||1; let doneB=0;
       for(let i=0;i<att.length;i++){
         const a=att[i];
-        if(a._fid){ ids.push(a._fid); continue; }
+        if(a._fid){ ids.push(a._fid); doneB+=sizes[i]; continue; }
         if(SRV.gen!==gen) return;
-        stat(`파일 올리는 중 ${i+1}/${att.length}…`);
+        stat(`${kindTxt} 올리는 중 ${i+1}/${n}…`); if(ui) ui.set(`${kindTxt} 보내는 중${n>1?` ${i+1}/${n}`:''} · ${Math.round(doneB/total*100)}%`, doneB/total*100);
         let blob=a._file||null;
         if(!blob&&a.data){ try{ blob=await (await fetch(a.data)).blob(); }catch(_){ } }
         if(!blob){ if(SRV.gen===gen) stat(`${trunc(a.name,20)}: 원본이 없어 보내지 못했습니다 (다시 첨부하세요)`); continue; }
-        const r=await api(`/api/rooms/${rid}/upload`,{body:blob, headers:{'Content-Type':blob.type||'application/octet-stream','X-Filename':encodeURIComponent(a.name)}});
-        if(!r.ok){ fail('파일 전송 실패: '+(r.j.error||'연결 오류'), v, att, i, r.status); return; }
-        Object.defineProperty(a,'_fid',{value:r.j.file.id, configurable:true}); ids.push(a._fid);
+        const r=await apiUp(`/api/rooms/${rid}/upload`, blob, {'Content-Type':blob.type||'application/octet-stream','X-Filename':encodeURIComponent(a.name)},
+          (l,t)=>{ if(!ui) return; const pc=(doneB+l/(t||1)*sizes[i])/total*100; ui.set(`${kindTxt} 보내는 중${n>1?` ${i+1}/${n}`:''} · ${Math.round(pc)}%`, pc); });
+        if(!r.ok){ if(ui) ui.fail(`${kindTxt} 전송 실패: ${r.j.error||'연결 오류'}`); fail(`${kindTxt} 전송 실패: `+(r.j.error||'연결 오류'), v, att, i, r.status); return; }
+        Object.defineProperty(a,'_fid',{value:r.j.file.id, configurable:true}); ids.push(a._fid); doneB+=sizes[i];
       }
-      if(!v&&!ids.length){ if(SRV.gen===gen) stat(''); return; }
+      if(ui) ui.set('거의 다 됐습니다…',100);
+      if(!v&&!ids.length){ if(ui) ui.done(); if(SRV.gen===gen) stat(''); return; }
       const reply=SRV.replyTo?SRV.replyTo.id:0;
       // 묶어 보내기(기본): 사진 여러 장을 한 말풍선으로. 끄면 한 장씩 따로 보내고 글은 마지막에
       const parts=(!bundlePref && ids.length>1) ? ids.map(id=>({text:'',files:[id]})).concat(v?[{text:v,files:[]}]:[]) : [{text:v,files:ids}];
@@ -5869,14 +5902,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         const body=Object.assign({},parts[k]); if(reply&&k===0) body.reply=reply;
         if(parts.length>1) stat(`보내는 중 ${k+1}/${parts.length}…`);
         const r=await api(`/api/rooms/${rid}/messages`,{json:body});
-        if(!r.ok){ fail('전송 실패: '+(r.j.error||'연결 오류'), v, att.slice(Math.min(k,att.length)), 0, r.status); return; }
+        if(!r.ok){ if(ui) ui.fail('전송 실패: '+(r.j.error||'연결 오류')); fail('전송 실패: '+(r.j.error||'연결 오류'), v, att.slice(Math.min(k,att.length)), 0, r.status); return; }
         if(SRV.gen!==gen) return;
+        if(ui&&k===parts.length-1) ui.done();
         append([r.j.message],{force:true}); applyState(r.j);
       }
       stat(''); setReply(null);
       if(window.innerWidth>=600){ const i=$('#chatText'); if(i) i.focus(); }
     };
-    bindComposer((v,att)=>{ sendQ=sendQ.then(()=>sendOne(v,att)).catch(()=>{}); });   // 빠르게 여러 번 보내도 차례대로
+    bindComposer((v,att)=>{ const ui=sendUi(v,att); sendQ=sendQ.then(()=>sendOne(v,att,ui)).catch(()=>{ if(ui) ui.fail('전송 실패'); }); });   // 빠르게 여러 번 보내도 차례대로
     { const ct=$('#chatText'); if(ct) ct.maxLength=1000; }   // 서버 한도와 같게
     // ＋ 버튼: 최근 사진 3장 · 앨범 · 카메라 · 파일
     const comp=$('#composer'), plus=comp.querySelector('.attach');
