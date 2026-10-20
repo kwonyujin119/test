@@ -951,7 +951,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v185</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v186</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1817,8 +1817,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V185', SRV_VER='11.1';
+  const APP_VER='V186', SRV_VER='11.2';
   const UPDATES=[
+    {v:'V186', d:'2026-10-20', t:['47망·디브리핑룸을 누르면 ‘불러오는 중’ 없이 바로 열림 — 대화명을 이 기기에 기억하고 서버 확인은 뒤에서','앱을 막 열었을 때도 자료 목록을 기다리지 않고 대화방부터 열림','글을 보내고 바로 나가도 다음에 들어오면 마지막 대화가 바로 보임']},
     {v:'V185', d:'2026-10-20', t:['사진 보내기: 미리보기(편집) 화면에서 ←(또는 휴대폰 뒤로)를 누르면 닫히지 않고 바로 앞 사진 고르기 화면으로 — 고른 사진·번호는 그대로','미리보기에서 고르기를 풀면 앞 화면 전송 수에도 반영']},
     {v:'V184', d:'2026-10-20', t:['Search: 다른 화면에 갔다 와도 마지막 검색 결과·보던 자리·펼친 결과가 그대로(지우기는 ✕)','Search: 결과를 보는 동안 검색창이 위에 고정 — 누르면 전체 선택돼 바로 새 검색','Search: 최근 검색(이 기기에만, 하나씩·모두 지우기), 결과 묶음 바로가기 칩, 늦거나 실패하면 ‘다시 시도’','Search: 돌아올 때 같은 조회를 다시 하지 않아 빠르고 공공데이터 한도도 아낌','메뉴: 위 회색 바를 위로 끌면(또는 누르면) 화면 위까지 펼쳐 모든 메뉴가 한 화면에, 아래로 끌면 원래 크기→닫기','메뉴: PC는 3열, 가로 휴대폰은 4열로 모든 메뉴가 한 화면에']},
     {v:'V183', d:'2026-10-19', t:['PC에서 세로로 긴 사진(휴대폰 캡처)을 크게 볼 때 창 밖으로 나가던 문제 바로잡음','47망·디브리핑룸 ＋: 이 방에 올라온 사진 대신 ‘갤러리’ 칸 — 눌러 휴대폰 갤러리에서 고르면 줄에 번호가 붙고 ‘전송’으로 업로드','사진 편집: 펜(5색)·지우개(그린 선만 지움)·자르기·돌리기']},
@@ -2410,6 +2411,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     { const pvEl=document.getElementById('pdfv'); if(pvEl&&!pvEl.hidden) closePdf(true); }
     if(window.__closeMap) window.__closeMap(); if(window.__closeHyd) window.__closeHyd();
     if(window.__closeBj) window.__closeBj();
+    if(SRV.mcFlush) SRV.mcFlush();
     if(SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } SRV.ctl=null; } SRV.gen++;
     pending=[];
     document.body.classList.toggle('compact', !(r==='search' && !state.query.trim()));
@@ -5019,7 +5021,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   const SRV={on:false, probing:/^https?:$/.test(location.protocol), notice:'', draft:null, room:0, epoch:'', lib:null, libErr:false, trim:0, requireCode:false, gen:0, last:0, seen:new Set(), retention:0, ctl:null};
   const MES={};   // 방별 서버 대화명(undefined = 아직 모름)
-  Object.defineProperty(SRV,'me',{get(){ return MES[RK]||null; }, set(v){ MES[RK]=v||null; }});
+  // V186: 방별 대화명을 이 기기에 기억 — 방을 누르면 서버 확인을 기다리지 않고 바로 열고, 확인은 뒤에서
+  const meKey=rk=>'sachil_me:'+SRVBASE+rk;
+  const setMe=(rk,v)=>{ MES[rk]=v||null; try{ if(v) localStorage.setItem(meKey(rk),JSON.stringify({id:v.id,name:v.name,role:v.role})); else localStorage.removeItem(meKey(rk)); }catch(_){ } };
+  const meCached=rk=>{ try{ const v=JSON.parse(localStorage.getItem(meKey(rk))||'null'); return v&&v.name?v:null; }catch(_){ return null; } };
+  Object.defineProperty(SRV,'me',{get(){ return MES[RK]||null; }, set(v){ setMe(RK,v); }});
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   const verLt=(a,b)=>{ const x=String(a).split('.').map(Number), y=String(b).split('.').map(Number); for(let i=0;i<Math.max(x.length,y.length);i++){ const d=(x[i]||0)-(y[i]||0); if(d) return d<0; } return false; };
   // V177: AI 도우미 스트리밍 — 서버가 text/event-stream으로 주면 조각마다 onText, 끝 이벤트(done)를 api()와 같은 모양으로 돌려줌
@@ -5068,8 +5074,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     useRoom(kind);
     if(!DB.agreed){ dbConsent(panel,kind); return; }
     // 다른 방에서 처음 들어왔고 이 방 토큰이 있으면 서버에 대화명을 먼저 묻는다
-    if(SRV.on && SRVTOK && MES[RK]===undefined){ const rk=RK; panel.innerHTML='<p class="convo-note">불러오는 중…</p>';
-      api('/api/me').then(r=>{ if(MES[rk]===undefined) MES[rk]=(r.ok&&r.j&&r.j.user)||null; if(rk===RK&&ROOMS_R.includes(state.route)) render(); }); return; }
+    if(SRV.on && SRVTOK && MES[RK]===undefined){ const rk=RK, c=meCached(rk);
+      const chk=api('/api/me',{tok:TOKS[rk]||''}).then(r=>{ if(!(r.ok&&r.j)) return; const u=r.j.user||null, was=MES[rk]; setMe(rk,u);
+        if((!!u!==!!was||(u&&was&&(u.id!==was.id||u.name!==was.name)))&&rk===RK&&ROOMS_R.includes(state.route)) render(); });
+      if(c){ MES[rk]=c; }   /* 기억해 둔 대화명으로 바로 방을 연다(서버 확인 결과가 다르면 다시 그림) */
+      else { panel.innerHTML='<p class="convo-note">불러오는 중…</p>'; chk.then(()=>{ if(MES[rk]===undefined) MES[rk]=null; if(rk===RK&&ROOMS_R.includes(state.route)) render(); }); return; } }
     if(!SRV.on && SRV.probing && (TOKS['']||TOKS[':deb'])){   // V122: 서버가 다시 켜지는 중 — 대화명은 그대로, 연결되면 바로 방으로
       panel.innerHTML=`<div class="srv-wait"><span class="spin" aria-hidden="true"></span><b>${SRV.retry?'서버가 다시 켜지는 중입니다':'서버에 연결하는 중…'}</b><p>대화명과 대화는 그대로 유지됩니다. 연결되면 바로 방으로 들어갑니다.</p><a class="btn ghost" href="#hub">첫 화면으로</a></div>`; return; }   // V138: 지하·터널에서 갇히지 않게
     if(SRV.on ? !SRV.me : !getNick()){ dbNick(panel,kind); return; }
@@ -6078,9 +6087,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     // V129: 카카오톡처럼 — 마지막으로 본 대화를 이 기기에 남겨 두었다가 들어오자마자 보여 주고, 서버에서는 그 뒤 글만 받는다('불러오는 중' 없이)
     const MCK='sachil_mc:'+SRVBASE+RK+':'+rid+':'+((SRV.me&&SRV.me.id)||'');   // V138: 사용자별(공용 기기에서 남의 글이 '내 글'로 보이지 않게)
     SRV.mck=MCK; try{ localStorage.removeItem('sachil_mc:'+SRVBASE+RK+':'+rid); }catch(_){ }   // 예전(사용자 구분 없는) 캐시는 지움
-    let mcT=null; const mcSave=()=>{ clearTimeout(mcT); mcT=setTimeout(()=>{ if(SRV.gen!==gen) return;
+    let mcT=null; const mcWrite=()=>{ clearTimeout(mcT); mcT=null;
       try{ const msgs=[...SRV.msgs.values()].sort((a,b)=>a.id-b.id).slice(-80).map(m=>({id:m.id,name:m.name,text:String(m.text||'').slice(0,1000),files:(m.files||[]).map(f=>({id:f.id,name:f.name,kind:f.kind,size:f.size})),ts:m.ts,mine:!!m.mine,can_delete:!!m.can_delete,reply:m.reply||null}));
-        localStorage.setItem(MCK,JSON.stringify({epoch:SRV.epoch, members:SRV.members, msgs})); }catch(_){ } },800); };
+        localStorage.setItem(MCK,JSON.stringify({epoch:SRV.epoch, members:SRV.members, msgs})); }catch(_){ } };
+    const mcSave=()=>{ clearTimeout(mcT); mcT=setTimeout(()=>{ if(SRV.gen===gen) mcWrite(); },800); SRV.mcFlush=()=>{ SRV.mcFlush=null; if(mcT&&SRV.gen===gen) mcWrite(); }; };   // V186: 방을 나갈 때 남은 저장을 바로(다음에 들어오면 바로 보이게)
     { let mc=null; try{ mc=JSON.parse(localStorage.getItem(MCK)||'null'); }catch(_){ }
       if(mc&&Array.isArray(mc.msgs)&&mc.msgs.length){ SRV.epoch=String(mc.epoch||''); if(Number.isFinite(mc.members)) applyState({members:mc.members}); append(mc.msgs,{force:true}); } }
     let first=true, down=false, loaded=false, fromCache=SRV.msgs.size>0;
@@ -6180,7 +6190,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(window.__rtplSync) window.__rtplSync();   // V125: 보고서 양식
       if(window.__clSync) window.__clSync();   // V173: 교수가 고친 체크리스트
       if(window.__ilSync) window.__ilSync();   // V174: 교수가 고친 상황보고서 서식
-      await loadLib();
+      for(const rk of ['',':deb']) if(rk!==RK&&TOKS[rk]&&MES[rk]===undefined) api('/api/me',{tok:TOKS[rk]}).then(x=>{ if(MES[rk]===undefined&&x.ok&&x.j) setMe(rk,x.j.user||null); });   // V186: 다른 방 대화명도 미리
+      const libP=loadLib();   // V186: 자료 목록을 기다리지 않고 대화방부터 연다
+      if(!ROOMS_R.includes(state.route)) await libP;
       if(ROOMS_R.includes(state.route)){ if(DB.agreed&&!wasWait){ SRV.notice='서버에 연결되어 공유 대화방으로 바뀌었습니다.'+(wasLocal?' 방금 쓴 내용은 이 기기에만 남습니다.':''); DB.enter=true; } render(); }
       else if(SECTIONS.some(x=>x.slug===state.route) || state.route==='login' || (state.route==='search'&&state.query.trim()) || (state.route==='ai'&&!chat.typing)) render();
       return;
