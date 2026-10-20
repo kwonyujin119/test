@@ -941,6 +941,20 @@ html body #mapov .msrch .btn,html body #hydov .msrch .btn{border-radius:12px}
 }
 @media (min-width:600px) and (max-width:759px){ #pdfv .pv-nav{display:none} }
 </style>
+<style id="v198-fix">
+/* V198 통합 정리(QA): 8개 블록을 합친 뒤 겹치거나 빠진 곳만 손봄. 머리(head) 블록이라 뒤쪽 본문 규칙에 지지 않게 html body 를 붙인다. */
+/* 디브리핑룸 동의 화면(폰): 화면 틀(.app)이 스크롤 칸이고 하단 탭은 그 밖에 있으므로 '동의하고 입장' 막대는 맨 아래(0)에 붙인다 — 탭 높이만큼 띄우면 막대 밑으로 글이 비쳐 보였다 */
+@media (max-width:599px){ html body .dbwrap.dbx .dbx-consent .acts{bottom:0} }
+/* 터치 기기 누르는 범위 44px 이상(장갑 손가락) */
+@media (pointer:coarse) and (max-width:759px){ html body #panel .board .timer .jump .jl > button{min-height:44px} }
+@media (pointer:coarse){
+  html body .profbar button{position:relative}
+  html body .profbar button::after{content:"";position:absolute;inset:-8px -4px}
+  html body #pdfv .pv-grp button,html body #pdfv .pv-fit{position:relative}
+  html body #pdfv .pv-grp button::after,html body #pdfv .pv-fit::after{content:"";position:absolute;inset:-3px -1px}
+  html body .psheet .go{min-height:44px}
+}
+</style>
 </head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
