@@ -975,7 +975,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v192</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v193</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1845,8 +1845,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V192', SRV_VER='11.8';
+  const APP_VER='V193', SRV_VER='12.0';
   const UPDATES=[
+    {v:'V193', d:'2026-10-20', t:['47망·디브리핑룸 1000명 동시 접속 대비 — 예전에는 200명이 넘으면 새로 들어온 사람이 연결되지 않았음','1000명 시험: 모든 글이 1000명 모두에게 도착(가운데값 약 1초), 연결 실패 0건','사진은 대화에 작은 미리보기(수십 KB)를 보여 주고, 누르면 원본 — 많은 사람이 같은 사진을 받아도 빠르게','사람이 많은 방은 ‘안 읽은 수’가 몇 초 늦게 바뀜(서버 부담을 줄이려고)']},
     {v:'V192', d:'2026-10-20', t:['AI: 답이 나오는 동안 위로 올려 보면 아래로 끌려 내려가던 문제 바로잡음 — 답이 끝나도 보던 자리 그대로','AI 입력창의 ＋(첨부) 버튼 없앰','AI 화면 제목을 ‘AI assistant’로, 옆에 ‘사용자가 질문하면 AI가 답합니다’']},
     {v:'V191', d:'2026-10-20', t:['AI 도우미: AI가 멈춰 답이 안 오면 끝없이 기다리지 않음 — 서버는 25초 뒤 다른 AI로 넘기고, 앱은 오래 멈추면 ‘다시 묻기’','말풍선을 길게 누르면(PC는 오른쪽 클릭) 복사 · 선택 복사 · 공유 — AI 도우미와 47망·디브리핑룸 모두','공유: 47망으로 · 디브리핑룸으로(그 방 입력창에 넣어 두고 확인 뒤 보내기) · 카카오톡으로 · 다른 앱']},
     {v:'V190', d:'2026-10-20', t:['47망·디브리핑룸: 사진을 잠깐 못 불러와도 저절로 두 번 더 받아 봄(깨진 그림·파일 이름만 뜨던 문제)','그래도 안 되면 ‘사진을 불러오지 못했습니다 · 눌러서 다시 시도’ 칸 — 서버에 없는 사진이면 그렇게 알려 줌','서버: 올리는 중 끊긴 반쪽 사진은 저장하지 않고 다시 보내게']},
@@ -5170,6 +5171,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     }catch(e){ return {ok:false, status:0, aborted:e&&e.name==='AbortError', j:{error:'서버에 연결할 수 없습니다'}}; }
   }
   // V187: 파일 올리기 — 진행률(%)을 알 수 있게 XHR로(api()와 같은 머리글·응답 모양)
+  // V193: 사진 → 긴 변 max px JPEG(대화 목록용 미리보기)
+  async function thumbBlob(blob,max){ let bm=null; try{ bm=await createImageBitmap(blob); }catch(_){ const u=URL.createObjectURL(blob); try{ bm=await new Promise((ok,no)=>{ const im=new Image(); im.onload=()=>ok(im); im.onerror=no; im.src=u; }); }finally{ setTimeout(()=>URL.revokeObjectURL(u),2000); } }
+    const w=bm.width, h=bm.height, k=Math.min(1,max/Math.max(w,h)); const c=document.createElement('canvas'); c.width=Math.max(1,Math.round(w*k)); c.height=Math.max(1,Math.round(h*k));
+    c.getContext('2d').drawImage(bm,0,0,c.width,c.height); if(bm.close) bm.close(); return await new Promise(r=>c.toBlob(r,'image/jpeg',0.72)); }
   function apiUp(path, blob, headers, onProg){ return new Promise(ok=>{ const x=new XMLHttpRequest();
     x.open('POST',SURL(path)); x.withCredentials=false; x.setRequestHeader('X-SACHIL','1'); if(SRVTOK) x.setRequestHeader('Authorization','Bearer '+SRVTOK);
     Object.entries(headers||{}).forEach(([k,v])=>x.setRequestHeader(k,v));
@@ -5262,10 +5267,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function srvAtt(files,ts){
     if(!files||!files.length) return '';
     // data-gsrc: 방 안 사진 하나당 한 번(라이트박스 넘기기·갤러리 목록), data-sview: 누르면 크게
-    const g=f=>`data-gsrc="${esc(FURL(f.id))}" data-name="${esc(f.name)}" data-ts="${Number(ts)||0}"`;
-    const img=f=>`<button type="button" class="att-img srv" data-sview="${esc(FURL(f.id))}" ${g(f)} aria-label="${esc(f.name)} 크게 보기"><img src="${esc(FURL(f.id))}" alt="${esc(f.name)}" loading="lazy"></button>`;
-    const bundle=a=>`<div class="att-bundle" aria-label="사진 ${a.length}장"><button type="button" class="att-img srv bmain" data-sview="${esc(FURL(a[0].id))}" data-name="${esc(a[0].name)}" aria-label="사진 ${a.length}장 중 1번째 크게 보기"><img src="${esc(FURL(a[0].id))}" alt="${esc(a[0].name)}" loading="lazy"></button>`
-      +`<div class="bstrip">${a.map((f,i)=>i<5?`<button type="button" class="bt${i?'':' on'}" data-bi="${i}" ${g(f)} aria-label="${i+1}번째 사진 보기"><img src="${esc(FURL(f.id))}" alt="" loading="lazy">${i===4&&a.length>5?`<b>+${a.length-5}</b>`:''}</button>`:`<i hidden ${g(f)}></i>`).join('')}</div></div>`;
+    // V193: 대화에는 작은 미리보기(th, 약 40KB)를, 크게 볼 때만 원본 — 1000명이 같은 사진을 받아도 PC 회선이 버티게(옛 글은 th 없음 → 원본)
+    const TU=f=>FURL(f.th&&/^[a-f0-9]{24}$/.test(f.th)?f.th:f.id);
+    const g=f=>`data-gsrc="${esc(FURL(f.id))}" data-tsrc="${esc(TU(f))}" data-name="${esc(f.name)}" data-ts="${Number(ts)||0}"`;
+    const img=f=>`<button type="button" class="att-img srv" data-sview="${esc(FURL(f.id))}" ${g(f)} aria-label="${esc(f.name)} 크게 보기"><img src="${esc(TU(f))}" alt="${esc(f.name)}" loading="lazy"></button>`;
+    const bundle=a=>`<div class="att-bundle" aria-label="사진 ${a.length}장"><button type="button" class="att-img srv bmain" data-sview="${esc(FURL(a[0].id))}" data-name="${esc(a[0].name)}" aria-label="사진 ${a.length}장 중 1번째 크게 보기"><img src="${esc(TU(a[0]))}" alt="${esc(a[0].name)}" loading="lazy"></button>`
+      +`<div class="bstrip">${a.map((f,i)=>i<5?`<button type="button" class="bt${i?'':' on'}" data-bi="${i}" ${g(f)} aria-label="${i+1}번째 사진 보기"><img src="${esc(TU(f))}" alt="" loading="lazy">${i===4&&a.length>5?`<b>+${a.length-5}</b>`:''}</button>`:`<i hidden ${g(f)}></i>`).join('')}</div></div>`;
     const pdf=f=>`<div class="att-pdf"><span class="ico">PDF</span><span class="nm">${esc(f.name)}</span><span class="sz">${fmtSize(f.size)}</span><a class="btn" href="${esc(FURL(f.id))}" target="_blank" rel="noopener" data-pdfv="${esc(f.name)}">열기</a></div>`;
     const imgs=files.filter(f=>f.kind==='image'), docs=files.filter(f=>f.kind!=='image');
     // 사진 여러 장을 묶어 보낸 글: 카카오톡처럼 한 말풍선 안에 바둑판으로
@@ -5919,7 +5926,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         const last=SRV.last; SRV.readSent=last;
         const r=await api(`/api/rooms/${rid}/read`,{json:{last}});
         if(SRV.gen!==gen) return; if(r.ok) applyState(r.j); else if(r.status===404){ SRV.readSent=Infinity; const o=$('#onlineN'); if(o) o.textContent=''; } else SRV.readSent=0;   // 예전 서버: 읽음 기능 없음 → 다시 묻지 않음
-      },400);
+      },(SRV.members||0)>100?400+Math.random()*3000:400);   // V193: 사람이 많은 방은 '읽음'을 0~3초 흩어 보냄(1000명이 같은 순간에 몰리지 않게)
     }
     const onVis=()=>{ if(SRV.gen!==gen){ document.removeEventListener('visibilitychange',onVis); removeEventListener('pageshow',onShow); return; } if(document.visibilityState==='visible'){ if(SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } } markRead(); } };   // 다시 보이면 기다리던 연결을 새로
     const onShow=e=>{ if(e.persisted&&SRV.gen===gen&&SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } } };
@@ -5997,7 +6004,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           (l,t)=>{ if(!ui) return; const pc=(doneB+l/(t||1)*sizes[i])/total*100; ui.set(`${kindTxt} 보내는 중${n>1?` ${i+1}/${n}`:''} · ${Math.round(pc)}%`, pc); });
         if(!r.ok){ if(ui) ui.fail(`${kindTxt} 전송 실패: ${r.j.error||'연결 오류'}`); fail(`${kindTxt} 전송 실패: `+(r.j.error||'연결 오류'), v, att, i, r.status); return; }
         Object.defineProperty(a,'_fid',{value:r.j.file.id, configurable:true}); ids.push(a._fid); doneB+=sizes[i];
+        if(a.kind==='image'&&!a._th){ try{ const tb=await thumbBlob(blob,640); if(tb&&tb.size<blob.size*0.8){ const tr=await apiUp(`/api/rooms/${rid}/upload`, tb, {'Content-Type':'image/jpeg','X-Filename':encodeURIComponent('th_'+a.name)}); if(tr.ok&&tr.j.file) Object.defineProperty(a,'_th',{value:tr.j.file.id, configurable:true}); } }catch(_){ } }   // V193: 대화용 작은 미리보기(실패해도 원본으로 보임)
       }
+      const thumbs={}; att.forEach(a=>{ if(a._fid&&a._th) thumbs[a._fid]=a._th; });
       if(ui) ui.set('거의 다 됐습니다…',100);
       if(!v&&!ids.length){ if(ui) ui.done(); if(SRV.gen===gen) stat(''); return; }
       const reply=SRV.replyTo?SRV.replyTo.id:0;
@@ -6005,6 +6014,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const parts=(!bundlePref && ids.length>1) ? ids.map(id=>({text:'',files:[id]})).concat(v?[{text:v,files:[]}]:[]) : [{text:v,files:ids}];
       for(let k=0;k<parts.length;k++){
         const body=Object.assign({},parts[k]); if(reply&&k===0) body.reply=reply;
+        { const tm={}; (body.files||[]).forEach(id=>{ if(thumbs[id]) tm[id]=thumbs[id]; }); if(Object.keys(tm).length) body.thumbs=tm; }
         if(parts.length>1) stat(`보내는 중 ${k+1}/${parts.length}…`);
         const r=await api(`/api/rooms/${rid}/messages`,{json:body});
         if(!r.ok){ if(ui) ui.fail('전송 실패: '+(r.j.error||'연결 오류')); fail('전송 실패: '+(r.j.error||'연결 오류'), v, att.slice(Math.min(k,att.length)), 0, r.status); return; }
@@ -6171,7 +6181,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const g=e.target.closest('[data-goto]'); if(g){ const t=convo.querySelector(`.msg[data-mid="${CSS.escape(g.dataset.goto)}"]`); if(t){ t.scrollIntoView({block:'center',behavior:'smooth'}); t.classList.add('flash'); setTimeout(()=>t.classList.remove('flash'),1200); } else toast('원래 메시지가 화면에 없습니다(오래된 대화)'); return; }
       const bt=e.target.closest('.bstrip [data-bi]');
       if(bt){ const bd=bt.closest('.att-bundle'), mb=bd.querySelector('.bmain'), im=mb.querySelector('img');
-        mb.dataset.sview=bt.dataset.gsrc; mb.dataset.name=bt.dataset.name; im.src=bt.dataset.gsrc; im.alt=bt.dataset.name;
+        mb.dataset.sview=bt.dataset.gsrc; mb.dataset.name=bt.dataset.name; im.src=bt.dataset.tsrc||bt.dataset.gsrc; im.removeAttribute('data-osrc'); im.dataset.tries='0'; im.alt=bt.dataset.name;
         mb.setAttribute('aria-label',`사진 ${bd.querySelectorAll('[data-gsrc]').length}장 중 ${+bt.dataset.bi+1}번째 크게 보기`);
         bd.querySelectorAll('.bt').forEach(x=>x.classList.toggle('on',x===bt)); return; }
       const b=e.target.closest('[data-sview]');
@@ -6231,7 +6241,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const MCK='sachil_mc:'+SRVBASE+RK+':'+rid+':'+((SRV.me&&SRV.me.id)||'');   // V138: 사용자별(공용 기기에서 남의 글이 '내 글'로 보이지 않게)
     SRV.mck=MCK; try{ localStorage.removeItem('sachil_mc:'+SRVBASE+RK+':'+rid); }catch(_){ }   // 예전(사용자 구분 없는) 캐시는 지움
     let mcT=null; const mcWrite=()=>{ clearTimeout(mcT); mcT=null;
-      try{ const msgs=[...SRV.msgs.values()].sort((a,b)=>a.id-b.id).slice(-80).map(m=>({id:m.id,name:m.name,text:String(m.text||'').slice(0,1000),files:(m.files||[]).map(f=>({id:f.id,name:f.name,kind:f.kind,size:f.size})),ts:m.ts,mine:!!m.mine,can_delete:!!m.can_delete,reply:m.reply||null}));
+      try{ const msgs=[...SRV.msgs.values()].sort((a,b)=>a.id-b.id).slice(-80).map(m=>({id:m.id,name:m.name,text:String(m.text||'').slice(0,1000),files:(m.files||[]).map(f=>({id:f.id,name:f.name,kind:f.kind,size:f.size,...(f.th?{th:f.th}:{})})),ts:m.ts,mine:!!m.mine,can_delete:!!m.can_delete,reply:m.reply||null}));
         localStorage.setItem(MCK,JSON.stringify({epoch:SRV.epoch, members:SRV.members, msgs})); }catch(_){ } };
     const mcSave=()=>{ clearTimeout(mcT); mcT=setTimeout(()=>{ if(SRV.gen===gen) mcWrite(); },800); SRV.mcFlush=()=>{ SRV.mcFlush=null; if(mcT&&SRV.gen===gen) mcWrite(); }; };   // V186: 방을 나갈 때 남은 저장을 바로(다음에 들어오면 바로 보이게)
     { let mc=null; try{ mc=JSON.parse(localStorage.getItem(MCK)||'null'); }catch(_){ }

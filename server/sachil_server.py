@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '11.8'
-APP_VERSION = 'V192'
+VERSION = '12.0'
+APP_VERSION = 'V193'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -200,6 +200,7 @@ DB = sqlite3.connect(os.path.join(DATA, 'chat.db'), check_same_thread=False)
 DB.row_factory = sqlite3.Row
 DB.executescript('''
 PRAGMA journal_mode=WAL;
+PRAGMA synchronous=NORMAL;
 CREATE TABLE IF NOT EXISTS sessions(id INTEGER PRIMARY KEY AUTOINCREMENT, token TEXT UNIQUE, name TEXT, role TEXT, created REAL, seen REAL, ip TEXT);
 CREATE TABLE IF NOT EXISTS rooms(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, cat TEXT, descr TEXT, owner INTEGER, owner_name TEXT, created REAL, last REAL);
 CREATE TABLE IF NOT EXISTS messages(id INTEGER PRIMARY KEY AUTOINCREMENT, room INTEGER, author INTEGER, name TEXT, text TEXT, files TEXT, ts REAL);
@@ -252,11 +253,74 @@ PRESENCE = {}                            # (방, 사용자) → 마지막으로 
 MEMBER_SEEN = set()                      # members 표에 이미 넣은 (방, 사용자) — 매 요청마다 DB에 쓰지 않게
 PRESENCE_LOCK = threading.Lock()
 READ_VER = {}                            # 방 → 읽음 표시가 바뀐 횟수(바뀌면 기다리던 화면이 깨어나 '안 읽은 수'를 고침)
+# V193: 1000명 대비 — 읽음 표시는 1.5초에 한 번만 모아서 알린다(예전: 한 사람이 읽을 때마다 기다리던 1000명이 모두 깨어나 다시 요청 → 글 하나에 요청 수십만)
+READ_DIRTY = set()
+READ_PEND = {}                           # (방, 사용자) → (읽은 마지막 글, 시각) — 1.5초마다 한 번에 DB로
+READ_LOCK = threading.Lock()
+READ_BUMP = {}                           # 방 → 마지막으로 읽음 변화를 알린 시각
+SESS_CACHE = {}                          # V193: 토큰 → (시각, 사용자) 30초
+ROOM_CACHE = {}                          # (종류, 방) → (시각, 값): 대화명 표·참여자 수처럼 모두에게 같은 값은 잠깐 같이 쓴다
+ROOM_CACHE_LOCK = threading.Lock()
+
+
+def _read_flush():
+    with READ_LOCK:
+        pend = dict(READ_PEND)
+        READ_PEND.clear()
+    if pend:
+        with DB_LOCK:
+            DB.executemany('INSERT INTO reads(room,user,last_id,seen) VALUES(?,?,?,?) ON CONFLICT(room,user) DO UPDATE SET '
+                           'last_id=MAX(last_id,excluded.last_id), seen=excluded.seen', [(r, u, l, t) for (r, u), (l, t) in pend.items()])
+            DB.commit()
+
+
+def _read_ticker():
+    while True:
+        time.sleep(1.5)
+        try:
+            _read_flush()
+        except Exception as e:
+            print('[읽음] 저장 실패:', str(e)[:120], flush=True)
+        if READ_DIRTY:
+            now, woke = time.time(), False
+            with PRESENCE_LOCK:
+                on = {}
+                for (r, _u), t in PRESENCE.items():
+                    if now - t <= 60:
+                        on[r] = on.get(r, 0) + 1
+            for rid in list(READ_DIRTY):
+                n = on.get(rid, 0)
+                gap = 1.5 if n <= 30 else 5 if n <= 200 else 10   # V193: 사람이 많을수록 '안 읽은 수' 갱신을 드물게(1000명 방에서 모두를 1.5초마다 깨우지 않게)
+                if now - READ_BUMP.get(rid, 0) < gap:
+                    continue
+                READ_DIRTY.discard(rid)
+                READ_BUMP[rid] = now
+                READ_VER[rid] = READ_VER.get(rid, 0) + 1
+                woke = True
+            if woke:
+                with NEW_MSG:
+                    NEW_MSG.notify_all()
+
+
+threading.Thread(target=_read_ticker, daemon=True).start()
 ONLINE_SEC = 40                          # 롱폴링(25초)보다 조금 길게
 MEMBER_DAYS = 7                          # 최근 7일 안에 들어온 사람만 '안 읽은 수'에 셈
 DEL_VER = {}                             # 방 → 지운 글 순번(바뀌면 다른 사람 화면에서도 지움)
 DELETED = {}                             # 방 → [(순번, 글 id)] 최근 300개
 DELETED_TXT = '(삭제된 메시지)'
+
+
+def file_ids(files_json):
+    """V193: 글에 붙은 파일 id(사진의 작은 미리보기 th 포함)"""
+    out = []
+    try:
+        for f in json.loads(files_json or '[]'):
+            out.append(f['id'])
+            if f.get('th'):
+                out.append(f['th'])
+    except (ValueError, TypeError, KeyError):
+        pass
+    return out
 # V122: 대화 구분값을 파일에 남겨 서버를 다시 켜도 그대로 — 재시작마다 모든 화면이 대화를 처음부터 다시 그리지 않게
 EPOCH_PATH = os.path.join(DATA, 'epoch.json')
 
@@ -366,12 +430,12 @@ def _weekly_trim(force):
                 continue
             rows = q('SELECT id, files FROM messages WHERE room=? ORDER BY id LIMIT ?', (rid, drop))
             for m in rows:
-                for f in json.loads(m['files'] or '[]'):
+                for fid in file_ids(m['files']):
                     try:
-                        os.remove(os.path.join(FILES, f['id']))
+                        os.remove(os.path.join(FILES, fid))
                     except OSError:
                         pass
-                    q('DELETE FROM files WHERE id=?', (f['id'],), commit=True)
+                    q('DELETE FROM files WHERE id=?', (fid,), commit=True)
             q('DELETE FROM messages WHERE room=? AND id<=?', (rid, rows[-1]['id']), commit=True)
             EPOCH[rid] = secrets.token_hex(4)
             epoch_save()
@@ -414,6 +478,7 @@ def cleanup():
                     pass
             q('DELETE FROM files WHERE used=0 AND ts < ?', (now - 86400,), commit=True)
             q('DELETE FROM sessions WHERE seen < ?', (now - SESSION_DAYS * 86400,), commit=True)
+            SESS_CACHE.clear()   # V193: 지운 대화명이 기억에 남지 않게
             q('DELETE FROM members WHERE user NOT IN (SELECT id FROM sessions)', commit=True)
         except Exception as e:
             print('[정리 오류]', e)
@@ -500,13 +565,18 @@ def looks_like_staff(name):
 
 
 # ---------------------------------------------------------------- 요청 처리
-MAX_CONN = 200                              # 동시에 처리하는 연결 수(롱폴링 1인 1연결 기준 넉넉하게)
+MAX_CONN = max(200, min(6000, int(CONF.get('max_conn') or 3000)))   # V193: 200 → 3000(설정 max_conn, 1명이 기다리기+읽음 등 2~3개) — 200명이 새 글을 기다리면 201번째부터 503이라 1000명 수업이 아예 안 됐다
 CONN_SEM = threading.BoundedSemaphore(MAX_CONN)
+try:
+    threading.stack_size(512 * 1024)   # V193: 연결마다 스레드 하나 — 3000개여도 메모리를 덜 잡게(기본 1~8MB)
+except (ValueError, RuntimeError):
+    pass
 
 
 class Server(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = True
+    request_queue_size = 1024   # V193: 수업 시작 때 한꺼번에 들어오는 연결을 받아 둘 대기열(기본 5)
 
     def handle_error(self, request, client_address):
         # 폰이 화면을 끄거나 앱이 기다리던 요청을 끊으면 Windows가 WinError 10053/10054를 낸다 — 오류가 아니므로 조용히 넘긴다
@@ -674,16 +744,26 @@ class H(BaseHTTPRequestHandler):
             tok = m.group(1) if m else None
         if not tok:
             return None
-        r = q('SELECT id,name,role,seen FROM sessions WHERE token=?', (th(tok),), one=True)
+        h = th(tok)
+        c = SESS_CACHE.get(h)   # V193: 같은 대화명의 요청이 몰려도(롱폴링·읽음) 30초 동안은 DB를 다시 보지 않음
+        if c and time.time() - c[0] < 30:
+            return c[1]
+        r = q('SELECT id,name,role,seen FROM sessions WHERE token=?', (h,), one=True)
         if not r:
+            SESS_CACHE.pop(h, None)
             return None
         age = time.time() - (r['seen'] or 0)
         if age > SESSION_DAYS * 86400:   # 7일 넘게 안 쓴 대화명은 로그아웃(다시 대화명 입력)
             q('DELETE FROM sessions WHERE id=?', (r['id'],), commit=True)
+            SESS_CACHE.clear()   # V193: 지운 대화명이 기억에 남지 않게
             return None
         if age > 300:
             q('UPDATE sessions SET seen=? WHERE id=?', (time.time(), r['id']), commit=True)
-        return {'id': r['id'], 'name': r['name'], 'role': r['role']}
+        u = {'id': r['id'], 'name': r['name'], 'role': r['role']}
+        if len(SESS_CACHE) > 5000:
+            SESS_CACHE.clear()
+        SESS_CACHE[h] = (time.time(), u)
+        return u
 
     def cors_origin(self):
         """허용 목록(config.json의 allowed_origins)에 있는 외부 앱에서 온 요청이면 그 주소를 돌려준다."""
@@ -879,6 +959,10 @@ class H(BaseHTTPRequestHandler):
                 return self.err(401, '로그인이 필요합니다')
             if path == '/api/logout':
                 q('DELETE FROM sessions WHERE id=?', (self.user['id'],), commit=True)
+                SESS_CACHE.clear()   # V193: 지운 대화명이 기억에 남지 않게
+                with READ_LOCK:
+                    for k in [k for k in READ_PEND if k[1] == self.user['id']]:
+                        READ_PEND.pop(k, None)
                 q('DELETE FROM reads WHERE user=?', (self.user['id'],), commit=True)
                 with PRESENCE_LOCK:   # 접속 수에서 바로 빠지게
                     for k in [k for k in PRESENCE if k[1] == self.user['id']]:
@@ -1864,6 +1948,7 @@ class H(BaseHTTPRequestHandler):
         kind = 'deb' if b.get('room') == 'deb' else 'net'
         if dev:   # 같은 기기에서 같은 방에 새 대화명을 만들면 예전 대화명은 로그아웃(참여자 수에서도 빠짐)
             q('DELETE FROM sessions WHERE dev=? AND kind=?', (dev, kind), commit=True)
+            SESS_CACHE.clear()   # V193: 지운 대화명이 기억에 남지 않게
         sid = q('INSERT INTO sessions(token,name,role,created,seen,ip,dev,kind) VALUES(?,?,?,?,?,?,?,?)',
                 (th(token), name, role, now, now, ip, dev, kind if dev else None), commit=True)
         self.user = {'id': sid, 'name': name, 'role': role}
@@ -1872,7 +1957,18 @@ class H(BaseHTTPRequestHandler):
         return self.send(200, out, extra={'Set-Cookie': cookie})
 
     # --- 익명 표시: 디브리핑룸 안에서 처음 글을 쓴 순서대로 '참여자 1, 2…' (이름은 화면에 내보내지 않음)
-    def aliases(self, rid):
+    def aliases(self, rid, need=None):
+        """V193: 방 대화명 표를 잠깐 같이 쓴다(1000명이 깨어날 때마다 전체 글을 다시 묶지 않게). 처음 보는 작성자가 있으면 새로"""
+        with ROOM_CACHE_LOCK:
+            c = ROOM_CACHE.get(('al', rid))
+        if c and time.time() - c[0] < 30 and not (need and any(a not in c[1] for a in need)):
+            return c[1]
+        out = self._aliases(rid)
+        with ROOM_CACHE_LOCK:
+            ROOM_CACHE[('al', rid)] = (time.time(), out)
+        return out
+
+    def _aliases(self, rid):
         rows = q('SELECT author, name, MIN(id) f FROM messages WHERE room=? GROUP BY author ORDER BY f', (rid,))
         out, used = {}, {}
         for r in rows:
@@ -1950,6 +2046,8 @@ class H(BaseHTTPRequestHandler):
         q('DELETE FROM messages WHERE room=?', (rid,), commit=True)
         EPOCH[rid] = secrets.token_hex(4)
         epoch_save()
+        with ROOM_CACHE_LOCK:
+            ROOM_CACHE.pop(('al', rid), None)
         with NEW_MSG:
             NEW_MSG.notify_all()
         self.alog(200, 'room-clear')
@@ -1980,6 +2078,12 @@ class H(BaseHTTPRequestHandler):
 
     def room_state(self, rid):
         now = time.time()
+        with ROOM_CACHE_LOCK:   # V193: 2초 동안은 모두에게 같은 값(참여자 수·읽음 위치) — 1000명이 동시에 깨어나도 한 번만 계산
+            c = ROOM_CACHE.get(('st', rid))
+            busy = ROOM_CACHE.get(('stb', rid))
+            if c and (now - c[0] < 2.0 or (busy and now - busy < 5)):   # 누가 계산 중이면 잠깐 옛 값
+                return dict(c[1], rv=READ_VER.get(rid, 0))
+            ROOM_CACHE[('stb', rid)] = now
         with PRESENCE_LOCK:
             for k in [k for k, t in PRESENCE.items() if now - t > ONLINE_SEC * 3]:
                 PRESENCE.pop(k, None)
@@ -1987,19 +2091,27 @@ class H(BaseHTTPRequestHandler):
         rows = q('SELECT r.last_id FROM reads r JOIN sessions s ON s.id=r.user WHERE r.room=? AND r.seen>?',
                  (rid, now - MEMBER_DAYS * 86400))
         mem = q('SELECT COUNT(*) n FROM members m JOIN sessions s ON s.id=m.user WHERE m.room=?', (rid,), one=True)['n']
-        return {'online': max(1, online), 'members': max(1, mem), 'rp': sorted(x['last_id'] for x in rows), 'rv': READ_VER.get(rid, 0)}
+        st = {'online': max(1, online), 'members': max(1, mem), 'rp': sorted(x['last_id'] for x in rows)}
+        with ROOM_CACHE_LOCK:
+            ROOM_CACHE[('st', rid)] = (now, st)
+            ROOM_CACHE.pop(('stb', rid), None)
+        return dict(st, rv=READ_VER.get(rid, 0))
 
     def set_read(self, rid, last):
-        cur = q('SELECT last_id FROM reads WHERE room=? AND user=?', (rid, self.user['id']), one=True)
-        now = time.time()
-        if cur and cur['last_id'] >= last:
-            q('UPDATE reads SET seen=? WHERE room=? AND user=?', (now, rid, self.user['id']), commit=True)
+        # V193: 읽음은 메모리에 모았다가 1.5초마다 한 번에 저장(1000명이 동시에 읽어도 저장은 1번)
+        key, now = (rid, self.user['id']), time.time()
+        with READ_LOCK:
+            p = READ_PEND.get(key)
+        if p is not None:
+            curl = p[0]
+        else:
+            cur = q('SELECT last_id FROM reads WHERE room=? AND user=?', key, one=True)
+            curl = cur['last_id'] if cur else -1
+        with READ_LOCK:
+            READ_PEND[key] = (max(curl, last), now)
+        if curl >= last:
             return False
-        q('INSERT OR REPLACE INTO reads(room,user,last_id,seen) VALUES(?,?,?,?)',
-          (rid, self.user['id'], last, now), commit=True)
-        READ_VER[rid] = READ_VER.get(rid, 0) + 1
-        with NEW_MSG:
-            NEW_MSG.notify_all()
+        READ_DIRTY.add(rid)   # V193: 1.5초마다 모아서 READ_VER을 올리고 알림(_read_ticker)
         return True
 
     def read_mark(self, rid):
@@ -2024,8 +2136,10 @@ class H(BaseHTTPRequestHandler):
         self.touch(rid)
         my_read = None
         if after <= 0:   # 처음 불러올 때: 내가 어디까지 읽었는지(안 읽은 곳에서 멈춤)
+            with READ_LOCK:
+                p0 = READ_PEND.get((rid, self.user['id']))
             r0 = q('SELECT last_id FROM reads WHERE room=? AND user=?', (rid, self.user['id']), one=True)
-            my_read = r0['last_id'] if r0 else 0
+            my_read = max(r0['last_id'] if r0 else 0, p0[0] if p0 else 0)
         while True:
             if after <= 0:
                 rows = q('SELECT * FROM (SELECT * FROM messages WHERE room=? ORDER BY id DESC LIMIT 200) ORDER BY id', (rid,))
@@ -2038,7 +2152,15 @@ class H(BaseHTTPRequestHandler):
                 break
             with NEW_MSG:
                 NEW_MSG.wait(timeout=max(0.5, min(10, deadline - time.time())))
-        al = self.aliases(rid)
+        need = {r['author'] for r in rows}
+        for r in rows:
+            if r['reply']:
+                try:
+                    need.add((json.loads(r['reply']) or {}).get('author'))
+                except (ValueError, AttributeError):
+                    pass
+        need.discard(None)
+        al = self.aliases(rid, need)
         self.touch(rid)
         out = dict({'ok': True, 'epoch': epoch(rid), 'messages': [self.msg_out(r, al) for r in rows]}, **self.room_state(rid))
         if my_read is not None:
@@ -2075,6 +2197,18 @@ class H(BaseHTTPRequestHandler):
                     DB.commit()
             if f:
                 files.append({'id': f['id'], 'name': f['name'], 'kind': f['kind'], 'size': f['size']})
+        # V193: 사진마다 앱이 만든 작은 미리보기(약 40KB)를 함께 올리면 대화에는 그것을 보여 준다(원본은 크게 볼 때만) — 1000명이 같은 사진을 받을 때 PC 회선 부담을 크게 줄임
+        tm = b.get('thumbs') if isinstance(b.get('thumbs'), dict) else {}
+        for fe in files:
+            t = tm.get(fe['id'])
+            if fe['kind'] != 'image' or not (isinstance(t, str) and re.fullmatch(r'[a-f0-9]{24}', t)):
+                continue
+            with DB_LOCK:
+                f = DB.execute("SELECT id FROM files WHERE id=? AND owner=? AND room=? AND used=0 AND kind='image'", (t, self.user['id'], rid)).fetchone()
+                if f:
+                    DB.execute('UPDATE files SET used=1 WHERE id=?', (t,))
+                    DB.commit()
+                    fe['th'] = t
         if not text and not files:
             return self.err(400, '보낼 내용이 없습니다')
         self._posted = False
@@ -2083,6 +2217,8 @@ class H(BaseHTTPRequestHandler):
         except Exception:
             for f in ([] if self._posted else files):   # 글이 저장되지 않았으면 붙이려던 파일을 다시 '안 씀'으로(하루 뒤 정리 대상)
                 q('UPDATE files SET used=0 WHERE id=?', (f['id'],), commit=True)
+                if f.get('th'):
+                    q('UPDATE files SET used=0 WHERE id=?', (f['th'],), commit=True)
             raise
 
     def _post_claimed(self, rid, b, text, files):
@@ -2104,7 +2240,7 @@ class H(BaseHTTPRequestHandler):
         with NEW_MSG:
             NEW_MSG.notify_all()
         r = q('SELECT * FROM messages WHERE id=?', (mid,), one=True)
-        return self.send(200, dict({'ok': True, 'message': self.msg_out(r, self.aliases(rid))}, **self.room_state(rid)))
+        return self.send(200, dict({'ok': True, 'message': self.msg_out(r, self.aliases(rid, {r['author']}))}, **self.room_state(rid)))
 
     def message_delete(self, mid):
         r = q('SELECT * FROM messages WHERE id=?', (mid,), one=True)
@@ -2112,12 +2248,12 @@ class H(BaseHTTPRequestHandler):
             return self.err(404, '없는 메시지입니다')
         if r['author'] != self.user['id'] and self.user['role'] != 'admin':
             return self.err(403, '본인 메시지만 지울 수 있습니다')
-        for f in json.loads(r['files'] or '[]'):
+        for fid in file_ids(r['files']):
             try:
-                os.remove(os.path.join(FILES, f['id']))
+                os.remove(os.path.join(FILES, fid))
             except OSError:
                 pass
-            q('DELETE FROM files WHERE id=?', (f['id'],), commit=True)
+            q('DELETE FROM files WHERE id=?', (fid,), commit=True)
         q('UPDATE messages SET text=?, files=? WHERE id=?', (DELETED_TXT, '[]', mid), commit=True)
         # 이 글을 인용한 답장에서도 원문을 지운다
         for x in q("SELECT id, reply FROM messages WHERE room=? AND reply IS NOT NULL AND reply LIKE ?", (r['room'], '%"id": ' + str(mid) + ',%')):
