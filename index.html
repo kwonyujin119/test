@@ -132,6 +132,7 @@ body.compact:not(.nosearch) .hero{padding-block:18px 10px}
 /* V184: 검색 결과를 보는 동안 검색창을 위에 고정 — 결과를 내려 보다가도 바로 다른 검색 */
 body.compact:not(.nosearch):not(.home) .hero{position:sticky;top:calc(var(--hdr,56px) + var(--sat,0px));z-index:12;background:var(--bg);padding-block:8px 10px;box-shadow:0 8px 14px -12px rgba(0,0,0,.25)}
 body.compact:not(.nosearch):not(.home) .hero .hint{display:none}
+body.compact:not(.nosearch):not(.home) #panel :is(a,button,input,summary,[tabindex]){scroll-margin-top:calc(var(--hdr,56px) + var(--sat,0px) + 96px)}   /* 키보드 이동 때 고정 검색창 밑에 숨지 않게 */
 body.home main{display:flex;flex-direction:column;justify-content:center}
 body.home .hero{padding-block:24px!important}
 body.home .panel{display:none}
@@ -2142,12 +2143,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     swipeTo(pos===5 ? 'log' : SEQ[pos-1], -1); return true;
   }
   // V184: S로 돌아오면 마지막 검색 결과 그대로(새 검색은 위 고정 검색창에서, 지우기는 ✕)
-  function goSearch(){ const qi=$('#q'); if(qi){ qi.value=state.query; syncClear(); } go('search'); }
+  let SRCH_Y=null;
+  function goSearch(){ const qi=$('#q'); if(qi){ qi.value=state.query; syncClear(); } const y=SRCH_Y&&SRCH_Y.q===state.query&&state.route!=='search'?SRCH_Y.y:0; go('search'); rootScrollTo(0);
+    if(y>0) [60,350,900].forEach(t=>setTimeout(()=>{ if(state.route==='search') rootScrollTo(y); },t)); }   /* 결과가 다 그려지는 동안 몇 번 맞춤 */
   function swipeTo(r, dir){
     const m=document.querySelector('main'); m.classList.remove('swipe-l','swipe-r'); void m.offsetWidth;
     m.classList.add(dir>0?'swipe-l':'swipe-r'); setTimeout(()=>m.classList.remove('swipe-l','swipe-r'),260);
-    if(r==='search') goSearch(); else go(r);
-    rootScrollTo(0);
+    if(r==='search') goSearch(); else { go(r); rootScrollTo(0); }
   }
   // 넘기면 안 되는 상황: 문서·사진·보고서가 열려 있음, 쓰던 글이 입력칸에 남아 있음
   function swipeBusy(){
@@ -2259,6 +2261,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     sync(); if(window.ResizeObserver&&hdr) new ResizeObserver(sync).observe(hdr); window.addEventListener('resize',sync); }
   function rootScrollTo(top,smooth){ const o={top:top,behavior:smooth?'smooth':'auto'}; const r=scrollRoot(); if(r) r.scrollTo(o); else window.scrollTo(o); }
   function go(route, query){
+    if(state.route==='search'&&route!=='search'){ const sr=scrollRoot(); SRCH_Y={q:state.query, y:sr?sr.scrollTop:window.scrollY}; }   // V184: 결과를 보던 자리
     if(query!==undefined){ state.query=query; try{ sessionStorage.setItem('sachil_lastq',String(query||'').slice(0,200)); }catch(_){ } }
     // 화면 이동은 방문 기록을 쌓지 않고 바꿔 끼운다(V60). 갤럭시 '<'(뒤로)는 아래 뒤로가기 처리가 맡는다 —
     // 열린 창 닫기 → 위로 스크롤 → 첫 화면 → '종료하려면 다시 누르세요'(인스타그램 방식)
@@ -2333,7 +2336,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(e.defaultPrevented||e.button!==0||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey) return;
     const a=e.target.closest&&e.target.closest('a[href^="#"]'); if(!a||a.target) return;
     const r=a.getAttribute('href').slice(1); if(!r) return;
-    e.preventDefault(); if(r==='search'){ goSearch(); rootScrollTo(0); return; } go(r==='chat-bot'?'ai':r); rootScrollTo(0);
+    e.preventDefault(); if(r==='search'){ goSearch(); return; } go(r==='chat-bot'?'ai':r); rootScrollTo(0);
   });
 
   const MAIN=['search','ai','board','log'];
@@ -2360,6 +2363,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     document.body.classList.toggle('home', r==='search' && !state.query.trim());
     document.body.classList.toggle('chatview', r==='ai' || ROOMS_R.includes(r));
     document.body.classList.toggle('hubview', r==='hub');
+    if(r==='search'){ const qi=$('#q'); if(qi&&document.activeElement!==qi&&qi.value!==state.query){ qi.value=state.query; qi.closest('.search')&&qi.closest('.search').classList.toggle('has-text',!!qi.value); } }   // V184: 어느 길로 돌아와도 입력칸 = 보이는 결과
     if(r==='search' && focusSearchAfter){ focusSearchAfter=false; const qi=$('#q'); if(qi){ qi.focus(); qi.select(); } }
     document.querySelectorAll('#sheetGrid a').forEach(a=>{ if(a.dataset.slug===r) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
     syncTabbar();
@@ -2434,7 +2438,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     box.innerHTML=`<div class="group-title">건축물대장 · ${esc(lab)}</div><p class="srch-note">건축물대장을 찾는 중…</p>`;
     box.insertAdjacentHTML('afterend','<div id="srchFfus"><div class="group-title">가까운 소방용수시설</div><p class="srch-note">찾는 중…</p></div>');
     ffusSearch(A.region_1depth_name||'', A.region_2depth_name||'', +hit.y, +hit.x, tok);
-    const x=await api(`/api/bld?b=${A.b_code}&bun=${encodeURIComponent(A.main_address_no)}&ji=${encodeURIComponent(A.sub_address_no||'0')}&mt=${A.mountain_yn==='Y'?1:0}`);
+    const x=await apiS(`/api/bld?b=${A.b_code}&bun=${encodeURIComponent(A.main_address_no)}&ji=${encodeURIComponent(A.sub_address_no||'0')}&mt=${A.mountain_yn==='Y'?1:0}`);
     if(!live()) return;
     const head=`<div class="group-title">건축물대장 · ${esc(lab)}</div>`;
     if(!x.ok||!x.j||x.j.ok===false){ box.innerHTML=head+`<p class="srch-note">❌ ${esc((x.j&&x.j.error)||'서버에 연결하지 못했습니다(서버 업데이트가 필요할 수 있음)')}</p>`; return; }
@@ -2447,7 +2451,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   async function lawTextSearch(q,tok){
     const el=$('#srchLawTxt'); if(!el) return;
     el.innerHTML='<div class="group-title">법령 조문 · 법제처 현행</div><p class="srch-note">법제처에서 관련 조문을 찾는 중…</p>';
-    const x=await api('/api/lawtext?q='+encodeURIComponent(q));
+    const x=await apiS('/api/lawtext?q='+encodeURIComponent(q));
     if(tok!==SEARCHGEN||document.getElementById('srchLawTxt')!==el) return;
     const rows=(x.ok&&x.j&&x.j.ok&&x.j.rows)||[];
     if(!rows.length){ el.innerHTML=''; return; }
@@ -2460,7 +2464,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     el.querySelectorAll('[data-lx]').forEach(b=>b.addEventListener('click',()=>{ const p=document.getElementById('lx'+b.dataset.lx); const on=p.classList.toggle('open'); b.setAttribute('aria-expanded',String(on)); b.textContent=on?'접기':'조문 전체'; })); }
   async function lawSearch(q,tok){
     const el=$('#srchLaw'); if(!el) return;
-    const x=await api('/api/law?q='+encodeURIComponent(q));
+    const x=await apiS('/api/law?q='+encodeURIComponent(q));
     if(tok!==SEARCHGEN||document.getElementById('srchLaw')!==el||!x.ok||!x.j||!x.j.ok) return;
     const rows=x.j.rows||[]; if(!rows.length) return;
     const ord=['law','admrul','ordin'];
@@ -2471,7 +2475,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const FFUS_T={};   // 시설유형 코드 → 이름(자료에 이름이 없을 때만 코드 그대로)
   async function ffusSearch(sd,sg,lat,lng,tok){
     const el=$('#srchFfus'); if(!el) return;
-    const x=await api(`/api/ffus?sd=${encodeURIComponent(sd)}&sg=${encodeURIComponent(sg)}&lat=${lat}&lng=${lng}`);
+    const x=await apiS(`/api/ffus?sd=${encodeURIComponent(sd)}&sg=${encodeURIComponent(sg)}&lat=${lat}&lng=${lng}`);
     if(tok!==SEARCHGEN||document.getElementById('srchFfus')!==el) return;
     const head='<div class="group-title">가까운 소방용수시설 · 반경 1,000m</div>';
     if(!x.ok||!x.j||x.j.ok===false){ el.innerHTML=head+`<p class="srch-note">❌ ${esc((x.j&&x.j.error)||'서버에 연결하지 못했습니다(서버 업데이트가 필요할 수 있음)')}</p>`; return; }
@@ -2538,7 +2542,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       }
     };
     if(!SRV.on){ done(0); return; }
-    api('/api/search?q='+encodeURIComponent(q)).then(r=>{
+    apiS('/api/search?q='+encodeURIComponent(q)).then(r=>{
       if(tok!==SEARCHGEN || state.route!=='search' || state.query.trim()!==q) return;
       const box=$('#srchBody'); if(!box) return;
       if(!r.ok){ box.innerHTML='<p class="srch-note">본문 검색에 실패했습니다. 서버 연결을 확인하세요.</p>'; done(0); return; }
@@ -4941,6 +4945,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       return fin?{ok:true, status:200, j:fin}:{ok:false, status:0, j:{error:'답변이 중간에 끊겼습니다. 다시 해 보세요.', text:acc}};
     }catch(e){ return {ok:false, status:0, aborted:e&&e.name==='AbortError', j:{error:'서버에 연결할 수 없습니다', text:acc}}; }
   }
+  // V184: 검색 화면 조회(GET)는 10분간 기억 — 다른 화면에 갔다 돌아올 때 공공데이터·본문 검색을 다시 부르지 않는다(성공한 응답만)
+  const SQC=new Map();
+  async function apiS(path){ const c=SQC.get(path); if(c&&Date.now()-c.t<600e3) return c.r; const r=await api(path); if(r&&r.ok&&r.j&&r.j.ok!==false){ if(SQC.size>60) SQC.delete(SQC.keys().next().value); SQC.set(path,{t:Date.now(),r}); } return r; }
   async function api(path, opt){
     opt=opt||{};
     const init={method:opt.method||((opt.json!==undefined||opt.body)?'POST':'GET'), credentials:SRVBASE?'omit':'same-origin', headers:{'X-SACHIL':'1'}};
@@ -6021,23 +6028,24 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const q=$('#q'), box=$('#searchBox');
   $('#chatBtn').addEventListener('click',()=>{ closeSheet(); if(state.route==='chat') render(); });
   $('#dbBtn').addEventListener('click',()=>{ closeSheet(); if(state.route==='debrief') render(); });
-  $('#navSearch').addEventListener('click',e=>{ e.preventDefault(); goSearch(); rootScrollTo(0); });
+  $('#navSearch').addEventListener('click',e=>{ e.preventDefault(); goSearch(); });
   function syncClear(){ box.classList.toggle('has-text', !!q.value); }
   if(state.query&&!q.value){ q.value=state.query; syncClear(); }   // V184: 새로고침 뒤에도 마지막 검색어
-  q.addEventListener('input',()=>{ syncClear(); if(!q.value.trim() && state.route==='search' && state.query){ state.query=''; render(); } });
+  q.addEventListener('input',()=>{ syncClear(); if(!q.value.trim() && state.route==='search' && state.query) go('search',''); });
+  q.addEventListener('focus',()=>{ if(state.route==='search'&&state.query&&q.value===state.query) setTimeout(()=>{ try{ q.select(); }catch(_){ } },0); });   // V184: 결과를 보다 검색창을 누르면 전체 선택 — 바로 새 낱말
   $('#clearBtn').addEventListener('click',()=>{ q.value=''; syncClear(); go('search',''); q.focus(); });
   $('#searchForm').addEventListener('submit',e=>{ e.preventDefault(); go('search', q.value); q.blur(); });
-  // 브랜드(ICTC 아이콘·이름) 클릭 = 초기 화면: 검색어를 지우고 검색 화면으로
-  document.querySelector('.brand').addEventListener('click',e=>{ e.preventDefault(); q.value=''; syncClear(); state.query=''; go('hub'); rootScrollTo(0,true); });   // 로고 = 첫 화면(6개 박스)
+  // 브랜드(로고) 클릭 = 첫 화면(6개 박스). V184: 마지막 검색 결과는 지우지 않는다(S로 돌아오면 그대로, 지우기는 ✕)
+  document.querySelector('.brand').addEventListener('click',e=>{ e.preventDefault(); go('hub'); rootScrollTo(0,true); });   // 로고 = 첫 화면(6개 박스)
   $('#menuBtn').addEventListener('click',openSheet);
-  document.querySelectorAll('.tabbar button').forEach(b=>b.addEventListener('click',()=>{ const t=b.dataset.go; if(t==='search'){ goSearch(); rootScrollTo(0); } else go(t); }));
+  document.querySelectorAll('.tabbar button').forEach(b=>b.addEventListener('click',()=>{ const t=b.dataset.go; if(t==='search') goSearch(); else go(t); }));
   document.addEventListener('keydown',e=>{
     if(e.isComposing) return;
     if(!pv.hidden){ if(e.key==='Escape') closePdf(); else if(e.key==='+'||e.key==='=') pvZoom(1); else if(e.key==='-') pvZoom(-1); return; }
     if(!lb.hidden){ if(e.key==='Escape') closeLightbox(); return; }
     if(!$('#report').hidden){ if(e.key==='Escape') closeReport(); return; }
     if(e.key==='Escape'){ if(sheet.classList.contains('open')){ closeSheet(); return; } if(document.activeElement===q){ q.value=''; syncClear(); go('search',''); } }
-    if(e.key==='/' && !/input|textarea|select/i.test(document.activeElement.tagName) && !document.querySelector('#mapov:not([hidden]),#bjov:not([hidden]),#hydov:not([hidden])')){ e.preventDefault(); if(state.route!=='search'){ focusSearchAfter=true; go('search'); } else { q.focus(); q.select(); } }
+    if(e.key==='/' && !/input|textarea|select/i.test(document.activeElement.tagName) && !document.querySelector('#mapov:not([hidden]),#bjov:not([hidden]),#hydov:not([hidden])')){ e.preventDefault(); if(state.route!=='search'){ focusSearchAfter=true; goSearch(); } else { q.focus(); q.select(); } }
   });
 
   // ---------- 시작 ----------
