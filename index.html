@@ -1,4 +1,73 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><style>:root{color-scheme:light;box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest?v=112"><link rel="icon" href="icons/icon-rounded-48.png?v=112" type="image/png" sizes="48x48"><link rel="icon" href="icons/icon-rounded-192.png?v=112" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=84"><meta name="theme-color" content="#FDD000"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SACHIL:47"></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><style>:root{color-scheme:light;box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest?v=112"><link rel="icon" href="icons/icon-rounded-48.png?v=112" type="image/png" sizes="48x48"><link rel="icon" href="icons/icon-rounded-192.png?v=112" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=84"><meta name="theme-color" content="#FDD000"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="SACHIL:47">
+<style id="v198-deb">
+/* V198 디브리핑룸(deb) — 입장 화면(동의·대화명·서버 대기)과 방 정체성. .dbx 와 body[data-room="deb"] 안에서만 적용 */
+.dbwrap.dbx{max-width:640px;gap:14px}
+.dbwrap.dbx h3{margin:0;font-size:15px;line-height:1.35;font-weight:800;color:var(--fg);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dbwrap.dbx h3 small{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--navy);background:var(--navy-soft);padding:2px 7px;border-radius:4px}
+.dbwrap.dbx .eyebrow{color:var(--navy);font-weight:700}
+.dbwrap.dbx .eyebrow::before{background:var(--ember);box-shadow:inset 0 0 0 1.5px var(--navy)}
+.dbwrap.dbx .dbx-consent{padding:24px 20px;gap:18px}
+.dbx-hero,.dbx-side{display:grid;gap:12px;min-width:0;align-content:start}
+.dbx-hero .art{margin:0 auto}
+.dbwrap.dbx .dbx-hero .room-info{margin:0}
+/* 익명 안내 — 노랑 띠로 '지켜야 할 것' 강조 */
+.dbx-anon{display:grid;gap:8px;padding:12px 14px;border-left:4px solid var(--ember-2);background:var(--ember-soft);border-radius:0 10px 10px 0}
+.dbx-anon ul{margin:0;padding:0;list-style:none;display:grid;gap:6px;font-size:14.5px;line-height:1.5;color:var(--fg)}
+.dbx-anon li{position:relative;padding-left:22px;word-break:keep-all}
+.dbx-anon li::before{content:"";position:absolute;left:3px;top:.42em;width:10px;height:5px;border-left:2.5px solid var(--navy);border-bottom:2.5px solid var(--navy);transform:rotate(-45deg)}
+.dbx-ic{position:relative;flex:none;width:14px;height:11px;margin-top:5px;border-radius:2px;background:var(--navy)}
+.dbx-ic::before{content:"";position:absolute;left:2.5px;top:-6px;width:9px;height:8px;border:2px solid var(--navy);border-bottom:0;border-radius:5px 5px 0 0;box-sizing:border-box}
+/* AAR 4단계 — 2x2 판 */
+.dbx-aar{display:grid;gap:10px;min-width:0}
+.dbx-aar ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.dbx-aar li{display:grid;gap:3px;align-content:start;padding:10px 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--surface);min-width:0}
+.dbx-aar li b{display:flex;align-items:center;gap:7px;font-size:15px;color:var(--navy)}
+.dbx-aar li i{font-style:normal;font-family:var(--mono);font-size:12px;font-weight:700;width:20px;height:20px;border-radius:5px;background:var(--navy);color:#fff;display:inline-grid;place-items:center;flex:none}
+.dbx-aar li span{font-size:13.5px;line-height:1.45;color:var(--fg);word-break:keep-all}
+.dbx-ex{margin:0;padding:10px 12px;border-radius:10px;background:var(--surface-2);border:1px dashed var(--line-2);font-size:13.5px;line-height:1.55;color:var(--fg);word-break:keep-all}
+.dbx-ex b{display:block;font-size:12px;color:var(--muted);margin-bottom:2px}
+.dbwrap.dbx .dbx-rule{margin:0;font-size:15.5px;line-height:1.6;font-weight:600;color:var(--fg);word-break:keep-all}
+/* 대화명 화면 */
+.dbwrap.dbx .dbx-h{margin:0;font-size:20px;line-height:1.35;word-break:keep-all}
+.dbx-nickrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;min-width:0}
+.dbwrap.dbx .dbx-nickrow input{width:100%;min-width:0}
+.dbwrap.dbx .dbx-nickrow .btn{min-height:44px;white-space:nowrap;padding:0 14px;border:1px solid var(--line-2);background:var(--surface);color:var(--navy)}
+.dbwrap.dbx .dbx-nickrow .btn:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
+.dbwrap.dbx .anon-tip{border-color:var(--ember-2);border-left-width:4px;background:var(--ember-soft)}
+.dbwrap.dbx .dbx-guide{padding:18px;display:grid;gap:16px;align-content:start}
+.dbwrap.dbx .dbx-guide .dbx-aar h3::before{content:"";width:4px;height:16px;border-radius:2px;background:var(--navy)}
+@media (pointer:coarse){ .dbwrap.dbx .dbx-nickrow .btn,.dbwrap.dbx .acts .btn{min-height:52px} }
+/* 태블릿 세로(600~999): 한 단, 조금 넓게 */
+@media (min-width:600px) and (max-width:999px){ .dbwrap.dbx{max-width:680px} .dbwrap.dbx .dbx-consent{padding:28px} }
+/* PC·태블릿 가로(1000+): 왼쪽 소개 · 오른쪽 규칙/행동 2단 */
+@media (min-width:1000px){
+  .dbwrap.dbx:has(.dbx-consent),.dbwrap.dbx.dbx-nickwrap{max-width:1040px}
+  .dbwrap.dbx .dbx-consent{grid-template-columns:minmax(0,5fr) minmax(0,6fr);column-gap:36px;padding:32px 36px;align-items:center}
+  .dbwrap.dbx .dbx-hero{padding-right:36px;border-right:1px solid var(--line);align-self:stretch;align-content:center}
+  .dbwrap.dbx .dbx-hero .art{width:260px;max-width:100%}
+  .dbwrap.dbx .dbx-hero h2{font-size:26px}
+  .dbwrap.dbx.dbx-nickwrap{grid-template-columns:minmax(0,5fr) minmax(0,6fr);align-items:start;gap:20px}
+  .dbwrap.dbx.dbx-nickwrap .create{padding:28px}
+  .dbwrap.dbx.dbx-nickwrap .dbx-guide{padding:24px 28px}
+}
+/* 모바일: 그림 줄이고, 휴대폰에서 '동의하고 입장'이 화면 밖으로 밀리지 않게 아래에 붙임 */
+@media (max-width:599px){
+  .dbwrap.dbx .dbx-consent{padding:20px 16px;gap:14px}
+  .dbwrap.dbx .dbx-hero .art{width:150px}
+  .dbwrap.dbx .dbx-consent .acts{position:sticky;bottom:calc(var(--bar-h) + var(--sab));z-index:2;margin:0 -16px -20px;padding:10px 16px calc(12px);background:var(--surface);border-top:1px solid var(--line);border-radius:0 0 var(--r) var(--r)}
+  .dbwrap.dbx .dbx-guide{padding:16px}
+  .dbx-aar li{padding:9px 10px}
+}
+@media (max-width:359px){ .dbx-aar ol{grid-template-columns:minmax(0,1fr)} .dbwrap.dbx .dbx-nickrow{grid-template-columns:minmax(0,1fr)} }
+/* 방 안: 제목 옆 '익명' 표시, 📌 안내에 노랑 띠 */
+.dbx-badge{flex:none;margin-left:8px;padding:3px 9px;border-radius:999px;background:var(--ember);color:var(--ink);font-size:12px;font-weight:800;line-height:1.3;letter-spacing:.02em}
+@media (max-width:599px){ .dbx-badge{margin-left:4px;padding:2px 7px;font-size:11px} }
+body[data-room="deb"] .room-note[data-kind="deb"]{box-shadow:inset 4px 0 0 var(--ember-2)}
+.room-note .dbx-q{margin:2px 12px 10px 34px;font-size:12.5px;line-height:1.5;color:var(--fg);word-break:keep-all}
+.room-note .dbx-q b{color:var(--navy)}
+body[data-room="deb"] .srv-wait b{font-size:16px}
+</style>
+</head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
 <style>
@@ -4747,7 +4816,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     roomNoteBind(panel.querySelector('.room-note')); rinfoSync();
   }
   function roomNoteHtml(kind){ const r=ROOM_INFO[kind]||ROOM_INFO.net;
-    return `<details class="room-note${r.lead.includes('\n')?' two':''}" data-kind="${kind}"><summary><span class="pin" aria-hidden="true">📌</span><span class="tx">${nl(r.lead)}</span></summary><ul>${r.more.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${isProf()?'<button type="button" class="btn ghost sm rn-edit">✎ 핀 문구 수정</button>':''}</details>`; }
+    return `<details class="room-note${r.lead.includes('\n')?' two':''}" data-kind="${kind}"><summary><span class="pin" aria-hidden="true">📌</span><span class="tx">${nl(r.lead)}</span></summary><ul>${r.more.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${kind==='deb'?'<p class="dbx-q"><b>계획</b> → <b>실제</b> → <b>차이</b> → <b>다음</b> 순서로 쓰면 지휘관이 바로 반영할 수 있어요.</p>':''}${isProf()?'<button type="button" class="btn ghost sm rn-edit">✎ 핀 문구 수정</button>':''}</details>`; }
   function roomNoteBind(d){ if(!d) return; d.addEventListener('toggle',()=>{ if(window.__fitConvo) window.__fitConvo(); });
     const e=d.querySelector('.rn-edit'); if(e) e.addEventListener('click',()=>{ openBangjae(); setTimeout(()=>{ if(window.__bjTab) window.__bjTab('pin'); },60); }); }
   function renderChat(panel,kind){
@@ -5218,6 +5287,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function renderDebrief(panel,kind){
     // 동의는 기기에 한 번만 묻는다(47망·디브리핑룸 공통). 대화명(서버 세션)이 있으면 바로 방으로.
     useRoom(kind);
+    dbRoomTag(kind);   /* V198: 방 표시(body[data-room]) — 디브리핑룸 전용 모양은 이 선택자로만 */
     if(!DB.agreed){ dbConsent(panel,kind); return; }
     // 다른 방에서 처음 들어왔고 이 방 토큰이 있으면 서버에 대화명을 먼저 묻는다
     if(SRV.on && SRVTOK && MES[RK]===undefined){ const rk=RK, c=meCached(rk);
@@ -5226,16 +5296,44 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(c){ MES[rk]=c; }   /* 기억해 둔 대화명으로 바로 방을 연다(서버 확인 결과가 다르면 다시 그림) */
       else { panel.innerHTML='<p class="convo-note">불러오는 중…</p>'; chk.then(()=>{ if(MES[rk]===undefined) MES[rk]=null; if(rk===RK&&ROOMS_R.includes(state.route)) render(); }); return; } }
     if(!SRV.on && SRV.probing && (TOKS['']||TOKS[':deb'])){   // V122: 서버가 다시 켜지는 중 — 대화명은 그대로, 연결되면 바로 방으로
-      panel.innerHTML=`<div class="srv-wait"><span class="spin" aria-hidden="true"></span><b>${SRV.retry?'서버가 다시 켜지는 중입니다':'서버에 연결하는 중…'}</b><p>대화명과 대화는 그대로 유지됩니다. 연결되면 바로 방으로 들어갑니다.</p><a class="btn ghost" href="#hub">첫 화면으로</a></div>`; return; }   // V138: 지하·터널에서 갇히지 않게
+      panel.innerHTML=`<div class="srv-wait"><span class="spin" aria-hidden="true"></span><b>${SRV.retry?'서버가 다시 켜지는 중입니다':'서버에 연결하는 중…'}</b><p>${kind==='deb'?'익명 대화명과 남긴 의견은 그대로 유지됩니다.':'대화명과 대화는 그대로 유지됩니다.'} 연결되면 바로 방으로 들어갑니다.</p><a class="btn ghost" href="#hub">첫 화면으로</a></div>`; return; }   // V138: 지하·터널에서 갇히지 않게
     if(SRV.on ? !SRV.me : !getNick()){ dbNick(panel,kind); return; }
     DB.enter=false;
     swipeTip();
     if(SRV.on) srvRoom(panel,kind); else localRoom(panel,kind);
     addRoomNote(panel,kind);
+    if(kind==='deb') dbMark(panel);
   }
+  /* V198: 디브리핑룸 정체성 — 익명 AAR(사후 강평) 길잡이 */
+  const DB_ANON=['다른 참여자에게는 <b>대화명만</b> 보여요.','실명·소속·계급·차량 번호처럼 <b>나를 알 수 있는 말</b>은 쓰지 마세요.','<b>사람이 아니라</b> 상황·절차·장비를 이야기해요.'];
+  const DB_AAR=[['계획','무엇을 하려 했나요?'],['실제','실제로는 어떻게 됐나요?'],['차이','왜 달랐나요? 잘된 점·아쉬운 점'],['다음','다음 현장에서 이어 갈 것과 바꿀 것']];
+  const dbAnonHtml=()=>`<div class="dbx-anon" role="note"><h3><span class="dbx-ic" aria-hidden="true"></span>익명으로 참여해요</h3><ul>${DB_ANON.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+  const dbAarHtml=()=>`<div class="dbx-aar"><h3>이렇게 돌아봐요 <small>AAR 4단계</small></h3><ol>${DB_AAR.map(([k,v],i)=>`<li><b><i>${i+1}</i>${k}</b><span>${v}</span></li>`).join('')}</ol><p class="dbx-ex"><b>좋은 의견 예</b> 2층 진입 때 무전이 겹쳐 지시를 놓쳤어요 → 진입조 채널을 따로 쓰면 좋겠어요.</p></div>`;
+  function dbRoomTag(kind){ try{ document.body.dataset.room=kind==='deb'?'deb':'net'; }catch(_){ }
+    if(window.__dbRoomHook) return; window.__dbRoomHook=1;
+    window.addEventListener('hashchange',()=>setTimeout(()=>{ if(!ROOMS_R.includes(state.route)) delete document.body.dataset.room; },0)); }
+  function dbMark(panel){ const l=panel.querySelector('.roomhead .l'); if(!l||l.querySelector('.dbx-badge')) return;
+    l.insertAdjacentHTML('beforeend','<span class="dbx-badge" title="다른 참여자에게는 대화명만 보입니다">익명</span>'); }
 
   function dbConsent(panel,kind){
-    panel.innerHTML=`
+    if(kind==='deb') panel.innerHTML=`
+      <div class="dbwrap dbx">
+        <section class="card consent dbx-consent" aria-labelledby="dbQ">
+          <div class="dbx-hero">
+            ${AS.dbConsent?`<img class="art" src="${AS.dbConsent}" alt="">`:''}
+            <span class="eyebrow">디브리핑룸 · 익명 강평</span>
+            <h2 id="dbQ"><span class="nw">디브리핑룸에</span> 입장하시겠습니까?</h2>
+            ${roomInfoHtml(kind)}
+          </div>
+          <div class="dbx-side">
+            ${dbAnonHtml()}
+            ${dbAarHtml()}
+            <p class="dbx-rule">${DB_RULE}</p>
+            <div class="acts"><button type="button" class="btn ghost" id="dbHome">첫 화면으로</button><button type="button" class="btn primary" id="dbAgree">동의하고 입장</button></div>
+          </div>
+        </section>
+      </div>`;
+    else panel.innerHTML=`
       <div class="dbwrap">
         <section class="card consent" aria-labelledby="dbQ">
           ${AS.dbConsent?`<img class="art" src="${AS.dbConsent}" alt="">`:''}
@@ -5253,11 +5351,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 
   function dbNick(panel,kind){
     panel.innerHTML=`
-      <div class="dbwrap">
+      <div class="dbwrap${kind==='deb'?' dbx dbx-nickwrap':''}">
         <form class="card create" id="nickForm" autocomplete="off">
-          <span class="eyebrow">${ROOM_NAME[kind]||'47망'}</span>
-          <div class="anon-tip">${AS.icAnon?`<img src="${AS.icAnon}" alt="">`:''}<p><b>실명·소속·계급은 쓰지 마세요.</b> 다른 참여자에게는 대화명만 보입니다.</p></div>
-          <div class="row"><label for="nick">대화명 (익명)</label><input id="nick" maxlength="12" placeholder="예: 47번대원" required enterkeyhint="go"></div>
+          <span class="eyebrow">${kind==='deb'?'디브리핑룸 · 익명 강평':(ROOM_NAME[kind]||'47망')}</span>
+          ${kind==='deb'?'<h2 class="dbx-h">익명 대화명을 정해 주세요</h2>':''}
+          <div class="anon-tip">${AS.icAnon?`<img src="${AS.icAnon}" alt="">`:''}<p><b>실명·소속·계급은 쓰지 마세요.</b> 다른 참여자에게는 대화명만 보입니다.${kind==='deb'?' <b>사람이 아니라</b> 상황·절차·장비를 이야기해요.':''}</p></div>
+          <div class="row"><label for="nick">대화명 (익명)</label>${kind==='deb'?'<div class="dbx-nickrow"><input id="nick" maxlength="12" placeholder="예: 47번대원" required enterkeyhint="go"><button type="button" class="btn ghost" id="dbRandNick">무작위로</button></div>':'<input id="nick" maxlength="12" placeholder="예: 47번대원" required enterkeyhint="go">'}</div>
           ${SRV.on&&SRV.requireCode?`<div class="row"><label for="dbCode">입장 코드</label><input id="dbCode" maxlength="40" inputmode="numeric" placeholder="교육 담당자에게 받은 코드" required></div>`:''}
           <p class="note">${SRV.on?'':SRV.probing?' <b>서버 연결을 확인하는 중</b>입니다. 연결되면 공유 디브리핑룸으로 바뀝니다.':' 이 화면은 서버에 연결되지 않아 대화가 <b>이 기기에만</b> 저장됩니다.'}</p>
           ${SRV.notice?`<p class="note" id="srvNote" role="status"><b>${esc(SRV.notice)}</b></p>`:''}
@@ -5265,8 +5364,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           <p class="note err" id="nickErr" role="alert" hidden></p>
           <div class="acts"><button type="button" class="btn ghost" id="dbHome">첫 화면으로</button><button type="submit" class="btn primary" id="nickGo">입장</button></div>
         </form>
+        ${kind==='deb'?`<aside class="card dbx-guide" aria-label="디브리핑 길잡이">${dbAarHtml()}</aside>`:''}
       </div>`;
     const ni=$('#nick'); ni.value=getNick(); SRV.notice='';
+    const rn=$('#dbRandNick'); if(rn) rn.addEventListener('click',()=>{ const W=['대원','현장','강평','소방','지원','안전']; ni.value=W[Math.floor(Math.random()*W.length)]+(100+Math.floor(Math.random()*900)); ni.focus(); });
     $('#dbHome').addEventListener('click',goHome);
     if(window.innerWidth>=600) ni.focus();
     $('#nickForm').addEventListener('submit',async e=>{
