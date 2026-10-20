@@ -510,7 +510,15 @@ body:not(.nosearch) #panel .card.empty.srch-none{padding:20px 16px;margin-bottom
 .sheet-back.open{opacity:1;pointer-events:auto}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--surface);border-radius:18px 18px 0 0;padding:10px 16px calc(16px + var(--sab));transform:translateY(105%);visibility:hidden;transition:transform .25s cubic-bezier(.2,.8,.2,1),visibility 0s linear .25s;max-height:82vh;max-height:82dvh;overflow:auto;box-shadow:0 -8px 30px rgba(0,0,0,.14)}
 .sheet.open{transform:none;visibility:visible;transition:transform .25s cubic-bezier(.2,.8,.2,1),visibility 0s}
-.sheet .grip{width:40px;height:4px;border-radius:2px;background:var(--line-2);margin:0 auto 10px}
+.sheet .grip{display:block;width:120px;height:28px;margin:-6px auto 2px;padding:0;border:0;background:transparent;cursor:grab;touch-action:none}.sheet .grip i{display:block;width:44px;height:5px;margin:0 auto;border-radius:3px;background:var(--line-2);transition:background .15s,width .15s}
+.sheet .grip:hover i,.sheet.drag .grip i{background:var(--muted-2);width:56px}
+/* V184: 회색 바를 위로 끌면 메뉴가 화면 위까지 — 모든 메뉴가 한 화면에 */
+.sheet.full{max-height:calc(100dvh - var(--sat) - 6px);height:calc(100dvh - var(--sat) - 6px);border-radius:14px 14px 0 0;display:flex;flex-direction:column}
+.sheet.full .sheet-grid{flex:1;align-content:start}
+.sheet.drag{transition:none!important}
+.sheet.full .sheet-grid{gap:6px}.sheet.full .sheet-grid a{min-height:50px;padding:6px 10px}.sheet.full .sheet-sep{margin-top:2px}
+@media (max-height:900px){ .sheet.full .sheet-grid a .dd{display:none}.sheet.full .sheet-grid a{min-height:46px} }
+@media (max-height:680px){ .sheet.full .sheet-grid a{min-height:40px;padding:4px 8px}.sheet.full .sheet-grid a .ab{width:30px;height:30px}.sheet.full header{margin-bottom:4px}.sheet.full .foot{margin-top:6px} }
 .sheet header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .sheet h2{margin:0;font-size:16px;font-weight:700}
 .sheet .close{border:0;background:transparent;width:var(--tap);height:var(--tap);border-radius:50%;font-size:22px;color:var(--muted)}
@@ -786,6 +794,7 @@ footer b{color:var(--muted);font-weight:600}
   .sheet{left:50%;right:auto;top:50%;bottom:auto;width:min(620px,calc(100% - 40px));max-height:min(80vh,720px);border-radius:18px;padding:18px 20px 20px;transform:translate(-50%,-50%) scale(.97);box-shadow:0 20px 60px rgba(0,0,0,.18)}
   .sheet.open{transform:translate(-50%,-50%)}
   .sheet .grip{display:none}
+  .sheet{max-height:min(94vh,880px)}.sheet .sheet-grid{grid-template-columns:repeat(3,minmax(0,1fr))}   /* V184: PC는 3열로 — 모든 메뉴가 한 화면에 */
   .sheet-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media (max-width:419px){ .sheet-grid a{padding:10px 8px} }
@@ -930,7 +939,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <div class="sheet-back" id="sheetBack"></div>
 <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
-  <div class="grip" aria-hidden="true"></div>
+  <button type="button" class="grip" id="sheetGrip" aria-label="메뉴 크게 보기(위로 끌기)" aria-expanded="false"><i aria-hidden="true"></i></button>
   <header><h2 id="sheetTitle"><i class="sg sg-MENU" role="img" aria-label="메뉴"></i></h2><button type="button" class="close" id="sheetClose" aria-label="닫기">×</button></header>
   <div class="sheet-grid" id="sheetGrid"></div>
   <div class="foot"><span id="sheetFoot">자료 14개 섹션</span><button type="button" class="inst-menu" id="instMenu" hidden>앱 설치</button><a href="#login" id="profLink">교수 로그인</a></div>
@@ -2121,9 +2130,20 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   let lastFocus=null;
   const appEl=document.querySelector('.app'), tabbarEl=document.querySelector('.tabbar');
   function openSheet(){ if(sheet.classList.contains('open')) return; lastFocus=document.activeElement; sheet.classList.add('open'); sheetBack.classList.add('open'); sheet.setAttribute('aria-hidden','false'); appEl.inert=true; tabbarEl.inert=true; document.documentElement.classList.add('sheet-lock'); $('#menuBtn').setAttribute('aria-expanded','true'); setTimeout(()=>$('#sheetClose').focus(),60); }
-  function closeSheet(){ if(!sheet.classList.contains('open')) return; sheet.classList.remove('open'); sheetBack.classList.remove('open'); sheet.setAttribute('aria-hidden','true'); appEl.inert=false; tabbarEl.inert=false; document.documentElement.classList.remove('sheet-lock'); $('#menuBtn').setAttribute('aria-expanded','false'); syncTabbar(); if(lastFocus && lastFocus.focus) lastFocus.focus(); }
+  function closeSheet(){ if(!sheet.classList.contains('open')) return; sheet.classList.remove('open','full'); sheet.style.maxHeight=''; sheet.style.transform=''; $('#sheetGrip').setAttribute('aria-expanded','false'); sheetBack.classList.remove('open'); sheet.setAttribute('aria-hidden','true'); appEl.inert=false; tabbarEl.inert=false; document.documentElement.classList.remove('sheet-lock'); $('#menuBtn').setAttribute('aria-expanded','false'); syncTabbar(); if(lastFocus && lastFocus.focus) lastFocus.focus(); }
   sheet.addEventListener('keydown',e=>{ if(e.key!=='Tab') return; const f=[...sheet.querySelectorAll('a,button,[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null); if(!f.length) return; const first=f[0], last=f[f.length-1]; if(e.shiftKey&&document.activeElement===first){ e.preventDefault(); last.focus(); } else if(!e.shiftKey&&document.activeElement===last){ e.preventDefault(); first.focus(); } });
   sheetBack.addEventListener('click',closeSheet); $('#sheetClose').addEventListener('click',closeSheet);
+  // V184: 회색 바 끌기 — 위로 = 크게(화면 위까지), 아래로 = 원래 크기 → 한 번 더 아래로 = 닫기. 눌러도 크게/원래로 바뀜
+  { const grip=$('#sheetGrip'); let d=null;
+    const setFull=on=>{ sheet.classList.toggle('full',on); grip.setAttribute('aria-expanded',String(on)); grip.setAttribute('aria-label',on?'메뉴 원래 크기로(아래로 끌기)':'메뉴 크게 보기(위로 끌기)'); };
+    grip.addEventListener('pointerdown',e=>{ if(e.button>0) return; d={y:e.clientY, h:sheet.getBoundingClientRect().height, moved:false}; try{ grip.setPointerCapture(e.pointerId); }catch(_){ } sheet.classList.add('drag'); });
+    grip.addEventListener('pointermove',e=>{ if(!d) return; const dy=e.clientY-d.y; if(Math.abs(dy)>6) d.moved=true;
+      if(dy<0) { sheet.style.maxHeight=Math.min(window.innerHeight-6,d.h-dy)+'px'; sheet.style.transform=''; } else { sheet.style.maxHeight=''; sheet.style.transform=`translateY(${dy}px)`; } });
+    const end=e=>{ if(!d) return; const dy=e.clientY-d.y, moved=d.moved; d=null; sheet.classList.remove('drag'); sheet.style.maxHeight=''; sheet.style.transform='';
+      if(!moved){ setFull(!sheet.classList.contains('full')); return; }
+      if(dy<-40) setFull(true); else if(dy>60){ if(sheet.classList.contains('full')) setFull(false); else closeSheet(); } };
+    grip.addEventListener('pointerup',end); grip.addEventListener('pointercancel',end);
+    grip.addEventListener('click',e=>{ if(e.detail===0) setFull(!sheet.classList.contains('full')); });   /* 키보드(Enter·Space) */ }
 
   const ROOMS_R=['chat','debrief'];   // 채팅방 화면: chat=47망, debrief=디브리핑룸
   // ---------- 끌어서 넘기기 (손가락·마우스) ----------
