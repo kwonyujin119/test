@@ -975,7 +975,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v193</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v194</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1845,8 +1845,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V193', SRV_VER='12.0';
+  const APP_VER='V194', SRV_VER='12.1';
   const UPDATES=[
+    {v:'V194', d:'2026-10-20', t:['교수(관리자)로 로그인한 기기는 47망·디브리핑룸에서 다른 사람 글도 길게 눌러 ‘삭제(관리자)’ — 한 번 더 확인 후 모두의 화면에서 ‘삭제된 메시지’로','관리자 삭제는 서버 접속 기록에 남음']},
     {v:'V193', d:'2026-10-20', t:['47망·디브리핑룸 1000명 동시 접속 대비 — 예전에는 200명이 넘으면 새로 들어온 사람이 연결되지 않았음','1000명 시험: 모든 글이 1000명 모두에게 도착(가운데값 약 1초), 연결 실패 0건','사진은 대화에 작은 미리보기(수십 KB)를 보여 주고, 누르면 원본 — 많은 사람이 같은 사진을 받아도 빠르게','사람이 많은 방은 ‘안 읽은 수’가 몇 초 늦게 바뀜(서버 부담을 줄이려고)']},
     {v:'V192', d:'2026-10-20', t:['AI: 답이 나오는 동안 위로 올려 보면 아래로 끌려 내려가던 문제 바로잡음 — 답이 끝나도 보던 자리 그대로','AI 입력창의 ＋(첨부) 버튼 없앰','AI 화면 제목을 ‘AI assistant’로, 옆에 ‘사용자가 질문하면 AI가 답합니다’']},
     {v:'V191', d:'2026-10-20', t:['AI 도우미: AI가 멈춰 답이 안 오면 끝없이 기다리지 않음 — 서버는 25초 뒤 다른 AI로 넘기고, 앱은 오래 멈추면 ‘다시 묻기’','말풍선을 길게 누르면(PC는 오른쪽 클릭) 복사 · 선택 복사 · 공유 — AI 도우미와 47망·디브리핑룸 모두','공유: 47망으로 · 디브리핑룸으로(그 방 입력창에 넣어 두고 확인 뒤 보내기) · 카카오톡으로 · 다른 앱']},
@@ -6193,7 +6194,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const old=$('#actSheet'); if(old) old.remove();
       let pre=null; const preP=(m.files||[]).length?fileBlobs(m).then(f=>{ pre=f; return f; }):Promise.resolve(pre=[]);
       const deleted=m.text==='(삭제된 메시지)'&&!(m.files||[]).length;
-      const acts=[['reply','답장'], m.text&&!deleted?['copy','복사']:null, m.text&&!deleted?['sel','선택 복사']:null, !deleted?['share','공유']:null, (m.files||[]).length?['save','저장']:null, m.can_delete&&!deleted?['del','삭제']:null].filter(Boolean);
+      const acts=[['reply','답장'], m.text&&!deleted?['copy','복사']:null, m.text&&!deleted?['sel','선택 복사']:null, !deleted?['share','공유']:null, (m.files||[]).length?['save','저장']:null, (m.can_delete||isProf())&&!deleted?['del',m.can_delete||m.mine?'삭제':'삭제(관리자)']:null].filter(Boolean);   // V194: 교수(관리자)로 로그인하면 다른 사람 글도 지울 수 있음
       const sh=document.createElement('div'); sh.className='act-sheet'; sh.id='actSheet'; sh.setAttribute('role','dialog'); sh.setAttribute('aria-modal','true'); sh.setAttribute('aria-label','메시지 메뉴');
       sh.innerHTML=`<div class="box"><p class="pv"><b>${esc(m.mine?'나':m.name)}</b> ${esc(msgSnip(m,30))}</p>${acts.map(([k,l])=>`<button type="button" data-a="${k}" class="${k==='del'?'danger':''}">${l}</button>`).join('')}<button type="button" data-a="close" class="cancel">닫기</button></div>`;
       document.body.appendChild(sh);
@@ -6222,7 +6223,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1), inapp=/KAKAOTALK|NAVER\(inapp|Instagram|FBAN|Line\//i.test(navigator.userAgent);
           if((ios||inapp||files.length>1) && files.length && navigator.canShare && navigator.canShare({files})){ try{ await navigator.share({files}); }catch(err){ if(!(err&&err.name==='AbortError')) toast('저장하지 못했습니다'); } return; }   // 아이폰·앱 속 브라우저는 다운로드 대신 공유 시트의 '저장'
           files.forEach(f=>{ const u=URL.createObjectURL(f); const x=document.createElement('a'); x.href=u; x.download=f.name; document.body.appendChild(x); x.click(); setTimeout(()=>{ URL.revokeObjectURL(u); x.remove(); },800); }); if(!files.length) toast('파일을 가져오지 못했습니다'); }
-        else if(k==='del'){ const r=await api(`/api/messages/${m.id}`,{method:'DELETE'}); if(r.ok){ m.text='(삭제된 메시지)'; m.files=[]; const el=convo.querySelector(`.msg[data-mid="${m.id}"] .bub`); if(el){ el.classList.remove('only-att'); el.innerHTML='<p class="del">(삭제된 메시지)</p>'; } } else toast('삭제하지 못했습니다: '+(r.j.error||'연결 오류')); }
+        else if(k==='del'){ const asProf=!m.can_delete&&isProf();
+          if(asProf&&!confirm(`${m.name||'다른 사람'}의 글을 관리자 권한으로 지웁니다. 모든 사람 화면에서 ‘삭제된 메시지’로 바뀝니다. 지울까요?`)) return;
+          const r=await api(`/api/messages/${m.id}`,asProf?{method:'DELETE',tok:PROF.tok}:{method:'DELETE'}); if(r.ok){ m.text='(삭제된 메시지)'; m.files=[]; const el=convo.querySelector(`.msg[data-mid="${m.id}"] .bub`); if(el){ el.classList.remove('only-att'); el.innerHTML='<p class="del">(삭제된 메시지)</p>'; } } else toast('삭제하지 못했습니다: '+(r.j.error||'연결 오류')); }
       });
       const first=sh.querySelector('button'); if(first) first.focus();
       sh.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); });
