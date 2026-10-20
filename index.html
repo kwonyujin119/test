@@ -951,7 +951,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v184</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v185</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1817,8 +1817,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V184', SRV_VER='11.0';
+  const APP_VER='V185', SRV_VER='11.1';
   const UPDATES=[
+    {v:'V185', d:'2026-10-20', t:['사진 보내기: 미리보기(편집) 화면에서 ←(또는 휴대폰 뒤로)를 누르면 닫히지 않고 바로 앞 사진 고르기 화면으로 — 고른 사진·번호는 그대로','미리보기에서 고르기를 풀면 앞 화면 전송 수에도 반영']},
     {v:'V184', d:'2026-10-20', t:['Search: 다른 화면에 갔다 와도 마지막 검색 결과·보던 자리·펼친 결과가 그대로(지우기는 ✕)','Search: 결과를 보는 동안 검색창이 위에 고정 — 누르면 전체 선택돼 바로 새 검색','Search: 최근 검색(이 기기에만, 하나씩·모두 지우기), 결과 묶음 바로가기 칩, 늦거나 실패하면 ‘다시 시도’','Search: 돌아올 때 같은 조회를 다시 하지 않아 빠르고 공공데이터 한도도 아낌','메뉴: 위 회색 바를 위로 끌면(또는 누르면) 화면 위까지 펼쳐 모든 메뉴가 한 화면에, 아래로 끌면 원래 크기→닫기','메뉴: PC는 3열, 가로 휴대폰은 4열로 모든 메뉴가 한 화면에']},
     {v:'V183', d:'2026-10-19', t:['PC에서 세로로 긴 사진(휴대폰 캡처)을 크게 볼 때 창 밖으로 나가던 문제 바로잡음','47망·디브리핑룸 ＋: 이 방에 올라온 사진 대신 ‘갤러리’ 칸 — 눌러 휴대폰 갤러리에서 고르면 줄에 번호가 붙고 ‘전송’으로 업로드','사진 편집: 펜(5색)·지우개(그린 선만 지움)·자르기·돌리기']},
     {v:'V182', d:'2026-10-19', t:['47망·디브리핑룸 입력창에서 Ctrl+V(맥은 ⌘V)로 캡처·복사한 이미지를 바로 첨부','여러 장을 복사해도 한 번에 붙고, 글자를 붙여넣을 때는 예전처럼 글자만']},
@@ -5875,11 +5876,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const pop=document.createElement('div'); pop.className='psheet'; pop.id='plusPop'; pop.hidden=true; pop.setAttribute('role','dialog'); pop.setAttribute('aria-modal','true'); pop.setAttribute('aria-label','사진 보내기');
     document.body.appendChild(pop);
     const PK={items:[], sel:[], urls:[]};
-    const closePop=()=>{ if(pop.hidden) return; pop.hidden=true; plus.setAttribute('aria-expanded','false'); PK.urls.forEach(u=>URL.revokeObjectURL(u)); PK.urls=[]; };
+    const closePop=force=>{ if(pop.hidden&&force!==true) return; pop.hidden=true; plus.setAttribute('aria-expanded','false'); PK.urls.forEach(u=>URL.revokeObjectURL(u)); PK.urls=[]; };
     document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!pop.hidden&&!e.isComposing){ e.stopPropagation(); closePop(); plus.focus(); } },true);   // V154: Esc로 닫기
     const pkFile=async it=>{ if(it.file) return it.file; const bl=await (await fetch(it.src)).blob(); return new File([bl], it.name||'사진.jpg', {type:bl.type||'image/jpeg'}); };
     async function pkSend(files,caption){   // 고른 사진(편집본 포함)을 첨부로 넣고 바로 보낸다
-      closePop(); if(!files.length||!addPendingFiles) return;
+      closePop(true); if(!files.length||!addPendingFiles) return;
       recentAdd(files);
       await addPendingFiles(files);
       const t=$('#chatText'); if(t&&caption) t.value=caption+(t.value?'\n'+t.value:'');
@@ -5905,7 +5906,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <p class="pn">‘갤러리’를 누르면 휴대폰 갤러리(최근 사진)가 열립니다. 고른 사진이 위 줄에 번호와 함께 올라오고, <b>전송</b>을 누르면 올라갑니다. 사진을 누르면 펜·지우개·자르기로 고칠 수 있습니다.</p></div>`;
       pop.querySelectorAll('[data-in]').forEach(inp=>inp.addEventListener('change',async()=>{ const fs=[...inp.files]; inp.value=''; if(!fs.length) return;
         const imgs=fs.filter(f=>/^image\//.test(f.type));
-        if(imgs.length===1&&fs.length===1){ closePop(); openEditor([{file:imgs[0], name:imgs[0].name, src:URL.createObjectURL(imgs[0]), own:true}],0,[true]); return; }   // 한 장이면 편집 화면으로(카톡처럼)
+        if(imgs.length===1&&fs.length===1){ closePop(); openEditor([{file:imgs[0], name:imgs[0].name, src:URL.createObjectURL(imgs[0]), own:true}],0,[true],null,()=>openPop()); return; }   // 한 장이면 편집 화면으로(카톡처럼)
         closePop(); recentAdd(imgs); if(addPendingFiles) addPendingFiles(fs); }));
       pop.querySelector('[data-gal]').addEventListener('change',e=>{ const inp=e.target, fs=[...inp.files].filter(f=>/^image\//.test(f.type)); inp.value=''; if(!fs.length) return;   // V183: 갤러리에서 고른 사진 → 줄 맨 앞에 골라 둔 채로(전송을 누르면 업로드)
         const add=fs.map(f=>{ const u=URL.createObjectURL(f); PK.urls.push(u); return {src:u, name:f.name, file:f}; });
@@ -5916,7 +5917,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         const b=e.target.closest('.pk[data-i]'); if(!b) return; const i=+b.dataset.i;
         if(e.target.closest('.ck')){ const k=PK.sel.indexOf(i); if(k>=0) PK.sel.splice(k,1); else if(PK.sel.length<MAX_FILES) PK.sel.push(i); else toast(`한 번에 ${MAX_FILES}장까지`); pkPaint(); return; }
         const on=PK.items.map((_,x)=>PK.sel.length?PK.sel.includes(x):x===i); if(!on[i]&&PK.sel.length<MAX_FILES) on[i]=true;   // 누른 사진은 고른 것으로
-        const keepUrls=PK.urls; PK.urls=[]; closePop(); openEditor(PK.items,i,on,keepUrls);
+        pop.hidden=true;   // V185: 사진 시트는 숨겨만 두고(고른 사진·순서 그대로) 편집 화면 ‘←’로 다시 보여 준다
+        openEditor(PK.items,i,on,null,on2=>{ const keep=PK.sel.filter(x=>on2[x]), add=on2.map((v,x)=>v&&!keep.includes(x)?x:-1).filter(x=>x>=0); PK.sel=keep.concat(add).slice(0,MAX_FILES); pop.hidden=false; pkPaint(); const f=pop.querySelector('.go'); if(f) f.focus(); });
       });
       pop.querySelector('.go').addEventListener('click',async()=>{ const b=pop.querySelector('.go'); b.disabled=true; b.textContent='준비 중…';
         try{ const fs=await Promise.all(PK.sel.map(i=>pkFile(PK.items[i]))); pkSend(fs,''); }catch(_){ toast('사진을 가져오지 못했습니다'); pkPaint(); } });
@@ -5924,7 +5926,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       pop.hidden=false; plus.setAttribute('aria-expanded','true'); setTimeout(()=>{ const f=pop.querySelector('button,[href],input'); if(f&&!pop.hidden) f.focus(); },30);   // V154: 열리면 안으로 초점
     }
     // 편집 화면: 위 ← · N 전송 · 고르기 동그라미 / 가운데 사진 / 아래 설명 입력 · 자르기 · 그리기
-    function openEditor(list,start,on0,urls){
+    function openEditor(list,start,on0,urls,onBack){   // onBack: ‘←’를 누르면 닫고 바로 앞 화면(사진 시트)으로
       const ed=document.createElement('div'); ed.className='pedit'; ed.setAttribute('role','dialog'); ed.setAttribute('aria-modal','true'); ed.setAttribute('aria-label','사진 편집');
       ed.innerHTML=`<div class="etop"><button type="button" class="eb back" aria-label="뒤로">←</button><span class="en"></span><button type="button" class="esend">전송</button><button type="button" class="eck" aria-label="이 사진 보내기"></button></div>
         <div class="estage"><canvas></canvas><div class="crop" hidden><i data-h="nw"></i><i data-h="ne"></i><i data-h="sw"></i><i data-h="se"></i></div></div>
@@ -5983,7 +5985,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       ed.querySelector('.done').addEventListener('click',()=>{
         if(st.mode==='crop'&&box){ const sx=Math.round(box.x*cv.width), sy=Math.round(box.y*cv.height), sw=Math.max(1,Math.round(box.w*cv.width)), sh=Math.max(1,Math.round(box.h*cv.height)); const d=cx.getImageData(sx,sy,sw,sh); cv.width=sw; cv.height=sh; cx.putImageData(d,0,0); st.dirty=true; st.hist=[]; st.base=null; fitCv(); }
         setMode(''); });
-      ed.querySelector('.back').addEventListener('click',()=>{ if(st.mode){ if(st.mode==='draw'){ while(st.hist.length){ const d=st.hist.shift(); if(!st.hist.length){ cv.width=d.width; cv.height=d.height; cx.putImageData(d,0,0); } } } setMode(''); return; } close(); });
+      ed.querySelector('.back').addEventListener('click',()=>{ if(st.mode){ if(st.mode==='draw'){ while(st.hist.length){ const d=st.hist.shift(); if(!st.hist.length){ cv.width=d.width; cv.height=d.height; cx.putImageData(d,0,0); } } } setMode(''); return; } close(); if(onBack) onBack(st.on.slice()); });
       ed.querySelector('.eck').addEventListener('click',()=>{ st.on[st.i]=!st.on[st.i]; paintTop(); });
       // 좌우로 밀어 다른 사진(편집 중이 아닐 때)
       { let sx=null; ed.querySelector('.estage').addEventListener('pointerdown',e=>{ if(!st.mode) sx=e.clientX; }); ed.querySelector('.estage').addEventListener('pointerup',e=>{ if(sx===null) return; const dx=e.clientX-sx; sx=null; if(Math.abs(dx)>60){ const n=st.i+(dx<0?1:-1); if(n>=0&&n<list.length) show(n); } }); }
