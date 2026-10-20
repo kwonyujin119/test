@@ -246,6 +246,9 @@ body:not(.nosearch) #panel .card.empty.srch-none{padding:20px 16px;margin-bottom
 .ai-gate .note{margin:0;font-size:12.5px;color:var(--muted);line-height:1.5}
 #panel:has(.botchat) .roomhead .btn{grid-row:1}
 .botchat .to-srch{display:inline-flex;align-items:center;min-height:var(--tap);margin-top:2px;padding:0}
+.botchat .fast-src{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--muted)}
+.botchat .fast-src span{flex:1 1 100%}.botchat .fast-src .to-srch{margin:0;padding:0 12px;text-decoration:none;border:1px solid var(--navy);border-radius:999px;color:var(--navy);background:var(--surface)}
+.botchat .fast-src .full-ask{border:0;background:none;min-height:var(--tap);padding:0 4px;color:var(--muted);font:inherit;font-size:12px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .botchat .bub a.ref{position:relative}
 .botchat .bub a.ref::after{content:"";position:absolute;inset:-9px -4px}
 .botchat .bub ol.src a{padding:7px 0;min-height:32px}
@@ -964,7 +967,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v188</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v189</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -1831,8 +1834,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V188', SRV_VER='11.4';
+  const APP_VER='V189', SRV_VER='11.5';
   const UPDATES=[
+    {v:'V189', d:'2026-10-20', t:['AI 도우미가 근거 목록 없이 짧게 바로 답함 — 법제처·공공데이터 조회를 기다리지 않아 더 빠름','답마다 ‘Search에서 근거 찾기’ 버튼 — 눌러서 원문·조문·자료 쪽을 확인','근거까지 필요하면 ‘근거와 함께 다시 묻기(느림)’']},
     {v:'V188', d:'2026-10-20', t:['CP 지도: 현장지휘소·유관기관CP·응급의료소·차량대기소를 여러 곳(각 9곳) — 버튼을 다시 누르면 다음 곳(현장지휘소2, 차량대기소2…)','방면은 A~F를 3벌까지 — 화재가 여러 곳이면 그 화재로 지도를 옮긴 뒤 누르면 그 둘레에','CP 메뉴에 종류별 몇 곳인지, 바로가기에 ‘차량대기소 n곳’ 칩']},
     {v:'V187', d:'2026-10-20', t:['47망·디브리핑룸: 사진·파일을 보내는 동안 대화 맨 아래에 ‘보내는 중’ 말풍선 — 사진 미리보기·진행 막대·몇 %·몇 번째 장','다 올라가면 실제 글로 바뀌고, 실패하면 빨간 말풍선으로 이유를 보여 주고 사진은 입력창에 되돌림']},
     {v:'V186', d:'2026-10-20', t:['47망·디브리핑룸을 누르면 ‘불러오는 중’ 없이 바로 열림 — 대화명을 이 기기에 기억하고 서버 확인은 뒤에서','앱을 막 열었을 때도 자료 목록을 기다리지 않고 대화방부터 열림','글을 보내고 바로 나가도 다음에 들어오면 마지막 대화가 바로 보임']},
@@ -4367,7 +4371,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const quickHtml=()=>quickPick().map(t=>`<button type="button" data-q="${esc(t)}">${esc(t)}</button>`).join('');
   let quickT=null;
   const now=()=>{const d=new Date();return `${pad(d.getHours())}:${pad(d.getMinutes())}`;};
-  function cload(){ try{ const s=JSON.parse(localStorage.getItem(CKEY)||'null'); if(s&&Array.isArray(s.msgs)) chat.msgs=s.msgs.filter(m=>m&&(m.who==='bot'||m.who==='me')&&typeof m.text==='string').map(m=>({who:m.who,text:m.text.slice(0,4000),t:/^\d{2}:\d{2}$/.test(String(m.t))?m.t:'',mode:['ai','extract','none','general'].includes(m.mode)?m.mode:'',cached:!!m.cached,note:String(m.note||'').slice(0,120),src:Array.isArray(m.src)?m.src.filter(x=>x&&(SECTIONS.some(z=>z.slug===x.slug)||(x.slug==='law'&&/^https:\/\/www\.law\.go\.kr\//.test(String(x.url||''))))&&typeof x.name==='string'&&Number.isInteger(x.page)).slice(0,8).map(x=>({slug:x.slug,name:x.name.slice(0,200),page:x.page,art:String(x.art||'').slice(0,60),snip:String(x.snip||'').slice(0,180),url:x.slug==='law'?String(x.url):''})):[],att:(Array.isArray(m.att)?m.att.filter(validAtt).map(cleanAtt):[]).slice(0,MAX_FILES),cards:Array.isArray(m.cards)?m.cards.filter(c=>c&&typeof c.title==='string'&&(['board','search','login','log','ai'].includes(c.slug)||SECTIONS.some(s=>s.slug===c.slug))).slice(0,8).map(c=>({title:c.title.slice(0,120),slug:c.slug,type:String(c.type||'').slice(0,8)})):[]})).slice(-100); }catch(_){ } }
+  function cload(){ try{ const s=JSON.parse(localStorage.getItem(CKEY)||'null'); if(s&&Array.isArray(s.msgs)) chat.msgs=s.msgs.filter(m=>m&&(m.who==='bot'||m.who==='me')&&typeof m.text==='string').map(m=>({who:m.who,text:m.text.slice(0,4000),t:/^\d{2}:\d{2}$/.test(String(m.t))?m.t:'',mode:['ai','extract','none','general','fast'].includes(m.mode)?m.mode:'',cached:!!m.cached,fast:m.mode==='fast',note:String(m.note||'').slice(0,120),src:Array.isArray(m.src)?m.src.filter(x=>x&&(SECTIONS.some(z=>z.slug===x.slug)||(x.slug==='law'&&/^https:\/\/www\.law\.go\.kr\//.test(String(x.url||''))))&&typeof x.name==='string'&&Number.isInteger(x.page)).slice(0,8).map(x=>({slug:x.slug,name:x.name.slice(0,200),page:x.page,art:String(x.art||'').slice(0,60),snip:String(x.snip||'').slice(0,180),url:x.slug==='law'?String(x.url):''})):[],att:(Array.isArray(m.att)?m.att.filter(validAtt).map(cleanAtt):[]).slice(0,MAX_FILES),cards:Array.isArray(m.cards)?m.cards.filter(c=>c&&typeof c.title==='string'&&(['board','search','login','log','ai'].includes(c.slug)||SECTIONS.some(s=>s.slug===c.slug))).slice(0,8).map(c=>({title:c.title.slice(0,120),slug:c.slug,type:String(c.type||'').slice(0,8)})):[]})).slice(-100); }catch(_){ } }
   function csave(){ trySet(CKEY, JSON.stringify({msgs:chat.msgs.slice(-100)})); }
   function push(who,text,cards,att){ chat.msgs.push({who,text,t:now(),cards:cards||[],att:att||[]}); if(chat.msgs.length>100) chat.msgs.splice(0,chat.msgs.length-100); csave(); }
 
@@ -4412,7 +4416,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     return `<div class="src-h">근거 자료</div><ol class="src" aria-label="근거 자료">${m.src.map((sc,i)=>(cited.size&&!cited.has(i)&&sc.slug!=='pub'&&sc.slug!=='law')?'':`<li${sc.slug==='law'||sc.slug==='pub'?' class="law"':''}><a href="${esc(srcHref(sc))}" target="_blank" rel="noopener"${srcPdf(sc)}><b>[${i+1}]</b><em>${esc(pdfName(sc.name))}${sc.art?` · ${esc(sc.art)}`:''}</em><span>${srcPg(sc)}</span></a>${sc.snip?`<q class="snip">${esc(deGlyph(sc.snip))}</q>`:''}</li>`).join('')}</ol>`;
   }
   const cacheTag=m=>m.cached?' · 같은 질문의 저장된 답':'';
-  const botModeHtml=m=> m.mode==='ai' ? `<span class="mode">AI 도우미 · ${(m.src||[]).some(x=>x.slug==='pub')?'건축물대장·소방용수(공공데이터)·':''}${(m.src||[]).some(x=>x.slug==='law')?'법령 원문(법제처)·':''}메뉴 자료 근거 답변${cacheTag(m)} — 중요한 내용은 원문으로 확인하세요</span>`
+  const botModeHtml=m=> m.mode==='fast' ? `<span class="mode">AI 빠른 답 · 근거 표시 없이${cacheTag(m)} — 중요한 기준·수치는 Search로 원문 확인</span>`
+    : m.mode==='ai' ? `<span class="mode">AI 도우미 · ${(m.src||[]).some(x=>x.slug==='pub')?'건축물대장·소방용수(공공데이터)·':''}${(m.src||[]).some(x=>x.slug==='law')?'법령 원문(법제처)·':''}메뉴 자료 근거 답변${cacheTag(m)} — 중요한 내용은 원문으로 확인하세요</span>`
     : m.mode==='general' ? `<span class="mode warn">AI 일반 설명 · 메뉴 자료에 근거 없음${(m.src||[]).some(x=>x.slug==='law')?' · 법제처 원문 링크 첨부':''}${cacheTag(m)} — 소속 기관 지침·원문으로 확인하세요</span>`
     : m.mode==='extract' ? `<span class="mode">교수 에이전트 · 원문 발췌 정리${m.note?` · ${esc(m.note)}`:' · AI 키 연결 시 해설형 답변'}</span>` : '';
 
@@ -4757,7 +4762,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   let aiErrAt=-1;   /* V181: 방금 실패한 AI 답의 위치(화면 표시용 · 저장 안 함) */
   function renderBotRoom(panel, room){
     if(!aiCode()&&SRV.aiGate){ aiGate(panel,room); return; }   // V124: AI 도우미 공개 — 서버가 입장코드를 요구할 때만(403 need_code) 코드 화면
-    const toSrch=(m,i)=>{ const u=chat.msgs[i-1]; return (m.mode==='ai'||m.mode==='extract'||m.mode==='general') && u && u.who==='me' && u.text ? `<button type="button" class="to-srch" data-srch="${esc(u.text)}">Search에서 원문 더 찾기 →</button>` : ''; };
+    const toSrch=(m,i)=>{ const u=chat.msgs[i-1]; if(!(u&&u.who==='me'&&u.text)) return '';
+      if(m.fast||m.mode==='fast') return `<div class="fast-src"><span>근거·원문은 <b>Search</b>에서 확인하세요</span><button type="button" class="btn ghost sm to-srch" data-srch="${esc(srchQ(u.text))}">Search에서 근거 찾기 →</button><button type="button" class="full-ask" data-full="${i}">근거와 함께 다시 묻기(느림)</button></div>`;   // V189
+      return (m.mode==='ai'||m.mode==='extract'||m.mode==='general') ? `<button type="button" class="to-srch" data-srch="${esc(u.text)}">Search에서 원문 더 찾기 →</button>` : ''; };
+    const srchQ=t=>{ const k=String(t).replace(/[?？!.]+$/,'').replace(/\s*(은|는|이|가|을|를|에서|에|의|와|과|도|좀|요)(?=\s|$)/g,' ').replace(/(무엇인가요|뭔가요|어떻게 하나요|어떻게 해야 하나요|알려줘|알려 주세요|설명해 ?줘|인가요|인지|하나요|되나요|할까요|나요)$/,'').replace(/\s+/g,' ').trim(); return k.length>=2?k.slice(0,60):String(t).slice(0,60); };   /* 질문 → 검색 낱말(조사·물음 끝 빼기) */
     const msgsHtml = chat.msgs.length ? chat.msgs.map((m,i)=> m.who==='me' ? msgMeHtml(m) : `
       <div class="msg bot">${avHtml()}
         <div class="bub${i===aiErrAt?' ai-err':''}">${botTextHtml(m)}${botSrcHtml(m)}${botModeHtml(m)}${toSrch(m,i)}${i===aiErrAt&&chat.msgs[i-1]&&chat.msgs[i-1].who==='me'&&chat.msgs[i-1].text?'<button type="button" class="ai-retry" data-retry>다시 묻기</button>':''}${m.cards&&m.cards.length?`<ul class="mini">${m.cards.map(c=>`<li><a href="#${esc(c.slug)}"><span class="tag">${esc(c.type)}</span><span>${esc(c.title)}</span><span class="arrow">→</span></a></li>`).join('')}</ul>`:''}</div>
@@ -4779,22 +4787,22 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     bindAtts(panel);
     if(chat.msgs.length) scrollEndOf(panel);
     if(chatPrefill){ const inp=$('#chatText'); if(inp){ inp.value=chatPrefill; if(window.innerWidth>=600) inp.focus(); } chatPrefill=''; }
-    const send=(text,att)=>{
+    const send=(text,att,full)=>{   // V189: 기본은 빠른 답(근거 없이) — full이면 근거(자료·법제처·공공데이터)까지
       const v=String(text||'').trim(); att=att||[]; if(!v&&!att.length) return;
       if(chat.typing){ const ti=$('#chatText'); if(ti&&!ti.value) ti.value=v; if(att.length){ pending=att.concat(pending); renderPending(); } toast('앞 질문의 답을 기다리는 중입니다'); return; }   // V154: 기다리는 동안 보낸 글을 지우지 않음
       push('me',v,[],att); aiErrAt=-1; chat.typing=true; renderBotRoom(panel,room);
       if(SRV.on && v && !localIntent(v)){
-        const hist=[]; for(let i=chat.msgs.length-2;i>0&&hist.length<2;i--){ const b=chat.msgs[i], u=chat.msgs[i-1]; if(b.who==='bot'&&(b.mode==='ai'||b.mode==='general')&&u.who==='me'&&u.text) hist.unshift({q:u.text,a:b.text}); }
+        const hist=[]; for(let i=chat.msgs.length-2;i>0&&hist.length<2;i--){ const b=chat.msgs[i], u=chat.msgs[i-1]; if(b.who==='bot'&&(b.mode==='ai'||b.mode==='general'||b.mode==='fast')&&u.who==='me'&&u.text) hist.unshift({q:u.text,a:b.text}); }
         const g0=chat.gen||0;
         // V177: 답을 글자가 나오는 대로 받아 '입력 중' 말풍선에 바로 보여 줌(서버 10.3+ · Gemini). 옛 서버·저장된 답은 한 번에
         let acc='', raf=0; const paint=()=>{ raf=0; if((chat.gen||0)!==g0||chat.room!=='bot'||state.route!=='ai') return; const tb=panel.querySelector('.bub.typing,.bub.streaming'); if(!tb) return;
           if(tb.classList.contains('typing')){ tb.classList.remove('typing'); tb.classList.add('streaming'); tb.removeAttribute('aria-label'); }
           tb.textContent=acc.replace(/\*\*/g,''); const cv=panel.querySelector('.convo'); if(cv&&cv.scrollHeight-cv.scrollTop-cv.clientHeight<160) cv.scrollTop=cv.scrollHeight; };
-        Promise.race([geoFor(v).catch(()=>null),sleep(6000).then(()=>null)]).then(geo=>askStream({q:v,history:hist,code:aiCode(),stream:true,...(geo?{geo}:{})}, t=>{ acc+=t; if(!raf) raf=requestAnimationFrame(paint); })).then(r=>{
+        (full?Promise.race([geoFor(v).catch(()=>null),sleep(6000).then(()=>null)]):Promise.resolve(null)).then(geo=>askStream({q:v,history:hist,code:aiCode(),stream:true,...(full?{}:{fast:1}),...(geo?{geo}:{})}, t=>{ acc+=t; if(!raf) raf=requestAnimationFrame(paint); })).then(r=>{
           if((chat.gen||0)!==g0) return;   // 그사이 '대화 비우기' — 이전 질문의 답은 버림
           chat.typing=false;
           if(r.status===403&&r.j&&r.j.code==='need_code'){ chat.msgs.pop(); csave(); setAiCode(''); SRV.aiGate=true; if(chat.room==='bot'&&state.route==='ai') aiGate(panel,room); return; }   // 코드가 바뀜 → 다시 입력
-          if(r.ok&&r.j.ok){ push('bot',String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.cached=!!r.j.cached; m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,art:String(x.art||'').slice(0,60),snip:String(x.snippet||'').slice(0,180),url:/^https:\/\/(?:www\.law\.go\.kr|map\.kakao\.com)\//.test(String(x.url||''))?String(x.url):''})); csave(); }
+          if(r.ok&&r.j.ok){ push('bot',(r.j.fast||r.j.mode==='fast')?String(r.j.answer||'').replace(/\n+근거\s*\n[\s\S]*$/,'').replace(/\s*\[(?:\d{1,2}|근거 부족)\]/g,''):String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.cached=!!r.j.cached; m.fast=!!r.j.fast||r.j.mode==='fast'; m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,art:String(x.art||'').slice(0,60),snip:String(x.snippet||'').slice(0,180),url:/^https:\/\/(?:www\.law\.go\.kr|map\.kakao\.com)\//.test(String(x.url||''))?String(x.url):''})); csave(); }
           else{ push('bot', r.status===0?'서버에 연결할 수 없습니다. 잠시 뒤 다시 물어보세요.':(r.j.error||'답변을 만들지 못했습니다.'),[]); aiErrAt=chat.msgs.length-1; }
           if(chat.room==='bot'&&state.route==='ai'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp&&window.innerWidth>=600) inp.focus(); }
         }).catch(()=>{ if((chat.gen||0)!==g0) return; chat.typing=false; push('bot','답변을 만들지 못했습니다. 다시 물어보세요.',[]); aiErrAt=chat.msgs.length-1; if(chat.room==='bot'&&state.route==='ai') renderBotRoom(panel,room); });
@@ -4807,6 +4815,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(SRV.on&&SRV.bld&&SRV.kakao) loadKakao(SRV.kakao).catch(()=>{});   // V154: 주소 질문이 빨리 가도록 미리 불러 둠
     { const ti=$('#chatText'), kh=$('#kwHint'); if(ti&&kh){ const sync=()=>{ kh.hidden=!isKeyword(ti.value); if(window.__fitConvo) window.__fitConvo(); }; ti.addEventListener('input',sync); $('#kwGo').addEventListener('click',()=>toSearch(ti.value)); } }
     panel.querySelectorAll('.to-srch').forEach(b=>b.addEventListener('click',()=>toSearch(b.dataset.srch)));
+    panel.querySelectorAll('[data-full]').forEach(b=>b.addEventListener('click',()=>{ const u=chat.msgs[+b.dataset.full-1]; if(chat.typing||!u||u.who!=='me') return; send(u.text,[],true); }));   // V189: 근거까지 필요할 때만
     { const rb=panel.querySelector('[data-retry]'); if(rb) rb.addEventListener('click',()=>{ const i=aiErrAt, u=chat.msgs[i-1]; if(chat.typing||!u||u.who!=='me') return; const t=u.text; chat.msgs.splice(i-1,2); aiErrAt=-1; csave(); send(t,[]); }); }   /* V181: 실패한 질문을 한 번에 다시 */
     { const qb=$('#quick');
       qb.addEventListener('click',e=>{ const b=e.target.closest('button[data-q]'); if(b) send(b.dataset.q,[]); });
