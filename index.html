@@ -129,6 +129,10 @@ body.compact .hint{display:none}
 body.nosearch .hero,html.boot-nosearch .hero{display:none}
 html.boot-hub footer,html.boot-chat footer{display:none}html.boot-hub .tabbar{display:none!important}
 body.compact:not(.nosearch) .hero{padding-block:18px 10px}
+/* V184: 검색 결과를 보는 동안 검색창을 위에 고정 — 결과를 내려 보다가도 바로 다른 검색 */
+body.compact:not(.nosearch):not(.home) .hero{position:sticky;top:calc(var(--hdr,56px) + var(--sat,0px));z-index:12;background:var(--bg);padding-block:8px 10px;box-shadow:0 8px 14px -12px rgba(0,0,0,.25)}
+body.compact:not(.nosearch):not(.home) .hero .hint{display:none}
+body.compact:not(.nosearch):not(.home) #panel :is(a,button,input,summary,[tabindex]){scroll-margin-top:calc(var(--hdr,56px) + var(--sat,0px) + 96px)}   /* 키보드 이동 때 고정 검색창 밑에 숨지 않게 */
 body.home main{display:flex;flex-direction:column;justify-content:center}
 body.home .hero{padding-block:24px!important}
 body.home .panel{display:none}
@@ -169,6 +173,28 @@ body.compact:not(.nosearch) .panel{padding-top:8px}
 .srch-note{font-size:12.5px;color:var(--muted);margin:8px 2px 0}
 .pubhint{margin:4px 2px 14px;line-height:1.9}.pubex{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font:inherit;font-size:12.5px;font-weight:700;color:var(--navy);cursor:pointer;min-height:30px}
 .srch-more{margin-top:10px}
+/* 검색: 최근 검색(이 기기) — 첫 검색 화면에는 칩으로, 결과 화면에서는 검색창을 누르면 아래로 펼침 */
+#recentQ{display:none;width:100%;max-width:640px;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px}
+body.home #recentQ.has{display:flex}
+#recentQ .rqh{width:100%;font-size:12px;font-weight:700;color:var(--muted)}
+#recentQ .rq{display:inline-flex;align-items:center;max-width:100%;border:1px solid var(--line);background:var(--surface);border-radius:999px;overflow:hidden}
+#recentQ .rq button{border:0;background:transparent;font:inherit;cursor:pointer;min-height:40px}
+#recentQ .rq [data-rq]{padding:0 4px 0 14px;font-size:14px;font-weight:600;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+#recentQ .rq .x{width:36px;font-size:18px;line-height:1;color:var(--muted-2)}
+#recentQ .rq .x:hover{color:var(--fg);background:var(--surface-2)}
+#recentQ .rqclr{border:0;background:transparent;font:inherit;font-size:12.5px;color:var(--muted);text-decoration:underline;cursor:pointer;min-height:40px;padding:0 6px}
+body.compact:not(.nosearch):not(.home) .hero:focus-within #recentQ.has{display:flex;position:absolute;top:calc(100% - 4px);left:50%;transform:translateX(-50%);width:min(640px,calc(100% - 32px));justify-content:flex-start;padding:12px 14px 14px;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);z-index:13}
+body.compact:not(.nosearch):not(.home) #recentQ .rqh{text-align:left}
+@media (pointer:coarse){ #recentQ .rq button,#recentQ .rqclr{min-height:44px} #recentQ .rq .x{width:44px} }
+/* 검색: 결과 묶음 바로가기(위 고정 검색창 아래로 맞춰 이동) */
+.srch-jump{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:-4px -2px 6px;padding:2px}
+.srch-jump::-webkit-scrollbar{display:none}
+.srch-jump button{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 12px;border:1px solid var(--line);background:var(--surface);border-radius:999px;font:inherit;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;white-space:nowrap}
+.srch-jump button b{font-size:12px;color:var(--muted)}
+.srch-jump button.ai{background:var(--navy-soft)}
+@media (pointer:coarse){ .srch-jump button{min-height:44px} }
+#panel [data-jg]{scroll-margin-top:calc(var(--hdr,56px) + var(--sat,0px) + 96px)}
+.srch-note .btn.sm{margin-left:6px;vertical-align:middle}
 .lawtx{padding:12px 14px}.lawtx .t{margin:0;font-size:15px}.lawtx .d{margin:2px 0 6px;font-size:12px;color:var(--muted)}
 .lawtx .lx{margin:0;white-space:pre-line;font-size:13.5px;line-height:1.6;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .lawtx .lx.open{display:block;-webkit-line-clamp:unset}
@@ -506,7 +532,16 @@ body:not(.nosearch) #panel .card.empty.srch-none{padding:20px 16px;margin-bottom
 .sheet-back.open{opacity:1;pointer-events:auto}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--surface);border-radius:18px 18px 0 0;padding:10px 16px calc(16px + var(--sab));transform:translateY(105%);visibility:hidden;transition:transform .25s cubic-bezier(.2,.8,.2,1),visibility 0s linear .25s;max-height:82vh;max-height:82dvh;overflow:auto;box-shadow:0 -8px 30px rgba(0,0,0,.14)}
 .sheet.open{transform:none;visibility:visible;transition:transform .25s cubic-bezier(.2,.8,.2,1),visibility 0s}
-.sheet .grip{width:40px;height:4px;border-radius:2px;background:var(--line-2);margin:0 auto 10px}
+.sheet .grip{display:block;width:120px;height:28px;margin:-6px auto 2px;padding:0;border:0;background:transparent;cursor:grab;touch-action:none}.sheet .grip i{display:block;width:44px;height:5px;margin:0 auto;border-radius:3px;background:var(--line-2);transition:background .15s,width .15s}
+.sheet .grip{position:sticky;top:-10px;z-index:2}
+.sheet .grip:hover i,.sheet.drag .grip i{background:var(--muted-2);width:56px}
+/* V184: 회색 바를 위로 끌면 메뉴가 화면 위까지 — 모든 메뉴가 한 화면에 */
+.sheet.full{max-height:calc(100dvh - var(--sat) - 6px);height:calc(100dvh - var(--sat) - 6px);border-radius:14px 14px 0 0;display:flex;flex-direction:column}
+.sheet.full .sheet-grid{flex:1;align-content:start}
+.sheet.drag{transition:none!important}
+.sheet.full .sheet-grid{gap:6px}.sheet.full .sheet-grid a{min-height:50px;padding:6px 10px}.sheet.full .sheet-sep{margin-top:2px}
+@media (max-height:900px){ .sheet.full .sheet-grid a .dd{display:none}.sheet.full .sheet-grid a{min-height:46px} }
+@media (max-height:680px){ .sheet.full .sheet-grid a{min-height:40px;padding:4px 8px}.sheet.full .sheet-grid a .ab{width:30px;height:30px}.sheet.full header{margin-bottom:4px}.sheet.full .foot{margin-top:6px} }
 .sheet header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .sheet h2{margin:0;font-size:16px;font-weight:700}
 .sheet .close{border:0;background:transparent;width:var(--tap);height:var(--tap);border-radius:50%;font-size:22px;color:var(--muted)}
@@ -782,7 +817,13 @@ footer b{color:var(--muted);font-weight:600}
   .sheet{left:50%;right:auto;top:50%;bottom:auto;width:min(620px,calc(100% - 40px));max-height:min(80vh,720px);border-radius:18px;padding:18px 20px 20px;transform:translate(-50%,-50%) scale(.97);box-shadow:0 20px 60px rgba(0,0,0,.18)}
   .sheet.open{transform:translate(-50%,-50%)}
   .sheet .grip{display:none}
+  .sheet{max-height:min(94vh,880px)}.sheet .sheet-grid{grid-template-columns:repeat(3,minmax(0,1fr))}   /* V184: PC는 3열로 — 모든 메뉴가 한 화면에 */
   .sheet-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .sheet .foot{margin-top:6px}.sheet .sheet-grid{gap:7px}
+}
+@media (min-width:600px) and (max-height:620px){   /* V184: 가로 휴대폰·낮은 창 — 4열·설명 숨김으로 모든 메뉴가 한 화면에 */
+  .sheet{max-height:calc(100dvh - 12px);padding:10px 16px 10px}.sheet header{margin-bottom:4px}
+  .sheet .sheet-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.sheet .sheet-grid a{min-height:40px;padding:4px 8px;gap:6px}.sheet .sheet-grid a .dd{display:none}.sheet .sheet-grid a .ab{width:28px;height:28px}.sheet .sheet-grid a .tt{font-size:13px}.sheet .sheet-sep{margin-top:0}.sheet .foot{margin-top:2px}
 }
 @media (max-width:419px){ .sheet-grid a{padding:10px 8px} }
 @media (max-width:380px){ .sheet-grid a .ab{display:none} .sheet-grid a{padding:10px 12px} }
@@ -901,6 +942,7 @@ footer b{color:var(--muted);font-weight:600}
         <button type="submit" class="go" aria-label="Search"><img src="data:image/webp;base64,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" alt="" width="84" height="22" decoding="async"></button>
       </form>
     </div>
+    <div id="recentQ" role="group" aria-label="최근 검색"></div>
     <p class="hint">어디서든 <kbd>/</kbd> 를 누르면 검색창으로 이동합니다</p>
   </section>
 
@@ -909,7 +951,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v183</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v184</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -926,7 +968,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <div class="sheet-back" id="sheetBack"></div>
 <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
-  <div class="grip" aria-hidden="true"></div>
+  <button type="button" class="grip" id="sheetGrip" aria-label="메뉴 크게 보기(위로 끌기)" aria-expanded="false"><i aria-hidden="true"></i></button>
   <header><h2 id="sheetTitle"><i class="sg sg-MENU" role="img" aria-label="메뉴"></i></h2><button type="button" class="close" id="sheetClose" aria-label="닫기">×</button></header>
   <div class="sheet-grid" id="sheetGrid"></div>
   <div class="foot"><span id="sheetFoot">자료 14개 섹션</span><button type="button" class="inst-menu" id="instMenu" hidden>앱 설치</button><a href="#login" id="profLink">교수 로그인</a></div>
@@ -1775,8 +1817,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V183', SRV_VER='10.9';
+  const APP_VER='V184', SRV_VER='11.0';
   const UPDATES=[
+    {v:'V184', d:'2026-10-20', t:['Search: 다른 화면에 갔다 와도 마지막 검색 결과·보던 자리·펼친 결과가 그대로(지우기는 ✕)','Search: 결과를 보는 동안 검색창이 위에 고정 — 누르면 전체 선택돼 바로 새 검색','Search: 최근 검색(이 기기에만, 하나씩·모두 지우기), 결과 묶음 바로가기 칩, 늦거나 실패하면 ‘다시 시도’','Search: 돌아올 때 같은 조회를 다시 하지 않아 빠르고 공공데이터 한도도 아낌','메뉴: 위 회색 바를 위로 끌면(또는 누르면) 화면 위까지 펼쳐 모든 메뉴가 한 화면에, 아래로 끌면 원래 크기→닫기','메뉴: PC는 3열, 가로 휴대폰은 4열로 모든 메뉴가 한 화면에']},
     {v:'V183', d:'2026-10-19', t:['PC에서 세로로 긴 사진(휴대폰 캡처)을 크게 볼 때 창 밖으로 나가던 문제 바로잡음','47망·디브리핑룸 ＋: 이 방에 올라온 사진 대신 ‘갤러리’ 칸 — 눌러 휴대폰 갤러리에서 고르면 줄에 번호가 붙고 ‘전송’으로 업로드','사진 편집: 펜(5색)·지우개(그린 선만 지움)·자르기·돌리기']},
     {v:'V182', d:'2026-10-19', t:['47망·디브리핑룸 입력창에서 Ctrl+V(맥은 ⌘V)로 캡처·복사한 이미지를 바로 첨부','여러 장을 복사해도 한 번에 붙고, 글자를 붙여넣을 때는 예전처럼 글자만']},
     {v:'V181', d:'2026-10-19', t:['앱 용량 약 18% 줄임(안 쓰는 그림·코드 정리) — 처음 여는 속도 개선','휴대폰에서 누르는 버튼·체크 칸을 손가락 크기(44px)로 키움(CH·IL·지도·방재실·AI)','폰 화면에서 카드 밖으로 삐져나오던 입력칸 바로잡음(47망·디브리핑룸 입장, 교수 로그인, AI 입장코드, 방재실 키)','AI 오류는 노란 경고로 보이고 ‘다시 묻기’ 버튼 추가, 기다리는 동안 ‘자료를 찾아 답을 쓰는 중’ 표시','검색 결과가 없을 때 다음에 할 일 안내, 공공데이터 조회 안내는 결과 아래로','방재실 탭이 한눈에 보이게 2줄로, CH 시각 기록이 휴대폰에서 덜 접히게','인포그래픽 보고서의 100%가 잘리던 문제 바로잡음, PC에서 업데이트 내역 모양이 빠지던 문제 바로잡음']},
@@ -2057,7 +2100,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // ---------- 상태 (상황판은 이 기기에만 저장) ----------
   const KEY='ictc_board_v3', KEY_V2='ictc_board_v2';
   let focusSearchAfter=false;
-  const state = {route:'hub', query:'',
+  const state = {route:'hub', query:(()=>{ try{ return String(sessionStorage.getItem('sachil_lastq')||'').slice(0,200); }catch(_){ return ''; } })(),   // V184: 마지막 검색어(다른 화면 갔다 와도·새로고침해도 결과 유지)
     checks:{}, timer:{running:false, start:0, acc:0}, log:[],
     situ:{inv:{}, text:{}, fields:{}}};
   let tick=null, saveT=null;
@@ -2117,9 +2160,21 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   let lastFocus=null;
   const appEl=document.querySelector('.app'), tabbarEl=document.querySelector('.tabbar');
   function openSheet(){ if(sheet.classList.contains('open')) return; lastFocus=document.activeElement; sheet.classList.add('open'); sheetBack.classList.add('open'); sheet.setAttribute('aria-hidden','false'); appEl.inert=true; tabbarEl.inert=true; document.documentElement.classList.add('sheet-lock'); $('#menuBtn').setAttribute('aria-expanded','true'); setTimeout(()=>$('#sheetClose').focus(),60); }
-  function closeSheet(){ if(!sheet.classList.contains('open')) return; sheet.classList.remove('open'); sheetBack.classList.remove('open'); sheet.setAttribute('aria-hidden','true'); appEl.inert=false; tabbarEl.inert=false; document.documentElement.classList.remove('sheet-lock'); $('#menuBtn').setAttribute('aria-expanded','false'); syncTabbar(); if(lastFocus && lastFocus.focus) lastFocus.focus(); }
+  function closeSheet(){ if(!sheet.classList.contains('open')) return; sheet.classList.remove('open','full'); sheet.style.maxHeight=''; sheet.style.transform=''; $('#sheetGrip').setAttribute('aria-expanded','false'); sheetBack.classList.remove('open'); sheet.setAttribute('aria-hidden','true'); appEl.inert=false; tabbarEl.inert=false; document.documentElement.classList.remove('sheet-lock'); $('#menuBtn').setAttribute('aria-expanded','false'); syncTabbar(); if(lastFocus && lastFocus.focus) lastFocus.focus(); }
   sheet.addEventListener('keydown',e=>{ if(e.key!=='Tab') return; const f=[...sheet.querySelectorAll('a,button,[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null); if(!f.length) return; const first=f[0], last=f[f.length-1]; if(e.shiftKey&&document.activeElement===first){ e.preventDefault(); last.focus(); } else if(!e.shiftKey&&document.activeElement===last){ e.preventDefault(); first.focus(); } });
   sheetBack.addEventListener('click',closeSheet); $('#sheetClose').addEventListener('click',closeSheet);
+  // V184: 회색 바 끌기 — 위로 = 크게(화면 위까지), 아래로 = 원래 크기 → 한 번 더 아래로 = 닫기. 눌러도 크게/원래로 바뀜
+  { const grip=$('#sheetGrip'); let d=null;
+    const setFull=on=>{ sheet.classList.toggle('full',on); grip.setAttribute('aria-expanded',String(on)); grip.setAttribute('aria-label',on?'메뉴 원래 크기로(아래로 끌기)':'메뉴 크게 보기(위로 끌기)'); };
+    grip.addEventListener('pointerdown',e=>{ if(e.button>0) return; d={y:e.clientY, h:sheet.getBoundingClientRect().height, moved:false}; try{ grip.setPointerCapture(e.pointerId); }catch(_){ } sheet.classList.add('drag'); });
+    grip.addEventListener('pointermove',e=>{ if(!d) return; const dy=e.clientY-d.y; if(Math.abs(dy)>6) d.moved=true;
+      if(dy<0) { sheet.style.maxHeight=Math.min(window.innerHeight-6,d.h-dy)+'px'; sheet.style.transform=''; } else { sheet.style.maxHeight=''; sheet.style.transform=`translateY(${dy}px)`; } });
+    let dragged=0;
+    const end=e=>{ if(!d) return; const dy=e.clientY-d.y, moved=d.moved; d=null; sheet.classList.remove('drag'); sheet.style.maxHeight=''; sheet.style.transform='';
+      if(!moved||e.type==='pointercancel') return;   /* 탭은 click에서 바꾼다 — pointerup에서 크기를 바꾸면 뒤따르는 터치 click이 그 자리에 온 다른 메뉴에 떨어짐 */
+      dragged=Date.now(); if(dy<-40) setFull(true); else if(dy>60){ if(sheet.classList.contains('full')) setFull(false); else closeSheet(); } };
+    grip.addEventListener('pointerup',end); grip.addEventListener('pointercancel',end);
+    grip.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); if(Date.now()-dragged<500) return; setFull(!sheet.classList.contains('full')); });   /* 탭·마우스 클릭·Enter·Space */ }
 
   const ROOMS_R=['chat','debrief'];   // 채팅방 화면: chat=47망, debrief=디브리핑룸
   // ---------- 끌어서 넘기기 (손가락·마우스) ----------
@@ -2138,11 +2193,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(sheet.classList.contains('open')){ closeSheet(); return true; }
     swipeTo(pos===5 ? 'log' : SEQ[pos-1], -1); return true;
   }
+  // V184: S로 돌아오면 마지막 검색 결과 그대로(새 검색은 위 고정 검색창에서, 지우기는 ✕)
+  let SRCH_Y=null, SRCH_MORE='';
+  function goSearch(){ const qi=$('#q'); if(qi){ qi.value=state.query; syncClear(); } const y=state.route!=='search'&&SRCH_Y&&SRCH_Y.q===state.query?SRCH_Y.y:0; go('search'); rootScrollTo(0);
+    if(y>0){ const ts=[60,350,900].map(t=>setTimeout(()=>{ if(state.route==='search') rootScrollTo(y); },t)), stop=()=>{ ts.forEach(clearTimeout); ['wheel','touchstart','keydown'].forEach(k=>removeEventListener(k,stop,true)); };
+      ['wheel','touchstart','keydown'].forEach(k=>addEventListener(k,stop,{capture:true,passive:true})); setTimeout(stop,1000); } }   /* 결과가 다 그려지는 동안 몇 번 맞춤 */
   function swipeTo(r, dir){
     const m=document.querySelector('main'); m.classList.remove('swipe-l','swipe-r'); void m.offsetWidth;
     m.classList.add(dir>0?'swipe-l':'swipe-r'); setTimeout(()=>m.classList.remove('swipe-l','swipe-r'),260);
-    if(r==='search'){ q.value=''; syncClear(); go('search',''); } else go(r);
-    rootScrollTo(0);
+    if(r==='search') goSearch(); else { go(r); rootScrollTo(0); }
   }
   // 넘기면 안 되는 상황: 문서·사진·보고서가 열려 있음, 쓰던 글이 입력칸에 남아 있음
   function swipeBusy(){
@@ -2254,7 +2313,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     sync(); if(window.ResizeObserver&&hdr) new ResizeObserver(sync).observe(hdr); window.addEventListener('resize',sync); }
   function rootScrollTo(top,smooth){ const o={top:top,behavior:smooth?'smooth':'auto'}; const r=scrollRoot(); if(r) r.scrollTo(o); else window.scrollTo(o); }
   function go(route, query){
-    if(query!==undefined) state.query=query;
+    if(query!==undefined){ state.query=query; try{ sessionStorage.setItem('sachil_lastq',String(query||'').slice(0,200)); }catch(_){ } }
     // 화면 이동은 방문 기록을 쌓지 않고 바꿔 끼운다(V60). 갤럭시 '<'(뒤로)는 아래 뒤로가기 처리가 맡는다 —
     // 열린 창 닫기 → 위로 스크롤 → 첫 화면 → '종료하려면 다시 누르세요'(인스타그램 방식)
     if(ROOMS_R.includes(route)) chat.room=null;
@@ -2328,7 +2387,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(e.defaultPrevented||e.button!==0||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey) return;
     const a=e.target.closest&&e.target.closest('a[href^="#"]'); if(!a||a.target) return;
     const r=a.getAttribute('href').slice(1); if(!r) return;
-    e.preventDefault(); if(r==='search'){ state.query=''; } go(r==='chat-bot'?'ai':r); rootScrollTo(0);
+    e.preventDefault(); if(r==='search'){ goSearch(); return; } go(r==='chat-bot'?'ai':r); rootScrollTo(0);
   });
 
   const MAIN=['search','ai','board','log'];
@@ -2342,8 +2401,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
 
   // ---------- 렌더 ----------
+  let lastRoute='';
   function render(){
     const r=state.route;
+    if(lastRoute==='search'&&r!=='search'){ const sr=scrollRoot(); SRCH_Y={q:state.query, y:sr?sr.scrollTop:window.scrollY}; }   // V184: 결과를 보던 자리(어느 길로 떠나든)
+    lastRoute=r;
     { const pvEl=document.getElementById('pdfv'); if(pvEl&&!pvEl.hidden) closePdf(true); }
     if(window.__closeMap) window.__closeMap(); if(window.__closeHyd) window.__closeHyd();
     if(window.__closeBj) window.__closeBj();
@@ -2355,6 +2417,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     document.body.classList.toggle('home', r==='search' && !state.query.trim());
     document.body.classList.toggle('chatview', r==='ai' || ROOMS_R.includes(r));
     document.body.classList.toggle('hubview', r==='hub');
+    if(r==='search'){ const qi=$('#q'); if(qi&&document.activeElement!==qi&&qi.value!==state.query){ qi.value=state.query; qi.closest('.search')&&qi.closest('.search').classList.toggle('has-text',!!qi.value); } }   // V184: 어느 길로 돌아와도 입력칸 = 보이는 결과
     if(r==='search' && focusSearchAfter){ focusSearchAfter=false; const qi=$('#q'); if(qi){ qi.focus(); qi.select(); } }
     document.querySelectorAll('#sheetGrid a').forEach(a=>{ if(a.dataset.slug===r) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
     syncTabbar();
@@ -2420,19 +2483,19 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(!live()) return; const h=(r||[]).find(x=>x.x&&x.y&&(x.address||x.road_address)), A=h&&(h.address||h.road_address);
       if(!h){ box.innerHTML=''; return; }
       box.innerHTML=`<div class="group-title">공공데이터 · ${esc(A.address_name||bq.a)}</div><p class="srch-note">동네 이름으로 찾아 <b>그 동네 중심에서 가까운 소방용수시설</b>을 보여 줍니다. 건축물대장은 번지까지 넣으면 나옵니다(예: ${esc((A.region_3depth_name||'구월동')+' 1138')}).</p>`;
-      box.insertAdjacentHTML('afterend','<div id="srchFfus"><div class="group-title">가까운 소방용수시설</div><p class="srch-note">찾는 중…</p></div>');
+      box.insertAdjacentHTML('afterend','<div id="srchFfus" data-jg><div class="group-title">가까운 소방용수시설</div><p class="srch-note srch-load">찾는 중…</p></div>');
       ffusSearch(A.region_1depth_name||'', A.region_2depth_name||'', +h.y, +h.x, tok); return; }
     const g=await geoHit(bq.a,bq.place), hit=g&&g.hit;
     if(!live()) return;
     if(!hit){ if(bq.place&&!bq.ex){ box.innerHTML=`<div class="group-title">공공데이터 · 건축물대장</div><p class="srch-note">‘${esc(bq.place)}’의 주소를 카카오에서 찾지 못했습니다 — 주소(예: 구월동 1138)로 검색하면 건축물대장·소방용수시설을 조회합니다</p>`; return; } fail('주소를 찾지 못했습니다 — 시·구·동과 번지(예: 구월동 1138) 또는 도로명과 건물번호(예: 정각로 29)로 검색하세요'); return; }
     const A=hit.address, lab=(g.label?g.label+' · ':'')+A.address_name;
-    box.innerHTML=`<div class="group-title">건축물대장 · ${esc(lab)}</div><p class="srch-note">건축물대장을 찾는 중…</p>`;
-    box.insertAdjacentHTML('afterend','<div id="srchFfus"><div class="group-title">가까운 소방용수시설</div><p class="srch-note">찾는 중…</p></div>');
+    box.innerHTML=`<div class="group-title">건축물대장 · ${esc(lab)}</div><p class="srch-note srch-load">건축물대장을 찾는 중…</p>`;
+    box.insertAdjacentHTML('afterend','<div id="srchFfus" data-jg><div class="group-title">가까운 소방용수시설</div><p class="srch-note srch-load">찾는 중…</p></div>');
     ffusSearch(A.region_1depth_name||'', A.region_2depth_name||'', +hit.y, +hit.x, tok);
-    const x=await api(`/api/bld?b=${A.b_code}&bun=${encodeURIComponent(A.main_address_no)}&ji=${encodeURIComponent(A.sub_address_no||'0')}&mt=${A.mountain_yn==='Y'?1:0}`);
+    const x=await apiS(`/api/bld?b=${A.b_code}&bun=${encodeURIComponent(A.main_address_no)}&ji=${encodeURIComponent(A.sub_address_no||'0')}&mt=${A.mountain_yn==='Y'?1:0}`);
     if(!live()) return;
     const head=`<div class="group-title">건축물대장 · ${esc(lab)}</div>`;
-    if(!x.ok||!x.j||x.j.ok===false){ box.innerHTML=head+`<p class="srch-note">❌ ${esc((x.j&&x.j.error)||'서버에 연결하지 못했습니다(서버 업데이트가 필요할 수 있음)')}</p>`; return; }
+    if(!x.ok||!x.j||x.j.ok===false){ box.innerHTML=head+`<p class="srch-note">❌ ${esc((x.j&&x.j.error)||'서버에 연결하지 못했습니다(서버 업데이트가 필요할 수 있음)')} ${RETRY}</p>`; return; }
     const rows=x.j.rows||[];
     if(!rows.length){ box.innerHTML=head+'<p class="srch-note">이 번지에 등록된 건축물대장(표제부)이 없습니다 — 빈 땅이거나, 큰 단지는 대표 번지가 다를 수 있습니다</p>'; return; }
     box.innerHTML=head+`<div class="results">${rows.slice(0,3).map(bldRow).join('')}</div>${rows.length>3?`<div class="srch-more"><button type="button" class="btn ghost" id="bldMore">다른 동 ${rows.length-3}개 더 보기</button></div>`:''}<p class="srch-note">국토교통부 건축물대장(표제부) 기준 — 증축·용도 변경 등 실제와 다를 수 있습니다</p>`;
@@ -2441,8 +2504,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // V157: 검색 — 법제처 현행 조문을 원문 그대로(앞 몇 줄, 누르면 전체) + 조문 링크
   async function lawTextSearch(q,tok){
     const el=$('#srchLawTxt'); if(!el) return;
-    el.innerHTML='<div class="group-title">법령 조문 · 법제처 현행</div><p class="srch-note">법제처에서 관련 조문을 찾는 중…</p>';
-    const x=await api('/api/lawtext?q='+encodeURIComponent(q));
+    el.innerHTML='<div class="group-title">법령 조문 · 법제처 현행</div><p class="srch-note srch-load">법제처에서 관련 조문을 찾는 중…</p>';
+    const x=await apiS('/api/lawtext?q='+encodeURIComponent(q));
     if(tok!==SEARCHGEN||document.getElementById('srchLawTxt')!==el) return;
     const rows=(x.ok&&x.j&&x.j.ok&&x.j.rows)||[];
     if(!rows.length){ el.innerHTML=''; return; }
@@ -2455,7 +2518,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     el.querySelectorAll('[data-lx]').forEach(b=>b.addEventListener('click',()=>{ const p=document.getElementById('lx'+b.dataset.lx); const on=p.classList.toggle('open'); b.setAttribute('aria-expanded',String(on)); b.textContent=on?'접기':'조문 전체'; })); }
   async function lawSearch(q,tok){
     const el=$('#srchLaw'); if(!el) return;
-    const x=await api('/api/law?q='+encodeURIComponent(q));
+    const x=await apiS('/api/law?q='+encodeURIComponent(q));
     if(tok!==SEARCHGEN||document.getElementById('srchLaw')!==el||!x.ok||!x.j||!x.j.ok) return;
     const rows=x.j.rows||[]; if(!rows.length) return;
     const ord=['law','admrul','ordin'];
@@ -2466,10 +2529,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const FFUS_T={};   // 시설유형 코드 → 이름(자료에 이름이 없을 때만 코드 그대로)
   async function ffusSearch(sd,sg,lat,lng,tok){
     const el=$('#srchFfus'); if(!el) return;
-    const x=await api(`/api/ffus?sd=${encodeURIComponent(sd)}&sg=${encodeURIComponent(sg)}&lat=${lat}&lng=${lng}`);
+    const x=await apiS(`/api/ffus?sd=${encodeURIComponent(sd)}&sg=${encodeURIComponent(sg)}&lat=${lat}&lng=${lng}`);
     if(tok!==SEARCHGEN||document.getElementById('srchFfus')!==el) return;
     const head='<div class="group-title">가까운 소방용수시설 · 반경 1,000m</div>';
-    if(!x.ok||!x.j||x.j.ok===false){ el.innerHTML=head+`<p class="srch-note">❌ ${esc((x.j&&x.j.error)||'서버에 연결하지 못했습니다(서버 업데이트가 필요할 수 있음)')}</p>`; return; }
+    if(!x.ok||!x.j||x.j.ok===false){ el.innerHTML=head+`<p class="srch-note">❌ ${esc((x.j&&x.j.error)||'서버에 연결하지 못했습니다(서버 업데이트가 필요할 수 있음)')} ${RETRY}</p>`; return; }
     const R=x.j.rows||{}, near=R.near||[];
     if(!near.length){ el.innerHTML=head+`<p class="srch-note">${R.total?`반경 1,000m 안에 등록된 시설이 없습니다(${esc(sg)} 자료 ${R.total}건 중)`:`${esc(sd+' '+sg)} 소방용수시설 자료가 표준데이터에 없습니다 — 지자체가 아직 올리지 않았을 수 있습니다`}</p>`; return; }
     const nm=r=>r.type||(r.code&&!/^\d+$/.test(r.code)?r.code:FFUS_T[r.code]||(r.code?'유형 '+r.code:'소방용수'));
@@ -2478,10 +2541,47 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <span class="body"><p class="t">${esc(nm(r))}${r.no?` <span class="art">${esc(r.no)}</span>`:''}</p><p class="d">${esc([r.at||r.addr,r.guard?'보호틀 '+r.guard:'',r.pr?'수압 '+r.pr:'',r.ctr].filter(Boolean).join(' · '))}</p></span>
         <span class="arrow">→</span></a>`).join('')}</div><p class="srch-note">전국소방용수시설표준데이터 기준${near[0].ref?' · 기준일 '+esc(near[0].ref):''} — 현장에서는 실제 위치·사용 가능 여부를 확인하세요</p>`; }
   const isKeyword=t=>{ t=String(t||'').trim(); return !!t && t.split(/\s+/).length<=2 && t.length<=14 && !isSentence(t); };
-  function toSearch(t){ t=String(t||'').trim(); const qi=$('#q'); if(qi){ qi.value=t; qi.dispatchEvent(new Event('input')); } go('search',t); rootScrollTo(0); }
+  // V184: 최근 검색 — 이 기기에만(최대 8개). 긴 문장·전화번호처럼 보이는 숫자는 남기지 않음
+  const RQ_KEY='sachil_recent_q_v1';
+  const rqGet=()=>{ try{ const a=JSON.parse(localStorage.getItem(RQ_KEY)||'[]'); return Array.isArray(a)?a.filter(x=>typeof x==='string'&&x).slice(0,8):[]; }catch(_){ return []; } };
+  const rqSet=a=>{ try{ if(a.length) localStorage.setItem(RQ_KEY,JSON.stringify(a.slice(0,8))); else localStorage.removeItem(RQ_KEY); }catch(_){ } };
+  function rqAdd(t){ t=String(t||'').replace(/\s+/g,' ').trim(); if(!t||t.length>40||/\d{7,}|\d{2,4}[-\s]\d{3,4}[-\s]\d{4}/.test(t)) return; rqSet([t,...rqGet().filter(x=>x!==t)]); rqDraw(); }
+  function rqDraw(){
+    const el=$('#recentQ'), qi=$('#q'); if(!el) return;
+    const cur=state.query.trim(), typed=qi&&document.activeElement===qi?qi.value.trim():'';
+    const filt=!!typed&&typed!==cur;
+    const a=rqGet().filter(x=>x!==cur&&(!filt||(x.includes(typed)&&x!==typed)));
+    el.classList.toggle('has',a.length>0);
+    el.innerHTML=a.length?`<span class="rqh">최근 검색 <small>· 이 기기에만</small></span>${a.map(x=>`<span class="rq"><button type="button" data-rq="${esc(x)}">${esc(x)}</button><button type="button" class="x" data-rqdel="${esc(x)}" aria-label="‘${esc(x)}’ 최근 검색에서 지우기">×</button></span>`).join('')}${filt?'':'<button type="button" class="rqclr" data-rqclr>모두 지우기</button>'}`:''; }
+  function toSearch(t){ t=String(t||'').trim(); const qi=$('#q'); if(qi){ qi.value=t; qi.dispatchEvent(new Event('input')); } go('search',t); rqAdd(t); rootScrollTo(0); }
+  // V184: 결과 묶음 바로가기 — 결과가 늦게 채워지는 묶음(건축물대장·법령…)도 채워지는 대로 칩에 반영
+  const JUMP=[['srchBld','건축물대장'],['srchFfus','소방용수'],['srchLawTxt','법령 조문'],['srchLaw','법령 원문'],['srchFileG','자료 파일'],['srchBodyG','본문'],['srchMenuG','메뉴']];
+  function jumpDraw(){
+    const nav=$('#srchJump'); if(!nav||state.route!=='search') return;
+    const g=JUMP.map(([id,n])=>{ const el=document.getElementById(id); if(!el||!el.innerHTML.trim()) return null;
+      const body=id==='srchBodyG'?document.getElementById('srchBody'):el.classList.contains('group-title')?el.nextElementSibling:el; if(!body) return null;
+      if(body.querySelector('.srch-load')) return {id,n,c:'…'};
+      if(id==='srchBld'&&!body.querySelector('.card')) return null;
+      const c=id==='srchBodyG'?(body.dataset.n||''):String(body.querySelectorAll('.card,.menu-chips a').length);
+      if(c==='0'||(id==='srchFfus'&&!body.querySelector('.card'))) return null;
+      if(id==='srchBld'){ const t=(el.querySelector('.group-title')||{}).textContent||''; if(/^공공데이터/.test(t)) n='공공데이터'; }
+      return {id,n,c}; }).filter(Boolean);
+    const ai=document.getElementById('srchAiG');
+    const html=g.length>=2?g.map(x=>`<button type="button" data-jump="${x.id}">${esc(x.n)}${x.c?` <b>${esc(x.c)}</b>`:''}</button>`).join('')+(ai?'<button type="button" class="ai" data-jump="srchAiG">AI 답 정리</button>':''):'';
+    if(nav.innerHTML!==html){ nav.innerHTML=html; nav.hidden=!html; } }
+  function srchJumpTo(id){
+    const el=document.getElementById(id); if(!el) return;
+    const hero=$('#hero'), r=scrollRoot(), cur=r?r.scrollTop:window.scrollY;
+    const off=hero&&getComputedStyle(hero).position==='sticky'?hero.getBoundingClientRect().bottom:((r?r.getBoundingClientRect().top:0)+(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hdr'))||56));
+    rootScrollTo(Math.max(0,cur+el.getBoundingClientRect().top-off-8),true); }
+  // V184: 늦거나 실패한 묶음 — '다시 시도'(같은 검색을 다시 실행)
+  const RETRY='<button type="button" class="btn ghost sm" data-srch-retry>다시 시도</button>';
+  function srchSlow(tok){ if(tok!==SEARCHGEN||state.route!=='search') return;
+    document.querySelectorAll('#panel .srch-load:not(.slow)').forEach(p=>{ p.classList.add('slow'); p.insertAdjacentHTML('beforeend',` — 응답이 늦습니다(통신 상태 확인) ${RETRY}`); }); }
   const pdfName=n=>String(n).replace(/\.pdf$/i,'');
   function renderSearch(panel){
     const q=state.query.trim();
+    rqDraw();   // V184: 최근 검색 칩(첫 화면)·펼침 목록(결과 화면)
     if(!q){ panel.innerHTML=''; return; }
     const tok=++SEARCHGEN;
     const terms=q.toLowerCase().split(/\s+/).filter(Boolean);
@@ -2494,16 +2594,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const hl=mkHl(terms);
     let html=`<div class="panel-head" aria-live="polite"><h2${q.length>18?' class="long"':''}>“${esc(q)}” 검색 결과</h2><span class="sub" id="srchSub">${SRV.on?'본문 검색 중…':''}</span></div>`;
     const bq=bldQuery(q);
-    if(bq) html+='<div id="srchBld"><div class="group-title">건축물대장</div><p class="srch-note">주소를 찾는 중…</p></div>';
+    html+='<nav class="srch-jump" id="srchJump" aria-label="결과 묶음 바로가기" hidden></nav>';   /* V184 */
+    if(bq) html+='<div id="srchBld" data-jg><div class="group-title">건축물대장</div><p class="srch-note srch-load">주소를 찾는 중…</p></div>';
     let pubHint='';   /* V181: 공공데이터 안내는 결과 아래로(검색 결과를 먼저) */
     if(!bq&&SRV.on&&SRV.bld) pubHint=`<p class="srch-note pubhint">🏢 공공데이터포털 실시간 조회는 <b>주소·건물 이름·동네</b>로 검색할 때 함께 나옵니다 — 예: ${['구월동 1138','인천 남동구청','구월동'].map(x=>`<button type="button" class="pubex" data-pubex="${esc(x)}">${esc(x)}</button>`).join(' ')}</p>`;
     const lawTxtOn=SRV.on&&!(bq&&!/법|조례|기준|고시|규칙|시행령|조문/.test(q));   // V157: 주소만 찾는 검색은 빼고
-    if(lawTxtOn) html+='<div id="srchLawTxt"></div>';   // V157: 법제처 현행 조문 원문(첨부 PDF 밖)
-    if(SRV.on) html+='<div id="srchLaw"></div>';   // V150: 법제처 원문 링크(법령 관련 검색일 때만 채워짐)
+    if(lawTxtOn) html+='<div id="srchLawTxt" data-jg></div>';   // V157: 법제처 현행 조문 원문(첨부 PDF 밖)
+    if(SRV.on) html+='<div id="srchLaw" data-jg></div>';   // V150: 법제처 원문 링크(법령 관련 검색일 때만 채워짐)
     if(isSentence(q)&&!bq) html+=`<div class="xhint"><span>문장으로 물으셨네요. <b>AI 도우미</b>가 자료를 근거로 답을 정리해 드립니다.</span><a class="btn primary" href="#ai" data-ask-ai>AI에게 묻기</a></div>`;
     // 1) 자료 파일 — 파일 이름이 맞는 것(서버에 올린 실제 파일)
     if(fileHits.length){
-      html+='<div class="group-title">자료 파일 · 이름 일치</div><div class="results">'+fileHits.map(({f,sec})=>`
+      html+='<div class="group-title" id="srchFileG" data-jg>자료 파일 · 이름 일치</div><div class="results">'+fileHits.map(({f,sec})=>`
         <a class="card result doc" href="${libHref(sec.slug,f)}" ${f.inline?'target="_blank" rel="noopener"':'download'}${f.ext==='pdf'?` data-pdfv="${esc(f.name)}"`:''}>
           <span class="ico">${esc(f.ext.toUpperCase())}</span>
           <span class="body"><p class="t">${hl(f.name.replace(/\.[^.]+$/,''))}</p><p class="d">${esc(sec.title)} · ${fmtSize(f.size)}</p></span>
@@ -2511,16 +2612,18 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         </a>`).join('')+'</div>';
     }
     // 2) 본문 — PDF 속 내용(쪽 단위). 누르면 그 쪽으로 열린다
-    html+=`<div class="group-title">본문 · 자료 속 내용</div><div id="srchBody">${SRV.on?'<p class="srch-note">자료 본문을 찾는 중…</p>':'<p class="srch-note">본문 검색은 서버(sachil_server.py)로 열었을 때 메뉴에 첨부된 PDF를 대상으로 동작합니다.</p>'}</div>`;
+    html+=`<div class="group-title" id="srchBodyG" data-jg>본문 · 자료 속 내용</div><div id="srchBody">${SRV.on?'<p class="srch-note srch-load">자료 본문을 찾는 중…</p>':'<p class="srch-note">본문 검색은 서버(sachil_server.py)로 열었을 때 메뉴에 첨부된 PDF를 대상으로 동작합니다.</p>'}</div>`;
     // 3) AI 도우미 — 검색은 찾기, AI는 답하기
-    html+=`<div class="group-title">AI 도우미</div><div class="card ask-ai"><p id="askAiP">이 검색 결과(같은 자료·같은 쪽)를 근거로 <b>AI가 답을 정리</b>합니다. 답의 [번호]를 누르면 원문 쪽이 열립니다.</p><a class="btn primary" href="#ai" data-ask-ai>이 결과로 AI에게 묻기</a></div>`;
+    html+=`<div class="group-title" id="srchAiG" data-jg>AI 도우미</div><div class="card ask-ai"><p id="askAiP">이 검색 결과(같은 자료·같은 쪽)를 근거로 <b>AI가 답을 정리</b>합니다. 답의 [번호]를 누르면 원문 쪽이 열립니다.</p><a class="btn primary" href="#ai" data-ask-ai>이 결과로 AI에게 묻기</a></div>`;
     // 4) 메뉴 바로가기 — 12개 메뉴 중 관련된 곳
     if(secHits.length){
-      html+='<div class="group-title">메뉴 바로가기</div><div class="menu-chips">'+secHits.map(({s})=>`<a href="#${s.slug}">${s.icon?`<img src="${s.icon}" alt="">`:''}${esc(s.title)}</a>`).join('')+'</div>';
+      html+='<div class="group-title" id="srchMenuG" data-jg>메뉴 바로가기</div><div class="menu-chips">'+secHits.map(({s})=>`<a href="#${s.slug}">${s.icon?`<img src="${s.icon}" alt="">`:''}${esc(s.title)}</a>`).join('')+'</div>';
     }
     panel.innerHTML=html+pubHint;
     panel.querySelectorAll('[data-ask-ai]').forEach(a=>a.addEventListener('click',()=>{ autoAsk=q; }));
     panel.querySelectorAll('[data-pubex]').forEach(b=>b.addEventListener('click',()=>toSearch(b.dataset.pubex)));
+    { const jn=$('#srchJump'); if(jn) jn.addEventListener('click',e=>{ const b=e.target.closest('[data-jump]'); if(b) srchJumpTo(b.dataset.jump); }); }
+    setTimeout(()=>srchSlow(tok),12000); setTimeout(()=>srchSlow(tok),25000); jumpDraw();
     if(bq) bldSearch(bq,tok);
     if(SRV.on) lawSearch(q,tok);
     if(lawTxtOn) lawTextSearch(q,tok);
@@ -2533,22 +2636,23 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       }
     };
     if(!SRV.on){ done(0); return; }
-    api('/api/search?q='+encodeURIComponent(q)).then(r=>{
+    apiS('/api/search?q='+encodeURIComponent(q)).then(r=>{
       if(tok!==SEARCHGEN || state.route!=='search' || state.query.trim()!==q) return;
       const box=$('#srchBody'); if(!box) return;
-      if(!r.ok){ box.innerHTML='<p class="srch-note">본문 검색에 실패했습니다. 서버 연결을 확인하세요.</p>'; done(0); return; }
+      if(!r.ok){ box.innerHTML=`<p class="srch-note">본문 검색에 실패했습니다. 서버 연결을 확인하세요. ${RETRY}</p>`; done(0); return; }
       const hits=r.j.hits||[], st=r.j.status||{}; const bh=mkHl([...(r.j.terms||[]), ...terms]);
       const stTxt = st.pending ? `자료 읽는 중 — 남은 파일 ${st.pending}개(완료되면 더 많이 찾습니다)` : (st.files?`PDF ${st.files}개 · ${st.pages}쪽에서 찾았습니다`:'메뉴에 첨부된 PDF가 아직 없습니다');
       const row=h=>`<a class="card result hitp" href="${libHref(h.slug,{name:h.name})}" target="_blank" rel="noopener" data-pdfv="${esc(h.name)}" data-page="${h.page}">
           <span class="ico">${h.page}쪽</span>
           <span class="body"><p class="t">${bh(pdfName(h.name))}${h.art?` <span class="art">${esc(h.art)}</span>`:''}</p><p class="d snip">${bh(deGlyph(h.snippet))}</p></span>
           <span class="arrow">→</span></a>`;
+      box.dataset.n=String(hits.length);
       box.innerHTML = hits.length
         ? `<div class="results">${hits.slice(0,6).map(row).join('')}</div>${hits.length>6?`<div class="srch-more" id="srchMoreBox"><button type="button" class="btn ghost" id="srchMore">본문 결과 ${hits.length-6}건 더 보기</button></div>`:''}<p class="srch-note">${esc(stTxt)}</p>`
         : `<p class="srch-note">본문에서 찾지 못했습니다. ${esc(stTxt)}</p>`;
       if(!hits.length&&!fileHits.length&&!bq) box.insertAdjacentHTML('beforebegin',`<div class="card empty srch-none"><p><b>‘${esc(trunc(q,24))}’와 일치하는 자료가 없습니다.</b></p><p>낱말을 줄이거나(예: 위험물, RIT) 다른 표현으로 찾아 보세요. 상황을 문장으로 물으려면 아래 <b>AI 도우미</b>를 쓰세요.</p></div>`);   /* V181: 서버 연결 중에도 '결과 없음'을 분명히 */
       if(hits.length){ const p=$('#askAiP'); if(p) p.innerHTML=`이 검색 결과를 근거로 <b>AI가 답을 정리</b>합니다 · 근거 후보: ${(()=>{ const g=new Map(); hits.slice(0,4).forEach(h=>{ if(!g.has(h.name)) g.set(h.name,[]); if(!g.get(h.name).includes(h.page)) g.get(h.name).push(h.page); }); return [...g].slice(0,2).map(([n,ps])=>`<b>${esc(trunc(pdfName(n),24))}</b> ${ps.join('·')}쪽`).join(', '); })()}`; }
-      const mb=$('#srchMore'); if(mb) mb.addEventListener('click',()=>{ $('#srchMoreBox').outerHTML=`<div class="results" style="margin-top:10px">${hits.slice(6).map(row).join('')}</div>`; });
+      const mb=$('#srchMore'); if(mb){ mb.addEventListener('click',()=>{ SRCH_MORE=q; $('#srchMoreBox').outerHTML=`<div class="results" style="margin-top:10px">${hits.slice(6).map(row).join('')}</div>`; }); if(SRCH_MORE===q) mb.click(); }   // V184: 펼쳐 본 결과는 돌아와도 펼친 채
       done(hits.length,st);
     });
   }
@@ -4737,7 +4841,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       : `<span class="hz-k bl" data-k="debrief" aria-hidden="true"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd w">익명으로 개선사항 도출<br>의견 청취로 지휘역량 강화</span><span class="hd n">익명으로<br>개선사항 도출<br>의견 청취로<br>지휘역량 강화</span></span>`;
     const cell=h=>h.y?corner(h):`<span class="hz-l" data-l="${h.go}" aria-hidden="true">${sigK(h.k)}<b>${h.t}</b></span>`;
     panel.innerHTML=`<nav class="hub hz" aria-label="SACHIL:47 첫 화면"><svg class="hz-svg" xmlns="http://www.w3.org/2000/svg">${HUB.map(h=>`<a href="#${h.go}" data-hub="${h.go}" aria-label="${h.t}"><path class="hz-p${h.y?' y':''}" data-p="${h.go}"/><path class="hz-hit" data-hit="${h.go}"/></a>`).join('')}${HZ.strokes.map((_,i)=>`<path class="hz-47" data-s="${i}" pathLength="1"/>`).join('')}</svg>${HUB.map(cell).join('')}<div class="hz-tools" data-tools="chat" role="group" aria-label="47망 바로 열기"><button type="button" class="hzt" data-hzt="map" aria-label="CP 현장 지휘 지도 열기">${HUB_CP_SVG}<b>CP</b></button><button type="button" class="hzt" data-hzt="hyd" aria-label="소화전 열기">${HUB_HYD_SVG}<b>소화전</b></button></div></nav>`;
-    panel.querySelectorAll('[data-hub]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const t=a.dataset.hub; if(t==='search'){ q.value=''; syncClear(); go('search',''); } else go(t); rootScrollTo(0); }));
+    panel.querySelectorAll('[data-hub]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const t=a.dataset.hub; if(t==='search') goSearch(); else go(t); rootScrollTo(0); }));
     panel.querySelectorAll('[data-hzt]').forEach(b=>{ b.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); hubTool(b.dataset.hzt); }); b.addEventListener('pointerdown',e=>e.stopPropagation()); });
     // V157: 칸 애니메이션 — 칸 모양(path)과 글자(따로 놓인 요소)를 함께 움직인다
     { const parts=k=>[...panel.querySelectorAll(`[data-p="${k}"],[data-l="${k}"],[data-k="${k}"]`)], set=(k,at,on)=>parts(k).forEach(el=>on?el.setAttribute(at,''):el.removeAttribute(at));
@@ -4936,6 +5040,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       return fin?{ok:true, status:200, j:fin}:{ok:false, status:0, j:{error:'답변이 중간에 끊겼습니다. 다시 해 보세요.', text:acc}};
     }catch(e){ return {ok:false, status:0, aborted:e&&e.name==='AbortError', j:{error:'서버에 연결할 수 없습니다', text:acc}}; }
   }
+  // V184: 검색 화면 조회(GET)는 10분간 기억 — 다른 화면에 갔다 돌아올 때 공공데이터·본문 검색을 다시 부르지 않는다(성공한 응답만)
+  const SQC=new Map();
+  async function apiS(path){ const c=SQC.get(path); if(c&&Date.now()-c.t<600e3) return c.r; const r=await api(path); if(r&&r.ok&&r.j&&r.j.ok!==false&&!(r.j.status&&r.j.status.pending)){ if(SQC.size>60) SQC.delete(SQC.keys().next().value); SQC.set(path,{t:Date.now(),r}); } return r; }
   async function api(path, opt){
     opt=opt||{};
     const init={method:opt.method||((opt.json!==undefined||opt.body)?'POST':'GET'), credentials:SRVBASE?'omit':'same-origin', headers:{'X-SACHIL':'1'}};
@@ -6016,22 +6123,34 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const q=$('#q'), box=$('#searchBox');
   $('#chatBtn').addEventListener('click',()=>{ closeSheet(); if(state.route==='chat') render(); });
   $('#dbBtn').addEventListener('click',()=>{ closeSheet(); if(state.route==='debrief') render(); });
-  $('#navSearch').addEventListener('click',e=>{ e.preventDefault(); q.value=''; syncClear(); go('search',''); });
+  $('#navSearch').addEventListener('click',e=>{ e.preventDefault(); goSearch(); });
   function syncClear(){ box.classList.toggle('has-text', !!q.value); }
-  q.addEventListener('input',()=>{ syncClear(); if(!q.value.trim() && state.route==='search' && state.query){ state.query=''; render(); } });
+  if(state.query&&!q.value){ q.value=state.query; syncClear(); }   // V184: 새로고침 뒤에도 마지막 검색어
+  q.addEventListener('input',()=>{ syncClear(); });   // V184: 검색창을 비워도 결과는 남김 — 지우기는 ✕, 바꾸기는 새 검색
+  q.addEventListener('focus',()=>{ if(state.route==='search'&&state.query&&q.value===state.query) setTimeout(()=>{ try{ q.select(); }catch(_){ } },0); });   // V184: 결과를 보다 검색창을 누르면 전체 선택 — 바로 새 낱말
   $('#clearBtn').addEventListener('click',()=>{ q.value=''; syncClear(); go('search',''); q.focus(); });
-  $('#searchForm').addEventListener('submit',e=>{ e.preventDefault(); go('search', q.value); q.blur(); });
-  // 브랜드(ICTC 아이콘·이름) 클릭 = 초기 화면: 검색어를 지우고 검색 화면으로
-  document.querySelector('.brand').addEventListener('click',e=>{ e.preventDefault(); q.value=''; syncClear(); state.query=''; go('hub'); rootScrollTo(0,true); });   // 로고 = 첫 화면(6개 박스)
+  $('#searchForm').addEventListener('submit',e=>{ e.preventDefault(); SQC.delete('/api/search?q='+encodeURIComponent(q.value.trim())); go('search', q.value); rqAdd(q.value); q.blur(); });
+  // V184: 최근 검색 — 누르면 다시 검색, ×는 하나 지우기. 누르는 동안 검색창 포커스를 지켜 펼침 목록이 닫히지 않게
+  { const rq=$('#recentQ');
+    rq.addEventListener('mousedown',e=>{ if(e.target.closest('button')&&document.activeElement===q) e.preventDefault(); });
+    rq.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
+      if(b.hasAttribute('data-rqdel')){ const v=b.getAttribute('data-rqdel'); rqSet(rqGet().filter(x=>x!==v)); rqDraw(); return; }
+      if(b.hasAttribute('data-rqclr')){ rqSet([]); rqDraw(); return; }
+      if(b.hasAttribute('data-rq')){ q.blur(); toSearch(b.getAttribute('data-rq')); } });
+    q.addEventListener('focus',rqDraw); q.addEventListener('input',rqDraw); }
+  document.addEventListener('click',e=>{ if(e.target.closest&&e.target.closest('#panel [data-srch-retry]')&&state.route==='search') render(); });   // V184: 검색 '다시 시도'
+  if(window.MutationObserver){ let jt=0; new MutationObserver(()=>{ if(state.route!=='search'||jt) return; jt=requestAnimationFrame(()=>{ jt=0; jumpDraw(); }); }).observe($('#panel'),{childList:true,subtree:true}); }   // V184: 늦게 채워지는 묶음도 바로가기 칩에
+  // 브랜드(로고) 클릭 = 첫 화면(6개 박스). V184: 마지막 검색 결과는 지우지 않는다(S로 돌아오면 그대로, 지우기는 ✕)
+  document.querySelector('.brand').addEventListener('click',e=>{ e.preventDefault(); go('hub'); rootScrollTo(0,true); });   // 로고 = 첫 화면(6개 박스)
   $('#menuBtn').addEventListener('click',openSheet);
-  document.querySelectorAll('.tabbar button').forEach(b=>b.addEventListener('click',()=>{ const t=b.dataset.go; if(t==='search'){ q.value=''; syncClear(); go('search',''); rootScrollTo(0); } else go(t); }));
+  document.querySelectorAll('.tabbar button').forEach(b=>b.addEventListener('click',()=>{ const t=b.dataset.go; if(t==='search') goSearch(); else go(t); }));
   document.addEventListener('keydown',e=>{
     if(e.isComposing) return;
     if(!pv.hidden){ if(e.key==='Escape') closePdf(); else if(e.key==='+'||e.key==='=') pvZoom(1); else if(e.key==='-') pvZoom(-1); return; }
     if(!lb.hidden){ if(e.key==='Escape') closeLightbox(); return; }
     if(!$('#report').hidden){ if(e.key==='Escape') closeReport(); return; }
-    if(e.key==='Escape'){ if(sheet.classList.contains('open')){ closeSheet(); return; } if(document.activeElement===q){ q.value=''; syncClear(); go('search',''); } }
-    if(e.key==='/' && !/input|textarea|select/i.test(document.activeElement.tagName) && !document.querySelector('#mapov:not([hidden]),#bjov:not([hidden]),#hydov:not([hidden])')){ e.preventDefault(); if(state.route!=='search'){ focusSearchAfter=true; go('search'); } else { q.focus(); q.select(); } }
+    if(e.key==='Escape'){ if(sheet.classList.contains('open')){ closeSheet(); return; } if(document.activeElement===q){ if(state.route==='search'&&state.query){ q.value=state.query; syncClear(); q.blur(); } else { q.value=''; syncClear(); go('search',''); } } }
+    if(e.key==='/' && !/input|textarea|select/i.test(document.activeElement.tagName) && !document.querySelector('#mapov:not([hidden]),#bjov:not([hidden]),#hydov:not([hidden])')){ e.preventDefault(); if(state.route!=='search'){ focusSearchAfter=true; goSearch(); } else { q.focus(); q.select(); } }
   });
 
   // ---------- 시작 ----------
