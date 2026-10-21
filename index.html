@@ -1335,6 +1335,23 @@ html body #otBtn.due .otbd{background:#D92D20;animation:otBdPulse 1s ease-in-out
 @media (max-height:700px){ .otal-yt iframe,#otYt{width:192px;height:108px} .otal-in{gap:10px} }
 @media (prefers-reduced-motion:reduce){ html body #otBtn.due .otbd{animation:none} }
 </style>
+<style id="v212-ot">
+/* V212: 합계 칸 = 누르는 버튼(오늘·이번 주·이번 달) → 아래에 그 기간 기록 */
+html body .otsum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+html body .otsum button{position:relative;display:grid;gap:2px;justify-items:start;min-height:64px;padding:10px 12px;border:2px solid transparent;border-radius:12px;background:var(--navy-soft);font:inherit;text-align:left;cursor:pointer;color:var(--navy-deep,#0B1B3F)}
+html body .otsum button span{font-size:12px;font-weight:700;color:var(--muted)}
+html body .otsum button b{font-size:17px}
+html body .otsum button i{position:absolute;top:8px;right:10px;font-style:normal;font-size:13px;color:var(--muted)}
+html body .otsum button[aria-expanded="true"]{border-color:var(--navy-deep,#0B1B3F);background:#fff}
+html body .otsum button:focus-visible{outline:3px solid #1F2A44;outline-offset:2px}
+html body .otper{display:grid;gap:8px;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--surface,#fff)}
+html body .otper ul{margin:0;padding:0;list-style:none;display:grid;gap:4px;max-height:40dvh;overflow:auto}
+html body .otper li{display:grid;grid-template-columns:1fr auto;gap:0 8px;padding:8px 10px;border-radius:10px;background:var(--surface-2,#F5F6F8);font-size:13.5px}
+html body .otper li.live{background:#E8F5EC}
+html body .otper li small{grid-column:1 / -1;color:var(--muted);font-size:12px}
+html body .otper .otempty{margin:4px 2px;font-size:13.5px;color:var(--muted)}
+@media (max-width:380px){ html body .otsum button{padding:8px} html body .otsum button b{font-size:15px} }
+</style>
 <style id="v199-room">
 #panel .board .phase h3 .one{margin-left:8px;font-size:11.5px;font-weight:700;color:var(--muted);white-space:nowrap}
 /* V199: 47망·디브리핑룸 채팅 칸 넓히기 — 공지 📌 버튼만, CP·소화전은 머리줄(방 이름과 '대화명 바꾸기' 사이), 아래 '대화명 …' 줄 숨김 */
@@ -2336,7 +2353,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v211</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v212</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -3355,8 +3372,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V211', SRV_VER='13.8';
+  const APP_VER='V212', SRV_VER='13.9';
   const UPDATES=[
+    {v:'V212', d:'2026-10-21', t:['초과근무 알리미: 오늘 · 이번 주 · 이번 달 칸을 누르면 그 기간 기록이 아래에 펼쳐짐(진행 중인 것 포함, 기간별 복사)','긴 안내 문구와 ‘지난 기록’ 접기 줄을 없애 화면을 간단하게']},
     {v:'V211', d:'2026-10-21', t:['디자인 모드: S·A·CH·IL 칸에 한글 설명 한 줄, 휴대폰 [간편 모드] 버튼 44px, 누름·키보드 초점 표시 정리','간편 모드: 칸 안에 지금 상태 — 47망 연결 상태, 최근 검색어 바로 검색, 체크리스트 진행 n/50·경과 시간, 저장된 보고서 수 · 햇빛에서 더 진한 글자','초과근무 알리미: ‘초과근무 시작’ 한 번에, 남은 시간을 가장 크게, 경보에 다음 확인 시각과 ‘5분 뒤 다시 알림’, 오늘·이번 주·이번 달 합계와 이번 달 기록 복사','진행 중 표시: 휴대폰 알림창에 ‘초과근무 진행 중 · 다음 확인’ 상시 알림, 설치한 앱 아이콘 배지, 창 제목에 다음 확인 시각 · 헤더 ⏱에 남은 분']},
     {v:'V210', d:'2026-10-21', t:['초과근무 알리미 알림 방식: 기본 소리+진동(모든 기기 다시 설정) · 옵션 진동만 / 소리만','알림음을 BAD TIMES LONG EDITION 공식 영상으로','그 브라우저에 YouTube 프리미엄 계정으로 로그인돼 있으면 광고 없이 재생']},
     {v:'V209', d:'2026-10-21', t:['초과근무 알리미 알림음: IMAEL ANGEL ‘BAD TIMES’ 공식 YouTube 영상을 경보 화면에서 재생(인터넷 필요, 재생이 막히면 기본 멜로디)','‘내 음원 고르기’ 삭제','서버 화면(app.sachil47.com)에서도 YouTube 플레이어가 열리게 보안 설정 보완']},
@@ -8325,6 +8343,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function sums(){ const now=new Date(), d0=ymd(now), m0=d0.slice(0,7), w=new Date(now); w.setHours(0,0,0,0); w.setDate(w.getDate()-((w.getDay()+6)%7)); const w0=w.getTime();   /* 주 = 월요일부터 */
     let day=0, wk=0, mon=0; const add=(s,l)=>{ if(ymd(s)===d0) day+=l; if(s>=w0) wk+=l; if(ymd(s).slice(0,7)===m0) mon+=l; };
     S.hist.forEach(h=>add(h.start,h.end-h.start)); if(S.run) add(S.run.start,Date.now()-S.run.start); return {day,wk,mon}; }
+  /* V212: 오늘·이번 주·이번 달 칸을 누르면 그 기간 기록 */
+  let per='';
+  function perRange(k){ const now=new Date(), d=new Date(now); d.setHours(0,0,0,0); if(k==='wk') d.setDate(d.getDate()-((d.getDay()+6)%7)); if(k==='mon') d.setDate(1); return d.getTime(); }
+  function perRows(k){ const t0=perRange(k), rows=S.hist.filter(h=>h.start>=t0).map(h=>Object.assign({},h)); if(S.run&&S.run.start>=t0) rows.unshift({start:S.run.start, end:Date.now(), checks:S.run.checks.length, iv:S.iv, live:true}); return rows; }
+  const PER_N={day:'오늘',wk:'이번 주',mon:'이번 달'};
+  function perText(k){ const rows=perRows(k).slice().reverse(); let tot=0;
+    const L=rows.map(h=>{ const d=new Date(h.start); tot+=h.end-h.start; return `${ymd(h.start).slice(5)}(${WD[d.getDay()]}) ${hm(h.start)}~${h.live?'진행 중':hm(h.end)}  ${dur(h.end-h.start)} · 확인 ${h.checks}회`; });
+    return `초과근무 메모 ${PER_N[k]} (이 기기 기록 · 공식 등록은 소속 시스템)\n`+(L.length?L.join('\n'):'기록 없음')+`\n합계 ${dur(tot)}`; }
   function monthText(){ const m0=ymd(Date.now()).slice(0,7), rows=S.hist.filter(h=>ymd(h.start).slice(0,7)===m0).slice().reverse(); let tot=0;
     const L=rows.map(h=>{ const d=new Date(h.start); tot+=h.end-h.start; return `${ymd(h.start).slice(5)}(${WD[d.getDay()]}) ${hm(h.start)}~${hm(h.end)}  ${dur(h.end-h.start)} · 확인 ${h.checks}회`; });
     return `초과근무 메모 ${m0} (이 기기 기록 · 공식 등록은 소속 시스템)\n`+(L.length?L.join('\n'):'기록 없음')+`\n합계 ${dur(tot)}`; }
@@ -8370,14 +8396,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         </details>
       </section>`}
       ${vibWarn}
-      <section class="otsum" aria-label="초과근무 합계"><div><span>오늘</span><b>${dur(sm.day)}</b></div><div><span>이번 주</span><b>${dur(sm.wk)}</b></div><div><span>이번 달</span><b>${dur(sm.mon)}</b></div></section>
+      <section class="otsum" aria-label="초과근무 합계 — 누르면 기록">${[['day',sm.day],['wk',sm.wk],['mon',sm.mon]].map(([k,v])=>`<button type="button" data-per="${k}" aria-expanded="${per===k}" aria-controls="otPer"><span>${PER_N[k]}</span><b>${dur(v)}</b><i aria-hidden="true">${per===k?'⌃':'⌄'}</i></button>`).join('')}</section>
+      ${per?(()=>{ const rows=perRows(per); return `<section class="otper" id="otPer" aria-label="${PER_N[per]} 기록">${rows.length?`<ul>${rows.map(h=>`<li${h.live?' class="live"':''}><span>${ymd(h.start).slice(5)}(${WD[new Date(h.start).getDay()]}) ${hm(h.start)}~${h.live?'진행 중':hm(h.end)}</span><b>${dur(h.end-h.start)}</b><small>확인 ${h.checks}회 · ${h.iv}분 간격</small></li>`).join('')}</ul><div class="otrow"><button type="button" class="btn ghost" id="otCopy">${PER_N[per]} 기록 복사</button>${S.hist.length?'<button type="button" class="btn ghost" id="otClr">기록 모두 지우기</button>':''}</div>`:`<p class="otempty">${PER_N[per]} 기록이 없어요</p>`}</section>`; })():''}
       ${perm==='default'?`<button type="button" class="otperm" id="otPerm">🔔 알림 허용 <small>다른 앱을 쓰는 중에도 알림 받기</small></button>`
         :perm==='denied'?'<p class="otwarn" role="status"><b>알림이 차단돼 있어요.</b> 앱 화면을 열어 두면 화면·소리·진동은 그대로 울립니다. 다른 앱을 쓰는 중에도 받으려면 주소창 왼쪽 아이콘(사이트 설정) → 알림 허용.</p>'
         :perm==='none'?'<p class="otwarn" role="status">이 브라우저는 알림을 지원하지 않아요(아이폰은 홈 화면에 추가한 앱에서 가능). 앱 화면을 열어 두거나 <b>캘린더 알림</b>을 함께 쓰세요.</p>':''}
       ${S.run&&perm==='granted'?'<p class="otnote">알림창에 <b>초과근무 진행 중</b>이 떠 있어요. 밀어서 지워지면 확인하거나 앱을 다시 열 때 다시 표시돼요.</p>':''}
-      <p class="otnote">화면이 꺼지거나 다른 앱을 쓰면 늦게 울릴 수 있어요. 꼭 울려야 하면 시작 후 <b>캘린더 알림</b>을 추가하세요. 기록은 이 기기에만 남는 메모이고, 공식 등록은 소속 시스템에서 따로 합니다.</p>
-      ${S.hist.length?`<details class="othist"><summary>지난 기록 ${S.hist.length}건</summary><ul>${S.hist.slice(0,30).map(h=>`<li><span>${ymd(h.start).slice(5)}(${WD[new Date(h.start).getDay()]}) ${hm(h.start)}~${hm(h.end)}</span><b>${dur(h.end-h.start)}</b><small>확인 ${h.checks}회 · ${h.iv}분 간격</small></li>`).join('')}</ul><div class="otrow"><button type="button" class="btn ghost" id="otCopy">이번 달 기록 복사</button><button type="button" class="btn ghost" id="otClr">기록 지우기</button></div></details>`
-        :(S.run?'':'<p class="otempty">아직 기록이 없어요. 시작하고 종료하면 여기에 날짜별로 쌓입니다.</p>')}`;
+      `;
     const $=id=>document.getElementById(id);
     body.querySelectorAll('[data-iv]').forEach(b=>b.addEventListener('click',()=>{ S.iv=+b.dataset.iv; save(); paint(); const f=body.querySelector(`[data-iv="${S.iv}"]`); if(f) f.focus({preventScroll:true}); }));
     { const i=$('otIvIn'); if(i){ const set=()=>{ const v=Math.round(+i.value); if(i.value!==''&&v>=1&&v<=240){ S.iv=v; save(); body.querySelectorAll('[data-iv]').forEach(b=>b.setAttribute('aria-checked','false')); i.closest('.oti').classList.add('on'); idleLive(); return true; } return false; };
@@ -8396,7 +8421,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         if(Date.now()-t>24*3600000){ toast('24시간 안의 시각만 고칠 수 있어요'); return; }
         S.run.start=t; S.run.checks=[t].concat(S.run.checks.slice(1).filter(x=>x>t)); if(S.run.last<t) S.run.last=t; save(); marks(); paint(); toast(`시작 시각을 ${hm(t)}로 고쳤어요`); }); }
     { const i=$('otWake'); if(i) i.addEventListener('change',()=>{ S.wake=i.checked; save(); wake(); }); }
-    { const b=$('otCopy'); if(b) b.addEventListener('click',async()=>{ const ok=await copy(monthText()); b.textContent=ok?'복사했어요':'복사 실패'; toast(ok?'이번 달 기록을 복사했어요 — 공식 등록할 때 참고하세요':'복사하지 못했어요'); }); }
+    body.querySelectorAll('[data-per]').forEach(b=>b.addEventListener('click',()=>{ per=per===b.dataset.per?'':b.dataset.per; paint(); const n=body.querySelector(`[data-per="${b.dataset.per}"]`); if(n) n.focus({preventScroll:true}); const l=document.getElementById('otPer'); if(l) l.scrollIntoView({block:'nearest'}); }));
+    { const b=$('otCopy'); if(b) b.addEventListener('click',async()=>{ const ok=await copy(perText(per||'mon')); b.textContent=ok?'복사했어요':'복사 실패'; toast(ok?`${PER_N[per||'mon']} 기록을 복사했어요 — 공식 등록할 때 참고하세요`:'복사하지 못했어요'); }); }
     { const b=$('otClr'); if(b) b.addEventListener('click',()=>{ if(b.dataset.arm!=='1'){ b.dataset.arm='1'; b.textContent='한 번 더 = 모두 지움'; b.classList.add('arm'); return; } S.hist=[]; save(); paint(); toast('지난 기록을 지웠어요'); }); }
     paintLive(); idleLive();
     if(had&&!dlg.contains(document.activeElement)){ const f=dlg.querySelector('.otbig')||dlg.querySelector('.otx'); if(f) f.focus({preventScroll:true}); } }   /* V211: 다시 그려도 초점이 창 안에 남게 */
