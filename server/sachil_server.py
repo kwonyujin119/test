@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '13.5'
-APP_VERSION = 'V208'
+VERSION = '13.6'
+APP_VERSION = 'V209'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -528,9 +528,9 @@ def packed(key, mtime, make):
 
 
 CSP = ("default-src 'self'; img-src 'self' data: blob: https://*.daumcdn.net https://*.kakao.com https://*.tmap.co.kr https://*.sk.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tmap.co.kr; "
-       "font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline' https://dapi.kakao.com https://*.daumcdn.net https://apis.openapi.sk.com https://*.tmap.co.kr; "
+       "font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline' https://dapi.kakao.com https://*.daumcdn.net https://apis.openapi.sk.com https://*.tmap.co.kr https://www.youtube.com; "
        "connect-src 'self' data: blob: https://dapi.kakao.com https://*.daumcdn.net https://apis.openapi.sk.com https://*.tmap.co.kr; "
-       "frame-src 'self' blob:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
+       "frame-src 'self' blob: https://www.youtube-nocookie.com https://www.youtube.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
 
 MAGIC = [
     (b'\xff\xd8\xff', 'image', 'image/jpeg', '.jpg'),
