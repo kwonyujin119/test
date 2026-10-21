@@ -1001,6 +1001,44 @@ html body .hub.hs .hmode{position:static}
 @media (min-width:760px){ .hs-g{gap:14px} .hs-a{padding:20px 24px;gap:6px} .hs-ic{width:56px;height:56px} .hs-ic img,.hs-ic svg{width:38px;height:38px} .hs-tools{padding:0 16px 16px} .hs-tools .hzt{min-height:52px} }
 @media (prefers-reduced-motion:reduce){ .hs-t:active{transform:none} }
 </style>
+<style id="v205-hub">
+/* V205: 간편 모드 벤토 카드 — 아이콘 위·이름 아래, 오른쪽 위 ↗, 47망 노랑 · 디브리핑룸 남색 · 나머지 흰 카드. 그림자 얕게, 누르면 살짝 눌림 */
+html body .hub.hs{gap:10px}
+html body .hub.hs .hmode{min-height:34px;padding:0 12px 0 10px;border:0;background:var(--navy-soft);color:var(--navy-deep,#0B1B3F);box-shadow:none;font-size:12.5px;letter-spacing:-.01em}
+html body .hub.hs .hmode i{font-size:13px}
+@media (pointer:coarse){ html body .hub.hs .hmode{min-height:40px} }
+html body .hs-g{gap:10px}
+html body .hs-t{border:1px solid rgba(11,27,63,.08);border-radius:22px;background:#fff;box-shadow:0 1px 1px rgba(11,27,63,.04),0 6px 18px -10px rgba(11,27,63,.22);transition:transform .16s ease,box-shadow .2s ease}
+html body .hs-t.y{background:linear-gradient(150deg,#FFE15A 0%,#FDD000 55%,#F5C400 100%);border-color:transparent;box-shadow:0 10px 24px -12px rgba(201,154,0,.7)}
+html body .hs-t.dk{background:linear-gradient(150deg,#1B2C55 0%,#0B1B3F 70%);border-color:transparent;box-shadow:0 10px 24px -12px rgba(11,27,63,.7)}
+html body .hs-a{justify-content:space-between;align-items:stretch;gap:8px;padding:16px 16px 14px}
+html body .hs-top{display:flex;align-items:flex-start;justify-content:space-between}
+html body .hs-ic{width:46px;height:46px;border-radius:14px;background:#F0F3F9}
+html body .hs-t.y .hs-ic{background:rgba(255,255,255,.7)}
+html body .hs-t.dk .hs-ic{background:#FDD000}
+html body .hs-go{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(11,27,63,.06);color:var(--navy-deep,#0B1B3F);transition:transform .2s ease,background .2s ease}
+html body .hs-go svg{width:15px;height:15px}
+html body .hs-t.y .hs-go{background:rgba(11,27,63,.1)}
+html body .hs-t.dk .hs-go{background:rgba(255,255,255,.14);color:#fff}
+html body .hs-tx{display:grid;gap:3px;min-width:0}
+html body .hs-a b{font-size:clamp(19px,5vw,28px);letter-spacing:-.03em;line-height:1.15}
+html body .hs-a small{font-size:clamp(11.5px,3vw,13.5px);font-weight:600;color:#5F6672;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html body .hs-t.y .hs-a small{color:#5A4500}
+html body .hs-t.dk .hs-a b{color:#fff}
+html body .hs-t.dk .hs-a small{color:rgba(255,255,255,.7)}
+html body .hs-tools{gap:6px;padding:0 12px 12px}
+html body .hs-tools .hzt{min-height:40px;border:0;border-radius:999px;background:rgba(255,255,255,.92);box-shadow:0 1px 2px rgba(107,83,0,.25)}
+html body .hs-tools .hzt svg{width:22px;height:22px}
+html body .hs-tools .hzt b{font-size:13.5px}
+html body .hs-tools .hzt{white-space:nowrap;gap:4px;padding:0 8px}
+@media (max-width:420px){ html body .hs-tools .hzt svg{width:18px;height:18px} html body .hs-tools .hzt b{font-size:12.5px} html body .hs-tools{gap:4px;padding:0 10px 10px} }
+@media (pointer:coarse){ html body .hs-tools .hzt{min-height:44px} }
+html body .hs-t:active{transform:scale(.975)}
+@media (hover:hover) and (pointer:fine){ html body .hs-t:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(11,27,63,.06),0 16px 30px -14px rgba(11,27,63,.35)} html body .hs-t:hover .hs-go{transform:translate(2px,-2px);background:var(--navy-deep,#0B1B3F);color:#fff} html body .hs-t.y:hover .hs-go{background:#0B1B3F} html body .hs-t.dk:hover .hs-go{background:#FDD000;color:#0B1B3F} }
+@media (max-width:380px){ html body .hs-a{padding:12px 12px 10px} html body .hs-ic{width:40px;height:40px;border-radius:12px} html body .hs-go{width:26px;height:26px} html body .hs-tools{padding:0 8px 8px;gap:4px} html body .hs-tools .hzt{flex-direction:row;min-height:40px} }
+@media (min-width:760px){ html body .hs-g{gap:16px} html body .hs-t{border-radius:26px} html body .hs-a{padding:24px 24px 20px} html body .hs-ic{width:58px;height:58px;border-radius:16px} html body .hs-go{width:38px;height:38px} html body .hs-go svg{width:18px;height:18px} html body .hs-tools{padding:0 20px 20px;gap:10px} html body .hs-tools .hzt{min-height:48px} }
+@media (prefers-reduced-motion:reduce){ html body .hs-t,html body .hs-go{transition:none} html body .hs-t:active,html body .hs-t:hover{transform:none} }
+</style>
 <style id="v202-ot">
 /* V202: 초과근무 알리미 — 메뉴 옆 시계 버튼 + 가운데 창(휴대폰은 아래에서 올라오는 시트) */
 html body #otBtn{position:relative;color:var(--navy-deep,#0B1B3F)}
@@ -2071,7 +2109,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v204</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v205</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -3090,8 +3128,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V204', SRV_VER='13.1';
+  const APP_VER='V205', SRV_VER='13.2';
   const UPDATES=[
+    {v:'V205', d:'2026-10-21', t:['간편 모드 새 디자인: 벤토 카드 — 아이콘은 위, 이름·설명은 아래, 오른쪽 위 ↗','47망은 노랑 그라데이션, 디브리핑룸은 남색 카드, 나머지는 흰 카드로 한눈에 구분','CP·소화전은 둥근 알약 버튼, PC는 마우스를 올리면 카드가 살짝 떠오름']},
     {v:'V204', d:'2026-10-21', t:['초과근무 알리미: 확인 간격 기본 50분(자동 선택), 옵션 30분 · 직접 입력','화면을 더 간단하게 — 큰 간격 버튼 3개 + ‘50분마다 알림 · 시작’ 한 버튼, 소리·예정 종료는 ‘설정’ 안으로']},
     {v:'V203', d:'2026-10-20', t:['첫 화면 모드 전환: 지금 화면(디자인 모드)에서는 Search 칸 왼쪽 위 ‘간편 모드’, 간편 모드에서는 ‘디자인 모드’ 버튼','간편 모드: 한글 2단 3줄 6칸 — 47망(CP·소화전 버튼 포함) · 디브리핑룸 · 검색 · AI · 체크리스트 · 사고보고서','고른 모드는 이 기기에 기억']},
     {v:'V202', d:'2026-10-20', t:['메뉴 옆에 ⏱ 초과근무 알리미: 시작하면 정한 간격(10·15·30·60분 또는 1~240분 직접 입력)마다 소리·진동·알림, ‘확인했어요’로 기록','확인 시각을 넘기면 버튼에 빨간 점·창에 빨간 테, 앱으로 돌아오면 놓친 확인을 바로 알림','캘린더 알림 추가(.ics): 휴대폰 캘린더가 확인 시각마다 대신 울림 — 화면이 꺼져도','오늘·이번 달 합계와 지난 기록(이 기기에만 저장)','사용법 안내에 초과근무 알리미 단계 추가']},
@@ -6337,7 +6376,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function setHubMode(m){ try{ localStorage.setItem(HUB_MODE_KEY,m); }catch(_){ } renderHub($('#panel')); rootScrollTo(0); const b=document.querySelector('[data-hmode]'); if(b) b.focus({preventScroll:true}); }
   const HS=[
     {go:'chat', t:'47망', d:'지휘·작전망으로 어려운 내용', y:true},
-    {go:'debrief', t:'디브리핑룸', d:'익명 개선사항·지휘역량 강화', y:true},
+    {go:'debrief', t:'디브리핑룸', d:'익명 개선사항·지휘역량 강화', dk:true},
     {go:'search', k:'S', t:'검색', d:'SOP·법령·교재·사례'},
     {go:'ai', k:'A', t:'AI', d:'자료를 근거로 빠른 답'},
     {go:'board', k:'CH', t:'체크리스트', d:'단계별 지휘 체크·경과 시간'},
@@ -6346,7 +6385,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const ic=h=>h.go==='chat'?HUB[0].ic:h.go==='debrief'?HUB[1].ic:sigK(h.k);
     panel.innerHTML=`<nav class="hub hs" aria-label="SACHIL:47 첫 화면(간편 모드)">
       <div class="hs-bar"><button type="button" class="hmode" data-hmode="design" aria-label="디자인 모드로 바꾸기"><i aria-hidden="true">◇</i>디자인 모드</button></div>
-      <div class="hs-g">${HS.map(h=>`<div class="hs-t${h.y?' y':''}" data-go="${h.go}"><a href="#${h.go}" data-hub="${h.go}" class="hs-a"><span class="hs-ic">${ic(h)}</span><b>${h.t}</b><small>${h.d}</small></a>${h.go==='chat'?`<span class="hs-tools"><button type="button" class="hzt" data-hzt="map" aria-label="CP 현장 지휘 지도 열기">${HUB_CP_SVG}<b>CP</b></button><button type="button" class="hzt" data-hzt="hyd" aria-label="소화전 찾기">${HUB_HYD_SVG}<b>소화전</b></button></span>`:''}</div>`).join('')}</div></nav>`;
+      <div class="hs-g">${HS.map(h=>`<div class="hs-t${h.y?' y':''}${h.dk?' dk':''}" data-go="${h.go}"><a href="#${h.go}" data-hub="${h.go}" class="hs-a"><span class="hs-top"><span class="hs-ic">${ic(h)}</span><i class="hs-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></i></span><span class="hs-tx"><b>${h.t}</b><small>${h.d}</small></span></a>${h.go==='chat'?`<span class="hs-tools"><button type="button" class="hzt" data-hzt="map" aria-label="CP 현장 지휘 지도 열기">${HUB_CP_SVG}<b>CP</b></button><button type="button" class="hzt" data-hzt="hyd" aria-label="소화전 찾기">${HUB_HYD_SVG}<b>소화전</b></button></span>`:''}</div>`).join('')}</div></nav>`;
     panel.querySelectorAll('[data-hub]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const t=a.dataset.hub; if(t==='search') goSearch(); else go(t); rootScrollTo(0); }));
     panel.querySelectorAll('[data-hzt]').forEach(b=>b.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); hubTool(b.dataset.hzt); }));
     panel.querySelector('[data-hmode]').addEventListener('click',()=>setHubMode('design'));
