@@ -1168,6 +1168,10 @@ html body #otBtn.due::after{background:#D92D20;animation:otBlink 1s steps(2) inf
 .otal-yt{display:grid;justify-items:center;gap:4px}
 .otal-yt iframe,#otYt{width:240px;height:135px;border:0;border-radius:12px;background:#000}
 .otal-yt small{font-size:11.5px;color:rgba(255,255,255,.6)}
+.otmd{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.otmd button{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:52px;border:2px solid var(--line-2);border-radius:12px;background:var(--surface,#fff);font:inherit;font-size:14px;font-weight:800;color:var(--fg);cursor:pointer}
+.otmd button small{font-size:10.5px;opacity:.75}
+.otmd button[aria-checked="true"]{background:var(--navy-deep,#0B1B3F);border-color:var(--navy-deep,#0B1B3F);color:#fff}
 .otcard.live .otrow .btn{font-size:13px;padding:0 6px}
 @media (pointer:coarse){ .otsnd .btn{min-height:44px} }
 @media (prefers-reduced-motion:reduce){ .otal,.otal::before,.otal-bg i,.otal-k,.otal-t{animation:none} .otal-bg i{opacity:.25} }
@@ -2173,7 +2177,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v209</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v210</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -3192,8 +3196,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V209', SRV_VER='13.6';
+  const APP_VER='V210', SRV_VER='13.7';
   const UPDATES=[
+    {v:'V210', d:'2026-10-21', t:['초과근무 알리미 알림 방식: 기본 소리+진동(모든 기기 다시 설정) · 옵션 진동만 / 소리만','알림음을 BAD TIMES LONG EDITION 공식 영상으로','그 브라우저에 YouTube 프리미엄 계정으로 로그인돼 있으면 광고 없이 재생']},
     {v:'V209', d:'2026-10-21', t:['초과근무 알리미 알림음: IMAEL ANGEL ‘BAD TIMES’ 공식 YouTube 영상을 경보 화면에서 재생(인터넷 필요, 재생이 막히면 기본 멜로디)','‘내 음원 고르기’ 삭제','서버 화면(app.sachil47.com)에서도 YouTube 플레이어가 열리게 보안 설정 보완']},
     {v:'V208', d:'2026-10-21', t:['초과근무 알리미: 🔔 알림 테스트 버튼(진동·소리·화면을 바로 확인)','확인 시각이 되면 전체 화면 경보 — 노랑 물결이 퍼지고 시각이 크게, ‘확인했어요’ 한 번이면 기록하고 창까지 닫힘','진동을 길고 촘촘하게(확인할 때까지 4초마다 반복, 최대 90초)','알림음: 기본 멜로디 또는 ‘내 음원 고르기’(이 기기에만 저장)']},
     {v:'V207', d:'2026-10-21', t:['첫 화면 모드 버튼 자리 균형: 디자인 모드는 Search 글자 위 가운데, 간편 모드는 47망 아이콘과 같은 높이','간편 모드 위·아래 여백을 같게, 휴대폰에서 47망·디브리핑룸 설명 두 줄까지','섹션별 기기 점검(PC·휴대폰·갤럭시탭 세로·가로): 사용법 안내 ‘다음’ 버튼 잘림 수정, CP·소화전·초과근무 설정·보고서 종류 닫기 누르는 칸 44px']},
@@ -8044,6 +8049,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const load=()=>{ try{ const v=JSON.parse(localStorage.getItem(KEY)||'null'); if(v&&typeof v==='object') return v; }catch(_){ } return null; };
   let S=Object.assign({iv:50, end:'', run:null, hist:[], sound:true}, load()||{});
   const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(_){ } };
+  if(!['both','vib','snd'].includes(S.mode)){ S.mode='both'; delete S.sound; save(); }   /* V210: 기본 다시 설정 — 소리+진동 */
+  const SND=()=>S.mode!=='vib', VIBON=()=>S.mode!=='snd';
+  const vib=p=>{ try{ if(VIBON()&&navigator.vibrate) navigator.vibrate(p); }catch(_){ } };
   const pad=n=>String(n).padStart(2,'0'), hm=t=>{ const d=new Date(t); return pad(d.getHours())+':'+pad(d.getMinutes()); };
   const dur=ms=>{ ms=Math.max(0,ms); const m=Math.floor(ms/60000); return (m>=60?Math.floor(m/60)+'시간 ':'')+(m%60)+'분'; };
   const clk=ms=>{ ms=Math.max(0,ms); const s=Math.floor(ms/1000); return pad(Math.floor(s/3600))+':'+pad(Math.floor(s/60)%60)+':'+pad(s%60); };
@@ -8052,27 +8060,27 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const nextDue=()=>S.run?S.run.last+ivMs():0;
   let tick=0, alerted=0, last=null;
 
-  function beep(){ if(!S.sound) return; try{ const A=window.AudioContext||window.webkitAudioContext; if(!A) return; const a=beep.ctx||(beep.ctx=new A()); if(a.state==='suspended') a.resume();
+  function beep(){ if(!SND()) return; try{ const A=window.AudioContext||window.webkitAudioContext; if(!A) return; const a=beep.ctx||(beep.ctx=new A()); if(a.state==='suspended') a.resume();
       [0,0.35,0.7].forEach(d=>{ const o=a.createOscillator(), g=a.createGain(); o.type='sine'; o.frequency.value=880; g.gain.setValueAtTime(0.0001,a.currentTime+d); g.gain.exponentialRampToValueAtTime(0.3,a.currentTime+d+0.02); g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+d+0.28); o.connect(g); g.connect(a.destination); o.start(a.currentTime+d); o.stop(a.currentTime+d+0.3); }); }catch(_){ } }
   /* V209: 알림음 = IMAEL ANGEL 'BAD TIMES' 공식 YouTube 영상(파일을 내려받지 않고 YouTube 플레이어로 재생 — 경보 화면에 플레이어가 보임). 막히면 기본 멜로디 */
   const VIB=[900,200,900,200,900,200,1200];   /* 웹 진동은 세기를 못 바꿔 길고 촘촘하게(아이폰 사파리는 진동 미지원) */
-  const YT_ID='DuaTdn1DUP8';
+  const YT_ID='1qFQ8EiuZB4';   /* V210: BAD TIMES LONG EDITION */
   let ytApi=null; const ytLoad=()=>ytApi||(ytApi=new Promise((ok,no)=>{ if(window.YT&&window.YT.Player) return ok(window.YT);
       const prev=window.onYouTubeIframeAPIReady; window.onYouTubeIframeAPIReady=()=>{ try{ if(prev) prev(); }catch(_){ } ok(window.YT); };
       const sc=document.createElement('script'); sc.src='https://www.youtube.com/iframe_api'; sc.async=true; sc.onerror=()=>{ ytApi=null; no(new Error('yt')); }; document.head.appendChild(sc); setTimeout(()=>no(new Error('yt-timeout')),8000); }));
-  function tune(){ if(!S.sound) return; try{ const A=window.AudioContext||window.webkitAudioContext; if(!A) return; const a=beep.ctx||(beep.ctx=new A()); if(a.state==='suspended') a.resume();
+  function tune(){ if(!SND()) return; try{ const A=window.AudioContext||window.webkitAudioContext; if(!A) return; const a=beep.ctx||(beep.ctx=new A()); if(a.state==='suspended') a.resume();
       [[784,0],[988,.16],[1175,.32],[1568,.48],[1175,.72],[1568,.88]].forEach(([f,d])=>{ const o=a.createOscillator(), g=a.createGain(); o.type='triangle'; o.frequency.value=f; const t=a.currentTime+d; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.45,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+0.22); o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+0.24); }); }catch(_){ } }
   let AL=null;
   function alarmStop(){ if(!AL) return; clearInterval(AL.iv); clearTimeout(AL.to); clearTimeout(AL.fb); try{ if(navigator.vibrate) navigator.vibrate(0); }catch(_){ } if(AL.yp){ try{ AL.yp.stopVideo(); AL.yp.destroy(); }catch(_){ } } AL.el.remove(); AL=null; document.body.classList.remove('otalarm'); }
   function alarm(txt, test){ alarmStop();
     const el=document.createElement('div'); el.className='otal'; el.setAttribute('role','alertdialog'); el.setAttribute('aria-modal','true'); el.setAttribute('aria-label','초과근무 확인');
-    el.innerHTML=`<div class="otal-bg" aria-hidden="true"><i></i><i></i><i></i></div><div class="otal-in"><span class="otal-k">${test?'알림 테스트':'초과근무 확인'}</span><b class="otal-t">${hm(Date.now())}</b><p>${txt}</p>${S.sound?'<div class="otal-yt"><div id="otYt"></div><small>BAD TIMES · IMAEL ANGEL (YouTube)</small></div>':''}<button type="button" class="otal-ok">${test?'확인(테스트 끝)':'확인했어요'}</button><button type="button" class="otal-snz">${test?'':'나중에(닫기)'}</button></div>`;
+    el.innerHTML=`<div class="otal-bg" aria-hidden="true"><i></i><i></i><i></i></div><div class="otal-in"><span class="otal-k">${test?'알림 테스트':'초과근무 확인'}</span><b class="otal-t">${hm(Date.now())}</b><p>${txt}</p>${SND()?'<div class="otal-yt"><div id="otYt"></div><small>BAD TIMES (LONG EDITION) · IMAEL ANGEL</small></div>':''}<button type="button" class="otal-ok">${test?'확인(테스트 끝)':'확인했어요'}</button><button type="button" class="otal-snz">${test?'':'나중에(닫기)'}</button></div>`;
     document.body.appendChild(el); document.body.classList.add('otalarm');
-    try{ if(navigator.vibrate) navigator.vibrate(VIB); }catch(_){ }
+    vib(VIB);
     const me={el, yt:false, yp:null}; AL=me;
-    me.iv=setInterval(()=>{ try{ if(navigator.vibrate) navigator.vibrate(VIB); }catch(_){ } if(S.sound&&!me.yt) tune(); },4200); me.to=setTimeout(alarmStop,90000);   /* 확인할 때까지 최대 90초 반복 */
-    if(S.sound){ me.fb=setTimeout(()=>{ if(AL===me&&!me.yt) tune(); },2500);   /* 2.5초 안에 영상 소리가 안 나면 기본 멜로디 */
-      ytLoad().then(YT=>{ if(AL!==me) return; me.yp=new YT.Player('otYt',{host:'https://www.youtube-nocookie.com', videoId:YT_ID, width:240, height:135,
+    me.iv=setInterval(()=>{ vib(VIB); if(SND()&&!me.yt) tune(); },4200); me.to=setTimeout(alarmStop,90000);   /* 확인할 때까지 최대 90초 반복 */
+    if(SND()){ me.fb=setTimeout(()=>{ if(AL===me&&!me.yt) tune(); },2500);   /* 2.5초 안에 영상 소리가 안 나면 기본 멜로디 */
+      ytLoad().then(YT=>{ if(AL!==me) return; me.yp=new YT.Player('otYt',{host:'https://www.youtube.com', videoId:YT_ID,   /* V210: nocookie는 로그인 정보를 안 써서 프리미엄도 광고가 나옴 → youtube.com(그 기기 브라우저에 프리미엄 계정으로 로그인돼 있으면 광고 없음) */ width:240, height:135,
           playerVars:{autoplay:1, controls:0, playsinline:1, rel:0, loop:1, playlist:YT_ID, modestbranding:1},
           events:{ onReady:e=>{ try{ e.target.unMute(); e.target.setVolume(100); e.target.playVideo(); }catch(_){ } }, onStateChange:e=>{ if(e.data===1&&AL===me) me.yt=true; }, onError:()=>{ if(AL===me) tune(); } }}); }).catch(()=>{ if(AL===me) tune(); }); }
     el.querySelector('.otal-ok').addEventListener('click',()=>{ alarmStop(); if(!test) confirm1(true); });
@@ -8080,7 +8088,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     setTimeout(()=>{ const b=el.querySelector('.otal-ok'); if(b) b.focus({preventScroll:true}); },30); }
   async function notify(txt){ alarm(txt,false);
     try{ if(!('Notification' in window)||Notification.permission!=='granted') return; const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();
-      const o={body:txt, tag:'sachil-ot', renotify:true, requireInteraction:true, icon:'icons/icon-192.png', badge:'icons/icon-96.png', vibrate:VIB};
+      const o={body:txt, tag:'sachil-ot', renotify:true, requireInteraction:true, icon:'icons/icon-192.png', badge:'icons/icon-96.png', vibrate:VIBON()?VIB:[], silent:!SND()};
       if(r&&r.showNotification) await r.showNotification('초과근무 확인 시간', o); else new Notification('초과근무 확인 시간', o); }catch(_){ } }
   function check(){ if(!S.run) return; const due=nextDue(), now=Date.now();
     if(now>=due&&alerted!==due){ alerted=due; const late=now-due; notify(late>90000?`확인 시각 ${hm(due)}이 ${dur(late)} 지났습니다 — 지금 확인하세요`:`${hm(due)} · ${S.iv}분 간격 확인 — 앱에서 ‘확인’을 누르세요`); }
@@ -8125,8 +8133,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <button type="button" class="otbig" id="otGo">${S.iv}분마다 알림 · 시작</button>
         <button type="button" class="ottest" id="otTest">🔔 알림 테스트 (진동·소리·화면)</button>
         <details class="otmore"><summary>설정</summary>
-          <label class="otsw"><input type="checkbox" id="otSnd" ${S.sound?'checked':''}> 소리 함께</label>
-          <div class="otf"><span class="otfl">알림음</span><div class="otsnd"><span>🎵 BAD TIMES · IMAEL ANGEL</span></div><small class="otnote">YouTube 공식 영상을 경보 화면에서 재생합니다(인터넷 필요·광고가 먼저 나올 수 있음). 재생이 막히면 기본 멜로디.</small></div>
+          <div class="otf"><span class="otfl">알림 방식</span><div class="otmd" role="radiogroup" aria-label="알림 방식">${[['both','소리+진동'],['vib','진동만'],['snd','소리만']].map(([k,l])=>`<button type="button" role="radio" data-md="${k}" aria-checked="${S.mode===k}">${l}${k==='both'?'<small>기본</small>':''}</button>`).join('')}</div></div>
+          <div class="otf"><span class="otfl">알림음</span><div class="otsnd"><span>🎵 BAD TIMES (LONG EDITION) · IMAEL ANGEL</span></div><small class="otnote">YouTube 공식 영상을 경보 화면에서 재생(인터넷 필요). 이 브라우저에 <b>YouTube 프리미엄 계정으로 로그인</b>돼 있으면 광고 없이 재생됩니다. 막히면 기본 멜로디.</small></div>
           <div class="otf"><label class="otfl" for="otEnd">예정 종료(캘린더 알림용)</label><input id="otEnd" type="time" value="${S.end||''}"></div>
         </details>
       </section>`}
@@ -8138,7 +8146,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     body.querySelectorAll('[data-iv]').forEach(b=>b.addEventListener('click',()=>{ S.iv=+b.dataset.iv; save(); paint(); }));
     { const i=$('otIvIn'); if(i) i.addEventListener('change',()=>{ const v=Math.round(+i.value); if(v>=1&&v<=240){ S.iv=v; save(); paint(); } }); }
     { const i=$('otEnd'); if(i) i.addEventListener('change',()=>{ S.end=i.value; save(); }); }
-    { const i=$('otSnd'); if(i) i.addEventListener('change',()=>{ S.sound=i.checked; save(); }); }
+    body.querySelectorAll('[data-md]').forEach(b=>b.addEventListener('click',()=>{ S.mode=b.dataset.md; save(); paint(); const d=body.querySelector('.otmore'); if(d) d.open=true; }));
     { const b=$('otGo'); if(b) b.addEventListener('click',()=>{ tune(); start(); }); }
     { const b=$('otOk'); if(b) b.addEventListener('click',()=>confirm1()); }
     { const b=$('otTest'); if(b) b.addEventListener('click',()=>{ askPerm(); alarm(`${S.iv}분 간격 확인 알림은 이렇게 울립니다`,true); }); }
@@ -8148,7 +8156,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     { const b=$('otPerm'); if(b) b.addEventListener('click',askPerm); }
     { const b=$('otClr'); if(b) b.addEventListener('click',()=>{ if(b.dataset.arm!=='1'){ b.dataset.arm='1'; b.textContent='한 번 더 누르면 지움'; return; } S.hist=[]; save(); paint(); }); }
     paintLive(); }
-  function open(){ last=document.activeElement; dlg.hidden=false; document.body.classList.add('otopen'); paint(); if(S.sound) ytLoad().catch(()=>{}); setTimeout(()=>{ const f=dlg.querySelector('.otbig,.otx'); if(f) f.focus({preventScroll:true}); },30); }
+  function open(){ last=document.activeElement; dlg.hidden=false; document.body.classList.add('otopen'); paint(); if(SND()) ytLoad().catch(()=>{}); setTimeout(()=>{ const f=dlg.querySelector('.otbig,.otx'); if(f) f.focus({preventScroll:true}); },30); }
   function close(){ if(dlg.hidden) return; dlg.hidden=true; document.body.classList.remove('otopen'); if(last&&last.focus) last.focus(); }
   btn.addEventListener('click',open);
   document.getElementById('otClose').addEventListener('click',close);
