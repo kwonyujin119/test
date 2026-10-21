@@ -2376,7 +2376,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v216</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v217</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -3395,8 +3395,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V216', SRV_VER='14.3';
+  const APP_VER='V217', SRV_VER='14.4';
   const UPDATES=[
+    {v:'V217', d:'2026-10-21', t:['초과근무 알리미: 다른 앱을 쓰는 중에도 확인 시각에 알림 팝업(확인할 때까지 약 30초마다 다시)','팝업의 ‘확인했어요’를 누르면 알림음·진동·경보가 끝나고 ‘✅ 확인했어요 · 다음 확인’이 4초 보였다가 사라짐']},
     {v:'V216', d:'2026-10-21', t:['초과근무 알리미: BAD TIMES 영상 화면은 보이지 않게(소리만)','화면이 꺼진 상태에서도 알림창 팝업 — ‘확인했어요’·‘5분 뒤 다시’ 버튼으로 앱을 열지 않고 바로 처리','꺼진 화면 진동: 확인할 때까지 약 30초마다 알림을 다시 띄워 휴대폰이 진동(알림 허용 필요)']},
     {v:'V215', d:'2026-10-21', t:['초과근무 알리미: 검은 화면(전원 버튼)에서도 BAD TIMES가 울리게 — 시작하면 오른쪽에 작은 플레이어가 아주 작은 소리로 계속 대기하다가 확인 시각에 음량을 올려 처음부터 재생','재생이 막히면 3초 뒤 기본 멜로디로 대신 울림 · 설정에서 끌 수 있음(데이터 사용)','PC·휴대폰 모두 크롬에서 youtube.com에 프리미엄 계정으로 로그인해 두면 광고 없이 재생 — 설정에 바로가기와 안내']},
     {v:'V214', d:'2026-10-21', t:['스마트폰에서 두 손가락으로 화면이 확대·축소되지 않게 — 앱 크기 고정','대화방(47망·디브리핑룸·AI)에서 두 손가락을 벌리면 말풍선 글자가 커지고 오므리면 작아짐(85~180%, 이 기기에 기억) · 사진·파일 크기는 그대로','지도·PDF·사진 보기의 두 손가락 확대는 그대로']},
@@ -8375,6 +8376,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const o={body:txt, tag:'sachil-ot', renotify:true, requireInteraction:true, icon:'icons/icon-192.png', badge:'icons/icon-96.png', vibrate:VIBON()?VIB:[], silent:S.mode==='snd'&&!!DK.yp, timestamp:Date.now(),
         actions:[{action:'ot-ok',title:'확인했어요'},{action:'ot-snz',title:'5분 뒤 다시'}]};
       if(r&&r.showNotification) await r.showNotification('⏰ 초과근무 확인 시간', o); else new Notification('⏰ 초과근무 확인 시간', o); }catch(_){ } }
+  /* V217: 다른 앱을 쓰는 중 알림에서 '확인했어요'를 누르면 — 경보·소리·알림을 끝내고, 짧은 확인 알림(소리 없음)을 4초 보여 준 뒤 지움 */
+  async function sysDone(){ try{ if(!document.hidden||!('Notification' in window)||Notification.permission!=='granted') return; const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration(); if(!r||!r.showNotification) return;
+      await r.showNotification('✅ 확인했어요', {body:`다음 확인 ${hm(nextDue())} · ${S.iv}분 간격`, tag:'sachil-ot-done', silent:true, icon:'icons/icon-192.png', badge:'icons/icon-96.png'});
+      setTimeout(async()=>{ try{ (await r.getNotifications({tag:'sachil-ot-done'})).forEach(n=>n.close()); }catch(_){ } },4000); }catch(_){ } }
   async function sysNoteClose(){ try{ const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration(); if(!r||!r.getNotifications) return; (await r.getNotifications({tag:'sachil-ot'})).forEach(n=>n.close()); }catch(_){ } }
   async function notify(txt){ alarm(txt,false); sysNote(txt); if(AL) AL.txt=txt; }
   function check(){ if(!S.run) return; const due=nextDue(), now=Date.now(), k=snzAt()||due;
@@ -8399,7 +8404,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function appBadge(){ try{ if(S.run){ if(navigator.setAppBadge) navigator.setAppBadge().catch(()=>{}); } else if(navigator.clearAppBadge) navigator.clearAppBadge().catch(()=>{}); }catch(_){ } }
   function title(){ const p=!S.run?'':Date.now()>=nextDue()?'⚠ 확인 · ':'⏱ '+hm(nextDue())+' · ', b=document.title.replace(TPRE,''), t=p+b; if(document.title!==t) document.title=t; }   /* 다음 확인 시각이 바뀔 때·지났을 때만 실제로 바뀜 */
   function marks(){ runNote(); appBadge(); title(); }
-  try{ if(navigator.serviceWorker) navigator.serviceWorker.addEventListener('message',e=>{ const t=e.data&&e.data.type; if(t==='sachil-ot-open') open(); else if(t==='sachil-ot-ok') confirm1(); else if(t==='sachil-ot-snz') snooze(false); }); }catch(_){ }
+  try{ if(navigator.serviceWorker) navigator.serviceWorker.addEventListener('message',e=>{ const t=e.data&&e.data.type; if(t==='sachil-ot-open') open(); else if(t==='sachil-ot-ok'){ confirm1(); sysDone(); } else if(t==='sachil-ot-snz') snooze(false); }); }catch(_){ }
 
   function start(){ const now=Date.now(); S.run={start:now, last:now, checks:[now]}; alerted=0; save(); bgOn(); dkStart(); startTick(); askPerm(); wake(); badge(); marks(); paint(); toast(`초과근무 시작 · 첫 확인 ${hm(nextDue())}`); }
   function confirm1(){ if(!S.run) return; const now=Date.now(); S.run.last=now; S.run.checks.push(now); delete S.run.snz; alerted=0; save(); paint(); alarmStop(); close(); badge(); marks(); bgMeta(); toast(`${hm(now)} 확인 · 다음 ${hm(nextDue())}`); }   /* V208: 확인하면 창을 닫음 */
