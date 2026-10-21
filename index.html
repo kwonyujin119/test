@@ -1075,6 +1075,26 @@ html body .tour .tip .nav{flex-wrap:wrap;row-gap:6px}
 /* 초과근무 '설정'·'지난 기록' 펼치기, 보고서 종류 창 닫기(×): 터치 44px */
 @media (pointer:coarse){ html body .otmore summary,html body .othist summary{min-height:44px} html body .rtbox .close{width:44px;height:44px} }
 </style>
+<style id="v211-design">
+/* V211 첫 화면 [디자인 모드] 다듬기 — 현장(장갑·햇빛·한 손)에서 빨리 알아보고 정확히 누르게 */
+/* S·A·CH·IL: 영문 이름 아래 한글 한 줄(무엇을 하는 칸인지) — 진한 회남색(흰 바탕 대비 9:1) */
+html body .hub.hz .hz-l .hz-sub{display:block;margin-top:-3px;font-size:12px;font-weight:700;line-height:1.25;color:#3F4A5E;letter-spacing:-.02em;white-space:nowrap}
+@media (min-width:600px){ html body .hub.hz .hz-l .hz-sub{font-size:14px} }
+@media (max-height:680px){ html body .hub.hz .hz-l .hz-sub{font-size:11px;margin-top:-1px} }
+html body .hub.hz .hz-l.sm .hz-sub{font-size:11px}
+/* 넓고 키 큰 화면(PC 1440·태블릿 세로): 큰 칸에 비해 작던 글자 키움 — 안 들어가면 배치 계산이 알아서 한 단계 작게 */
+@media (min-width:600px) and (min-height:860px){ html body .hub.hz .hz-l .sg{height:78px} html body .hub.hz .hz-l[data-l="search"] .sg{height:64px} html body .hub.hz .hz-l .sg-CH,html body .hub.hz .hz-l .sg-IL{height:66px} html body .hub.hz .hz-l b{font-size:21px} html body .hub.hz .hz-l[data-l="search"] b,html body .hub.hz .hz-l[data-l="log"] b{font-size:19px} html body .hub.hz .hz-l .hz-sub{font-size:15px} }
+/* 키보드 초점: 칸 테두리를 두껍고 진하게, CP·소화전도 또렷한 초점 링 */
+html body .hz-svg a:focus-visible{outline:none}   /* 칸 모양과 다른 네모 초점 링(브라우저 기본)은 숨기고 칸 테두리로 표시 */
+html body .hz-svg a:focus-visible .hz-p{stroke:#1F2A44;stroke-width:4.5}
+html body .hz-tools .hzt:focus-visible{outline:3px solid #1F2A44;outline-offset:3px}
+/* 터치로 누를 때 바로 보이는 눌림(노란 버튼을 조금 더 진하게) */
+html body .hz-tools .hzt:active{background:#F0C400;box-shadow:0 1px 3px rgba(107,83,0,.3)}
+/* 폰 터치: [간편 모드] 버튼 실제 크기 44px(장갑 손가락) — S 글자는 그만큼 아래로 */
+@media (pointer:coarse) and (max-width:599px){ html body .hub.hz .hmode{min-height:44px;padding:0 12px;font-size:12.5px} html body .hub.hz .hmode::after{inset:-4px} html body .hub.hz [data-l="search"]{margin-top:36px} }
+/* 움직임 줄이기 설정: CP·소화전 들썩임도 끔 */
+@media (prefers-reduced-motion:reduce){ html body .hz-tools .hzt{transition:none} html body .hz-tools .hzt:hover,html body .hz-tools .hzt:active{transform:none} }
+</style>
 <style id="v202-ot">
 /* V202: 초과근무 알리미 — 메뉴 옆 시계 버튼 + 가운데 창(휴대폰은 아래에서 올라오는 시트) */
 html body #otBtn{position:relative;color:var(--navy-deep,#0B1B3F)}
@@ -6470,8 +6490,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const corner=h=>h.go==='chat'
       ? `<span class="hz-k tr" data-k="chat" aria-hidden="true"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd w">지휘·작전망으로 어려운 내용<br>47망으로 전달하세요</span><span class="hd n">지휘·작전망으로<br>어려운 내용<br>47망으로<br>전달하세요</span></span>`
       : `<span class="hz-k bl" data-k="debrief" aria-hidden="true"><span class="ic">${h.ic}</span><b>${h.t}</b><span class="hd w">익명으로 개선사항 도출<br>의견 청취로 지휘역량 강화</span><span class="hd n">익명으로<br>개선사항 도출<br>의견 청취로<br>지휘역량 강화</span></span>`;
-    const cell=h=>h.y?corner(h):`<span class="hz-l" data-l="${h.go}" aria-hidden="true">${sigK(h.k)}<b>${h.t}</b></span>`;
-    panel.innerHTML=`<nav class="hub hz" aria-label="SACHIL:47 첫 화면"><svg class="hz-svg" xmlns="http://www.w3.org/2000/svg">${HUB.map(h=>`<a href="#${h.go}" data-hub="${h.go}" aria-label="${h.t}"><path class="hz-p${h.y?' y':''}" data-p="${h.go}"/><path class="hz-hit" data-hit="${h.go}"/></a>`).join('')}${HZ.strokes.map((_,i)=>`<path class="hz-47" data-s="${i}" pathLength="1"/>`).join('')}</svg>${HUB.map(cell).join('')}<div class="hz-tools" data-tools="chat" role="group" aria-label="47망 바로 열기"><button type="button" class="hzt" data-hzt="map" aria-label="CP 현장 지휘 지도 열기">${HUB_CP_SVG}<b>CP</b></button><button type="button" class="hzt" data-hzt="hyd" aria-label="소화전 열기">${HUB_HYD_SVG}<b>소화전</b></button></div></nav>`;
+    const HZSUB={search:'SOP·법령 찾기', ai:'자료 근거로 답변', board:'단계별 지휘 체크', log:'상황 보고서 작성'};   /* V211: 영문 이름 아래 한글로 '무엇을 하는 칸인지' 한 줄 */
+    const cell=h=>h.y?corner(h):`<span class="hz-l" data-l="${h.go}" aria-hidden="true">${sigK(h.k)}<b>${h.t}</b><small class="hz-sub">${HZSUB[h.go]||''}</small></span>`;
+    panel.innerHTML=`<nav class="hub hz" aria-label="SACHIL:47 첫 화면"><svg class="hz-svg" xmlns="http://www.w3.org/2000/svg">${HUB.map(h=>`<a href="#${h.go}" data-hub="${h.go}" aria-label="${h.t}${HZSUB[h.go]?', '+HZSUB[h.go]:''}"><path class="hz-p${h.y?' y':''}" data-p="${h.go}"/><path class="hz-hit" data-hit="${h.go}"/></a>`).join('')}${HZ.strokes.map((_,i)=>`<path class="hz-47" data-s="${i}" pathLength="1"/>`).join('')}</svg>${HUB.map(cell).join('')}<div class="hz-tools" data-tools="chat" role="group" aria-label="47망 바로 열기"><button type="button" class="hzt" data-hzt="map" aria-label="CP 현장 지휘 지도 열기">${HUB_CP_SVG}<b>CP</b></button><button type="button" class="hzt" data-hzt="hyd" aria-label="소화전 열기">${HUB_HYD_SVG}<b>소화전</b></button></div></nav>`;
     panel.querySelectorAll('[data-hub]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const t=a.dataset.hub; if(t==='search') goSearch(); else go(t); rootScrollTo(0); }));
     panel.querySelectorAll('[data-hzt]').forEach(b=>{ b.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); hubTool(b.dataset.hzt); }); b.addEventListener('pointerdown',e=>e.stopPropagation()); });
     // V157: 칸 애니메이션 — 칸 모양(path)과 글자(따로 놓인 요소)를 함께 움직인다
