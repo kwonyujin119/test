@@ -1095,6 +1095,81 @@ html body .hz-tools .hzt:active{background:#F0C400;box-shadow:0 1px 3px rgba(107
 /* 움직임 줄이기 설정: CP·소화전 들썩임도 끔 */
 @media (prefers-reduced-motion:reduce){ html body .hz-tools .hzt{transition:none} html body .hz-tools .hzt:hover,html body .hz-tools .hzt:active{transform:none} }
 </style>
+<style id="v211-simple">
+/* V211 간편 모드: 칸 안 '지금 상태'(47망 연결·체크리스트 진행과 경과 시간·저장된 보고서 수·최근 검색 다시 찾기), 햇빛 아래 읽히게 글자 대비·크기 올림, 시그니처 글자(S·A·CH·IL) 크게, 누름·키보드 초점 표시, 장갑 터치 44px */
+html body .hs-t{-webkit-tap-highlight-color:transparent}
+/* 아이콘: S·A·CH·IL 글자가 칸에 비해 작던 것(16px) → 아이콘 상자에 맞춤 */
+html body .hs-ic{position:relative;font-size:22px}
+html body .hs-ic .sg{height:1em;transform:none}
+/* 글자: 이름 더 크게·진하게, 설명은 대비 높임(흰 칸 #454C59 ≈ 8.9:1, 남색 칸 흰색 86%) */
+html body .hs-a b{font-size:clamp(20px,5.4vw,30px);font-weight:800;color:#0B1B3F}
+html body .hs-t.dk .hs-a b{color:#fff}
+html body .hs-a small{color:#454C59;font-weight:600}
+html body .hs-t.y .hs-a small{color:#4A3900}
+html body .hs-t.dk .hs-a small{color:rgba(255,255,255,.86)}
+/* 47망 이름 옆 서버 연결 상태(CP·소화전·47망은 서버가 켜져 있어야 씀) */
+html body .hs-tt{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;min-width:0}
+html body .hs-st{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px 0 7px;border-radius:999px;background:rgba(255,255,255,.72);color:#4A3900;font-size:12px;font-weight:800;white-space:nowrap;line-height:1}
+html body .hs-st::before{content:"";width:8px;height:8px;border-radius:50%;background:#8A94A6;flex:none}
+html body .hs-st.on{color:#05603A}
+html body .hs-st.on::before{background:#12B76A;box-shadow:0 0 0 2px rgba(18,183,106,.25)}
+html body .hs-st.wait::before{background:#F79009}
+/* 체크리스트 진행 중: ● 3/50 · 00:02:11 + 얇은 진행 막대 / 사고보고서: 저장된 수 */
+html body .hs-a .hs-live{display:block;color:#0B1B3F;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+html body .hs-a .hs-live.ck{display:flex;align-items:center;gap:6px}
+html body .hs-a .hs-live .n{display:inline;font-size:inherit;letter-spacing:0;color:#244EA2}
+html body .hs-rec{flex:none;width:9px;height:9px;border-radius:50%;background:#8A94A6}
+html body .hs-live.run .hs-rec{background:#D92D20;animation:hsRec 1.6s ease-in-out infinite}
+@keyframes hsRec{0%,100%{box-shadow:0 0 0 0 rgba(217,45,32,.45)}50%{box-shadow:0 0 0 5px rgba(217,45,32,0)}}
+html body .hs-pb{display:block;height:6px;margin-top:3px;border-radius:999px;background:linear-gradient(90deg,#244EA2 var(--p),#E4E9F2 var(--p))}
+/* 검색: 최근 검색어 한 번에 다시 찾기(47망 CP·소화전과 같은 자리·모양) */
+html body .hs-rqw{display:flex;padding:0 12px 12px}
+html body .hs-rq{flex:1;min-width:0;display:flex;align-items:center;gap:6px;min-height:44px;padding:0 14px 0 12px;border:0;border-radius:999px;background:#EEF2F8;color:#0B1B3F;font:inherit;font-size:13.5px;font-weight:700;text-align:left;cursor:pointer}
+html body .hs-rq svg{flex:none;width:16px;height:16px;color:#5F6672}
+html body .hs-rq span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 누름 표시(장갑·햇빛에서도 눌렸는지 알게) */
+html body .hs-t:active{filter:brightness(.95)}
+html body .hs-tools .hzt:active,html body .hs-rq:active{transform:scale(.96);filter:brightness(.92)}
+html body .hs-tools .hzt,html body .hs-rq{transition:transform .12s ease}
+/* 키보드 초점: 남색 칸에서도 보이게(노랑), 버튼은 바깥 고리 */
+html body .hs-a:focus-visible{outline:3px solid #0B1B3F;outline-offset:-5px;border-radius:22px}
+html body .hs-t.dk .hs-a:focus-visible{outline-color:#FDD000}
+html body .hs-tools .hzt:focus-visible,html body .hs-rq:focus-visible,html body .hub.hs .hmode:focus-visible{outline:3px solid #0B1B3F;outline-offset:2px}
+@media (hover:hover) and (pointer:fine){ html body .hs-rq:hover{background:#E1E8F3} }
+/* [디자인 모드]: 터치 기기에서 44px, 47망 아이콘과 가운데 높이를 맞춤(top = 칸 안쪽 여백 + (아이콘 − 버튼)/2) */
+@media (pointer:coarse){ html body .hub.hs .hmode{min-height:44px;top:17px;padding:0 12px;font-size:12.5px} }
+@media (max-width:380px){ html body .hs-ic{font-size:20px} html body .hs-rqw{padding:0 8px 8px} html body .hs-rq{padding:0 10px;font-size:12.5px} html body .hs-st{height:22px;padding:0 7px 0 6px;font-size:11px} }
+@media (pointer:coarse) and (max-width:380px){ html body .hub.hs .hmode{top:10px;right:8px;padding:0 9px;font-size:11px} }
+@media (min-width:760px){
+  html body .hs-ic{font-size:28px}
+  html body .hs-a b{font-size:clamp(26px,2.6vw,34px)}
+  html body .hs-a small{font-size:15px}
+  html body .hs-st{height:28px;padding:0 11px 0 9px;font-size:13px}
+  html body .hs-rqw{padding:0 20px 20px}
+  html body .hs-rq{min-height:48px;font-size:15px;padding:0 18px 0 14px}
+  html body .hs-rq svg{width:18px;height:18px}
+  html body .hs-pb{height:8px}
+  html body .hs-tools .hzt{gap:8px}
+  html body .hs-tools .hzt svg{width:28px;height:28px}
+  html body .hs-tools .hzt b{font-size:16px}
+}
+/* 세로로 긴 태블릿(800×1280 등, 칸 높이 ~380px): 이름·설명을 더 크게 */
+@media (min-width:760px) and (min-height:1000px){ html body .hs-a b{font-size:clamp(30px,4.2vw,38px)} html body .hs-a small{font-size:16px} html body .hs-a .hs-live{font-size:17px} html body .hs-st{height:30px;font-size:14px} }
+@media (min-width:760px) and (pointer:coarse){ html body .hub.hs .hmode{top:31px;right:24px;font-size:13.5px;padding:0 16px} }
+/* 가로로 낮은 화면(1280×800 등, 칸 높이 ~225px): 여백·아이콘을 줄여 47망 이름과 CP·소화전이 붙지 않게 */
+@media (min-width:760px) and (max-height:860px){
+  html body .hs-a{padding:18px 22px 14px}
+  html body .hs-ic{width:50px;height:50px;font-size:24px}
+  html body .hs-ic img,html body .hs-ic svg{width:34px;height:34px}
+  html body .hs-go{width:34px;height:34px}
+  html body .hs-tools{padding:0 18px 16px}
+  html body .hs-rqw{padding:0 18px 16px}
+  html body .hs-rq{min-height:44px}
+  html body .hub.hs .hmode{top:24px;right:20px}
+}
+@media (min-width:760px) and (max-height:860px) and (pointer:coarse){ html body .hub.hs .hmode{top:21px} html body .hs-tools .hzt{min-height:48px} }
+@media (prefers-reduced-motion:reduce){ html body .hs-live.run .hs-rec{animation:none} html body .hs-tools .hzt,html body .hs-rq{transition:none} html body .hs-tools .hzt:active,html body .hs-rq:active{transform:none} }
+</style>
 <style id="v202-ot">
 /* V202: 초과근무 알리미 — 메뉴 옆 시계 버튼 + 가운데 창(휴대폰은 아래에서 올라오는 시트) */
 html body #otBtn{position:relative;color:var(--navy-deep,#0B1B3F)}
@@ -6475,13 +6550,35 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {go:'ai', k:'A', t:'AI', d:'자료를 근거로 빠른 답'},
     {go:'board', k:'CH', t:'체크리스트', d:'단계별 지휘 체크·경과 시간'},
     {go:'log', k:'IL', t:'사고보고서', d:'화재등 상황 보고서 작성'}];
+  /* V211: 간편 모드 칸 안 '지금 상태' — 이 기기에 이미 있는 값만(서버 연결·체크리스트 진행·경과 시간·보고서 수·최근 검색) */
+  let hsT=0;
+  const HS_RQ_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+  const hsSrv=()=>SRV.on?['on','연결됨']:SRV.probing?['wait','연결 중']:['off','연결 안 됨'];
+  function hsCk(){ try{ const ck=state.checks||{}, t=state.timer||{}, total=totalItems(), done=CHECKLIST.reduce((n,p,pi)=>n+clGot(p,pi,ck),0);
+      if(!done&&!t.running&&!t.acc) return null;
+      return {run:!!t.running, tx:`${done}/${total} · ${hhmmss(elapsed())}`, p:total?Math.round(done/total*100):0, lb:t.running?'진행 중':'멈춤'}; }catch(_){ return null; } }
+  function hsLive(h){
+    if(h.go==='board'){ const c=hsCk(); if(c) return `<small class="hs-live ck${c.run?' run':''}" data-hslive="board"><i class="hs-rec" aria-hidden="true"></i><span class="sr-only">${c.lb} </span><span data-hsck>${c.tx}</span></small><i class="hs-pb" style="--p:${c.p}%" aria-hidden="true"></i>`; }
+    if(h.go==='log'){ let n=0; try{ n=reports.length; }catch(_){ } if(n) return `<small class="hs-live">저장된 보고서 <b class="n">${n}</b>건</small>`; }
+    return `<small>${h.d}</small>`;
+  }
+  function hsPaint(g){
+    const st=hsSrv(), el=g.querySelector('[data-hssrv]'); if(el&&el.dataset.hssrv!==st[0]){ el.dataset.hssrv=st[0]; el.className='hs-st '+st[0]; el.lastChild.textContent=st[1]; }
+    const ck=g.querySelector('[data-hsck]'); if(ck){ const c=hsCk(); if(c&&ck.textContent!==c.tx) ck.textContent=c.tx; }
+  }
   function renderHubSimple(panel){
     const ic=h=>h.go==='chat'?HUB[0].ic:h.go==='debrief'?HUB[1].ic:sigK(h.k);
+    const st=hsSrv(), rq=(rqGet()[0]||'');
+    const title=h=>h.go==='chat'?`<span class="hs-tt"><b>${h.t}</b><span class="hs-st ${st[0]}" data-hssrv="${st[0]}"><span class="sr-only">서버 </span>${st[1]}</span></span>`:`<b>${h.t}</b>`;
+    const extra=h=>h.go==='chat'?`<button type="button" class="hmode" data-hmode="design" aria-label="디자인 모드로 바꾸기"><i aria-hidden="true">◇</i>디자인 모드</button><span class="hs-tools"><button type="button" class="hzt" data-hzt="map" aria-label="CP 현장 지휘 지도 열기">${HUB_CP_SVG}<b>CP</b></button><button type="button" class="hzt" data-hzt="hyd" aria-label="소화전 찾기">${HUB_HYD_SVG}<b>소화전</b></button></span>`
+      : h.go==='search'&&rq?`<span class="hs-rqw"><button type="button" class="hs-rq" data-hsrq="${esc(rq)}" aria-label="최근 검색 ‘${esc(rq)}’ 다시 찾기">${HS_RQ_SVG}<span>${esc(rq)}</span></button></span>`:'';
     panel.innerHTML=`<nav class="hub hs" aria-label="SACHIL:47 첫 화면(간편 모드)">
-      <div class="hs-g">${HS.map(h=>`<div class="hs-t${h.y?' y':''}${h.dk?' dk':''}" data-go="${h.go}"><a href="#${h.go}" data-hub="${h.go}" class="hs-a"><span class="hs-top"><span class="hs-ic">${ic(h)}</span>${h.go==='chat'?'':'<i class="hs-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></i>'}</span><span class="hs-tx"><b>${h.t}</b><small>${h.d}</small></span></a>${h.go==='chat'?`<button type="button" class="hmode" data-hmode="design" aria-label="디자인 모드로 바꾸기"><i aria-hidden="true">◇</i>디자인 모드</button><span class="hs-tools"><button type="button" class="hzt" data-hzt="map" aria-label="CP 현장 지휘 지도 열기">${HUB_CP_SVG}<b>CP</b></button><button type="button" class="hzt" data-hzt="hyd" aria-label="소화전 찾기">${HUB_HYD_SVG}<b>소화전</b></button></span>`:''}</div>`).join('')}</div></nav>`;
+      <div class="hs-g">${HS.map(h=>`<div class="hs-t${h.y?' y':''}${h.dk?' dk':''}" data-go="${h.go}"><a href="#${h.go}" data-hub="${h.go}" class="hs-a"><span class="hs-top"><span class="hs-ic">${ic(h)}</span>${h.go==='chat'?'':'<i class="hs-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></i>'}</span><span class="hs-tx">${title(h)}${hsLive(h)}</span></a>${extra(h)}</div>`).join('')}</div></nav>`;
     panel.querySelectorAll('[data-hub]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const t=a.dataset.hub; if(t==='search') goSearch(); else go(t); rootScrollTo(0); }));
     panel.querySelectorAll('[data-hzt]').forEach(b=>b.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); hubTool(b.dataset.hzt); }));
+    panel.querySelectorAll('[data-hsrq]').forEach(b=>b.addEventListener('click',e=>{ e.preventDefault(); toSearch(b.dataset.hsrq); }));
     panel.querySelector('[data-hmode]').addEventListener('click',()=>setHubMode('design'));
+    clearInterval(hsT); hsT=setInterval(()=>{ const g=panel.querySelector('.hub.hs'); if(!g||!g.isConnected){ clearInterval(hsT); return; } if(!document.hidden) hsPaint(g); },1000);
     fitHub();
     if(window.__introGo) window.__introGo();
   }
