@@ -1359,6 +1359,13 @@ html body .otper .otempty{margin:4px 2px;font-size:13.5px;color:var(--muted)}
 .otbg.on{background:rgba(6,118,71,.35)}
 button.otbg.off{min-height:44px;border:2px dashed rgba(253,208,0,.7);background:transparent;color:#FDD000;font:inherit;font-size:14px;font-weight:800;cursor:pointer;width:100%}
 .otcard.live > .otbg{grid-column:1 / -1}
+.otdock{position:fixed;right:6px;top:46%;z-index:70;display:grid;gap:3px;padding:4px;border-radius:12px;background:#0B1B3F;box-shadow:0 8px 24px rgba(0,0,0,.3);opacity:.92}
+.otdock iframe,#otDockP{width:128px;height:72px;border:0;border-radius:8px;background:#000;display:block}
+.otdock span{font-size:10px;font-weight:700;color:rgba(255,255,255,.8);text-align:center;max-width:128px;line-height:1.25}
+.otdock.loud{box-shadow:0 0 0 4px #FDD000,0 8px 24px rgba(0,0,0,.3)}
+body.otalarm .otdock{z-index:96}
+.otsw small{font-weight:600;color:var(--muted);font-size:12px}
+
 </style>
 <style id="v214-cfs">
 /* V214: 대화방 글자 크기(두 손가락) — 말풍선만 비율로(사진·파일은 그대로). 앱 화면 확대는 막음 */
@@ -2369,7 +2376,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v214</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v215</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -3388,8 +3395,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V214', SRV_VER='14.1';
+  const APP_VER='V215', SRV_VER='14.2';
   const UPDATES=[
+    {v:'V215', d:'2026-10-21', t:['초과근무 알리미: 검은 화면(전원 버튼)에서도 BAD TIMES가 울리게 — 시작하면 오른쪽에 작은 플레이어가 아주 작은 소리로 계속 대기하다가 확인 시각에 음량을 올려 처음부터 재생','재생이 막히면 3초 뒤 기본 멜로디로 대신 울림 · 설정에서 끌 수 있음(데이터 사용)','PC·휴대폰 모두 크롬에서 youtube.com에 프리미엄 계정으로 로그인해 두면 광고 없이 재생 — 설정에 바로가기와 안내']},
     {v:'V214', d:'2026-10-21', t:['스마트폰에서 두 손가락으로 화면이 확대·축소되지 않게 — 앱 크기 고정','대화방(47망·디브리핑룸·AI)에서 두 손가락을 벌리면 말풍선 글자가 커지고 오므리면 작아짐(85~180%, 이 기기에 기억) · 사진·파일 크기는 그대로','지도·PDF·사진 보기의 두 손가락 확대는 그대로']},
     {v:'V213', d:'2026-10-21', t:['초과근무 알리미: 화면이 꺼진(전원 버튼) 상태에서도 확인 시각에 알림음이 울림 — 시작하면 들리지 않는 소리로 재생을 유지하다가 시각이 되면 알림 멜로디로','잠금 화면·알림창의 재생 표시에 ‘초과근무 진행 중 · 다음 확인’, 울릴 때 ⏸(일시정지)를 누르면 바로 ‘확인했어요’','화면이 켜져 있을 때는 지금처럼 BAD TIMES 영상 + 전체 화면 경보']},
     {v:'V212', d:'2026-10-21', t:['초과근무 알리미: 오늘 · 이번 주 · 이번 달 칸을 누르면 그 기간 기록이 아래에 펼쳐짐(진행 중인 것 포함, 기간별 복사)','긴 안내 문구와 ‘지난 기록’ 접기 줄을 없애 화면을 간단하게']},
@@ -8323,20 +8331,36 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function bgRing(){ if(!BG.want||!SND()) return false; BG.ring=true; bgPlay(); return true; }
   function bgCalm(){ if(!BG.ring) return; BG.ring=false; if(BG.want) bgPlay(); }
   /* 앱을 다시 열었을 때(진행 중) — 재생은 사람이 한 번 눌러야 시작되므로 첫 터치에 다시 켬 */
-  const bgArm=()=>{ if(!S.run||BG.ok) return; const go=()=>{ document.removeEventListener('pointerdown',go,true); if(S.run) bgOn(); }; document.addEventListener('pointerdown',go,true); };
-  function alarmStop(){ bgCalm(); if(!AL) return; clearInterval(AL.iv); clearTimeout(AL.to); clearTimeout(AL.fb); try{ if(navigator.vibrate) navigator.vibrate(0); }catch(_){ } if(AL.yp){ try{ AL.yp.stopVideo(); AL.yp.destroy(); }catch(_){ } } const f=AL.prev; AL.el.remove(); AL=null; document.body.classList.remove('otalarm'); if(f&&f.isConnected&&f.focus) try{ f.focus({preventScroll:true}); }catch(_){ } }
+  const bgArm=()=>{ if(!S.run||BG.ok) return; const go=()=>{ document.removeEventListener('pointerdown',go,true); if(S.run){ bgOn(); dkStart(); } }; document.addEventListener('pointerdown',go,true); };
+  /* V215: 검은 화면에서도 BAD TIMES — 시작(사람이 누른 순간)에 YouTube 플레이어를 오른쪽 아래 작은 창으로 띄워 '아주 작은 소리'로 계속 반복 재생해 둔다.
+     브라우저는 이미 재생 중인 소리는 화면이 꺼져도 멈추지 않으므로, 확인 시각에 음량만 올리고 처음으로 돌려 울린다(새로 재생을 시작하는 건 꺼진 화면에서 막힘).
+     YouTube가 멈추면(프리미엄이 아닌 계정의 백그라운드 정지 등) 3초 뒤 직접 만든 멜로디로 대신 울린다. 데이터를 계속 쓰므로 설정에서 끌 수 있음 */
+  const DK={yp:null, el:null, st:-1, loud:false};
+  const dkOn=()=>SND()&&S.dock!==false;
+  function dkStart(){ if(!dkOn()||DK.el) return; const el=document.createElement('div'); el.id='otDock'; el.className='otdock'; el.setAttribute('aria-label','초과근무 알림음 대기(BAD TIMES)');
+    el.innerHTML='<div id="otDockP"></div><span>🎵 초과근무 알림음 대기</span>'; document.body.appendChild(el); DK.el=el;
+    ytLoad().then(YT=>{ if(DK.el!==el) return; DK.yp=new YT.Player('otDockP',{host:'https://www.youtube.com', videoId:YT_ID, width:200, height:113,
+        playerVars:{autoplay:1, controls:0, playsinline:1, rel:0, loop:1, playlist:YT_ID, modestbranding:1},
+        events:{ onReady:e=>{ try{ e.target.unMute(); e.target.setVolume(DK.loud?100:2); e.target.playVideo(); }catch(_){ } },
+          onStateChange:e=>{ DK.st=e.data; if(e.data===1&&AL) AL.yt=true; },
+          onError:()=>{ DK.st=-2; } }}); }).catch(()=>{ DK.st=-2; }); }
+  function dkStop(){ if(DK.yp){ try{ DK.yp.stopVideo(); DK.yp.destroy(); }catch(_){ } } if(DK.el) DK.el.remove(); DK.yp=null; DK.el=null; DK.st=-1; DK.loud=false; }
+  function dkLoud(){ if(!DK.yp) return false; DK.loud=true; try{ DK.yp.unMute(); DK.yp.setVolume(100); DK.yp.seekTo(0,true); DK.yp.playVideo(); }catch(_){ return false; } if(DK.el) DK.el.classList.add('loud'); return true; }
+  function dkQuiet(){ DK.loud=false; if(DK.el) DK.el.classList.remove('loud'); if(!DK.yp) return; try{ DK.yp.setVolume(2); }catch(_){ } }
+  function alarmStop(){ bgCalm(); dkQuiet(); if(!AL) return; clearInterval(AL.iv); clearTimeout(AL.to); clearTimeout(AL.fb); clearTimeout(AL.fb2); try{ if(navigator.vibrate) navigator.vibrate(0); }catch(_){ } if(AL.yp){ try{ AL.yp.stopVideo(); AL.yp.destroy(); }catch(_){ } } const f=AL.prev; AL.el.remove(); AL=null; document.body.classList.remove('otalarm'); if(f&&f.isConnected&&f.focus) try{ f.focus({preventScroll:true}); }catch(_){ } }
   function snooze(auto){ if(!S.run) return; S.run.snz=Date.now()+SNZ*60000; save(); alarmStop(); badge(); if(!dlg.hidden) paint();
     toast(auto?`응답이 없어 ${hm(S.run.snz)}에 다시 알려요`:`${hm(S.run.snz)}에 다시 알려요`); }
   function alarm(txt, test){ alarmStop();
     const el=document.createElement('div'); el.className='otal'; el.setAttribute('role','alertdialog'); el.setAttribute('aria-modal','true'); el.setAttribute('aria-labelledby','otalK'); el.setAttribute('aria-describedby','otalP');
-    el.innerHTML=`<div class="otal-bg" aria-hidden="true"><i></i><i></i><i></i></div><div class="otal-in"><span class="otal-k" id="otalK">${test?'알림 테스트':'초과근무 확인 시간'}</span><b class="otal-t">${hm(Date.now())}</b><p id="otalP">${txt}</p>${SND()?'<div class="otal-yt"><div id="otYt"></div><small>BAD TIMES (LONG EDITION) · IMAEL ANGEL</small></div>':''}<button type="button" class="otal-ok"><span>${test?'테스트 끝':'확인했어요'}</span><small class="otal-nx">${test?'기록되지 않아요':'다음 확인 '+hm(Date.now()+ivMs())}</small></button>${test?'':`<button type="button" class="otal-snz">${SNZ}분 뒤 다시 알림</button><small class="otal-auto">90초 동안 누르지 않으면 멈추고 ${SNZ}분 뒤 다시 울려요</small>`}</div>`;
+    el.innerHTML=`<div class="otal-bg" aria-hidden="true"><i></i><i></i><i></i></div><div class="otal-in"><span class="otal-k" id="otalK">${test?'알림 테스트':'초과근무 확인 시간'}</span><b class="otal-t">${hm(Date.now())}</b><p id="otalP">${txt}</p>${SND()&&!DK.yp?'<div class="otal-yt"><div id="otYt"></div><small>BAD TIMES (LONG EDITION) · IMAEL ANGEL</small></div>':''}<button type="button" class="otal-ok"><span>${test?'테스트 끝':'확인했어요'}</span><small class="otal-nx">${test?'기록되지 않아요':'다음 확인 '+hm(Date.now()+ivMs())}</small></button>${test?'':`<button type="button" class="otal-snz">${SNZ}분 뒤 다시 알림</button><small class="otal-auto">90초 동안 누르지 않으면 멈추고 ${SNZ}분 뒤 다시 울려요</small>`}</div>`;
     const me={el, yt:false, yp:null, prev:document.activeElement}; AL=me;
-    if(!test&&document.hidden&&bgRing()) me.bg=true;   /* V213: 화면이 꺼져 있으면 배경 재생기로 멜로디 */
+    if(DK.yp&&dkLoud()){ me.dk=true; me.fb2=setTimeout(()=>{ if(AL===me&&DK.st!==1){ if(document.hidden){ if(bgRing()) me.bg=true; } else tune(); } },3000); }   /* V215: 대기 중 BAD TIMES 음량 올림 — 3초 안에 재생 중이 아니면 멜로디 */
+    else if(!test&&document.hidden&&bgRing()) me.bg=true;   /* V213: 화면이 꺼져 있으면 배경 재생기로 멜로디 */
     document.body.appendChild(el); document.body.classList.add('otalarm');
     vib(VIB);
-    me.iv=setInterval(()=>{ vib(VIB); if(SND()&&!me.yt&&!me.bg) tune(); const n=el.querySelector('.otal-nx'); if(n&&!test) n.textContent='다음 확인 '+hm(Date.now()+ivMs()); },4200);
+    me.iv=setInterval(()=>{ vib(VIB); if(SND()&&!me.yt&&!me.bg&&!(me.dk&&DK.st===1)) tune(); const n=el.querySelector('.otal-nx'); if(n&&!test) n.textContent='다음 확인 '+hm(Date.now()+ivMs()); },4200);
     me.to=setTimeout(()=>{ if(AL!==me) return; if(test) alarmStop(); else snooze(true); },90000);   /* 확인할 때까지 최대 90초 반복 → V211: 무응답이면 5분 뒤 다시 */
-    if(SND()){ me.fb=setTimeout(()=>{ if(AL===me&&!me.yt) tune(); },2500);   /* 2.5초 안에 영상 소리가 안 나면 기본 멜로디 */
+    if(SND()&&!me.dk){ me.fb=setTimeout(()=>{ if(AL===me&&!me.yt) tune(); },2500);   /* 2.5초 안에 영상 소리가 안 나면 기본 멜로디 */
       ytLoad().then(YT=>{ if(AL!==me) return; me.yp=new YT.Player('otYt',{host:'https://www.youtube.com', videoId:YT_ID,   /* V210: nocookie는 로그인 정보를 안 써서 프리미엄도 광고가 나옴 → youtube.com(그 기기 브라우저에 프리미엄 계정으로 로그인돼 있으면 광고 없음) */ width:240, height:135,
           playerVars:{autoplay:1, controls:0, playsinline:1, rel:0, loop:1, playlist:YT_ID, modestbranding:1},
           events:{ onReady:e=>{ try{ e.target.unMute(); e.target.setVolume(100); e.target.playVideo(); }catch(_){ } }, onStateChange:e=>{ if(e.data===1&&AL===me) me.yt=true; }, onError:()=>{ if(AL===me) tune(); } }}); }).catch(()=>{ if(AL===me) tune(); }); }
@@ -8373,9 +8397,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function marks(){ runNote(); appBadge(); title(); }
   try{ if(navigator.serviceWorker) navigator.serviceWorker.addEventListener('message',e=>{ if(e.data&&e.data.type==='sachil-ot-open') open(); }); }catch(_){ }
 
-  function start(){ const now=Date.now(); S.run={start:now, last:now, checks:[now]}; alerted=0; save(); bgOn(); startTick(); askPerm(); wake(); badge(); marks(); paint(); toast(`초과근무 시작 · 첫 확인 ${hm(nextDue())}`); }
+  function start(){ const now=Date.now(); S.run={start:now, last:now, checks:[now]}; alerted=0; save(); bgOn(); dkStart(); startTick(); askPerm(); wake(); badge(); marks(); paint(); toast(`초과근무 시작 · 첫 확인 ${hm(nextDue())}`); }
   function confirm1(){ if(!S.run) return; const now=Date.now(); S.run.last=now; S.run.checks.push(now); delete S.run.snz; alerted=0; save(); paint(); alarmStop(); close(); badge(); marks(); bgMeta(); toast(`${hm(now)} 확인 · 다음 ${hm(nextDue())}`); }   /* V208: 확인하면 창을 닫음 */
-  function stop(){ if(!S.run) return; const now=Date.now(), l=now-S.run.start; S.hist.unshift({start:S.run.start, end:now, checks:S.run.checks.length, iv:S.iv}); S.hist=S.hist.slice(0,200); S.run=null; save(); bgOff(); clearInterval(tick); wake(); badge(); marks(); paint(); toast(`종료 · ${dur(l)} 기록했어요`); }
+  function stop(){ if(!S.run) return; const now=Date.now(), l=now-S.run.start; S.hist.unshift({start:S.run.start, end:now, checks:S.run.checks.length, iv:S.iv}); S.hist=S.hist.slice(0,200); S.run=null; save(); bgOff(); dkStop(); clearInterval(tick); wake(); badge(); marks(); paint(); toast(`종료 · ${dur(l)} 기록했어요`); }
   async function askPerm(){ let asked=false; try{ if('Notification' in window&&Notification.permission==='default'){ asked=true; await Notification.requestPermission(); } }catch(_){ } if(asked&&S.run) runNote(); if(!dlg.hidden) paint(); }
   function ics(){ const from=S.run?nextDue():Date.now()+ivMs(); let to=from+4*3600000;
     if(S.end){ const [h,m]=S.end.split(':').map(Number), d=new Date(); d.setHours(h,m,0,0); if(d.getTime()<Date.now()) d.setDate(d.getDate()+1); to=d.getTime(); }
@@ -8423,7 +8447,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <div class="otring" id="otRing" role="img"><div class="otrin"><span class="otrl" id="otRl">다음 확인까지</span><b class="otleft" id="otLeft">--:--</b></div></div>
         <div class="otmain"><span class="otl" id="otNxL">다음 확인</span><b class="otnx" id="otNx">--:--</b><span class="otel2">경과 <b id="otEl" role="timer" aria-live="off">00:00:00</b></span><span class="otl">확인 ${S.run.checks.length-1}회</span></div>
         <button type="button" class="otbig" id="otOk"><span>확인했어요</span><small id="otOkN"></small></button>
-        ${SND()?(BG.ok?'<p class="otbg on">🔒 화면이 꺼져도 알림음이 울려요 <small>잠금 화면 재생 표시의 ⏸ = 확인했어요</small></p>':'<button type="button" class="otbg off" id="otBgOn">🔒 화면 꺼짐에도 울리기 켜기</button>'):'<p class="otbg">진동만: 화면이 꺼지면 진동이 울리지 않아요(웹 한계)</p>'}
+        ${SND()?(BG.ok?(DK.yp?'<p class="otbg on">🔒 화면이 꺼져도 BAD TIMES가 울려요 <small>오른쪽 작은 플레이어가 아주 작은 소리로 대기 중 · 재생이 막히면 기본 멜로디</small></p>':'<p class="otbg on">🔒 화면이 꺼져도 알림음이 울려요 <small>잠금 화면 재생 표시의 일시정지(❚❚) = 확인했어요</small></p>'):'<button type="button" class="otbg off" id="otBgOn">🔒 화면 꺼짐에도 울리기 켜기</button>'):'<p class="otbg">진동만: 화면이 꺼지면 진동이 울리지 않아요(웹 한계)</p>'}
         <div class="otrow"><button type="button" class="btn ghost" id="otTest">알림 테스트</button><button type="button" class="btn ghost" id="otIcs">캘린더 알림</button><button type="button" class="btn ghost" id="otStop">종료</button></div>
         <details class="otfix"><summary>시작 시각 고치기${CANWAKE?' · 화면 켜 두기':''}</summary>
           <div class="otfixb"><label class="otfl" for="otFixIn">늦게 눌렀다면 실제 시작 시각</label><input id="otFixIn" type="time" value="${fixT}">
@@ -8436,7 +8460,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <button type="button" class="ottest" id="otTest">🔔 알림 테스트 — 지금 한 번 울려 보기</button>
         <details class="otmore"><summary>설정 <span class="otsv">${modeLabelHtml()}</span></summary>
           <div class="otf"><span class="otfl" id="otMdL">알림 방식</span><div class="otmd" role="radiogroup" aria-labelledby="otMdL">${MODES.map(([k,l])=>`<button type="button" role="radio" data-md="${k}" aria-checked="${S.mode===k}">${l}${k==='both'?'<small>기본</small>':''}</button>`).join('')}</div>${CANVIB?'':'<small class="otnote">이 기기(아이폰 등)는 웹 진동을 지원하지 않아 소리와 화면으로 알려요.</small>'}</div>
-          <div class="otf"><span class="otfl">알림음</span><div class="otsnd"><span>🎵 BAD TIMES (LONG EDITION) · IMAEL ANGEL</span></div><small class="otnote">YouTube 공식 영상을 경보 화면에서 재생(인터넷 필요). 이 브라우저에 <b>YouTube 프리미엄 계정으로 로그인</b>돼 있으면 광고 없이 재생됩니다. 막히면 기본 멜로디.</small></div>
+          <div class="otf"><span class="otfl">알림음</span><div class="otsnd"><span>🎵 BAD TIMES (LONG EDITION) · IMAEL ANGEL</span></div><label class="otsw"><input type="checkbox" id="otDk" ${S.dock!==false?'checked':''}> 검은 화면에서도 BAD TIMES <small>(진행 중 작은 플레이어로 계속 대기 · 데이터 사용)</small></label><small class="otnote"><b>광고 없이:</b> 이 브라우저(PC는 크롬)에서 <a href="https://www.youtube.com/" target="_blank" rel="noopener">youtube.com</a>에 <b>YouTube 프리미엄 계정으로 로그인</b>해 두세요. 크롬 설정에서 ‘서드파티 쿠키 차단’이 켜져 있으면 로그인을 못 알아봐 광고가 나올 수 있어요. 재생이 막히면 기본 멜로디.</small></div>
           <div class="otf"><label class="otfl" for="otEnd">예정 종료(캘린더 알림용)</label><input id="otEnd" type="time" value="${S.end||''}"></div>
         </details>
       </section>`}
@@ -8458,6 +8482,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     { const b=$('otMdFix'); if(b) b.addEventListener('click',()=>{ S.mode='both'; save(); paint(); }); }
     { const b=$('otGo'); if(b) b.addEventListener('click',()=>{ const i=$('otIvIn'); if(i&&i.value!==''){ const v=Math.round(+i.value); if(v>=1&&v<=240) S.iv=v; } tune(); start(); }); }
     { const b=$('otOk'); if(b) b.addEventListener('click',()=>confirm1()); }
+    { const c=$('otDk'); if(c) c.addEventListener('change',()=>{ S.dock=c.checked; save(); if(S.run){ if(c.checked) dkStart(); else dkStop(); } }); }
     { const b=$('otBgOn'); if(b) b.addEventListener('click',()=>bgOn()); }
     { const b=$('otTest'); if(b) b.addEventListener('click',()=>{ askPerm(); alarm(`${S.iv}분마다 이렇게 울려요. 소리·진동이 안 나면 기기 무음·방해 금지를 확인하세요.`,true); }); }
     { const b=$('otStop'); if(b) b.addEventListener('click',()=>{ if(b.dataset.arm!=='1'){ b.dataset.arm='1'; b.textContent='한 번 더 = 종료'; b.classList.add('arm'); setTimeout(()=>{ if(b.isConnected){ b.dataset.arm=''; b.textContent='종료'; b.classList.remove('arm'); } },3000); return; } stop(); }); }
@@ -8490,7 +8515,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const l=!on?'초과근무 알리미':due?`초과근무 알리미 · 확인 시각 ${hm(nextDue())} 지남`:`초과근무 알리미 · 다음 확인 ${hm(nextDue())}(${m}분 남음)`;
     if(btn.getAttribute('aria-label')!==l){ btn.setAttribute('aria-label',l); btn.title=l; } title(); };
   setInterval(badge,5000); badge();
-  if(S.run){ startTick(); check(); wake(); marks(); BG.want=true; bgPlay().then(ok=>{ BG.ok=ok; if(!ok) bgArm(); }); }
+  if(S.run){ startTick(); check(); wake(); marks(); BG.want=true; bgPlay().then(ok=>{ BG.ok=ok; if(!ok) bgArm(); else dkStart(); }); }
   if(/[?&]ot=1(&|$)/.test(location.search)){ try{ history.replaceState(null,'',location.pathname+location.hash); }catch(_){ } setTimeout(open,700); }   /* 알림을 눌러 새 창으로 열렸을 때 */
   window.__otOpen=open;
 })();
