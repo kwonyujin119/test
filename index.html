@@ -2145,7 +2145,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v206</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v207</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -3164,8 +3164,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V206', SRV_VER='13.3';
+  const APP_VER='V207', SRV_VER='13.4';
   const UPDATES=[
+    {v:'V207', d:'2026-10-21', t:['첫 화면 모드 버튼 자리 균형: 디자인 모드는 Search 글자 위 가운데, 간편 모드는 47망 아이콘과 같은 높이','간편 모드 위·아래 여백을 같게, 휴대폰에서 47망·디브리핑룸 설명 두 줄까지','섹션별 기기 점검(PC·휴대폰·갤럭시탭 세로·가로): 사용법 안내 ‘다음’ 버튼 잘림 수정, CP·소화전·초과근무 설정·보고서 종류 닫기 누르는 칸 44px']},
     {v:'V206', d:'2026-10-21', t:['간편 모드: ‘디자인 모드’ 버튼을 47망 칸 안 오른쪽 위로(디자인 모드의 ‘간편 모드’처럼 칸 안에)','위쪽 버튼 줄을 없애 6칸이 화면 폭·높이를 고르게 채움 — PC·태블릿은 넓은 화면을 다 씀, 위·아래 여백 맞춤']},
     {v:'V205', d:'2026-10-21', t:['간편 모드 새 디자인: 벤토 카드 — 아이콘은 위, 이름·설명은 아래, 오른쪽 위 ↗','47망은 노랑 그라데이션, 디브리핑룸은 남색 카드, 나머지는 흰 카드로 한눈에 구분','CP·소화전은 둥근 알약 버튼, PC는 마우스를 올리면 카드가 살짝 떠오름']},
     {v:'V204', d:'2026-10-21', t:['초과근무 알리미: 확인 간격 기본 50분(자동 선택), 옵션 30분 · 직접 입력','화면을 더 간단하게 — 큰 간격 버튼 3개 + ‘50분마다 알림 · 시작’ 한 버튼, 소리·예정 종료는 ‘설정’ 안으로']},
