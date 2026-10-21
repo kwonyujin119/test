@@ -1042,7 +1042,8 @@ html body .hs-t:active{transform:scale(.975)}
 <style id="v206-hub">
 /* V206: 간편 모드 — '디자인 모드' 토글은 47망 칸 안 오른쪽 위(디자인 모드의 '간편 모드'처럼 칸 안), 6칸은 화면 폭·높이를 고르게 */
 html body .hub.hs{display:block;max-width:1040px;width:100%}
-html body .hub.hs .hs-g{height:calc(100% - 18px);margin-top:18px}   /* 위·아래 여백을 같게 */
+html body .hub.hs{padding-top:var(--hs-pt,12px);box-sizing:border-box}
+html body .hub.hs .hs-g{height:100%}   /* 위·아래 여백을 같게(padding — margin은 부모 밖으로 빠짐) */
 html body .hub.hs .hmode{position:absolute;top:12px;right:12px;left:auto;z-index:3;min-height:32px;padding:0 10px;border:0;border-radius:999px;background:rgba(255,255,255,.75);color:var(--navy-deep,#0B1B3F);font-size:12px;box-shadow:0 1px 2px rgba(107,83,0,.25);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 html body .hub.hs .hmode::after{content:"";position:absolute;inset:-6px}
 html body .hub.hs .hmode i{color:#C99A00}
@@ -1050,6 +1051,15 @@ html body .hub.hs .hmode i{color:#C99A00}
 @media (max-width:380px){ html body .hub.hs .hmode{top:8px;right:8px;padding:0 8px;font-size:11px} html body .hub.hs .hmode i{display:none} }
 @media (min-width:760px){ html body .hub.hs .hmode{top:18px;right:18px;min-height:38px;padding:0 14px;font-size:13px} }
 @media (min-width:1100px){ html body .hub.hs .hs-g{gap:18px} }
+</style>
+<style id="v207-hub">
+/* V207: 모드 토글 균형 — 디자인 모드 [간편 모드]는 Search 칸 안쪽(모서리에서 띄우고 S 글자 열 가운데), 간편 모드 [디자인 모드]는 47망 아이콘과 같은 높이·같은 안쪽 여백 */
+html body .hub.hz .hmode{left:max(16%,62px);top:16px;transform:translateX(-50%)}
+@media (max-width:599px){ html body .hub.hz .hmode{left:max(16%,58px);top:14px} }
+html body .hub.hs .hmode{top:21px;right:16px}
+@media (max-width:420px){ html body .hub.hs .hmode{top:24px;right:12px;min-height:30px;padding:0 9px;font-size:11px} html body .hub.hs .hmode i{display:none} }
+@media (max-width:380px){ html body .hub.hs .hmode{top:17px;right:10px;padding:0 8px;font-size:10.5px} }
+@media (min-width:760px){ html body .hub.hs .hmode{top:34px;right:24px} }
 </style>
 <style id="v202-ot">
 /* V202: 초과근무 알리미 — 메뉴 옆 시계 버튼 + 가운데 창(휴대폰은 아래에서 올라오는 시트) */
@@ -6453,7 +6463,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const probe=document.createElement('div'); probe.style.cssText='position:fixed;bottom:0;height:env(safe-area-inset-bottom,0px);visibility:hidden'; document.body.appendChild(probe); const safe=probe.offsetHeight; probe.remove();
     const bottom=tbOn?tb.getBoundingClientRect().top:window.innerHeight-safe-(window.innerWidth<600?4:0);   // 탭이 없으면 화면 끝에서 safe-area만큼 띄움(아래 -12와 합쳐 16px)
     const avail=Math.round(bottom-(h.getBoundingClientRect().top-(parseFloat(h.style.marginTop)||4)+4)-12);   // 지난번 가운데 맞춤 여백은 빼고 잼
-    const hh=Math.max(420, Math.min(avail, Math.round(h.clientWidth*2.1)));
+    const hh=Math.max(420, Math.min(avail, h.classList.contains('hs')?avail:Math.round(h.clientWidth*2.1)));   /* V207: 간편 모드는 남은 높이를 다 씀(위·아래 여백 같게) */
     h.style.height=hh+'px'; h.style.marginTop=Math.max(4, Math.round((avail-hh)/2))+'px';
     if(!h.classList.contains('hz')) return;
     const W=h.clientWidth, H=h.clientHeight;
