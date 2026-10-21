@@ -1039,7 +1039,17 @@ html body #otBtn.due::after{background:#D92D20;animation:otBlink 1s steps(2) inf
 .otlead{margin:0;font-size:14.5px;line-height:1.55}
 .otf{display:grid;gap:6px}
 .otfl{font-size:13px;font-weight:700;color:var(--muted)}
-.otcs{display:flex;flex-wrap:wrap;gap:6px}
+.otcs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.otcard.idle{gap:14px}
+.otc{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-height:64px!important;font-size:20px!important;border-width:2px!important}
+.otc small{font-size:11px;font-weight:700;opacity:.75}
+.oti{justify-content:center;flex-direction:column;gap:0!important;min-height:64px!important;padding:4px!important;border-width:2px!important;font-size:11px!important}
+.oti.on{border-color:var(--navy-deep,#0B1B3F);background:var(--navy-soft)}
+.oti input{width:100%!important;text-align:center;font-size:20px!important;height:34px!important}
+.otmore summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--muted);min-height:36px;display:flex;align-items:center}
+.otmore[open]{display:grid;gap:8px}
+.otmore summary{list-style:none}.otmore summary::-webkit-details-marker{display:none}.otmore summary::after{content:"⌄";margin-left:4px}.otmore[open] summary::after{content:"⌃"}
+.otperm{min-height:44px;border:1px dashed var(--line-2);border-radius:12px;background:var(--surface,#fff);font:inherit;font-size:14px;font-weight:700;color:var(--navy-deep,#0B1B3F);cursor:pointer}
 .otc{min-height:44px;min-width:64px;padding:0 12px;border:1px solid var(--line-2);border-radius:12px;background:var(--surface,#fff);font:inherit;font-size:15px;font-weight:700;cursor:pointer}
 .otc[aria-pressed="true"]{background:var(--navy-deep,#0B1B3F);color:#fff;border-color:var(--navy-deep,#0B1B3F)}
 .oti{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 4px 0 10px;border:1px solid var(--line-2);border-radius:12px;font-size:13px;font-weight:700;color:var(--muted)}
@@ -2061,7 +2071,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v203</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v204</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -3080,8 +3090,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V203', SRV_VER='13.0';
+  const APP_VER='V204', SRV_VER='13.1';
   const UPDATES=[
+    {v:'V204', d:'2026-10-21', t:['초과근무 알리미: 확인 간격 기본 50분(자동 선택), 옵션 30분 · 직접 입력','화면을 더 간단하게 — 큰 간격 버튼 3개 + ‘50분마다 알림 · 시작’ 한 버튼, 소리·예정 종료는 ‘설정’ 안으로']},
     {v:'V203', d:'2026-10-20', t:['첫 화면 모드 전환: 지금 화면(디자인 모드)에서는 Search 칸 왼쪽 위 ‘간편 모드’, 간편 모드에서는 ‘디자인 모드’ 버튼','간편 모드: 한글 2단 3줄 6칸 — 47망(CP·소화전 버튼 포함) · 디브리핑룸 · 검색 · AI · 체크리스트 · 사고보고서','고른 모드는 이 기기에 기억']},
     {v:'V202', d:'2026-10-20', t:['메뉴 옆에 ⏱ 초과근무 알리미: 시작하면 정한 간격(10·15·30·60분 또는 1~240분 직접 입력)마다 소리·진동·알림, ‘확인했어요’로 기록','확인 시각을 넘기면 버튼에 빨간 점·창에 빨간 테, 앱으로 돌아오면 놓친 확인을 바로 알림','캘린더 알림 추가(.ics): 휴대폰 캘린더가 확인 시각마다 대신 울림 — 화면이 꺼져도','오늘·이번 달 합계와 지난 기록(이 기기에만 저장)','사용법 안내에 초과근무 알리미 단계 추가']},
     {v:'V201', d:'2026-10-20', t:['IL 입력 박스를 4묶음으로: 1 발생개요 · 2 화재 개요(원인·성상·상황) · 3 피해 현황(인명·재산) · 4 진행 사항(조치 사항·향후 전망)','보고서(A4)를 세 띠로: 위 1|2 나란히 · 가운데 피해 현황 인명|재산 나란히 · 아래 진행 사항 조치|전망 나란히 (AI 작성본도 같은 모양)','보고서 만들기: 누르자마자 실시간 미리보기와 같은 초안을 A4로 먼저 보여 주고, AI는 뒤에서 다듬어 끝나면 바꿔 끼움 · AI 글 분량을 줄여 더 빨리','PC 위쪽 메뉴 이름 ‘AI assistant’로 통일']},
@@ -7922,9 +7933,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
    웹앱 한계: 화면이 꺼지거나 다른 앱을 쓰면 브라우저가 타이머를 늦출 수 있다 → 돌아오면 놓친 확인을 바로 알리고, '캘린더 알림 추가'(.ics)로 휴대폰 캘린더가 대신 울리게 한다 */
 (function(){
   const btn=document.getElementById('otBtn'), dlg=document.getElementById('otv'), body=document.getElementById('otBody'); if(!btn||!dlg||!body) return;
-  const KEY='sachil_ot_v1', PRE=[10,15,30,60];
+  const KEY='sachil_ot_v1', PRE=[50,30];   /* V204: 기본 50분, 옵션 30분 · 직접 입력 */
   const load=()=>{ try{ const v=JSON.parse(localStorage.getItem(KEY)||'null'); if(v&&typeof v==='object') return v; }catch(_){ } return null; };
-  let S=Object.assign({iv:60, end:'', run:null, hist:[], sound:true}, load()||{});
+  let S=Object.assign({iv:50, end:'', run:null, hist:[], sound:true}, load()||{});
   const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(_){ } };
   const pad=n=>String(n).padStart(2,'0'), hm=t=>{ const d=new Date(t); return pad(d.getHours())+':'+pad(d.getMinutes()); };
   const dur=ms=>{ ms=Math.max(0,ms); const m=Math.floor(ms/60000); return (m>=60?Math.floor(m/60)+'시간 ':'')+(m%60)+'분'; };
@@ -7969,7 +7980,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(c) c.classList.toggle('due',left<=0);
     if(r) r.style.setProperty('--p',Math.max(0,Math.min(100,100-left/ivMs()*100)).toFixed(1)+'%'); }
   function paint(){ const perm=('Notification' in window)?Notification.permission:'none', sm=sums();
-    const ivBtns=PRE.map(m=>`<button type="button" class="otc" data-iv="${m}" aria-pressed="${+S.iv===m}">${m}분</button>`).join('')+`<label class="oti"><span>직접</span><input id="otIvIn" type="number" inputmode="numeric" min="1" max="240" value="${PRE.includes(+S.iv)?'':S.iv}" placeholder="분" aria-label="간격(분) 직접 입력"></label>`;
+    const own=!PRE.includes(+S.iv);
+    const ivBtns=PRE.map(m=>`<button type="button" class="otc" role="radio" data-iv="${m}" aria-checked="${+S.iv===m}" aria-pressed="${+S.iv===m}">${m}분${m===50?'<small>기본</small>':''}</button>`).join('')+`<label class="oti${own?' on':''}"><span>직접</span><input id="otIvIn" type="number" inputmode="numeric" min="1" max="240" value="${own?S.iv:''}" placeholder="분" aria-label="간격(분) 직접 입력"></label>`;
     body.innerHTML=`
       ${S.run?`<section class="otcard live" id="otCard">
         <div class="otring" id="otRing" aria-hidden="true"><i></i></div>
@@ -7977,16 +7989,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <button type="button" class="otbig" id="otOk">확인했어요</button>
         <div class="otrow"><button type="button" class="btn ghost" id="otIcs">캘린더 알림 추가</button><button type="button" class="btn ghost" id="otStop">종료</button></div>
         <ol class="otlog" aria-label="확인 기록">${S.run.checks.slice().reverse().map((t,i,a)=>`<li><b>${hm(t)}</b> ${i===a.length-1?'시작':'확인 '+(a.length-1-i)+'회'}</li>`).join('')}</ol>
-      </section>`:`<section class="otcard">
-        <p class="otlead">초과근무를 시작하면 정한 간격마다 <b>소리·진동·알림</b>으로 확인할 때를 알려 줍니다.</p>
-        <div class="otf"><span class="otfl">확인 간격</span><div class="otcs" role="group" aria-label="확인 간격">${ivBtns}</div></div>
-        <div class="otf"><label class="otfl" for="otEnd">예정 종료(선택)</label><input id="otEnd" type="time" value="${S.end||''}"></div>
-        <label class="otsw"><input type="checkbox" id="otSnd" ${S.sound?'checked':''}> 소리 함께</label>
-        <button type="button" class="otbig" id="otGo">지금 시작</button>
+      </section>`:`<section class="otcard idle">
+        <div class="otcs" role="radiogroup" aria-label="확인 간격">${ivBtns}</div>
+        <button type="button" class="otbig" id="otGo">${S.iv}분마다 알림 · 시작</button>
+        <details class="otmore"><summary>설정</summary>
+          <label class="otsw"><input type="checkbox" id="otSnd" ${S.sound?'checked':''}> 소리 함께</label>
+          <div class="otf"><label class="otfl" for="otEnd">예정 종료(캘린더 알림용)</label><input id="otEnd" type="time" value="${S.end||''}"></div>
+        </details>
       </section>`}
       <section class="otsum"><div><span>오늘</span><b>${dur(sm.day)}</b></div><div><span>이번 달</span><b>${dur(sm.mon)}</b></div></section>
-      ${perm!=='granted'?`<p class="otwarn">${perm==='denied'?'알림이 꺼져 있습니다 — 브라우저 설정에서 이 사이트 알림을 허용하세요.':'<button type="button" class="btn ghost sm" id="otPerm">알림 허용</button> 화면 밖에서도 알림 배너를 띄우려면 허용하세요.'}</p>`:''}
-      <p class="otnote">※ 휴대폰 화면이 꺼지거나 다른 앱을 쓰는 동안에는 브라우저가 알림을 늦출 수 있습니다. 꼭 울려야 하면 <b>캘린더 알림 추가</b>로 휴대폰 캘린더에 확인 시각을 넣어 두세요. 기록은 이 기기에만 저장되는 개인 메모이며, 공식 초과근무 등록은 소속 시스템에서 따로 하세요.</p>
+      ${perm==='default'?`<button type="button" class="otperm" id="otPerm">🔔 알림 허용하기</button>`:perm==='denied'?'<p class="otwarn">알림이 꺼져 있어요 — 브라우저 설정에서 허용하세요</p>':''}
+      <p class="otnote">화면이 꺼지면 늦게 울릴 수 있어요 → 시작 후 <b>캘린더 알림 추가</b> · 기록은 이 기기에만(공식 등록은 소속 시스템)</p>
       ${S.hist.length?`<details class="othist"><summary>지난 기록 ${S.hist.length}건</summary><ul>${S.hist.slice(0,30).map(h=>`<li><span>${ymd(h.start).slice(5)} ${hm(h.start)}~${hm(h.end)}</span><b>${dur(h.end-h.start)}</b><small>확인 ${h.checks}회 · ${h.iv}분</small></li>`).join('')}</ul><button type="button" class="btn ghost sm" id="otClr">기록 지우기</button></details>`:''}`;
     const $=id=>document.getElementById(id);
     body.querySelectorAll('[data-iv]').forEach(b=>b.addEventListener('click',()=>{ S.iv=+b.dataset.iv; save(); paint(); }));
@@ -8046,7 +8059,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
      d:['<b>발생개요·화재 원인·인명 피해·재산 피해</b>를 칩으로 고르고 <b>보고서 만들기</b>를 누르면 체크리스트 기록과 합쳐 보고서가 나옵니다(브리핑형·인포그래픽형·사진기록형).','만든 보고서는 아래에 모여 고치기·AI로 작성·복사·저장·공유를 할 수 있어요.'],
      n:'화면을 좌우로 밀면 옆 탭으로 넘어갑니다.'},
     {k:'OT', t:'초과근무 알리미', get:()=>[pick('#otBtn')],
-     d:['초과근무를 <b>시작</b>하면 정한 간격(10·15·30·60분 또는 직접 입력)마다 소리·진동·알림으로 확인할 때를 알려 줍니다. <b>확인했어요</b>를 누르면 다음 확인까지 다시 셉니다.','화면이 꺼지면 늦게 울릴 수 있어요 — 꼭 울려야 하면 <b>캘린더 알림 추가</b>로 휴대폰 캘린더에 넣어 두세요.'],
+     d:['초과근무를 <b>시작</b>하면 정한 간격(기본 50분 · 30분 · 직접 입력)마다 소리·진동·알림으로 확인할 때를 알려 줍니다. <b>확인했어요</b>를 누르면 다음 확인까지 다시 셉니다.','화면이 꺼지면 늦게 울릴 수 있어요 — 꼭 울려야 하면 <b>캘린더 알림 추가</b>로 휴대폰 캘린더에 넣어 두세요.'],
      n:'기록은 이 기기에만 남는 개인 메모입니다. 공식 등록은 소속 시스템에서.'},
     {k:'메뉴', t:'메뉴 · 자료와 설치', get:()=>[pick('#menuBtn')],
      d:['교육일정·SOP·긴급구조대응계획·RIT 등 <b>섹션 자료</b>를 엽니다. PDF는 앱 안에서 쪽 맞춤·확대로 봅니다.','<b>앱 설치</b>(홈 화면 바로가기), 교관 로그인, 맨 끝 <b>업데이트 내역</b>도 여기 있습니다.']},
