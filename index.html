@@ -3401,7 +3401,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
   const APP_VER='V218', SRV_VER='14.5';
   const UPDATES=[
-    {v:'V218', d:'2026-10-21', t:['초과근무 알리미: ‘⏱ 3초 후 테스트’ 추가 — 누르고 3초 안에 화면을 끄거나 다른 앱으로 가면, 실제 확인 시각처럼 알림음·알림 팝업·진동이 울림','팝업의 ‘확인했어요’로 테스트를 끝내면 기록은 남지 않음 · 진행 중 화면에도 3초 후 테스트 버튼']},
+    {v:'V218', d:'2026-10-21', t:['초과근무 알리미: ‘⏱ 3초 후 테스트’ 추가 — 누르고 3초 안에 화면을 끄거나 다른 앱으로 가면, 실제 확인 시각처럼 알림음·알림 팝업·진동이 울림','팝업의 ‘확인했어요’로 테스트를 끝내면 기록은 남지 않음 · 진행 중 화면에도 3초 후 테스트 버튼','시작할 때 작은 소리로 BAD TIMES를 틀어 두던 기능 삭제 — 꺼진 화면·다른 앱에서는 알림 멜로디와 팝업, 화면이 켜져 있으면 BAD TIMES']},
     {v:'V217', d:'2026-10-21', t:['초과근무 알리미: 다른 앱을 쓰는 중에도 확인 시각에 알림 팝업(확인할 때까지 약 30초마다 다시)','팝업의 ‘확인했어요’를 누르면 알림음·진동·경보가 끝나고 ‘✅ 확인했어요 · 다음 확인’이 4초 보였다가 사라짐']},
     {v:'V216', d:'2026-10-21', t:['초과근무 알리미: BAD TIMES 영상 화면은 보이지 않게(소리만)','화면이 꺼진 상태에서도 알림창 팝업 — ‘확인했어요’·‘5분 뒤 다시’ 버튼으로 앱을 열지 않고 바로 처리','꺼진 화면 진동: 확인할 때까지 약 30초마다 알림을 다시 띄워 휴대폰이 진동(알림 허용 필요)']},
     {v:'V215', d:'2026-10-21', t:['초과근무 알리미: 검은 화면(전원 버튼)에서도 BAD TIMES가 울리게 — 시작하면 오른쪽에 작은 플레이어가 아주 작은 소리로 계속 대기하다가 확인 시각에 음량을 올려 처음부터 재생','재생이 막히면 3초 뒤 기본 멜로디로 대신 울림 · 설정에서 끌 수 있음(데이터 사용)','PC·휴대폰 모두 크롬에서 youtube.com에 프리미엄 계정으로 로그인해 두면 광고 없이 재생 — 설정에 바로가기와 안내']},
@@ -8343,7 +8343,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
      브라우저는 이미 재생 중인 소리는 화면이 꺼져도 멈추지 않으므로, 확인 시각에 음량만 올리고 처음으로 돌려 울린다(새로 재생을 시작하는 건 꺼진 화면에서 막힘).
      YouTube가 멈추면(프리미엄이 아닌 계정의 백그라운드 정지 등) 3초 뒤 직접 만든 멜로디로 대신 울린다. 데이터를 계속 쓰므로 설정에서 끌 수 있음 */
   const DK={yp:null, el:null, st:-1, loud:false};
-  const dkOn=()=>SND()&&S.dock!==false;
+  const dkOn=()=>false;   /* V218: 사용자 요청 — 시작 때 작은 소리로 영상을 틀어 두는 기능 삭제(꺼진 화면에서는 들리지 않는 대기 소리 + 알림 멜로디) */
   function dkStart(){ if(!dkOn()||DK.el) return; const el=document.createElement('div'); el.id='otDock'; el.className='otdock'; el.setAttribute('aria-label','초과근무 알림음 대기(BAD TIMES)');
     el.innerHTML='<div id="otDockP"></div><span>🎵 초과근무 알림음 대기</span>'; document.body.appendChild(el); DK.el=el;
     ytLoad().then(YT=>{ if(DK.el!==el) return; DK.yp=new YT.Player('otDockP',{host:'https://www.youtube.com', videoId:YT_ID, width:200, height:113,
@@ -8467,7 +8467,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <div class="otring" id="otRing" role="img"><div class="otrin"><span class="otrl" id="otRl">다음 확인까지</span><b class="otleft" id="otLeft">--:--</b></div></div>
         <div class="otmain"><span class="otl" id="otNxL">다음 확인</span><b class="otnx" id="otNx">--:--</b><span class="otel2">경과 <b id="otEl" role="timer" aria-live="off">00:00:00</b></span><span class="otl">확인 ${S.run.checks.length-1}회</span></div>
         <button type="button" class="otbig" id="otOk"><span>확인했어요</span><small id="otOkN"></small></button>
-        ${SND()?(BG.ok?(DK.yp?'<p class="otbg on">🔒 화면이 꺼져도 BAD TIMES가 울려요 <small>아주 작은 소리로 대기 중 · 재생이 막히면 기본 멜로디 · 알림창 팝업으로 확인</small></p>':'<p class="otbg on">🔒 화면이 꺼져도 알림음이 울려요 <small>잠금 화면 재생 표시의 일시정지(❚❚) = 확인했어요</small></p>'):'<button type="button" class="otbg off" id="otBgOn">🔒 화면 꺼짐에도 울리기 켜기</button>'):'<p class="otbg">진동만: 화면이 꺼지면 진동이 울리지 않아요(웹 한계)</p>'}
+        ${SND()?(BG.ok?(DK.yp?'<p class="otbg on">🔒 화면이 꺼져도 알림이 울려요 <small>꺼진 화면·다른 앱: 알림 멜로디 + 알림창 팝업 · 켜진 화면: BAD TIMES</small></p>':'<p class="otbg on">🔒 화면이 꺼져도 알림이 울려요 <small>꺼진 화면·다른 앱: 알림 멜로디 + 알림창 팝업 · 켜진 화면: BAD TIMES</small></p>'):'<button type="button" class="otbg off" id="otBgOn">🔒 화면 꺼짐에도 울리기 켜기</button>'):'<p class="otbg">진동만: 화면이 꺼지면 진동이 울리지 않아요(웹 한계)</p>'}
         <div class="otrow"><button type="button" class="btn ghost" id="otTest">알림 테스트</button><button type="button" class="btn ghost" id="otTest3">3초 후 테스트</button><button type="button" class="btn ghost" id="otIcs">캘린더 알림</button><button type="button" class="btn ghost" id="otStop">종료</button></div>
         <details class="otfix"><summary>시작 시각 고치기${CANWAKE?' · 화면 켜 두기':''}</summary>
           <div class="otfixb"><label class="otfl" for="otFixIn">늦게 눌렀다면 실제 시작 시각</label><input id="otFixIn" type="time" value="${fixT}">
@@ -8480,7 +8480,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <div class="ottests"><button type="button" class="ottest" id="otTest">🔔 지금 테스트</button><button type="button" class="ottest" id="otTest3">⏱ 3초 후 테스트<small>화면 끄고·다른 앱에서 확인</small></button></div>
         <details class="otmore"><summary>설정 <span class="otsv">${modeLabelHtml()}</span></summary>
           <div class="otf"><span class="otfl" id="otMdL">알림 방식</span><div class="otmd" role="radiogroup" aria-labelledby="otMdL">${MODES.map(([k,l])=>`<button type="button" role="radio" data-md="${k}" aria-checked="${S.mode===k}">${l}${k==='both'?'<small>기본</small>':''}</button>`).join('')}</div>${CANVIB?'':'<small class="otnote">이 기기(아이폰 등)는 웹 진동을 지원하지 않아 소리와 화면으로 알려요.</small>'}</div>
-          <div class="otf"><span class="otfl">알림음</span><div class="otsnd"><span>🎵 BAD TIMES (LONG EDITION) · IMAEL ANGEL</span></div><label class="otsw"><input type="checkbox" id="otDk" ${S.dock!==false?'checked':''}> 검은 화면에서도 BAD TIMES <small>(진행 중 작은 플레이어로 계속 대기 · 데이터 사용)</small></label><small class="otnote"><b>화면이 꺼졌을 때:</b> 알림창 팝업(확인했어요 · 5분 뒤 버튼)과 진동은 <b>알림 허용</b>이 필요해요. 팝업이 안 뜨면 휴대폰 설정 → 앱 → Chrome → 알림 → 이 사이트 → ‘화면에 팝업 표시’를 켜세요.</small><small class="otnote"><b>광고 없이:</b> 이 브라우저(PC는 크롬)에서 <a href="https://www.youtube.com/" target="_blank" rel="noopener">youtube.com</a>에 <b>YouTube 프리미엄 계정으로 로그인</b>해 두세요. 크롬 설정에서 ‘서드파티 쿠키 차단’이 켜져 있으면 로그인을 못 알아봐 광고가 나올 수 있어요. 재생이 막히면 기본 멜로디.</small></div>
+          <div class="otf"><span class="otfl">알림음</span><div class="otsnd"><span>🎵 BAD TIMES (LONG EDITION) · IMAEL ANGEL</span></div><small class="otnote"><b>화면이 꺼졌을 때:</b> 알림창 팝업(확인했어요 · 5분 뒤 버튼)과 진동은 <b>알림 허용</b>이 필요해요. 팝업이 안 뜨면 휴대폰 설정 → 앱 → Chrome → 알림 → 이 사이트 → ‘화면에 팝업 표시’를 켜세요.</small><small class="otnote"><b>광고 없이(화면이 켜져 있을 때 BAD TIMES):</b> 이 브라우저(PC는 크롬)에서 <a href="https://www.youtube.com/" target="_blank" rel="noopener">youtube.com</a>에 <b>YouTube 프리미엄 계정으로 로그인</b>해 두세요. 크롬 설정에서 ‘서드파티 쿠키 차단’이 켜져 있으면 로그인을 못 알아봐 광고가 나올 수 있어요. 재생이 막히면 기본 멜로디.</small></div>
           <div class="otf"><label class="otfl" for="otEnd">예정 종료(캘린더 알림용)</label><input id="otEnd" type="time" value="${S.end||''}"></div>
         </details>
       </section>`}
@@ -8502,7 +8502,6 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     { const b=$('otMdFix'); if(b) b.addEventListener('click',()=>{ S.mode='both'; save(); paint(); }); }
     { const b=$('otGo'); if(b) b.addEventListener('click',()=>{ const i=$('otIvIn'); if(i&&i.value!==''){ const v=Math.round(+i.value); if(v>=1&&v<=240) S.iv=v; } tune(); start(); }); }
     { const b=$('otOk'); if(b) b.addEventListener('click',()=>confirm1()); }
-    { const c=$('otDk'); if(c) c.addEventListener('change',()=>{ S.dock=c.checked; save(); if(S.run){ if(c.checked) dkStart(); else dkStop(); } }); }
     { const b=$('otBgOn'); if(b) b.addEventListener('click',()=>bgOn()); }
     { const b=$('otTest3'); if(b) b.addEventListener('click',testLater); }
     { const b=$('otTest'); if(b) b.addEventListener('click',()=>{ askPerm(); alarm(`${S.iv}분마다 이렇게 울려요. 소리·진동이 안 나면 기기 무음·방해 금지를 확인하세요.`,true); }); }
