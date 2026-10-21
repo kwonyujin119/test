@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '14.5'
-APP_VERSION = 'V218'
+VERSION = '14.6'
+APP_VERSION = 'V219'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -909,6 +909,7 @@ class H(BaseHTTPRequestHandler):
                 return self.send(200, {'ok': True, 'info': CONF.get('room_info') or {}, 'ts': CONF.get('room_info_ts') or 0}, log=False)
             if path == '/api/me':
                 return self.send(200, {'server': 'sachil', 'version': VERSION, 'user': self.user, 'room': ROOM47, 'room_debrief': ROOM_DB,
+                                       'ot_yt': str(CONF.get('ot_yt') or ''),   # V219: 초과근무 알리미 알림음 YouTube 영상(교수가 방재실에서 정함)
                                        'trim_ratio': CONF.get('weekly_trim_ratio'),
                                        'require_code': bool(CONF.get('require_code')),
                                        'retention_days': CONF.get('retention_days'), 'max_files': 10,
@@ -1577,6 +1578,20 @@ class H(BaseHTTPRequestHandler):
             write_conf(CONF)
             return self.send(200, dict(status(), checklist=cl or None, checklist_cols=CONF.get('checklist_cols') or 0, checklist_ts=CONF['checklist_ts'],
                                        msg=f'체크리스트를 저장했습니다 — {len(cl)}단계 {sum(len(x["items"]) for x in cl)}항목, 모든 기기에 적용' if cl else '기본 체크리스트로 되돌렸습니다'), log=False)
+        if act == 'otvideo':   # V219: 초과근무 알리미 알림음 — YouTube 퍼가기 코드·주소에서 영상 ID(11자)만 꺼내 저장. 빈 글 = 앱 기본 영상
+            src = str(j.get('src') or '').strip()[:3000]
+            vid = ''
+            if src:
+                mm = re.search(r'(?:youtube(?:-nocookie)?\.com/(?:embed/|watch\?(?:[^"\s]*&)?v=|shorts/|live/)|youtu\.be/)([A-Za-z0-9_-]{11})', src) or re.fullmatch(r'([A-Za-z0-9_-]{11})', src)
+                if not mm:
+                    return self.err(400, 'YouTube 소스코드(퍼가기 코드)나 주소에서 영상을 찾지 못했습니다')
+                vid = mm.group(1)
+            if vid:
+                CONF['ot_yt'] = vid
+            else:
+                CONF.pop('ot_yt', None)
+            write_conf(CONF)
+            return self.send(200, dict(status(), ot_yt=vid, msg=f'초과근무 알림음 영상을 저장했습니다({vid}) — 모든 기기에 적용' if vid else '기본 영상으로 되돌렸습니다'), log=False)
         if act == 'roominfo':   # V133: 대화방 📌 핀 문구 저장 — kind(net·deb)별 lead(첫 줄) + more(펼치면 보이는 줄들). 빈 글 = 기본 문구로
             kind = str(j.get('kind') or '')
             if kind not in ('net', 'deb'):
