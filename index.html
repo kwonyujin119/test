@@ -2336,7 +2336,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v210</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v211</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -3355,8 +3355,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V210', SRV_VER='13.7';
+  const APP_VER='V211', SRV_VER='13.8';
   const UPDATES=[
+    {v:'V211', d:'2026-10-21', t:['디자인 모드: S·A·CH·IL 칸에 한글 설명 한 줄, 휴대폰 [간편 모드] 버튼 44px, 누름·키보드 초점 표시 정리','간편 모드: 칸 안에 지금 상태 — 47망 연결 상태, 최근 검색어 바로 검색, 체크리스트 진행 n/50·경과 시간, 저장된 보고서 수 · 햇빛에서 더 진한 글자','초과근무 알리미: ‘초과근무 시작’ 한 번에, 남은 시간을 가장 크게, 경보에 다음 확인 시각과 ‘5분 뒤 다시 알림’, 오늘·이번 주·이번 달 합계와 이번 달 기록 복사','진행 중 표시: 휴대폰 알림창에 ‘초과근무 진행 중 · 다음 확인’ 상시 알림, 설치한 앱 아이콘 배지, 창 제목에 다음 확인 시각 · 헤더 ⏱에 남은 분']},
     {v:'V210', d:'2026-10-21', t:['초과근무 알리미 알림 방식: 기본 소리+진동(모든 기기 다시 설정) · 옵션 진동만 / 소리만','알림음을 BAD TIMES LONG EDITION 공식 영상으로','그 브라우저에 YouTube 프리미엄 계정으로 로그인돼 있으면 광고 없이 재생']},
     {v:'V209', d:'2026-10-21', t:['초과근무 알리미 알림음: IMAEL ANGEL ‘BAD TIMES’ 공식 YouTube 영상을 경보 화면에서 재생(인터넷 필요, 재생이 막히면 기본 멜로디)','‘내 음원 고르기’ 삭제','서버 화면(app.sachil47.com)에서도 YouTube 플레이어가 열리게 보안 설정 보완']},
     {v:'V208', d:'2026-10-21', t:['초과근무 알리미: 🔔 알림 테스트 버튼(진동·소리·화면을 바로 확인)','확인 시각이 되면 전체 화면 경보 — 노랑 물결이 퍼지고 시각이 크게, ‘확인했어요’ 한 번이면 기록하고 창까지 닫힘','진동을 길고 촘촘하게(확인할 때까지 4초마다 반복, 최대 90초)','알림음: 기본 멜로디 또는 ‘내 음원 고르기’(이 기기에만 저장)']},
