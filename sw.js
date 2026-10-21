@@ -23,7 +23,12 @@ self.addEventListener('fetch', e => {
   e.respondWith(fetch(req));
 });
 // V202: 초과근무 알리미 알림을 누르면 앱 창으로
+// V211: '초과근무 진행 중' 상시 알림(tag sachil-ot-run)은 눌러도 지우지 않고(진행 표시 유지), 앱 창에 알리미 창을 열라고 전한다(postMessage, 새 창이면 ?ot=1)
 self.addEventListener('notificationclick', e => {
-  e.notification.close();
-  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(l => { for (const c of l) { if ('focus' in c) return c.focus(); } return self.clients.openWindow ? self.clients.openWindow('./') : null; }));
+  const ot = /^sachil-ot/.test(e.notification.tag || '');
+  if (e.notification.tag !== 'sachil-ot-run') e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(l => {
+    for (const c of l) { if ('focus' in c) { if (ot) { try { c.postMessage({ type: 'sachil-ot-open' }); } catch (_) {} } return c.focus(); } }
+    return self.clients.openWindow ? self.clients.openWindow(ot ? './?ot=1' : './') : null;
+  }));
 });
