@@ -1257,6 +1257,8 @@ html body #otBtn.due::after{background:#D92D20;animation:otBlink 1s steps(2) inf
 .otal-ok{width:100%;min-height:68px;border:0;border-radius:18px;background:#FDD000;color:#0B1B3F;font:inherit;font-size:22px;font-weight:800;cursor:pointer;box-shadow:0 10px 30px rgba(253,208,0,.35)}
 .otal-snz{min-height:44px;padding:0 16px;border:0;background:transparent;color:rgba(255,255,255,.7);font:inherit;font-size:14px;font-weight:700;cursor:pointer}
 .otal-snz:empty{display:none}
+.otal-end{width:100%;min-height:56px;border:2px solid rgba(255,255,255,.55);border-radius:18px;background:transparent;color:#fff;font:inherit;font-size:18px;font-weight:800;cursor:pointer;display:grid;gap:2px;justify-items:center;align-content:center}
+.otal-end small{font-size:12px;font-weight:600;opacity:.75}
 @keyframes otalIn{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
 @keyframes otalRing{0%{opacity:.9;transform:scale(.3)}100%{opacity:0;transform:scale(2.6)}}
 @keyframes otalGlow{from{opacity:.5}to{opacity:1}}
@@ -2385,7 +2387,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v223</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v224</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -3404,8 +3406,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V223', SRV_VER='15.0';
+  const APP_VER='V224', SRV_VER='15.1';
   const UPDATES=[
+    {v:'V224', d:'2026-10-22', t:['초과근무 알리미: 확인 시각에 뜨는 창에 [초과근무 계속] · [초과근무 종료] — 한 번 누르면 바로 처리(계속 = 확인하고 다음 확인까지, 종료 = 지금까지 기록하고 끝냄)','휴대폰 알림 팝업에도 같은 두 버튼(앱을 열지 않고 처리) · 떠 있는 창의 ❚❚ = 초과근무 계속']},
     {v:'V223', d:'2026-10-22', t:['47망·디브리핑룸: PC에서 보낸 사진을 휴대폰에서 저장·공유할 수 있게 — 메뉴를 여는 순간 사진을 미리 받아 두어, 누를 때 바로 저장·공유(큰 원본도 끊기지 않게)','아직 받는 중이면 ‘준비 중…’ 뒤 한 번 더 누르기','파일 이름 끝(.jpg·.png)을 실제 형식에 맞추고, 휴대폰이 못 받는 형식(HEIC·BMP 등)은 JPEG로 바꿈 · 공유가 안 되는 기기는 저장으로 대신']},
     {v:'V222', d:'2026-10-22', t:['메뉴 자료: 교수(관리자)로 로그인하면 각 자료 아래 ‘⬇ 내려받기’ — 올린 원래 파일(PDF·사진 등)을 원래 이름으로 저장','일반 사용자 화면은 그대로(보기만)']},
     {v:'V221', d:'2026-10-21', t:['초과근무 알리미: ‘종료’ 한 번 누르면 바로 종료(6초 안 되돌리기)','팝업 줄이기 — 확인 후 ‘확인했어요’ 알림 없앰, 꺼진 화면 다시 알림은 1분마다','확인 시각에 멜로디 대신 지정 음원(YouTube 소스 코드)을 재생 — 시작할 때 소리 없이 멈춘 채 준비해 두었다가 재생, 막힐 때만 멜로디']},
@@ -8408,7 +8411,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const due=S.run?(snzAt()||nextDue()):0, over=!!(S.run&&now>=due), blink=Math.floor(now/500)%2===0, ring=over||!!AL;
     g.fillStyle=ring?(blink?'#FDD000':'#D92D20'):'#0B1B3F'; g.fillRect(0,0,W,H);
     g.textAlign='center'; g.textBaseline='middle';
-    if(ring){ g.fillStyle=blink?'#0B1B3F':'#fff'; g.font='800 44px system-ui,sans-serif'; g.fillText('⏰ 초과근무 확인',W/2,H*0.36); g.font='800 64px ui-monospace,monospace'; g.fillText(hm(now),W/2,H*0.68); g.font='700 22px system-ui,sans-serif'; g.fillText('❚❚ 누르면 확인했어요',W/2,H*0.9); return; }
+    if(ring){ g.fillStyle=blink?'#0B1B3F':'#fff'; g.font='800 44px system-ui,sans-serif'; g.fillText('⏰ 초과근무 확인',W/2,H*0.36); g.font='800 64px ui-monospace,monospace'; g.fillText(hm(now),W/2,H*0.68); g.font='700 22px system-ui,sans-serif'; g.fillText('❚❚ 누르면 초과근무 계속',W/2,H*0.9); return; }
     g.fillStyle='#FDD000'; g.font='700 26px system-ui,sans-serif'; g.fillText(S.run?'초과근무 진행 중':'초과근무 알리미',W/2,H*0.2);
     if(S.run){ const left=due-now, s=Math.max(0,Math.floor(left/1000)); g.fillStyle='#fff'; g.font='800 78px ui-monospace,monospace'; g.fillText(pad(Math.floor(s/60))+':'+pad(s%60),W/2,H*0.53);
       g.fillStyle='rgba(255,255,255,.8)'; g.font='600 24px system-ui,sans-serif'; g.fillText('다음 확인 '+hm(due)+' · '+S.iv+'분 간격',W/2,H*0.84); } }
@@ -8424,7 +8427,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     toast(auto?`응답이 없어 ${hm(S.run.snz)}에 다시 알려요`:`${hm(S.run.snz)}에 다시 알려요`); }
   function alarm(txt, test){ alarmStop();
     const el=document.createElement('div'); el.className='otal'; el.setAttribute('role','alertdialog'); el.setAttribute('aria-modal','true'); el.setAttribute('aria-labelledby','otalK'); el.setAttribute('aria-describedby','otalP');
-    el.innerHTML=`<div class="otal-bg" aria-hidden="true"><i></i><i></i><i></i></div><div class="otal-in"><span class="otal-k" id="otalK">${test?'알림 테스트':'초과근무 확인 시간'}</span><b class="otal-t">${hm(Date.now())}</b><p id="otalP">${txt}</p>${SND()&&!DK.yp?'<div class="otal-yt"><div id="otYt"></div><small>BAD TIMES (LONG EDITION) · IMAEL ANGEL</small></div>':''}<button type="button" class="otal-ok"><span>${test?'테스트 끝':'확인했어요'}</span><small class="otal-nx">${test?'기록되지 않아요':'다음 확인 '+hm(Date.now()+ivMs())}</small></button>${test?'':`<button type="button" class="otal-snz">${SNZ}분 뒤 다시 알림</button><small class="otal-auto">90초 동안 누르지 않으면 멈추고 ${SNZ}분 뒤 다시 울려요</small>`}</div>`;
+    el.innerHTML=`<div class="otal-bg" aria-hidden="true"><i></i><i></i><i></i></div><div class="otal-in"><span class="otal-k" id="otalK">${test?'알림 테스트':'초과근무 확인 시간'}</span><b class="otal-t">${hm(Date.now())}</b><p id="otalP">${txt}</p>${SND()&&!DK.yp?'<div class="otal-yt"><div id="otYt"></div><small>BAD TIMES (LONG EDITION) · IMAEL ANGEL</small></div>':''}<button type="button" class="otal-ok"><span>${test?'테스트 끝':'초과근무 계속'}</span><small class="otal-nx">${test?'기록되지 않아요':'확인하고 계속 · 다음 확인 '+hm(Date.now()+ivMs())}</small></button><button type="button" class="otal-end">${test?'테스트 끝(종료 버튼)':'초과근무 종료'}<small>${test?'기록되지 않아요':'지금까지 기록하고 끝냄'}</small></button>${test?'':`<button type="button" class="otal-snz">${SNZ}분 뒤 다시 알림</button>`}</div>`;   /* V224: 한 번 누르기로 계속 / 종료 */
     const me={el, yt:false, yp:null, prev:document.activeElement, test}; AL=me;
     if(DK.yp&&dkLoud()){ me.dk=true; me.fb2=setTimeout(()=>{ if(AL===me&&DK.st!==1){ if(document.hidden){ if(bgRing()) me.bg=true; } else tune(); } },3000); }   /* V215: 대기 중 BAD TIMES 음량 올림 — 3초 안에 재생 중이 아니면 멜로디 */
     else if(test!==true&&document.hidden&&bgRing()) me.bg=true;   /* V213: 화면이 꺼져 있으면 배경 재생기로 멜로디 */
@@ -8438,13 +8441,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           events:{ onReady:e=>{ try{ e.target.unMute(); e.target.setVolume(100); e.target.playVideo(); }catch(_){ } }, onStateChange:e=>{ if(e.data===1&&AL===me) me.yt=true; }, onError:()=>{ if(AL===me) tune(); } }}); }).catch(()=>{ if(AL===me) tune(); }); }
     el.querySelector('.otal-ok').addEventListener('click',()=>{ alarmStop(); if(!test) confirm1(); else testEnd(); });
     { const z=el.querySelector('.otal-snz'); if(z) z.addEventListener('click',()=>snooze(false)); }
+    el.querySelector('.otal-end').addEventListener('click',()=>{ alarmStop(); if(!test) stop(); else testEnd(); });
     el.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); if(test) alarmStop(); else snooze(false); return; }
       if(e.key==='Tab'){ const f=[...el.querySelectorAll('button')]; const i=f.indexOf(document.activeElement); e.preventDefault(); f[(i+(e.shiftKey?-1:1)+f.length)%f.length].focus(); } });
     setTimeout(()=>{ const b=el.querySelector('.otal-ok'); if(b) b.focus({preventScroll:true}); },30); }
   /* V216: 확인 알림(휴대폰 알림창·잠금 화면 팝업) — '확인했어요'·'5분 뒤' 버튼. 화면이 꺼져 있으면 휴대폰 진동은 이 알림으로만 울리므로(웹 진동은 화면이 켜져 있을 때만) 확인할 때까지 30초마다 다시 띄운다 */
   async function sysNote(txt){ try{ if(!('Notification' in window)||Notification.permission!=='granted') return; const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();
       const o={body:txt, tag:'sachil-ot', renotify:true, requireInteraction:true, icon:'icons/icon-192.png', badge:'icons/icon-96.png', vibrate:VIBON()?VIB:[], silent:S.mode==='snd'&&!!DK.yp, timestamp:Date.now(),
-        actions:[{action:'ot-ok',title:'확인했어요'},{action:'ot-snz',title:'5분 뒤 다시'}]};
+        actions:[{action:'ot-ok',title:'초과근무 계속'},{action:'ot-end',title:'초과근무 종료'}]};
       if(r&&r.showNotification) await r.showNotification('⏰ 초과근무 확인 시간', o); else new Notification('⏰ 초과근무 확인 시간', o); }catch(_){ } }
   /* V217: 다른 앱을 쓰는 중 알림에서 '확인했어요'를 누르면 — 경보·소리·알림을 끝내고, 짧은 확인 알림(소리 없음)을 4초 보여 준 뒤 지움 */
   async function sysDone(){ try{ if(!document.hidden||!('Notification' in window)||Notification.permission!=='granted') return; const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration(); if(!r||!r.showNotification) return;
@@ -8480,7 +8484,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function appBadge(){ try{ if(S.run){ if(navigator.setAppBadge) navigator.setAppBadge().catch(()=>{}); } else if(navigator.clearAppBadge) navigator.clearAppBadge().catch(()=>{}); }catch(_){ } }
   function title(){ const p=!S.run?'':Date.now()>=nextDue()?'⚠ 확인 · ':'⏱ '+hm(nextDue())+' · ', b=document.title.replace(TPRE,''), t=p+b; if(document.title!==t) document.title=t; }   /* 다음 확인 시각이 바뀔 때·지났을 때만 실제로 바뀜 */
   function marks(){ runNote(); appBadge(); title(); }
-  try{ if(navigator.serviceWorker) navigator.serviceWorker.addEventListener('message',e=>{ const t=e.data&&e.data.type; if(t==='sachil-ot-open') open(); else if(t==='sachil-ot-ok'){ if(AL&&AL.test){ alarmStop(); testEnd(); } else confirm1(); }   /* V221: 확인 완료 알림은 띄우지 않음(팝업 줄이기) */ else if(t==='sachil-ot-snz') snooze(false); }); }catch(_){ }
+  try{ if(navigator.serviceWorker) navigator.serviceWorker.addEventListener('message',e=>{ const t=e.data&&e.data.type; if(t==='sachil-ot-open') open(); else if(t==='sachil-ot-ok'){ if(AL&&AL.test){ alarmStop(); testEnd(); } else confirm1(); }
+      else if(t==='sachil-ot-end'){ if(AL&&AL.test){ alarmStop(); testEnd(); } else stop(); }   /* V221: 확인 완료 알림은 띄우지 않음(팝업 줄이기) */ else if(t==='sachil-ot-snz') snooze(false); }); }catch(_){ }
 
   function start(){ const now=Date.now(); S.run={start:now, last:now, checks:[now]}; alerted=0; save(); bgOn(); pipOn(); dkStart(); startTick(); askPerm(); wake(); badge(); marks(); paint(); toast(`초과근무 시작 · 첫 확인 ${hm(nextDue())}`); }
   function confirm1(){ if(!S.run) return; const now=Date.now(); S.run.last=now; S.run.checks.push(now); delete S.run.snz; alerted=0; save(); paint(); alarmStop(); close(); badge(); marks(); bgMeta(); toast(`${hm(now)} 확인 · 다음 ${hm(nextDue())}`); }   /* V208: 확인하면 창을 닫음 */
@@ -8604,7 +8609,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(btn.getAttribute('aria-label')!==l){ btn.setAttribute('aria-label',l); btn.title=l; } title(); };
   setInterval(badge,5000); badge();
   if(S.run){ startTick(); check(); wake(); marks(); BG.want=true; bgPlay().then(ok=>{ BG.ok=ok; if(!ok) bgArm(); else dkStart(); }); }
-  { const m=location.search.match(/[?&]ot=(ok|snz)(&|$)/); if(m){ try{ history.replaceState(null,'',location.pathname+location.hash); }catch(_){ } setTimeout(()=>{ if(m[1]==='ok') confirm1(); else snooze(false); },600); } }
+  { const m=location.search.match(/[?&]ot=(ok|snz|end)(&|$)/); if(m){ try{ history.replaceState(null,'',location.pathname+location.hash); }catch(_){ } setTimeout(()=>{ if(m[1]==='ok') confirm1(); else if(m[1]==='end') stop(); else snooze(false); },600); } }
   if(/[?&]ot=1(&|$)/.test(location.search)){ try{ history.replaceState(null,'',location.pathname+location.hash); }catch(_){ } setTimeout(open,700); }   /* 알림을 눌러 새 창으로 열렸을 때 */
   window.__otOpen=open;
 })();
