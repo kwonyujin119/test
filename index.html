@@ -5648,7 +5648,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(ext&&!new RegExp('\\.'+(ext==='jpg'?'jpe?g':ext)+'$','i').test(n)) n=n.replace(/\.[A-Za-z0-9]{1,5}$/,'')+'.'+ext;
     return new File([bl], n, {type}); }
   async function imgFile(src,name){ const r=await fetch(src,{cache:'force-cache'}); if(!r.ok) throw new Error('get'); return normFile(await r.blob(), name, 'image'); }
-  function dlFile(f){ const u=URL.createObjectURL(f), x=document.createElement('a'); x.href=u; x.download=f.name; document.body.appendChild(x); x.click(); setTimeout(()=>{ URL.revokeObjectURL(u); x.remove(); },4000); }
+  function dlFile(f){ window.__lastDlName=f.name; const u=URL.createObjectURL(f), x=document.createElement('a'); x.href=u; x.download=f.name; document.body.appendChild(x); x.click(); setTimeout(()=>{ URL.revokeObjectURL(u); x.remove(); },4000); }
   async function toPng(bl){ if(bl.type==='image/png') return bl; const bm=await createImageBitmap(bl); const c=document.createElement('canvas'); c.width=bm.width; c.height=bm.height; c.getContext('2d').drawImage(bm,0,0); if(bm.close) bm.close(); return await new Promise(r=>c.toBlob(r,'image/png')); }
   async function copyImage(src,name){ try{ if(!(navigator.clipboard&&window.ClipboardItem)) throw new Error('nosupport'); const f=await imgFile(src,name);
       await navigator.clipboard.write([new ClipboardItem({'image/png':toPng(f)})]); toast('이미지를 복사했습니다 — 붙여넣기(Ctrl+V)로 쓰세요'); }
@@ -8333,7 +8333,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const load=()=>{ try{ const v=JSON.parse(localStorage.getItem(KEY)||'null'); if(v&&typeof v==='object') return v; }catch(_){ } return null; };
   let S=Object.assign({iv:50, end:'', run:null, hist:[], sound:true}, load()||{});
   if(!Array.isArray(S.hist)) S.hist=[];
-  const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(_){ } };
+  /* V225: 안드로이드 앱(SACHIL47 APK) 안에서는 확인 알람을 휴대폰 알람에 맡김 — 다른 앱·잠금 화면 위 가운데 팝업, 알람음·진동. 누른 결과는 앱이 다시 열릴 때 받아 기록 */
+  const NAT=window.SachilNative&&window.SachilNative.isNative?window.SachilNative:null;
+  function natSync(){ if(!NAT) return; try{ if(S.run) NAT.schedule(String(Math.round(snzAt()||nextDue())), S.iv|0); else NAT.cancel(); }catch(_){ } }
+  const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(_){ } natSync(); };
   if(!['both','vib','snd'].includes(S.mode)){ S.mode='both'; delete S.sound; save(); }   /* V210: 기본 다시 설정 — 소리+진동 */
   const SND=()=>S.mode!=='vib', VIBON=()=>S.mode!=='snd';
   const CANVIB=typeof navigator.vibrate==='function';   /* 아이폰 사파리는 웹 진동 미지원 */
@@ -8457,12 +8460,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   async function sysNoteClose(){ try{ const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration(); if(!r||!r.getNotifications) return; (await r.getNotifications({tag:'sachil-ot'})).forEach(n=>n.close()); }catch(_){ } }
   /* V218: 3초 후 테스트 — 누른 순간 소리 재생을 준비하고 3초 뒤 실제 확인 알림처럼(꺼진 화면·다른 앱 중 포함) 울린다. 끝나면 진행 중이 아닐 때만 재생 정리 */
   let t3=0;
-  function testLater(){ clearTimeout(t3); askPerm(); BG.want=true; bgPlay().then(ok=>{ BG.ok=ok; }); pipOn(); if(dkOn()) dkStart();
+  function testLater(){ if(NAT&&!S.run){ try{ NAT.testAlarm(3); }catch(_){ } close(); toast('3초 뒤 앱 알람이 울려요 — 화면을 끄거나 다른 앱으로 가 보세요'); return; }
+    clearTimeout(t3); askPerm(); BG.want=true; bgPlay().then(ok=>{ BG.ok=ok; }); pipOn(); if(dkOn()) dkStart();
     toast('3초 뒤 울려요 — 지금 화면을 끄거나 다른 앱으로 가 보세요'); close();
     t3=setTimeout(()=>{ const txt='3초 후 테스트 — 화면이 꺼져 있거나 다른 앱을 써도 이렇게 울립니다'; alarm(txt,'later'); if(AL) AL.txt=txt; sysNote(txt); },3000); }
   function testEnd(){ sysNoteClose(); if(!S.run){ bgOff(); dkStop(); pipOff(); } }
+  /* 앱이 알람에서 받은 '계속·종료·5분 뒤'를 웹 기록에 반영 */
+  window.__otNativeSync=function(){ if(!NAT) return; let ev=[]; try{ ev=JSON.parse(NAT.takeEvents()||'[]'); }catch(_){ }
+    ev.forEach(e=>{ const at=+e.at||Date.now(); if(!S.run) return; if(e.t==='ok'){ S.run.last=at; S.run.checks.push(at); delete S.run.snz; } else if(e.t==='snz'){ S.run.snz=at+SNZ*60000; } else if(e.t==='end'){ stop(at); } });
+    if(ev.length){ save(); alerted=0; alarmStop(); badge(); marks(); if(!dlg.hidden) paint(); } else natSync(); };
   async function notify(txt){ alarm(txt,false); sysNote(txt); if(AL) AL.txt=txt; }
-  function check(){ if(!S.run) return; const due=nextDue(), now=Date.now(), k=snzAt()||due;
+  function check(){ if(!S.run) return; if(NAT){ paintLive(); badge(); return; }   /* 앱: 알람은 휴대폰이 울림 */ const due=nextDue(), now=Date.now(), k=snzAt()||due;
     if(now>=k&&alerted!==k){ alerted=k; const late=now-due; if(k===due) runNote(); notify(late>90000?`확인 시각 ${hm(due)}에서 ${dur(late)} 지났어요. 지금 확인하세요.`:`${hm(due)} 확인 시각이에요 · ${S.iv}분 간격`); }
     paintLive(); badge(); }
   function startTick(){ clearInterval(tick); if(S.run) tick=setInterval(check,1000); }
@@ -8487,9 +8495,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   try{ if(navigator.serviceWorker) navigator.serviceWorker.addEventListener('message',e=>{ const t=e.data&&e.data.type; if(t==='sachil-ot-open') open(); else if(t==='sachil-ot-ok'){ if(AL&&AL.test){ alarmStop(); testEnd(); } else confirm1(); }
       else if(t==='sachil-ot-end'){ if(AL&&AL.test){ alarmStop(); testEnd(); } else stop(); }   /* V221: 확인 완료 알림은 띄우지 않음(팝업 줄이기) */ else if(t==='sachil-ot-snz') snooze(false); }); }catch(_){ }
 
-  function start(){ const now=Date.now(); S.run={start:now, last:now, checks:[now]}; alerted=0; save(); bgOn(); pipOn(); dkStart(); startTick(); askPerm(); wake(); badge(); marks(); paint(); toast(`초과근무 시작 · 첫 확인 ${hm(nextDue())}`); }
+  function start(){ const now=Date.now(); S.run={start:now, last:now, checks:[now]}; alerted=0; save(); if(!NAT){ bgOn(); pipOn(); dkStart(); } startTick(); askPerm(); wake(); badge(); marks(); paint(); toast(`초과근무 시작 · 첫 확인 ${hm(nextDue())}`); }
   function confirm1(){ if(!S.run) return; const now=Date.now(); S.run.last=now; S.run.checks.push(now); delete S.run.snz; alerted=0; save(); paint(); alarmStop(); close(); badge(); marks(); bgMeta(); toast(`${hm(now)} 확인 · 다음 ${hm(nextDue())}`); }   /* V208: 확인하면 창을 닫음 */
-  function stop(){ if(!S.run) return; const now=Date.now(), l=now-S.run.start; S.hist.unshift({start:S.run.start, end:now, checks:S.run.checks.length, iv:S.iv}); S.hist=S.hist.slice(0,200); const was=S.run; S.run=null; save(); bgOff(); dkStop(); pipOff(); alarmStop(); clearInterval(tick); wake(); badge(); marks(); paint(); close();
+  function stop(endAt){ if(!S.run) return; const now=+endAt>S.run.start?+endAt:Date.now(), l=now-S.run.start; S.hist.unshift({start:S.run.start, end:now, checks:S.run.checks.length, iv:S.iv}); S.hist=S.hist.slice(0,200); const was=S.run; S.run=null; save(); bgOff(); dkStop(); pipOff(); alarmStop(); clearInterval(tick); wake(); badge(); marks(); paint(); close();
     toast(`초과근무 종료 · ${dur(l)} 기록`,()=>{ if(S.run) return; S.hist.shift(); S.run=was; save(); alerted=0; startTick(); badge(); marks(); if(!dlg.hidden) paint(); }); }   /* V221: 한 번 누르면 종료(6초 안 되돌리기) */
   async function askPerm(){ let asked=false; try{ if('Notification' in window&&Notification.permission==='default'){ asked=true; await Notification.requestPermission(); } }catch(_){ } if(asked&&S.run) runNote(); if(!dlg.hidden) paint(); }
   function ics(){ const from=S.run?nextDue():Date.now()+ivMs(); let to=from+4*3600000;
@@ -8538,8 +8546,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <div class="otring" id="otRing" role="img"><div class="otrin"><span class="otrl" id="otRl">다음 확인까지</span><b class="otleft" id="otLeft">--:--</b></div></div>
         <div class="otmain"><span class="otl" id="otNxL">다음 확인</span><b class="otnx" id="otNx">--:--</b><span class="otel2">경과 <b id="otEl" role="timer" aria-live="off">00:00:00</b></span><span class="otl">확인 ${S.run.checks.length-1}회</span></div>
         <button type="button" class="otbig" id="otOk"><span>확인했어요</span><small id="otOkN"></small></button>
-        ${pipOK()?(PIP.on?'<p class="otbg on">🪟 떠 있는 창 켜짐 <small>다른 앱 위에 남은 시간 · 확인 시각엔 깜빡임 · 창의 ❚❚ = 확인했어요</small></p>':'<button type="button" class="otbg off" id="otPip">🪟 다른 앱 위에 떠 있는 창 켜기</button>'):''}
-        ${SND()?(BG.ok?(DK.yp?'<p class="otbg on">🔒 화면이 꺼져도 알림이 울려요 <small>확인 시각에 지정 음원(YouTube) 재생 · 막히면 멜로디</small></p>':'<p class="otbg on">🔒 화면이 꺼져도 알림이 울려요 <small>확인 시각에 지정 음원(YouTube) 재생 · 막히면 멜로디</small></p>'):'<button type="button" class="otbg off" id="otBgOn">🔒 화면 꺼짐에도 울리기 켜기</button>'):'<p class="otbg">진동만: 화면이 꺼지면 진동이 울리지 않아요(웹 한계)</p>'}
+        ${NAT?(NAT.canOverlay()?'<p class="otbg on">📱 앱 알람 켜짐 <small>확인 시각에 다른 앱·잠금 화면 위로 가운데 팝업 + 알람음·진동</small></p>':'<button type="button" class="otbg off" id="otOv">📱 다른 앱 위에 팝업 허용하기<small style="display:block;font-size:12px;opacity:.8">허용하면 쓰는 중인 앱 위로 가운데 팝업</small></button>'):''}
+        ${NAT?'':pipOK()?(PIP.on?'<p class="otbg on">🪟 떠 있는 창 켜짐 <small>다른 앱 위에 남은 시간 · 확인 시각엔 깜빡임 · 창의 ❚❚ = 확인했어요</small></p>':'<button type="button" class="otbg off" id="otPip">🪟 다른 앱 위에 떠 있는 창 켜기</button>'):''}
+        ${NAT?'':SND()?(BG.ok?(DK.yp?'<p class="otbg on">🔒 화면이 꺼져도 알림이 울려요 <small>확인 시각에 지정 음원(YouTube) 재생 · 막히면 멜로디</small></p>':'<p class="otbg on">🔒 화면이 꺼져도 알림이 울려요 <small>확인 시각에 지정 음원(YouTube) 재생 · 막히면 멜로디</small></p>'):'<button type="button" class="otbg off" id="otBgOn">🔒 화면 꺼짐에도 울리기 켜기</button>'):'<p class="otbg">진동만: 화면이 꺼지면 진동이 울리지 않아요(웹 한계)</p>'}
         <div class="otrow"><button type="button" class="btn ghost" id="otTest">알림 테스트</button><button type="button" class="btn ghost" id="otTest3">3초 후 테스트</button><button type="button" class="btn ghost" id="otIcs">캘린더 알림</button><button type="button" class="btn ghost" id="otStop">종료</button></div>
         <details class="otfix"><summary>시작 시각 고치기${CANWAKE?' · 화면 켜 두기':''}</summary>
           <div class="otfixb"><label class="otfl" for="otFixIn">늦게 눌렀다면 실제 시작 시각</label><input id="otFixIn" type="time" value="${fixT}">
@@ -8574,11 +8583,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     { const b=$('otMdFix'); if(b) b.addEventListener('click',()=>{ S.mode='both'; save(); paint(); }); }
     { const b=$('otGo'); if(b) b.addEventListener('click',()=>{ const i=$('otIvIn'); if(i&&i.value!==''){ const v=Math.round(+i.value); if(v>=1&&v<=240) S.iv=v; } tune(); start(); }); }
     { const b=$('otOk'); if(b) b.addEventListener('click',()=>confirm1()); }
+    { const b=$('otOv'); if(b) b.addEventListener('click',()=>{ try{ NAT.requestOverlay(); }catch(_){ } }); }
     { const b=$('otPip'); if(b) b.addEventListener('click',()=>{ pipOn().then(ok=>{ if(!ok) toast('이 브라우저는 떠 있는 창을 지원하지 않거나 막았어요'); }); }); }
     { const b=$('otBgOn'); if(b) b.addEventListener('click',()=>bgOn()); }
     { const b=$('otTest3'); if(b) b.addEventListener('click',testLater); }
     { const b=$('otTest'); if(b) b.addEventListener('click',()=>{ askPerm(); alarm(`${S.iv}분마다 이렇게 울려요. 소리·진동이 안 나면 기기 무음·방해 금지를 확인하세요.`,true); }); }
-    { const b=$('otStop'); if(b) b.addEventListener('click',stop); }
+    { const b=$('otStop'); if(b) b.addEventListener('click',()=>stop()); }
     { const b=$('otIcs'); if(b) b.addEventListener('click',()=>{ const n=ics(); b.textContent=`${n}개 받음`; toast(`캘린더 알림 ${n}개 파일을 받았어요 — 열어서 캘린더에 추가하세요`); }); }
     { const b=$('otPerm'); if(b) b.addEventListener('click',askPerm); }
     { const i=$('otFixIn'); if(i) i.addEventListener('change',()=>{ if(!S.run||!i.value) return; const [h,m]=i.value.split(':').map(Number), d=new Date(); d.setHours(h,m,0,0); if(d.getTime()>Date.now()) d.setDate(d.getDate()-1); const t=d.getTime();
@@ -8608,7 +8618,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const l=!on?'초과근무 알리미':due?`초과근무 알리미 · 확인 시각 ${hm(nextDue())} 지남`:`초과근무 알리미 · 다음 확인 ${hm(nextDue())}(${m}분 남음)`;
     if(btn.getAttribute('aria-label')!==l){ btn.setAttribute('aria-label',l); btn.title=l; } title(); };
   setInterval(badge,5000); badge();
-  if(S.run){ startTick(); check(); wake(); marks(); BG.want=true; bgPlay().then(ok=>{ BG.ok=ok; if(!ok) bgArm(); else dkStart(); }); }
+  if(S.run&&NAT){ startTick(); marks(); window.__otNativeSync(); }
+  else if(S.run){ startTick(); check(); wake(); marks(); BG.want=true; bgPlay().then(ok=>{ BG.ok=ok; if(!ok) bgArm(); else dkStart(); }); }
   { const m=location.search.match(/[?&]ot=(ok|snz|end)(&|$)/); if(m){ try{ history.replaceState(null,'',location.pathname+location.hash); }catch(_){ } setTimeout(()=>{ if(m[1]==='ok') confirm1(); else if(m[1]==='end') stop(); else snooze(false); },600); } }
   if(/[?&]ot=1(&|$)/.test(location.search)){ try{ history.replaceState(null,'',location.pathname+location.hash); }catch(_){ } setTimeout(open,700); }   /* 알림을 눌러 새 창으로 열렸을 때 */
   window.__otOpen=open;
