@@ -1543,6 +1543,108 @@ html body .chat:not(.botchat) > .chat-foot:not(.on):not(:has(.warn)){display:non
   };
 })();
 </script>
+<style id="v226-deb">
+/* V226(deb): 디브리핑룸 — 입장 화면(동의·대화명·서버 대기, 47망 입장도 같은 틀) + 디브리핑룸 방 머리·공지·빈 방.
+   범위: #panel .db-entry(입장 화면) · #panel .db-head(방 머리) · body[data-room="deb"](방 안). 공용 대화 UI는 건드리지 않음 */
+/* ---- 입장 화면 공통 ---- */
+#panel .dbwrap.db-entry{gap:var(--sp-3)}
+#panel .dbwrap.db-entry > .pg-head{grid-column:1 / -1;margin:0;padding:0 2px}
+#panel .db-entry .card{border:1px solid var(--c-line);border-radius:var(--rad-m);box-shadow:none;background:var(--c-surface)}
+#panel .db-entry .consent h2,#panel .db-entry .dbx-h{margin:0;font-size:var(--fs-h2);font-weight:var(--fw-bold);line-height:1.35;color:var(--c-ink);letter-spacing:-.01em;word-break:keep-all;text-wrap:balance}
+#panel .db-entry .consent p{font-size:var(--fs-body);line-height:1.6;color:var(--c-ink)}
+#panel .db-entry .art{display:block;width:min(220px,60vw);max-width:100%;height:auto;margin:0 auto var(--sp-3)}
+@media (min-width:600px){ #panel .db-entry .art{width:260px} }
+/* 방 소개(공지 문구) 상자 */
+#panel .db-entry .room-info{margin:0;padding:var(--sp-3) 14px;border-radius:var(--rad-s);background:var(--c-ocean-soft);color:var(--c-ink)}
+#panel .db-entry .room-info .lead{font-size:var(--fs-h3);font-weight:var(--fw-bold);color:var(--c-ink)}
+#panel .db-entry .room-info ul{font-size:var(--fs-sub);color:var(--c-ink-2)}
+/* 버튼 — 주(노랑+네이비 글) · 보조(흰 바탕+테두리) */
+#panel .db-entry .acts .btn{min-height:var(--tap-min);border-radius:var(--rad-s);font-size:var(--fs-sm);font-weight:var(--fw-bold)}
+#panel .db-entry .acts .btn.primary{background:var(--c-ember);border:1px solid var(--c-ember);color:var(--c-ink)}
+#panel .db-entry .acts .btn.primary:hover{background:var(--c-ember-2);border-color:var(--c-ember-2);color:var(--c-ink)}
+#panel .db-entry .acts .btn.primary:disabled{opacity:.6}
+#panel .db-entry .acts .btn.ghost,#panel .db-entry .srv-wait .btn.ghost{background:var(--c-surface);border:1px solid var(--c-line-2);color:var(--c-ink)}
+#panel .db-entry .acts .btn.ghost:hover,#panel .db-entry .srv-wait .btn.ghost:hover{background:var(--c-ocean-soft)}
+#panel .db-entry .btn:focus-visible{outline:3px solid var(--c-ocean);outline-offset:2px}
+@media (hover:hover) and (pointer:fine){ #panel .db-entry .acts .btn,#panel .db-entry .dbx-nickrow .btn{min-height:40px} }
+@media (pointer:coarse){ #panel .db-entry .acts .btn,#panel .db-entry .dbx-nickrow .btn{min-height:var(--tap-min)} }
+/* ---- 동의 화면(디브리핑룸) — 익명 안내 · AAR 4단계 ---- */
+#panel .dbwrap.dbx.db-entry h3{font-size:var(--fs-h3);font-weight:var(--fw-bold);color:var(--c-ink)}
+#panel .dbwrap.dbx.db-entry h3 small{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:var(--rad-pill);background:var(--c-ember-soft);color:var(--c-ember-text);font-family:var(--sans);font-size:var(--fs-micro);font-weight:var(--fw-bold);letter-spacing:0}
+#panel .db-entry .dbx-anon{border-left-color:var(--c-ember);background:var(--c-ember-soft);border-radius:0 var(--rad-s) var(--rad-s) 0}
+#panel .db-entry .dbx-anon ul{font-size:var(--fs-body);color:var(--c-ink)}
+#panel .db-entry .dbx-anon li::before{border-color:var(--c-ink)}
+#panel .db-entry .dbx-ic,#panel .db-entry .dbx-ic::before{border-color:var(--c-ink)}
+#panel .db-entry .dbx-ic{background:var(--c-ink)}
+#panel .db-entry .dbx-aar li{border:1px solid var(--c-line);border-radius:var(--rad-s);background:var(--c-surface)}
+#panel .db-entry .dbx-aar li b{font-size:var(--fs-h3);font-weight:var(--fw-bold);color:var(--c-ink)}
+#panel .db-entry .dbx-aar li i{border-radius:var(--rad-xs);background:var(--c-ink);color:var(--c-ember)}
+#panel .db-entry .dbx-aar li span{font-size:var(--fs-sub);font-weight:var(--fw-mid);color:var(--c-sub)}
+#panel .db-entry .dbx-ex{border-radius:var(--rad-s);background:var(--c-surface-2);border:1px dashed var(--c-line-2);font-size:var(--fs-sm);color:var(--c-ink)}
+#panel .db-entry .dbx-ex b{font-size:var(--fs-cap);font-weight:var(--fw-semi);color:var(--c-mute)}
+#panel .db-entry .dbx-rule{font-size:var(--fs-body);font-weight:var(--fw-semi);line-height:1.6;color:var(--c-ink)}
+#panel .db-entry .dbx-hero h2{font-size:var(--fs-h2)}
+@media (min-width:1000px){
+  #panel .dbwrap.dbx.db-entry .dbx-hero h2{font-size:var(--fs-h2)}
+  #panel .dbwrap.dbx.db-entry .dbx-hero{border-right-color:var(--c-line)}
+}
+@media (max-width:599px){
+  #panel .dbwrap.dbx.db-entry .dbx-consent .acts{border-top-color:var(--c-line);border-radius:0 0 var(--rad-m) var(--rad-m)}
+}
+/* ---- 대화명 화면 ---- */
+#panel .db-entry .create label{font-size:var(--fs-cap);font-weight:var(--fw-semi);color:var(--c-ink-2)}
+#panel .db-entry .create input{border-color:var(--c-line-2);border-radius:var(--rad-s);color:var(--c-ink)}
+#panel .db-entry .create input:focus{border-color:var(--c-ocean);box-shadow:0 0 0 3px var(--c-ocean-soft)}
+#panel .db-entry .create .note{font-size:var(--fs-cap);color:var(--c-mute)}
+#panel .db-entry .create .note.err{font-size:var(--fs-sub);color:var(--c-danger)}
+#panel .db-entry .anon-tip{border:1px solid var(--c-ember);border-left-width:4px;border-radius:var(--rad-s);background:var(--c-ember-soft)}
+#panel .db-entry .anon-tip p{font-size:var(--fs-sm);color:var(--c-ink)}
+#panel .db-entry .dbx-nickrow .btn{border:1px solid var(--c-line-2);border-radius:var(--rad-s);background:var(--c-surface);color:var(--c-ink);font-size:var(--fs-sm);font-weight:var(--fw-semi)}
+#panel .db-entry .dbx-nickrow .btn:hover{background:var(--c-ocean-soft)}
+#panel .db-entry .adm summary{font-size:var(--fs-sm);color:var(--c-ocean)}
+#panel .db-entry .adm summary::before{color:var(--c-mute)}
+#panel .db-entry .dbx-guide .dbx-aar h3::before{width:4px;height:14px;background:var(--c-ember)}
+/* ---- 서버 대기 화면 ---- */
+#panel .db-waitwrap{max-width:560px}
+#panel .db-entry .srv-wait{padding:var(--sp-6) var(--sp-4) var(--sp-8);gap:var(--sp-2);border:1px solid var(--c-line);border-radius:var(--rad-m);background:var(--c-surface);color:var(--c-ink)}
+#panel .db-entry .srv-wait .art{margin-bottom:var(--sp-2)}
+#panel .db-entry .srv-wait b{display:inline-flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-h2);font-weight:var(--fw-bold);color:var(--c-ink)}
+#panel .db-entry .srv-wait .spin{width:20px;height:20px;border-width:3px;border-color:var(--c-ocean-soft);border-top-color:var(--c-ocean)}
+#panel .db-entry .srv-wait p{max-width:34em;font-size:var(--fs-sm);line-height:1.55;color:var(--c-sub);word-break:keep-all}
+#panel .db-entry .srv-wait .btn{min-height:var(--tap-min);margin-top:var(--sp-2);padding:0 var(--sp-5);border-radius:var(--rad-s);font-size:var(--fs-sm);font-weight:var(--fw-bold)}
+@media (prefers-reduced-motion:reduce){ #panel .db-entry .srv-wait .spin{animation-duration:3s} }
+/* ---- 방 머리(디브리핑룸): pgHead compact — 47망 머리와 같은 줄 높이 ---- */
+#panel .pg-head.db-head{margin:0 0 var(--sp-2);min-height:44px}
+#panel .db-head .pg-title{display:flex;align-items:center;min-width:0;white-space:nowrap;overflow:hidden}
+#panel .db-head .pg-title .pg-n,#panel .db-head .pg-title .pg-badge{flex:none}
+#panel .db-head .pg-title .pg-n{margin-left:4px}
+#panel .db-head .pg-badge{background:var(--c-ember);color:var(--c-ink);margin-left:6px;vertical-align:0}
+#panel .db-head .pg-meta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#panel .db-head .pg-meta b{color:var(--c-ink)}
+#panel .db-head .pg-act{gap:6px}
+#panel .db-head .pg-act .btn{display:inline-flex;align-items:center;justify-content:center;height:auto;min-height:40px;padding:0 12px;border:1px solid var(--c-line-2);border-radius:var(--rad-s);background:var(--c-surface);color:var(--c-ink);font-size:var(--fs-sm);font-weight:var(--fw-semi);white-space:nowrap}
+#panel .db-head .pg-act .btn:hover{background:var(--c-ocean-soft)}
+#panel .db-head .pg-act .btn.accent{border-color:var(--c-danger);color:var(--c-danger);background:var(--c-danger-soft)}
+#panel .db-head #dbRename .rnx{margin-left:.28em}
+#panel .db-head .rn-pin{flex:none;display:inline-grid;place-items:center;width:40px;height:40px;margin:0;padding:0;border:1px solid var(--c-line-2);border-radius:var(--rad-s);background:var(--c-surface);color:var(--c-ink);font-size:17px;line-height:1;cursor:pointer}
+#panel .db-head .rn-pin:hover{background:var(--c-ocean-soft)}
+#panel .db-head .rn-pin svg{width:20px;height:20px}
+#panel .db-head .rn-pin:focus-visible,#panel .db-head .pg-act .btn:focus-visible,#panel .db-head .pg-back:focus-visible{outline:3px solid var(--c-ocean);outline-offset:2px}
+@media (pointer:coarse){ #panel .db-head .pg-act .btn{min-height:var(--tap-min)} #panel .db-head .rn-pin{width:var(--tap-min);height:var(--tap-min)} }
+@media (max-width:420px){ #panel .db-head #dbRename .rnx{display:none} #panel .db-head .pg-act .btn{padding:0 10px} #panel .pg-head.db-head{gap:6px} }
+@media (max-width:374px){ #panel .db-head .pg-title .pg-n{display:none} }
+/* '한 번 더 누르면 바꿈'(확인 대기) 글이 길어 제목을 밀어내지 않게 두 줄 허용 */
+#panel .db-head .pg-act .btn.accent{white-space:normal;max-width:8.5em;line-height:1.2;font-size:var(--fs-cap)}
+/* 서버 없는 이 기기 방(버튼 3개): 제목 자리가 모자라면 버튼 줄을 아래로 */
+#panel .db-head:has(#roomDel){flex-wrap:wrap;row-gap:6px}
+#panel .db-head:has(#roomDel) .pg-txt{min-width:132px}
+/* ---- 방 안: 📌 공지(디브리핑룸 AAR 한 줄) · 빈 방 그림 ---- */
+body[data-room="deb"] .room-note[data-kind="deb"]{box-shadow:inset 4px 0 0 var(--c-ember)}
+body[data-room="deb"] .room-note .dbx-q{font-size:var(--fs-sub);font-weight:var(--fw-mid);color:var(--c-ink)}
+body[data-room="deb"] .room-note .dbx-q b{color:var(--c-ocean);font-weight:var(--fw-bold)}
+body[data-room="deb"] .convo-empty img{width:min(220px,60vw);max-width:100%;height:auto}
+@media (min-width:600px){ body[data-room="deb"] .convo-empty img{width:260px} }
+</style>
 </head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
@@ -6563,7 +6665,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 방 설명(V68): 입장 화면에는 전부, 대화방 위에는 접히는 한 줄로
   const ROOM_INFO={
     net:{lead:'지휘·작전망으로 전달하기 어려운 내용은 47망을 이용하세요.', more:['예) 사칠망으로 현장지휘소, 방면, 대기장소 확인 바람!','예) 사칠망으로 상수도 배관망 공유하였으니 탱크차는 확인 바람!']},
-    deb:{lead:'익명으로 개선사항 도출\n의견 청취로 지휘역량 강화', more:['현장에 참여했던 대원들은 익명으로 개선사항을 도출!','현장지휘관은 대원들의 의견을 청취하여 지휘역량을 강화!']}
+    deb:{lead:'익명으로 개선사항 도출\n의견 청취로 지휘역량 강화', more:['현장에 참여했던 대원은 익명으로 개선할 점을 남겨요.','현장지휘관은 대원 의견을 듣고 지휘역량을 키워요.']}
   };
   // V133: 📌 핀 문구는 교수가 SACHIL방재실에서 고친다(서버에 저장, 모든 기기 공통). 이 기기에 받아 둔 것을 먼저 쓴다
   const ROOM_DEF=JSON.parse(JSON.stringify(ROOM_INFO)), RINFO_KEY='sachil_roominfo', RINFO={ts:0, at:0, q:0, done:0};
@@ -6643,7 +6745,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <div class="card convo-card">
           <div class="convo" id="convo">
             ${list.length? list.map(msgMeHtml).join('')
-              : `${AS.dbEmpty?`<div class="convo-empty"><img src="${AS.dbEmpty}" alt=""></div>`:''}<p class="convo-note">아직 의견이 없습니다. ＋ 버튼으로 사진·PDF를 올릴 수 있습니다. 서버에 연결되지 않은 화면이라 다른 사람에게는 전달되지 않습니다.</p>`}
+              : `${AS.dbEmpty?`<div class="convo-empty"><img src="${AS.dbEmpty}" alt=""></div>`:''}<p class="convo-note">아직 의견이 없어요. ＋ 버튼으로 사진·PDF를 올릴 수 있어요. 서버에 연결되지 않은 화면이라 다른 사람에게는 전달되지 않아요.</p>`}
           </div>
         </div>
         ${composerHtml('의견 입력')}
@@ -6653,6 +6755,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     bindComposer((v,att)=>{ const had=document.activeElement&&document.activeElement.id==='chatText'; (roomMsgs[room.id]=roomMsgs[room.id]||[]).push({text:v,t:now(),att}); if(roomMsgs[room.id].length>100) roomMsgs[room.id].splice(0,roomMsgs[room.id].length-100); rsave(); renderUserRoom(panel,room); if(had||window.innerWidth>=600){ const i=$('#chatText'); if(i) i.focus(); } });   // 폰 키보드가 보낼 때마다 닫히지 않게
     $('#roomDel').addEventListener('click',()=>{ const b=$('#roomDel'); if(b.dataset.arm!=='1'){ b.dataset.arm='1'; b.textContent='정말 비우기'; b.classList.add('accent'); setTimeout(()=>{ if(b.isConnected){ b.dataset.arm=''; b.textContent='대화 비우기'; b.classList.remove('accent'); } },2500); return; } roomMsgs[room.id]=[]; rsave(); renderUserRoom(panel,room); });
     $('#dbRename').addEventListener('click',()=>{ setNick(''); toChat(); });
+    if(room.id==='rdb') dbMark(panel);   /* V226(deb): 이 기기 방도 보낼 때마다 다시 그리므로 디브리핑룸 머리를 다시 끼움 */
   }
 
   // 대화 목록을 화면 안의 스크롤 상자로 맞춘다(폰·PC 공통) → 문서 전체가 스크롤되지 않아 주소창·하단 탭이 움직이지 않음
@@ -7025,7 +7128,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // 아티팩트·파일로 열면 이 기기에만 저장한다. 체크리스트(CH)·사고보고서(IL)는 서버로 보내지 않는다.
   const DB_AGREE_KEY='sachil_db_agree_v1';
   const DB={agreed:(()=>{ try{ return localStorage.getItem(DB_AGREE_KEY)==='1'; }catch(_){ return false; } })(), enter:false, nick:''};   // enter: 동의·대화명 직후 1회만 방으로 자동 진입(뒤로가기 함정 방지)
-  const DB_RULE='욕설 및 비난 섞인 말을 하지 않으며, 건설적인 의견을 나누고 개선방안 도출에 도움을 주시겠습니까?';
+  const DB_RULE='욕설·비난 없이 건설적인 의견을 나누고, 개선방안을 찾는 데 함께해 주시겠어요?';
   const cleanNick=v=>String(v||'').replace(/[\x00-\x1f\x7f<>]/g,'').replace(/\s+/g,' ').trim().slice(0,12);
   // 47망·디브리핑룸은 대화명(서버 세션)을 따로 둔다(V88). RK: 지금 방 — ''=47망, ':deb'=디브리핑룸
   let RK='';
@@ -7152,7 +7255,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(c){ MES[rk]=c; }   /* 기억해 둔 대화명으로 바로 방을 연다(서버 확인 결과가 다르면 다시 그림) */
       else { panel.innerHTML='<p class="convo-note">불러오는 중…</p>'; chk.then(()=>{ if(MES[rk]===undefined) MES[rk]=null; if(rk===RK&&ROOMS_R.includes(state.route)) render(); }); return; } }
     if(!SRV.on && SRV.probing && (TOKS['']||TOKS[':deb'])){   // V122: 서버가 다시 켜지는 중 — 대화명은 그대로, 연결되면 바로 방으로
-      panel.innerHTML=`<div class="srv-wait"><span class="spin" aria-hidden="true"></span><b>${SRV.retry?'서버가 다시 켜지는 중입니다':'서버에 연결하는 중…'}</b><p>${kind==='deb'?'익명 대화명과 남긴 의견은 그대로 유지됩니다.':'대화명과 대화는 그대로 유지됩니다.'} 연결되면 바로 방으로 들어갑니다.</p><a class="btn ghost" href="#hub">첫 화면으로</a></div>`; return; }   // V138: 지하·터널에서 갇히지 않게
+      panel.innerHTML=`<div class="dbwrap db-entry db-waitwrap">${dbEntryHead(kind)}<div class="srv-wait" role="status">${AS.offline?`<img class="art" src="${AS.offline}" alt="">`:''}<b><span class="spin" aria-hidden="true"></span>${SRV.retry?'서버가 다시 켜지는 중이에요':'서버에 연결하는 중…'}</b><p>${kind==='deb'?'익명 대화명과 남긴 의견은 그대로 남아 있어요.':'대화명과 대화는 그대로 남아 있어요.'} 연결되면 바로 방으로 들어가요.</p><a class="btn ghost" href="#hub">첫 화면으로</a></div></div>`; return; }   // V138: 지하·터널에서 갇히지 않게
     if(SRV.on ? !SRV.me : !getNick()){ dbNick(panel,kind); return; }
     DB.enter=false;
     swipeTip();
@@ -7168,17 +7271,27 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function dbRoomTag(kind){ try{ document.body.dataset.room=kind==='deb'?'deb':'net'; }catch(_){ }
     if(window.__dbRoomHook) return; window.__dbRoomHook=1;
     window.addEventListener('hashchange',()=>setTimeout(()=>{ if(!ROOMS_R.includes(state.route)) delete document.body.dataset.room; },0)); }
-  function dbMark(panel){ const l=panel.querySelector('.roomhead .l'); if(!l||l.querySelector('.dbx-badge')) return;
-    l.insertAdjacentHTML('beforeend','<span class="dbx-badge" title="다른 참여자에게는 대화명만 보입니다">익명</span>'); }
+  /* V226(deb): 입장 화면 머리 — 47망·디브리핑룸 같은 틀(SPEC 2장) */
+  const dbEntryHead=kind=>kind==='deb'?pgHead({g:'DB', t:PG_NAME.DB.t, s:PG_NAME.DB.s, cls:'db-ehead'}):pgHead({g:'47', t:PG_NAME['47'].t, s:PG_NAME['47'].s, cls:'db-ehead'});
+  /* V226(deb): 디브리핑룸 방 머리 = pgHead(compact) — 공용 머리줄(.roomhead)을 그린 뒤 바꿔 끼운다. 버튼(공지·대화명·비우기)과 #onlineN은 노드째 옮겨 이벤트 유지 */
+  function dbMark(panel){ const h=panel.firstElementChild; if(!h||h.classList.contains('db-head')||!h.matches('.roomhead,.pg-head')) return;
+    addRoomNote(panel,'deb');   /* 공지 버튼을 먼저 붙인 뒤 옮김(여러 번 불려도 하나만) */
+    const box=document.createElement('div'); box.innerHTML=pgHead({g:'DB', t:PG_NAME.DB.t, badge:'익명', s:PG_NAME.DB.s, s1:true, back:'#hub', cls:'is-compact db-head', act:' '});
+    const nh=box.firstElementChild, ti=nh.querySelector('.pg-title'), bd=ti.querySelector('.pg-badge'), act=nh.querySelector('.pg-act'); act.textContent='';
+    bd.title='다른 참여자에게는 대화명만 보여요';
+    const on=h.querySelector('#onlineN'); if(on){ on.classList.add('pg-n'); ti.insertBefore(on,bd); }
+    const sub=h.querySelector('.sub'); if(sub&&sub.textContent.trim()){ const m=document.createElement('p'); m.className='pg-meta'; m.innerHTML=sub.innerHTML; nh.querySelector('.pg-txt').appendChild(m); }
+    h.querySelectorAll('.rn-pin,button').forEach(b=>{ if(!b.closest('.pg-back,.back')&&!act.contains(b)) act.appendChild(b); });
+    h.replaceWith(nh); if(window.__fitConvo) window.__fitConvo(); }
 
   function dbConsent(panel,kind){
     if(kind==='deb') panel.innerHTML=`
-      <div class="dbwrap dbx">
+      <div class="dbwrap dbx db-entry">
+        ${dbEntryHead(kind)}
         <section class="card consent dbx-consent" aria-labelledby="dbQ">
           <div class="dbx-hero">
             ${AS.dbConsent?`<img class="art" src="${AS.dbConsent}" alt="">`:''}
-            <span class="eyebrow">디브리핑룸 · 익명 강평</span>
-            <h2 id="dbQ"><span class="nw">디브리핑룸에</span> 입장하시겠습니까?</h2>
+            <h2 id="dbQ"><span class="nw">디브리핑룸에</span> 입장할까요?</h2>
             ${roomInfoHtml(kind)}
           </div>
           <div class="dbx-side">
@@ -7190,31 +7303,31 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         </section>
       </div>`;
     else panel.innerHTML=`
-      <div class="dbwrap">
+      <div class="dbwrap db-entry">
+        ${dbEntryHead(kind)}
         <section class="card consent" aria-labelledby="dbQ">
           ${AS.dbConsent?`<img class="art" src="${AS.dbConsent}" alt="">`:''}
-          <span class="eyebrow">${ROOM_NAME[kind]||'47망'}</span>
-          <h2 id="dbQ"><span class="nw">${ROOM_NAME[kind]||'47망'}에</span> 입장하시겠습니까?</h2>
+          <h2 id="dbQ"><span class="nw">${ROOM_NAME[kind]||'47망'}에</span> 입장할까요?</h2>
           ${roomInfoHtml(kind)}
           <p>${DB_RULE}</p>
           <div class="acts"><button type="button" class="btn ghost" id="dbHome">첫 화면으로</button><button type="button" class="btn primary" id="dbAgree">동의하고 입장</button></div>
         </section>
       </div>`;
-    $('#dbAgree').addEventListener('click',()=>{ DB.agreed=true; try{ localStorage.setItem(DB_AGREE_KEY,'1'); }catch(_){ } render(); });
+    $('#dbAgree').addEventListener('click',()=>{ DB.agreed=true; try{ localStorage.setItem(DB_AGREE_KEY,'1'); }catch(_){ } render(); rootScrollTo(0); });   /* V226: 다음 화면(대화명)을 머리부터 보이게 */
     $('#dbHome').addEventListener('click',goHome);
     if(window.innerWidth>=600) $('#dbAgree').focus();
   }
 
   function dbNick(panel,kind){
     panel.innerHTML=`
-      <div class="dbwrap${kind==='deb'?' dbx dbx-nickwrap':''}">
+      <div class="dbwrap db-entry${kind==='deb'?' dbx dbx-nickwrap':''}">
+        ${dbEntryHead(kind)}
         <form class="card create" id="nickForm" autocomplete="off">
-          <span class="eyebrow">${kind==='deb'?'디브리핑룸 · 익명 강평':(ROOM_NAME[kind]||'47망')}</span>
-          ${kind==='deb'?'<h2 class="dbx-h">익명 대화명을 정해 주세요</h2>':''}
-          <div class="anon-tip">${AS.icAnon?`<img src="${AS.icAnon}" alt="">`:''}<p><b>실명·소속·계급은 쓰지 마세요.</b> 다른 참여자에게는 대화명만 보입니다.${kind==='deb'?' <b>사람이 아니라</b> 상황·절차·장비를 이야기해요.':''}</p></div>
+          <h2 class="dbx-h">${kind==='deb'?'익명 대화명을 정해 주세요':'대화명을 정해 주세요'}</h2>
+          <div class="anon-tip">${AS.icAnon?`<img src="${AS.icAnon}" alt="">`:''}<p><b>실명·소속·계급은 쓰지 마세요.</b> 다른 참여자에게는 대화명만 보여요.${kind==='deb'?' <b>사람이 아니라</b> 상황·절차·장비를 이야기해요.':''}</p></div>
           <div class="row"><label for="nick">대화명 (익명)</label>${kind==='deb'?'<div class="dbx-nickrow"><input id="nick" maxlength="12" placeholder="예: 47번대원" required enterkeyhint="go"><button type="button" class="btn ghost" id="dbRandNick">무작위로</button></div>':'<input id="nick" maxlength="12" placeholder="예: 47번대원" required enterkeyhint="go">'}</div>
           ${SRV.on&&SRV.requireCode?`<div class="row"><label for="dbCode">입장 코드</label><input id="dbCode" maxlength="40" inputmode="numeric" placeholder="교육 담당자에게 받은 코드" required></div>`:''}
-          <p class="note">${SRV.on?'':SRV.probing?' <b>서버 연결을 확인하는 중</b>입니다. 연결되면 공유 디브리핑룸으로 바뀝니다.':' 이 화면은 서버에 연결되지 않아 대화가 <b>이 기기에만</b> 저장됩니다.'}</p>
+          ${SRV.on?'':`<p class="note">${SRV.probing?`<b>서버 연결을 확인하는 중</b>이에요. 연결되면 공유 ${ROOM_NAME[kind]||'47망'}으로 바뀌어요.`:'이 화면은 서버에 연결되지 않아 대화가 <b>이 기기에만</b> 저장돼요.'}</p>`}
           ${SRV.notice?`<p class="note" id="srvNote" role="status"><b>${esc(SRV.notice)}</b></p>`:''}
           ${SRV.on?`<details class="adm"><summary>관리자 입장</summary><div class="row"><label for="admCode">관리자 코드</label><input id="admCode" maxlength="40"></div></details>`:''}
           <p class="note err" id="nickErr" role="alert" hidden></p>
@@ -7229,8 +7342,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     $('#nickForm').addEventListener('submit',async e=>{
       e.preventDefault(); const er=$('#nickErr');
       const nick=cleanNick(ni.value);
-      if(!nick){ er.hidden=false; er.textContent='대화명을 입력하세요'; return; }
-      if(!setNick(nick)){ er.hidden=false; er.textContent='이 기기에 저장 공간이 부족해 대화명이 이번 세션에만 유지됩니다'; }
+      if(!nick){ er.hidden=false; er.textContent='대화명을 입력해 주세요'; return; }
+      if(!setNick(nick)){ er.hidden=false; er.textContent='이 기기에 저장 공간이 부족해 대화명이 이번 세션에만 유지돼요'; }
       DB.enter=true;
       if(!SRV.on){ render(); return; }
       const adm=$('#admCode')?$('#admCode').value.trim():'';
@@ -7238,7 +7351,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const b=$('#nickGo'); b.disabled=true;
       const r=await api('/api/login',{json:{name:nick,code,dev:devId(),room:kind==='deb'?'deb':'net'}}); b.disabled=false;
       if(r.ok&&r.j.user){ if(r.j.token) setTok(r.j.token); SRV.me=r.j.user; if(r.j.user.name) setNick(cleanNick(r.j.user.name)); render(); }
-      else { DB.enter=false; er.hidden=false; er.textContent=r.j.error||'입장하지 못했습니다'; }
+      else { DB.enter=false; er.hidden=false; er.textContent=r.j.error||'입장하지 못했어요'; }
     });
   }
 
@@ -7917,7 +8030,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const onVis=()=>{ if(SRV.gen!==gen){ document.removeEventListener('visibilitychange',onVis); removeEventListener('pageshow',onShow); return; } if(document.visibilityState==='visible'){ if(SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } } markRead(); } };   // 다시 보이면 기다리던 연결을 새로
     const onShow=e=>{ if(e.persisted&&SRV.gen===gen&&SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } } };
     document.addEventListener('visibilitychange',onVis); addEventListener('pageshow',onShow);
-    const EMPTY='아직 의견이 없습니다. 첫 의견을 남겨 주세요. 다른 참여자에게는 대화명만 보입니다. ＋ 버튼으로 사진·PDF를 올릴 수 있습니다.';
+    const EMPTY='아직 의견이 없어요. 첫 의견을 남겨 주세요. 다른 참여자에게는 대화명만 보여요. ＋ 버튼으로 사진·PDF를 올릴 수 있어요.';
     const append=(list,opt)=>{
       opt=opt||{};
       const c=$('#convo'); if(!c||SRV.gen!==gen) return 0;
