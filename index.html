@@ -3567,7 +3567,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v226</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v227</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4586,8 +4586,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V226', SRV_VER='15.3';
+  const APP_VER='V227', SRV_VER='15.4';
   const UPDATES=[
+    {v:'V227', d:'2026-10-22', t:['AI 답·보고서 만들기 속도 개선: 최신 AI 모델이 답하기 전에 오래 \'생각\'하던 설정을 고쳐 바로 쓰게 함(서버 15.4로 업데이트해야 적용)']},
     {v:'V226', d:'2026-10-22', t:['모든 화면 머리를 한 모양으로 통일: 기호 + 제목 + 한 줄 요약(대화방·창은 작은 머리)','그림·아이콘 색을 시그니처 색(남색·노랑)으로 통일 — 예전 검정 그림과 어긋나던 색 정리, 앱 아이콘 파랑도 시그니처 색으로','화면 속 이모지 아이콘을 선 아이콘으로 바꾸고, 글자 크기·둥글기·버튼 모양을 한 규칙으로 정리(주 버튼은 노랑 하나)','안내 문구를 해요체로, 이름 통일(사고보고서 → 상황 보고서)','폰·태블릿·PC 6가지 화면에서 겹침·잘림 점검']},
     {v:'V225', d:'2026-10-22', t:['안드로이드 앱(APK) 추가: SACHIL:47 웹앱을 그대로 담고, 초과근무 확인 시각에 휴대폰 알람처럼 — 잠금 화면·다른 앱 위로 가운데 팝업 [초과근무 계속]·[초과근무 종료]·[5분 뒤] + 알람음·강한 진동(누를 때까지 반복)','앱에서 ‘다른 앱 위에 팝업 허용하기’를 한 번 켜 두면 쓰는 중인 앱 위로 바로 뜸 · 앱을 닫아 두어도 울림','팝업에서 누른 결과는 앱을 다시 열 때 기록에 반영 · 웹(브라우저)은 지금과 같음']},
     {v:'V224', d:'2026-10-22', t:['초과근무 알리미: 확인 시각에 뜨는 창에 [초과근무 계속] · [초과근무 종료] — 한 번 누르면 바로 처리(계속 = 확인하고 다음 확인까지, 종료 = 지금까지 기록하고 끝냄)','휴대폰 알림 팝업에도 같은 두 버튼(앱을 열지 않고 처리) · 떠 있는 창의 ❚❚ = 초과근무 계속']},
