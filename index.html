@@ -2385,7 +2385,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v222</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v223</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -3404,8 +3404,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#EAF2FF" stroke="#244EA2" stroke-width="3"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#244EA2" stroke-width="3"/><path d="M23 54v-8h6v8" fill="#D92D20"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V222', SRV_VER='14.9';
+  const APP_VER='V223', SRV_VER='15.0';
   const UPDATES=[
+    {v:'V223', d:'2026-10-22', t:['47망·디브리핑룸: PC에서 보낸 사진을 휴대폰에서 저장·공유할 수 있게 — 메뉴를 여는 순간 사진을 미리 받아 두어, 누를 때 바로 저장·공유(큰 원본도 끊기지 않게)','아직 받는 중이면 ‘준비 중…’ 뒤 한 번 더 누르기','파일 이름 끝(.jpg·.png)을 실제 형식에 맞추고, 휴대폰이 못 받는 형식(HEIC·BMP 등)은 JPEG로 바꿈 · 공유가 안 되는 기기는 저장으로 대신']},
     {v:'V222', d:'2026-10-22', t:['메뉴 자료: 교수(관리자)로 로그인하면 각 자료 아래 ‘⬇ 내려받기’ — 올린 원래 파일(PDF·사진 등)을 원래 이름으로 저장','일반 사용자 화면은 그대로(보기만)']},
     {v:'V221', d:'2026-10-21', t:['초과근무 알리미: ‘종료’ 한 번 누르면 바로 종료(6초 안 되돌리기)','팝업 줄이기 — 확인 후 ‘확인했어요’ 알림 없앰, 꺼진 화면 다시 알림은 1분마다','확인 시각에 멜로디 대신 지정 음원(YouTube 소스 코드)을 재생 — 시작할 때 소리 없이 멈춘 채 준비해 두었다가 재생, 막힐 때만 멜로디']},
     {v:'V220', d:'2026-10-21', t:['초과근무 알리미: 다른 앱 위에 떠 있는 작은 창 — 시작하면 남은 시간·다음 확인이 떠 있고, 확인 시각이면 노랑·빨강으로 깜빡이며 ‘⏰ 초과근무 확인’ · 창의 ❚❚를 누르면 확인했어요','경보 화면 왼쪽 위에 영상이 비쳐 보이던 문제 수정(소리만 나게)']},
@@ -5618,8 +5619,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   let FWD=null;   // 47망·디브리핑룸으로 넘길 글·사진(그 방 입력창에 넣어 두고, 확인 뒤 보내기)
   function fwdApply(kind){ if(!FWD||FWD.kind!==kind) return; const f=FWD; FWD=null; const t=$('#chatText'); if(t){ t.value=f.text||''; t.dispatchEvent(new Event('input')); t.focus(); }
     if(f.files&&f.files.length&&addPendingFiles) addPendingFiles(f.files); toast(`${ROOM_NAME[kind]||'대화방'} 입력창에 넣었습니다 — 확인하고 보내기를 누르세요`); }
-  async function shareMenu(text, getFiles, at){
+  async function shareMenu(text, getFiles, at, ready){
     actSheet('<b>공유</b> — 어디로 보낼까요?', [['net','47망으로'],['deb','디브리핑룸으로'],['kakao','카카오톡으로'],['os','다른 앱(공유 시트)']], at, async(k,btn,close)=>{
+      if((k==='os'||k==='kakao')&&ready&&!ready()){ const t=btn.textContent; btn.textContent='파일 준비 중…'; try{ await getFiles(); }catch(_){ } btn.textContent=t+' (한 번 더)'; return; }   /* V223 */
       if(k==='net'||k==='deb'){ if(!SRV.on){ toast('서버에 연결됐을 때 보낼 수 있습니다'); return; } btn.textContent='준비 중…'; const files=getFiles?await getFiles():[]; close();
         FWD={kind:k, text:String(text||''), files}; const r=k==='deb'?'debrief':'chat'; if(state.route===r) fwdApply(k); else go(r); return; }
       const files=getFiles?await getFiles():[]; close();
@@ -5628,12 +5630,22 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         if(files.length&&navigator.canShare&&navigator.canShare({files})) await navigator.share({files, text:text||undefined});
         else if(navigator.share&&text) await navigator.share({text});
         else if(text){ await copyPlain(text); toast(k==='kakao'?'복사했습니다 — 카카오톡 대화창에 붙여넣으세요':'이 브라우저는 공유를 지원하지 않아 복사했습니다'); }
+        else if(files.length){ dlFile(files[0]); toast('이 기기는 사진 공유를 지원하지 않아 저장했습니다 — 갤러리·내 파일에서 보내세요'); }
         else toast('이 브라우저는 파일 공유를 지원하지 않습니다. 저장을 이용하세요');
-      }catch(err){ if(!(err&&err.name==='AbortError')) toast('공유하지 못했습니다'); } }); }
+      }catch(err){ if(!(err&&err.name==='AbortError')){ if(files&&files.length&&err&&err.name==='NotAllowedError') toast('공유가 막혔습니다 — 한 번 더 눌러 주세요'); else toast('공유하지 못했습니다'); } } }); }
   function textActs(text, at){ if(!text) return; actSheet(`${esc(trunc(String(text).replace(/\s+/g,' '),36))}`, [['copy','복사'],['sel','선택 복사'],['share','공유']], at, (k,btn,close)=>{ close();
     if(k==='copy') copyPlain(text); else if(k==='sel') selCopy(text); else if(k==='share') shareMenu(text,null,at); }); }
   // V195: 사진 메뉴(오른쪽 클릭) — 이미지 복사 · 저장 · 공유
-  async function imgFile(src,name){ const r=await fetch(src); if(!r.ok) throw new Error('get'); const bl=await r.blob(); return new File([bl], name||'사진.jpg', {type:bl.type||'image/jpeg'}); }
+  /* V223: 휴대폰 저장·공유 — 파일 이름 끝(확장자)을 실제 형식에 맞춤(공유는 확장자로 거름), 휴대폰이 못 받는 형식(HEIC·BMP·TIFF 등)은 JPEG로 바꿈 */
+  const IMG_EXT={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif'};
+  async function normFile(bl,name,kind){ let type=bl.type||(kind==='image'?'image/jpeg':'application/octet-stream');
+    if(/^image\//.test(type)&&!IMG_EXT[type]){ try{ const bm=await createImageBitmap(bl); const c=document.createElement('canvas'); c.width=bm.width; c.height=bm.height; c.getContext('2d').drawImage(bm,0,0); if(bm.close) bm.close(); bl=await new Promise(r=>c.toBlob(r,'image/jpeg',0.92)); type='image/jpeg'; }catch(_){ } }
+    let n=String(name||'').replace(/[\\/:*?"<>|]+/g,'_').trim(); const ext=IMG_EXT[type]||(type==='application/pdf'?'pdf':'');
+    if(!n) n=(kind==='image'||IMG_EXT[type]?'사진_':'파일_')+new Date().toISOString().slice(0,10);
+    if(ext&&!new RegExp('\\.'+(ext==='jpg'?'jpe?g':ext)+'$','i').test(n)) n=n.replace(/\.[A-Za-z0-9]{1,5}$/,'')+'.'+ext;
+    return new File([bl], n, {type}); }
+  async function imgFile(src,name){ const r=await fetch(src,{cache:'force-cache'}); if(!r.ok) throw new Error('get'); return normFile(await r.blob(), name, 'image'); }
+  function dlFile(f){ const u=URL.createObjectURL(f), x=document.createElement('a'); x.href=u; x.download=f.name; document.body.appendChild(x); x.click(); setTimeout(()=>{ URL.revokeObjectURL(u); x.remove(); },4000); }
   async function toPng(bl){ if(bl.type==='image/png') return bl; const bm=await createImageBitmap(bl); const c=document.createElement('canvas'); c.width=bm.width; c.height=bm.height; c.getContext('2d').drawImage(bm,0,0); if(bm.close) bm.close(); return await new Promise(r=>c.toBlob(r,'image/png')); }
   async function copyImage(src,name){ try{ if(!(navigator.clipboard&&window.ClipboardItem)) throw new Error('nosupport'); const f=await imgFile(src,name);
       await navigator.clipboard.write([new ClipboardItem({'image/png':toPng(f)})]); toast('이미지를 복사했습니다 — 붙여넣기(Ctrl+V)로 쓰세요'); }
@@ -8024,10 +8036,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(b){ const list=[...convo.querySelectorAll('[data-gsrc]')].map(x=>({src:x.dataset.gsrc, name:x.dataset.name||'', ts:+x.dataset.ts||0}));
         openLightbox(b.dataset.sview,b.dataset.name,list,true); }
     },true);
-    async function fileBlobs(m){ const out=[]; for(const f of (m.files||[])){ try{ const bl=await (await fetch(FURL(f.id))).blob(); out.push(new File([bl], f.name, {type:bl.type||(f.kind==='image'?'image/jpeg':'application/pdf')})); }catch(_){ } } return out; }
+    async function fileBlobs(m){ const out=[]; for(const f of (m.files||[])){ try{ const r=await fetch(FURL(f.id),{cache:'force-cache'}); if(!r.ok) continue; out.push(await normFile(await r.blob(), f.name, f.kind)); }catch(_){ } } return out; }
     function openActs(m,at,img){   // V197: 글·사진·파일 모두 같은 메뉴 — 답장 · 복사 · 선택 복사 · 공유 · (저장) · 삭제/삭제(관리자). 할 수 없는 것은 흐리게(이유와 함께)
       const old=$('#actSheet'); if(old) old.remove();
       let pre=null; const preP=(m.files||[]).length?fileBlobs(m).then(f=>{ pre=f; return f; }):Promise.resolve(pre=[]);
+      let imF=null; const imP=img?imgFile(img.src,img.name).then(f=>(imF=f)).catch(()=>(imF=false)):null;   /* V223: PC에서 보낸 큰 원본 사진도 받는 동안 누른 동작이 끊기지 않게 미리 받음 */
       const deleted=m.text==='(삭제된 메시지)'&&!(m.files||[]).length;
       const hasText=!!(m.text&&!deleted), im0=(m.files||[]).find(f=>f.kind==='image'), pic=img||(!hasText&&im0?{src:FURL(im0.id),name:im0.name||'사진.jpg'}:null);
       const acts=deleted?[['reply','답장']]:[['reply','답장'],
@@ -8045,9 +8058,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         if(e.target===sh){ close(); return; }
         const a=e.target.closest('[data-a]'); if(!a) return; const k=a.dataset.a;
         if(a.dataset.why){ toast(a.dataset.why); return; }
-        if(k==='save' && img){ close(); saveImage(img.src,img.name); return; }
+        if(k==='save' && img){ if(imF===null){ a.textContent='사진 준비 중…'; await imP; a.textContent='사진 저장 (한 번 더)'; return; } close(); if(imF){ dlFile(imF); toast('저장했습니다 — 다운로드(내 파일)에서 확인'); } else saveImage(img.src,img.name); return; }
         if(k==='copy' && pic){ close(); copyImage(pic.src,pic.name); return; }
-        if(k==='share' && img){ close(); let fp=null; shareMenu(hasText?m.text:'', ()=>fp||(fp=imgFile(img.src,img.name).then(f=>[f]).catch(()=>[])), at); return; }
+        if(k==='share' && img){ close(); shareMenu(hasText?m.text:'', ()=>imF?[imF]:(imP?imP.then(f=>f?[f]:[]):[]), at, ()=>imF!==null); return; }
         if(k==='save' && pre===null){ a.textContent='파일 준비 중…'; await preP; a.textContent='저장'; return; }   // 준비되면 한 번 더 누르게(누르는 순간 바로 공유해야 아이폰이 허용)
         close();
         if(k==='reply') setReply(m);
