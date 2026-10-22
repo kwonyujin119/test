@@ -1665,6 +1665,131 @@ html body .chat:not(.botchat) > .chat-foot:not(.on):not(:has(.warn)){display:non
 :root #panel .srch-grid .card.empty b{color:var(--c-ink);font-size:var(--fs-h3)}
 @media (max-width:599px){ :root #panel .srch-head.is-long .pg-title{font-size:var(--fs-h3)} }
 </style>
+<style id="v226-il">
+/* V226(il): IL 화재등 상황 보고서 — 공통 머리(pgHead)·토큰·칩 규칙(SPEC 5장). #panel .il-* · .il2 · .ilbar · #report · .rtov 안에서만 */
+/* 화면 머리 */
+#panel #ilHead{margin-bottom:var(--sp-4)}
+#panel #ilHead #ilReset{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border:1px solid var(--c-line-2);border-radius:var(--rad-s);background:var(--c-surface);color:var(--c-ink);font-size:var(--fs-sm);font-weight:600}
+#panel #ilHead #ilReset::before{content:"";flex:none;width:18px;height:18px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M10 7V4.5h4V7M6.5 7l1 13h9l1-13'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M10 7V4.5h4V7M6.5 7l1 13h9l1-13'/%3E%3C/svg%3E") center/contain no-repeat}
+#panel #ilHead #ilReset.accent{background:var(--c-danger);border-color:var(--c-danger);color:#fff}
+@media (max-width:399px){ #panel #ilHead #ilReset{padding:0 10px} }
+@media (hover:hover) and (pointer:fine){ #panel #ilHead #ilReset{min-height:40px} #panel #ilHead #ilReset:not(.accent):hover{border-color:var(--c-ink);background:var(--c-surface-2)} }
+/* 고정 막대: 바로가기 칩 + 주 버튼(노랑) */
+#panel .ilbar{border:1px solid var(--c-line);border-radius:var(--rad-m);box-shadow:var(--sh-1)}
+#panel .ilbar .jump button{min-height:44px;padding:0 14px;border:1px solid var(--c-line-2);border-radius:var(--rad-pill);background:var(--c-surface);color:var(--c-ink);font-size:var(--fs-sm);font-weight:600}
+#panel .ilbar .jump button.on{background:var(--c-ocean-soft);border-color:var(--c-ocean);box-shadow:inset 0 0 0 1px var(--c-ocean);color:var(--c-ocean-2)}
+#panel .ilbar .jump .reps{border-style:dashed;color:var(--c-ocean-2)}
+#panel .ilbar .jump .reps .c{min-width:22px;height:22px;padding:0 6px;border-radius:var(--rad-pill);background:var(--c-ink);color:#fff;font-size:var(--fs-micro);font-weight:700}
+#panel .ilbar .jump .reps.on .c{background:var(--c-ocean);color:#fff}
+#panel .ilbar #mkReport{min-height:48px;padding:0 18px;border:1px solid var(--c-ember);border-radius:var(--rad-s);background:var(--c-ember);color:var(--c-ink);font-size:var(--fs-body);font-weight:700}
+#panel .ilbar #mkReport:hover{background:var(--c-ember-2);border-color:var(--c-ember-2);color:var(--c-ink)}
+@media (max-width:599px){ #panel .ilbar #mkReport{min-height:46px;padding:0 12px;font-size:var(--fs-sm)} }
+@media (hover:hover) and (pointer:fine){ #panel .ilbar .jump button{min-height:36px} #panel .ilbar #mkReport{min-height:40px} #panel .ilbar .jump button:not(.on):hover{border-color:var(--c-ink)} }
+@media (min-width:1100px){ #panel .ilbar .jump button{padding:0 12px;font-size:var(--fs-sub)} }
+/* 묶음 카드: 평면 카드(테두리만) · 번호 칸 네이비+옐로 · 제목 17/700 */
+#panel .il2 .ilsec{border:1px solid var(--c-line);border-radius:var(--rad-m);box-shadow:none}
+#panel .il2 .ilsec>header{background:var(--c-surface-2);border-bottom:1px solid var(--c-line);border-radius:var(--rad-m) var(--rad-m) 0 0}
+#panel .il2 .ilsec>header h3{font-size:var(--fs-h2);font-weight:700;color:var(--c-ink);letter-spacing:-.01em}
+#panel .il2 .ilsec>header h3::before{min-width:28px;height:28px;border-radius:var(--rad-xs);background:var(--c-ink);color:var(--c-ember);font-family:var(--mono);font-size:var(--fs-sm);font-weight:700}
+#panel .il2 .st{height:24px;padding:0 10px;display:inline-flex;align-items:center;border:1px solid var(--c-line);border-radius:var(--rad-pill);background:var(--c-surface);color:var(--c-mute);font-size:var(--fs-cap);font-weight:600}
+#panel .il2 .st.has{background:var(--c-ok-soft);border-color:#ABEFC6;color:var(--c-ok)}
+#panel .il2 .ilsub>h4{font-size:var(--fs-h3);font-weight:700;color:var(--c-ink)}
+#panel .il2 .ill{font-size:var(--fs-sub);font-weight:700;color:var(--c-ink-2)}
+/* 대응단계: 고르면 위험 색(의미 있음) */
+#panel .il2 .lvl button{border:1px solid var(--c-line-2);border-radius:var(--rad-s);background:var(--c-surface);color:var(--c-ink);font-size:var(--fs-sm);font-weight:700}
+#panel .il2 .lvl button[aria-pressed="true"]{background:var(--c-danger);border-color:var(--c-danger);color:#fff}
+/* 칩: 알약 · 선택 = 오션 연한 바탕 + 오션 테두리 + ✓ */
+#panel .il2 .ichips button{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 16px;border:1px solid var(--c-line-2);border-radius:var(--rad-pill);background:var(--c-surface);color:var(--c-ink);font-size:var(--fs-sm);font-weight:600}
+#panel .il2 .ichips button[aria-pressed="true"]{background:var(--c-ocean-soft);border-color:var(--c-ocean);box-shadow:inset 0 0 0 1px var(--c-ocean);color:var(--c-ocean-2);font-weight:700}
+#panel .il2 .ichips button[aria-pressed="true"]::before{content:"✓";margin:0;font-weight:700;color:var(--c-ocean)}
+#panel .il2 .ichips .ihurt[aria-pressed="true"]{background:var(--c-danger-soft);border-color:var(--c-danger);box-shadow:inset 0 0 0 1px var(--c-danger);color:#B42318}
+#panel .il2 .ichips .ihurt[aria-pressed="true"]::before{color:var(--c-danger)}
+#panel .il2 .ichips .inone[aria-pressed="true"]{background:var(--c-ok-soft);border-color:var(--c-ok);box-shadow:inset 0 0 0 1px var(--c-ok);color:var(--c-ok)}
+#panel .il2 .ichips .inone[aria-pressed="true"]::before{color:var(--c-ok)}
+#panel .il2 .ichips .ioth,#panel .il2 .ilfold{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 16px;border:1px dashed var(--c-line-2);border-radius:var(--rad-pill);background:transparent;color:var(--c-sub);font-size:var(--fs-sm);font-weight:600}
+#panel .il2 .ichips .ioth[aria-expanded="true"]{border-style:solid;border-color:var(--c-ocean);color:var(--c-ocean-2);background:var(--c-ocean-soft)}
+#panel .il2 .ioth .pg-ic,#panel .il2 .ilfold .pg-ic{width:16px;height:16px}
+/* 글 칸 · 지금(보조 버튼) */
+#panel .il2 .ilfield input[type=text],#panel .il2 .ilfield textarea,#panel .il2 .ilfield input[type=datetime-local]{border:1px solid var(--c-line-2);border-radius:var(--rad-s);color:var(--c-ink)}
+#panel .il2 .ilfield input:focus,#panel .il2 .ilfield textarea:focus,#panel .il2 .ilnum input:focus{border-color:var(--c-ocean);box-shadow:0 0 0 3px var(--c-ocean-line)}
+#panel .il2 .ilnow{min-height:48px;min-width:64px;border:1px solid var(--c-line-2);border-radius:var(--rad-s);background:var(--c-surface);color:var(--c-ink);font-size:var(--fs-sm);font-weight:700}
+/* 스테퍼(−/+) · 피해액 */
+#panel .il2 .istep{border-radius:var(--rad-pill);border:1px solid var(--c-line-2);background:var(--c-surface-2);color:var(--c-ink);font-size:var(--fs-sm);font-weight:700}
+#panel .il2 .istep b{font-family:var(--mono);font-size:var(--fs-h2);font-weight:700;color:var(--c-ink)}
+#panel .il2 .istep button,#panel .il2 .ilnum button{border:1px solid var(--c-line-2);border-radius:var(--rad-pill);background:var(--c-surface);color:var(--c-ink);font-size:22px;font-weight:600}
+#panel .il2 .ilnum input{font-family:var(--mono);font-size:var(--fs-h2);font-weight:700;color:var(--c-ink);border:1px solid var(--c-line-2);border-radius:var(--rad-s)}
+#panel .il2 .ilnum span{font-size:var(--fs-sm);font-weight:600;color:var(--c-ink-2)}
+#panel .il2 .ilnum em{font-size:var(--fs-sub);font-style:normal;color:var(--c-mute)}
+#panel .il2 .ilwon span{font-size:var(--fs-body);font-weight:700;color:var(--c-ink-2)}
+#panel .il2 .ilwon em{font-size:var(--fs-sm);font-weight:700;color:var(--c-ocean-2)}
+@media (pointer:coarse){ #panel .il2 .ichips button,#panel .il2 .lvl button,#panel .il2 .ilfold{min-height:44px} #panel .il2 .istep button,#panel .il2 .ilnum button{width:44px;height:44px} #panel .il2 .ilnum input{height:44px} }
+@media (hover:hover) and (pointer:fine){ #panel .il2 .ichips button,#panel .il2 .ichips .ioth,#panel .il2 .ilfold{min-height:36px} #panel .il2 .istep button,#panel .il2 .ilnum button{width:40px;height:40px} #panel .il2 .ilnum input{height:40px} #panel .il2 .ilnow{min-height:44px} #panel .il2 .ilfield input[type=text],#panel .il2 .ilfield input[type=datetime-local]{min-height:44px}
+  #panel .il2 .ichips button:not([aria-pressed="true"]):hover,#panel .il2 .ilfold:hover,#panel .il2 .ilnow:hover,#panel .il2 .lvl button:not([aria-pressed="true"]):hover{border-color:var(--c-ink);background:var(--c-surface-2)} }
+#panel .il2 button:focus-visible,#panel .ilbar button:focus-visible,#panel .il-pvt:focus-visible,#panel #ilHead #ilReset:focus-visible,#panel .il-reps button:focus-visible{outline:3px solid var(--c-ocean);outline-offset:2px}
+/* 실시간 미리보기 머리 */
+#panel .il-pv{border:1px solid var(--c-line);border-radius:var(--rad-m);box-shadow:none}
+#panel .il-pvt b{font-size:var(--fs-h3);font-weight:700;color:var(--c-ink)}
+#panel .il-pvs{font-size:var(--fs-cap);font-weight:600;color:var(--c-mute)}
+#panel .il-pvc{border-color:var(--c-sub)}
+#panel .il-pvm i{background:var(--c-line)}
+#panel .il-pvm i.has{background:var(--c-ok)}
+#panel .il-pvn{font-size:var(--fs-cap);font-weight:500;color:var(--c-sub)}
+/* 작성된 보고서 목록 */
+#panel .il-reps .il-h.pg-sec{margin:var(--sp-2) 2px var(--sp-3);font-size:var(--fs-sub);color:var(--c-ink)}
+#panel .il-reps .replist{border:1px solid var(--c-line);border-radius:var(--rad-m);box-shadow:none}
+#panel .il-reps .reprow .roomrow .av{background:var(--c-ocean-soft);color:var(--c-ocean-2);font-family:var(--mono);font-weight:700}
+#panel .il-reps .reprow .roomrow .t{font-size:var(--fs-h3);font-weight:700;color:var(--c-ink)}
+#panel .il-reps .reprow .roomrow .d{font-size:var(--fs-cap);font-weight:500;color:var(--c-mute)}
+#panel .il-reps .reprow .tag{font-size:var(--fs-micro);font-weight:700;border-radius:var(--rad-pill)}
+#panel .il-reps .reprow .tag.rt-photo{background:var(--c-ember-soft);color:var(--c-ember-text)}
+#panel .il-reps .reprow .del{min-width:64px;color:var(--c-danger);font-size:var(--fs-sub);font-weight:600;border-left:1px solid var(--c-line)}
+#panel .il-reps .reprow .del.accent{background:var(--c-danger);color:#fff}
+#panel .il-reps .rep-empty img{width:min(220px,60vw);margin-bottom:var(--sp-3)}
+@media (min-width:600px){ #panel .il-reps .rep-empty img{width:260px} }
+#panel .il-reps .rep-empty p{font-size:var(--fs-sm);color:var(--c-sub)}
+/* 보고서 창: 머리 = pgHead(compact) */
+#report .rep>header.pg-head{display:flex;justify-content:flex-start;align-items:center;gap:var(--sp-2);margin:0;padding:10px 10px 6px 16px}
+#report .rep>header.pg-head .pg-title{margin:0;font-size:var(--fs-h2);font-weight:700;color:var(--c-ink)}
+#report #repEdit{min-height:44px;padding:0 16px;border:1px solid var(--c-line-2);border-radius:var(--rad-s);background:var(--c-surface);color:var(--c-ink);font-size:var(--fs-sm);font-weight:700}
+#report #repEdit.accent{background:var(--c-ember);border-color:var(--c-ember);color:var(--c-ink)}
+#report .rep>header .close{width:44px;height:44px;border-radius:50%;color:var(--c-ink);font-size:24px}
+@media (hover:hover) and (pointer:fine){ #report #repEdit{min-height:40px} #report #repEdit:not(.accent):hover{border-color:var(--c-ink)} #report .rep>header .close:hover{background:var(--c-ocean-soft)} }
+/* AI 작성 중 띠 · 사진 칸 */
+#report .rep-busy{border-radius:var(--rad-m);background:var(--c-ink);box-shadow:var(--sh-1)}
+#report .rep-busy b{font-size:var(--fs-h3);font-weight:700}
+#report .rep-busy small{font-size:var(--fs-cap);font-weight:500;color:#D5E0F3}
+#report .rep-busy .btn{min-height:44px;border-radius:var(--rad-s);font-weight:700}
+#report .rep-ph{border:1px solid var(--c-line);border-radius:var(--rad-m);background:var(--c-surface-2)}
+#report .rph-h b{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-h3);font-weight:700;color:var(--c-ink)}
+#report .rph-h b .pg-ic{width:20px;height:20px;color:var(--c-ocean)}
+#report .rph-h span{font-size:var(--fs-sub);color:var(--c-sub)}
+#report .rph-h label.btn{min-height:44px;border:1px solid var(--c-ocean-line);border-radius:var(--rad-s);background:var(--c-ocean-soft);color:var(--c-ocean-2);font-weight:700}
+#report .rph-i{border:1px solid var(--c-line);border-radius:var(--rad-s)}
+#report .rph-i img{border-radius:var(--rad-xs)}
+#report .rph-t input,#report .rph-t textarea{min-height:40px;border:1px solid var(--c-line-2);border-radius:var(--rad-s);font-size:var(--fs-body);font-weight:500;color:var(--c-ink)}
+#report .rph-b button{border:1px solid var(--c-line-2);border-radius:var(--rad-s);color:var(--c-ink);font-size:var(--fs-sub);font-weight:600}
+#report .rph-b [data-ph="del"]{color:var(--c-danger)}
+@media (pointer:coarse){ #report .rph-t input{min-height:44px;font-size:16px} #report .rph-t textarea{font-size:16px} }
+#report .rep-foot .note{font-size:var(--fs-cap);color:var(--c-mute)}
+/* 보고서 종류 고르기 창 */
+.rtov .rtbox{border-radius:var(--rad-l);box-shadow:var(--sh-3)}
+.rtov .rtbox>.pg-head{margin:0 0 var(--sp-4);justify-content:flex-start}
+.rtov .rtbox>.pg-head .pg-title{font-size:var(--fs-h2);color:var(--c-ink)}
+.rtov .rtbox .close{width:44px;height:44px;border-radius:50%;background:var(--c-surface-2);color:var(--c-ink);font-size:22px}
+.rtov .rtc{border:1px solid var(--c-line-2);border-radius:var(--rad-m);box-shadow:none}
+.rtov .rtc b{font-size:var(--fs-h3);font-weight:700;color:var(--c-ink)}
+.rtov .rtc span{font-size:var(--fs-sub);font-weight:500;color:var(--c-sub)}
+.rtov .rtc em{font-size:var(--fs-cap);font-weight:600;color:var(--c-ocean-2)}
+.rtov .rtc[aria-checked="true"]{border-color:var(--c-ocean);box-shadow:inset 0 0 0 1px var(--c-ocean);background:var(--c-ocean-soft)}
+.rtov .rtc[aria-checked="true"]::after{background:var(--c-ink);color:var(--c-ember);font-weight:700}
+.rtov .rtwarn{border-radius:var(--rad-s);background:var(--c-caution-soft);color:#93370D;font-size:var(--fs-sub);font-weight:600}
+.rtov .rtacts .btn{min-height:44px;border-radius:var(--rad-s);font-weight:700}
+.rtov .rtacts [data-rt="go"]{background:var(--c-ember);border-color:var(--c-ember);color:var(--c-ink)}
+.rtov .rtacts [data-rt="go"]:hover{background:var(--c-ember-2);border-color:var(--c-ember-2)}
+.rtov .rtacts [data-rt="go"]:disabled{background:var(--c-line);border-color:var(--c-line);color:var(--c-mute)}
+.rtov .rtacts [data-rt="x"]{color:var(--c-ink)}
+@media (hover:hover) and (pointer:fine){ .rtov .rtacts .btn{min-height:40px} .rtov .rtbox .close{width:40px;height:40px} }
+</style>
 </head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
@@ -2680,7 +2805,7 @@ footer b{color:var(--muted);font-weight:600}
       </div>
       <div class="right"><span class="rep-status" id="repStatus" aria-live="polite"></span><button type="button" class="btn ghost sm" id="repRegen" hidden>초안 새로 생성</button><button type="button" class="btn ghost sm" id="repTpl" hidden>양식·지시사항</button></div>
     </div>
-    <div class="rep-busy" id="repBusy" role="status" aria-live="polite" hidden><span class="rb-spin" aria-hidden="true"></span><div><b>AI가 보고서를 작성하고 있습니다</b><small id="repBusyT">IL 입력·체크·시각 기록을 읽는 중 · 보통 10~40초</small></div><button type="button" class="btn ghost sm" id="repBusyStop">중지</button><i class="rb-bar" aria-hidden="true"></i></div>
+    <div class="rep-busy" id="repBusy" role="status" aria-live="polite" hidden><span class="rb-spin" aria-hidden="true"></span><div><b>AI가 보고서를 작성하고 있어요</b><small id="repBusyT">IL 입력·체크·시각 기록을 읽는 중 · 보통 10~40초</small></div><button type="button" class="btn ghost sm" id="repBusyStop">중지</button><i class="rb-bar" aria-hidden="true"></i></div>
     <div class="rep-ph" id="repPh" hidden></div>
     <textarea class="rep-body" id="repBody" spellcheck="false" aria-label="보고서 본문" hidden></textarea>
     <div class="rep-doc" id="repDoc" tabindex="0" aria-label="보고서 미리보기"></div>
@@ -2690,7 +2815,7 @@ footer b{color:var(--muted);font-weight:600}
       <button type="button" class="btn" id="repCopy">복사</button>
       <button type="button" class="btn" id="repShare" aria-haspopup="menu" aria-expanded="false">공유</button>
       <button type="button" class="btn" id="repSave">PDF받기</button>
-      <span class="note">만든 시점의 체크 항목·시각 기록 스냅샷으로 작성되어 IL 화재등 상황 보고서에 저장됩니다. 본문은 누구나 ‘편집’으로 고칠 수 있고(이 기기의 이 보고서), 규칙 초안의 틀과 AI가 따를 지시는 교수의 ‘양식·지시사항’(모든 보고서·AI 작성 공통)으로 정합니다. AI에는 사실과 작성자가 고친 초안만 주고 새 사실을 추가하지 않도록 지시합니다. 평가 판정이 아닙니다.</span>
+      <span class="note">만든 시점의 체크 항목·시각 기록 스냅샷으로 작성되어 IL 화재등 상황 보고서에 저장돼요. 본문은 누구나 ‘편집’으로 고칠 수 있고(이 기기의 이 보고서), 규칙 초안의 틀과 AI가 따를 지시는 교수의 ‘양식·지시사항’(모든 보고서·AI 작성 공통)으로 정해요. AI에는 사실과 작성자가 고친 초안만 주고 새 사실을 추가하지 않도록 지시해요. 평가 판정이 아니에요.</span>
     </div>
   </div>
 </div>
@@ -5201,15 +5326,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const wrap=(inner,cls)=>`<div class="ilfield ${cls||''}${dis?' off':''}" data-fk="${esc(f.k)}">${lab}${inner}</div>`;
     if(f.type==='datetime') return wrap(`<div class="ilrw"><input type="datetime-local" data-f="${esc(f.k)}" value="${esc(v)}" aria-label="${esc(f.label)}"><button type="button" class="ilnow" data-now="${esc(f.k)}">지금</button></div>`);
     if(f.type==='text') return wrap(`<input type="text" data-f="${esc(f.k)}" maxlength="120" placeholder="${esc(dis?'경상·중상·심정지를 고르면 입력':(f.ph||''))}" value="${esc(v)}" autocomplete="off" aria-label="${esc(f.label)}" ${dis?'disabled':''}>`);
-    if(f.type==='long'){ if(f.fold&&!v&&!ILOPEN[f.k]) return `<div class="ilfield" data-fk="${esc(f.k)}"><button type="button" class="ilfold" data-fold="${esc(f.k)}">✎ ${esc(f.label||'수기작성')}</button></div>`;
+    if(f.type==='long'){ if(f.fold&&!v&&!ILOPEN[f.k]) return `<div class="ilfield" data-fk="${esc(f.k)}"><button type="button" class="ilfold" data-fold="${esc(f.k)}">${pgIcon('edit')}${esc(f.label||'수기작성')}</button></div>`;
       return wrap(`<textarea data-f="${esc(f.k)}" maxlength="600" rows="2" placeholder="${esc(f.ph||'')}" aria-label="${esc(f.label)}">${esc(v)}</textarea>`); }
     if(f.type==='one'){ const opts=f.opts||[], custom=v&&!opts.includes(v);
-      return wrap(`<div class="ichips" role="group" aria-label="${esc(f.label)}">${opts.map(o=>`<button type="button" data-one="${esc(f.k)}" data-v="${esc(o)}" aria-pressed="${o===v}">${esc(o)}</button>`).join('')}${f.other?(custom?`<button type="button" data-one="${esc(f.k)}" data-v="${esc(v)}" aria-pressed="true">${esc(v)}</button>`:'')+`<button type="button" class="ioth" data-oth="${esc(f.k)}" aria-expanded="${!!ILOPEN[f.k]}">✎ 직접</button>`:''}</div>${f.other&&ILOPEN[f.k]?`<input type="text" class="iloth" data-f="${esc(f.k)}" maxlength="40" placeholder="직접 입력 후 확인(Enter)" value="${esc(custom?v:'')}" autocomplete="off" aria-label="${esc(f.label)} 직접 입력">`:''}`); }
+      return wrap(`<div class="ichips" role="group" aria-label="${esc(f.label)}">${opts.map(o=>`<button type="button" data-one="${esc(f.k)}" data-v="${esc(o)}" aria-pressed="${o===v}">${esc(o)}</button>`).join('')}${f.other?(custom?`<button type="button" data-one="${esc(f.k)}" data-v="${esc(v)}" aria-pressed="true">${esc(v)}</button>`:'')+`<button type="button" class="ioth" data-oth="${esc(f.k)}" aria-expanded="${!!ILOPEN[f.k]}">${pgIcon('edit')}직접</button>`:''}</div>${f.other&&ILOPEN[f.k]?`<input type="text" class="iloth" data-f="${esc(f.k)}" maxlength="40" placeholder="직접 입력 후 확인(Enter)" value="${esc(custom?v:'')}" autocomplete="off" aria-label="${esc(f.label)} 직접 입력">`:''}`); }
     if(f.type==='multi'){ const on=multiGet(f.k); return wrap(`<div class="ichips" role="group" aria-label="${esc(f.label)}">${(f.opts||[]).map(o=>`<button type="button" data-multi="${esc(f.k)}" data-v="${esc(o)}" aria-pressed="${on.includes(o)}">${esc(o)}</button>`).join('')}</div>`); }
     if(f.type==='injury'){ const o=injGet(f.k);
       return wrap(`<div class="ichips" role="group" aria-label="${esc(f.label)}"><button type="button" class="inone" data-inj="${esc(f.k)}" data-v="none" aria-pressed="${o.none}">${esc(f.none||'해당없음')}</button>${(f.opts||[]).map(x=>`<button type="button" class="ihurt" data-inj="${esc(f.k)}" data-v="${esc(x)}" aria-pressed="${!!o.c[x]}">${esc(x)}</button>`).join('')}</div>${Object.keys(o.c).length?`<div class="isteps">${(f.opts||[]).filter(x=>o.c[x]).map(x=>`<div class="istep"><span>${esc(x)}</span><button type="button" data-step="${esc(f.k)}" data-v="${esc(x)}" data-d="-1" aria-label="${esc(x)} 한 명 빼기">−</button><b>${o.c[x]}명</b><button type="button" data-step="${esc(f.k)}" data-v="${esc(x)}" data-d="1" aria-label="${esc(x)} 한 명 더하기">+</button></div>`).join('')}</div>`:''}`); }
     if(f.type==='num'&&(f.max||0)>999) return wrap(`<div class="ilnum ilwon"><input type="number" inputmode="numeric" min="0" max="${f.max}" data-f="${esc(f.k)}" value="${esc(v)}" placeholder="0" aria-label="${esc(f.label)}"><span>${esc(f.unit||'')}</span>${v?`<em>${esc(wonTxt(+v))}</em>`:''}</div>`);
-    if(f.type==='num') return wrap(`<div class="ilnum"><button type="button" data-num="${esc(f.k)}" data-d="-1" ${dis?'disabled':''} aria-label="빼기">−</button><input type="number" inputmode="numeric" min="0" max="${f.max||999}" data-f="${esc(f.k)}" value="${esc(v)}" placeholder="0" ${dis?'disabled':''} aria-label="${esc(f.label)}"><button type="button" data-num="${esc(f.k)}" data-d="1" ${dis?'disabled':''} aria-label="더하기">+</button><span>${esc(f.unit||'')}</span>${dis?'<em>경상·중상·심정지를 고르면 켜집니다</em>':''}</div>`);
+    if(f.type==='num') return wrap(`<div class="ilnum"><button type="button" data-num="${esc(f.k)}" data-d="-1" ${dis?'disabled':''} aria-label="빼기">−</button><input type="number" inputmode="numeric" min="0" max="${f.max||999}" data-f="${esc(f.k)}" value="${esc(v)}" placeholder="0" ${dis?'disabled':''} aria-label="${esc(f.label)}"><button type="button" data-num="${esc(f.k)}" data-d="1" ${dis?'disabled':''} aria-label="더하기">+</button><span>${esc(f.unit||'')}</span>${dis?'<em>경상·중상·심정지를 고르면 켜져요</em>':''}</div>`);
     return '';
   }
   // V179: 기본값(재산피해 '조사 중' 등) — 기록마다 한 번만. 그 칸 묶음에 아무 값도 없을 때만 채움(지우면 다시 안 채움, 기록 초기화 후엔 다시)
@@ -5245,7 +5370,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     box.addEventListener('click',e=>{ const t=e.target.closest('button'); if(!t) return; const d=t.dataset;
       if(d.lvl){ const k=d.lvl, v=d.v, {b}=ilFind(k), on=state.situ.fields[k]===v;   // V133: 대응단계 — 다시 누르면 해제
         if(on){ delete state.situ.fields[k]; if(chipLog(k)) addLog(`[${b.name}] 대응단계 해제`); } else { state.situ.fields[k]=v; chipLog(k); chipAdd(k, `[${b.name}] 대응단계: ${v} 발령`); }
-        toast(on?'대응단계를 해제했습니다':`${v} — 보고서에 들어갑니다`); return done(); }
+        toast(on?'대응단계를 해제했어요':`${v} — 보고서에 들어가요`); return done(); }
       if(d.now){ const {b,f}=ilFind(d.now); state.situ.fields[d.now]=localDT(new Date()); addLog(`${tag(b,f)}${showDT(state.situ.fields[d.now])}`); return done(); }
       if(d.fold){ ILOPEN[d.fold]=1; redraw(); const ta=panel.querySelector(`textarea[data-f="${d.fold}"]`); if(ta) ta.focus(); return; }
       if(d.oth){ ILOPEN[d.oth]=!ILOPEN[d.oth]; redraw(); const i=panel.querySelector(`.iloth[data-f="${d.oth}"]`); if(i) i.focus(); return; }
@@ -5494,17 +5619,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(head.length+pj.length<28000||log.length<10) break; log=log.slice(-Math.floor(log.length*0.7)); }
     return head+'\n'+['[사실]', '<<<', pj, '>>>'].join('\n');
   }
-  const AI_MSG={rate_limited:'요청이 많습니다. 잠시 후 다시 시도해 주세요.', refused:'AI가 이 입력의 작성을 거부했습니다. 기록을 바꿔 다시 시도해 주세요.', prompt_too_large:'기록이 너무 깁니다. 시각 기록을 줄여 주세요.', session_expired:'다시 로그인한 뒤 시도해 주세요.', empty_completion:'AI가 내용을 내지 않았습니다. 다시 시도해 주세요.', upstream_error:'연결 오류입니다. 다시 시도해 주세요.', not_granted:'이 화면에서 AI 사용이 허용되지 않았습니다.', sampling_disabled:'이 계정에서는 AI를 쓸 수 없습니다.'};
+  const AI_MSG={rate_limited:'요청이 많아요. 잠시 후 다시 시도해 주세요.', refused:'AI가 이 입력의 작성을 거부했어요. 기록을 바꿔 다시 시도해 주세요.', prompt_too_large:'기록이 너무 길어요. 시각 기록을 줄여 주세요.', session_expired:'다시 로그인한 뒤 시도해 주세요.', empty_completion:'AI가 내용을 내지 않았어요. 다시 시도해 주세요.', upstream_error:'연결 오류예요. 다시 시도해 주세요.', not_granted:'이 화면에서 AI 사용이 허용되지 않았어요.', sampling_disabled:'이 계정에서는 AI를 쓸 수 없어요.'};
   const HIDE_AI=['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed'];
   const repEmpty=e=>{ const f=e.facts; return !f || (!f.done && !f.log.length && !f.situ.some(b=>b.text||b.investigating||b.fields.some(x=>x.value))); };
 
   function repStatusText(){
     if(repCtl) return '작성 중';
     if(!cur) return '';
-    if(repView==='draft'&&!repDraftOk()&&cur.facts) return CAP.sample?'AI 작성본을 아직 만들지 못해 기본 초안을 보여 줍니다 — ‘AI로 작성’을 눌러 다시 시도':'AI 작성은 SACHIL 서버(AI 키) 연결 시 가능 — 지금은 기본 초안';
+    if(repView==='draft'&&!repDraftOk()&&cur.facts) return CAP.sample?'AI 작성본을 아직 만들지 못해 기본 초안을 보여 드려요 — ‘AI로 작성’을 눌러 다시 시도':'AI 작성은 SACHIL 서버(AI 키) 연결 시 가능 — 지금은 기본 초안';
     if(repView==='ai') return cur.ai ? `47 · AI 작성본${cur.aiSrc?'('+cur.aiSrc+')':''} ${cur.at}${cur.aiEdited?' · 편집됨':''} · 교관 확인 전` : '';
     if(cur.draftEdited) return '초안 편집됨 · 이 기기에 저장'+(storageFull?' · 저장 공간 부족':'');
-    if(!cur.facts) return '이전 버전에서 가져온 보고서 — 사실 스냅샷이 없어 AI·재생성은 꺼져 있습니다';
+    if(!cur.facts) return '이전 버전에서 가져온 보고서 — 사실 스냅샷이 없어 AI·재생성은 꺼져 있어요';
     if(!CAP.ready || CAP.sample) return '';
     return SRV.on ? '규칙 초안 · 서버에 AI 키가 없어 AI 작성은 꺼져 있음' : '규칙 초안 · AI 작성은 SACHIL 서버(AI 키) 연결 시 가능';
   }
@@ -5518,7 +5643,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     $('#repTabDraft').setAttribute('aria-selected', v==='draft'); $('#repTabAi').setAttribute('aria-selected', v==='ai');
     $('#repTabAi').disabled = !(cur.ai || repCtl);
     $('#repTabAi').closest('.seg').hidden = !repDraftOk() || !(CAP.sample || cur.ai || repCtl);   // AI를 못 쓰면 탭 자체를 숨김(고장처럼 보이지 않게) · V133: 교수가 아니면 늘 숨김
-    body.value = v==='draft' ? cur.draft : (cur.ai || (repCtl ? 'AI가 사실을 읽고 보고서를 작성하는 중입니다…' : ''));
+    body.value = v==='draft' ? cur.draft : (cur.ai || (repCtl ? 'AI가 사실을 읽고 보고서를 작성하는 중이에요…' : ''));
     body.readOnly = !repEditing || (!!repCtl && v==='ai'); repDocSync();   // 편집은 교수 로그인 + '초안 편집'일 때만(V83)
     { const tb=$('#repTpl'); if(tb) tb.hidden=!isProf()||repEditing; }
     { const eb=$('#repEdit'); if(eb){ eb.hidden=!!repCtl; eb.textContent=repEditing?'편집 저장':'편집'; eb.classList.toggle('accent',repEditing); } }
@@ -5537,9 +5662,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!keepStatus && !$('#report').hidden && !repCtl) $('#repStatus').textContent=repStatusText();
   }
   // V176: 보고서 종류 고르기 — 신속 브리핑형 / 인포그래픽 요약형 / 사진기록 리포트형
+  { const h=document.querySelector('#report .rep>header'); if(h&&window.pgHead) h.outerHTML=pgHead({g:'IL', t:'화재등 상황 보고서', sHtml:'<span id="repSub"></span>', s1:true, id:'repTitle', cls:'is-compact rep-h', act:'<button type="button" class="btn primary sm" id="repEdit" hidden>편집</button><button type="button" class="close" id="repClose" aria-label="닫기">×</button>'}); }   /* V226(il): 보고서 창 머리도 공통 틀(pgHead) */
   const REP_TN={brief:'신속 브리핑형', info:'인포그래픽 요약형', photo:'사진기록 리포트형'}, RT_KEY='sachil_rep_type';
   const rtEl=document.createElement('div'); rtEl.className='rtov'; rtEl.hidden=true; rtEl.setAttribute('role','dialog'); rtEl.setAttribute('aria-modal','true'); rtEl.setAttribute('aria-labelledby','rtH');
-  rtEl.innerHTML=`<div class="rtbox"><header><b id="rtH">어떤 보고서로 만들까요?</b><button type="button" class="close" data-rt="x" aria-label="닫기">×</button></header>
+  rtEl.innerHTML=`<div class="rtbox">${pgHead({g:'IL', t:'어떤 보고서로 만들까요?', s:'종류를 고르면 칸에 채운 내용으로 바로 만들어요', id:'rtH', cls:'is-compact', act:'<button type="button" class="close" data-rt="x" aria-label="닫기">×</button>'})}
     <div class="rtcards" role="radiogroup" aria-label="보고서 종류">
       <button type="button" class="rtc" role="radio" data-rtt="brief"><i class="rtv rtv-brief" aria-hidden="true"><s></s><s></s><s></s><u></u><s></s></i><b>신속 브리핑형</b><span>A4 1쪽 요약 · 핵심만 · 표와 아이콘</span><em>상급자 보고·무전 브리핑</em></button>
       <button type="button" class="rtc" role="radio" data-rtt="info"><i class="rtv rtv-info" aria-hidden="true"><s></s><s></s><s></s><s></s><u></u><q></q></i><b>인포그래픽 요약형</b><span>숫자 타일 · 차트 · 단계 도식 · 아이콘</span><em>한눈에 보는 현황판</em></button>
@@ -5552,7 +5678,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const rtPick=t=>{ rtSel=t; rtEl.querySelectorAll('[data-rtt]').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.rtt===t))); const go=rtEl.querySelector('[data-rt="go"]'); go.disabled=!t; go.textContent=t?`${REP_TN[t]}으로 만들기`:'보고서 만들기'; };
   function openRepType(){ if(!$('#report').hidden) return; rtLast=document.activeElement; let t=''; try{ t=localStorage.getItem(RT_KEY)||''; }catch(_){ } rtPick(REP_TN[t]?t:'');
     const miss=SITU.filter(x=>!situStatus(x).cls).length, full=reports.length>=MAX_REPORTS, w=rtEl.querySelector('#rtWarn');
-    w.hidden=!(miss||full); w.textContent=[miss?`아직 비어 있는 칸 ${miss}곳 — ‘파악 중’으로 들어갑니다`:'', full?`보고서가 ${MAX_REPORTS}건이라 가장 오래된 1건이 지워집니다`:''].filter(Boolean).join(' · ');
+    w.hidden=!(miss||full); w.textContent=[miss?`아직 비어 있는 칸 ${miss}곳 — ‘파악 중’으로 들어가요`:'', full?`보고서가 ${MAX_REPORTS}건이라 가장 오래된 1건이 지워져요`:''].filter(Boolean).join(' · ');
     rtEl.hidden=false; appEl.inert=true; tabbarEl.inert=true; setTimeout(()=>{ const b=rtEl.querySelector(rtSel?`[data-rtt="${rtSel}"]`:'[data-rtt]'); if(b) b.focus(); },30); }
   const closeRepType=()=>{ if(rtEl.hidden) return; rtEl.hidden=true; appEl.inert=false; tabbarEl.inert=false; if(rtLast&&rtLast.focus) rtLast.focus(); };
   rtEl.addEventListener('click',e=>{ if(e.target===rtEl) return closeRepType(); const c=e.target.closest('[data-rtt]'); if(c) return rtPick(c.dataset.rtt);
@@ -5577,7 +5703,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     $('#repBody').scrollTop=0;
     setTimeout(()=>{ if(mqNarrow.matches) $('#repClose').focus(); else { const d=$('#repDoc'); if(d&&!d.hidden){ d.focus({preventScroll:true}); d.scrollTop=0; } } },40);
     // 원클릭: AI를 쓸 수 있고 작성본이 없으면 바로 작성 (같은 사실이면 5분간 재사용 → 사용량 추가 없음). 기록이 비어 있으면 생략.
-    if(CAP.sample && !e.ai && e.facts && repType(e)==='brief'){ if(repEmpty(e)) $('#repStatus').textContent='기록이 없어 AI 작성을 생략했습니다 — 체크·기록 후 "AI로 작성"'; else runAi(false); }
+    if(CAP.sample && !e.ai && e.facts && repType(e)==='brief'){ if(repEmpty(e)) $('#repStatus').textContent='기록이 없어 AI 작성을 생략했어요 — 체크·기록 후 "AI로 작성"'; else runAi(false); }
   }
 
   // ---------- PDF 뷰어 (서버 모드: 서버가 함께 내보내는 /vendor/pdfjs 로 앱 안에서 넘겨 본다) ----------
@@ -5784,9 +5910,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const e=cur, ctl=new AbortController(); repCtl=ctl;
     const body=$('#repBody'), st=$('#repStatus');
     const prev={ai:e.ai, aiAuto:e.aiAuto, aiEdited:e.aiEdited, aiSrc:e.aiSrc, at:e.at};   // 실패·중지하면 이전 AI 작성본으로 되돌린다(V99)
-    e.ai=''; e.aiAuto=''; e.aiEdited=false; e.aiSrc=''; repShowDraft=!!e.draft; setRepView('ai'); body.readOnly=true; body.value=e.draft||'AI가 사실을 읽고 보고서를 작성하는 중입니다…'; repDocSync(); st.textContent='작성 중'; st.classList.add('busy'); syncRepUI();   /* V201: 누르자마자 실시간 미리보기와 같은 초안(A4)을 먼저 보여 주고, AI는 뒤에서 다듬어 끝나면 바꿔 끼움 */
-    { const bz=$('#repBusy'), t0=Date.now(); bz.hidden=false; $('#report').classList.add('busy'); clearInterval(repBusyIv); repBusyIv=setInterval(()=>{ if(repCtl!==ctl){ clearInterval(repBusyIv); return; } const n=Math.round((Date.now()-t0)/1000), got=(e.ai||'').length; $('#repBusyT').textContent=(repShowDraft?'초안을 먼저 보여 드립니다 · ':'')+(got?`AI가 다듬는 중 · ${n}초 · ${got.toLocaleString('ko-KR')}자`:`AI가 읽는 중 · ${n}초`); },500);
-      { const hb=$('#repBusy b'); if(hb) hb.textContent=repShowDraft?'초안 완성 · AI가 문장을 다듬는 중':'AI가 보고서를 작성하고 있습니다'; } if(repShowDraft) $('#report').classList.remove('busy'); }   // V175: 눈에 띄는 작성 중 띠
+    e.ai=''; e.aiAuto=''; e.aiEdited=false; e.aiSrc=''; repShowDraft=!!e.draft; setRepView('ai'); body.readOnly=true; body.value=e.draft||'AI가 사실을 읽고 보고서를 작성하는 중이에요…'; repDocSync(); st.textContent='작성 중'; st.classList.add('busy'); syncRepUI();   /* V201: 누르자마자 실시간 미리보기와 같은 초안(A4)을 먼저 보여 주고, AI는 뒤에서 다듬어 끝나면 바꿔 끼움 */
+    { const bz=$('#repBusy'), t0=Date.now(); bz.hidden=false; $('#report').classList.add('busy'); clearInterval(repBusyIv); repBusyIv=setInterval(()=>{ if(repCtl!==ctl){ clearInterval(repBusyIv); return; } const n=Math.round((Date.now()-t0)/1000), got=(e.ai||'').length; $('#repBusyT').textContent=(repShowDraft?'초안을 먼저 보여 드려요 · ':'')+(got?`AI가 다듬는 중 · ${n}초 · ${got.toLocaleString('ko-KR')}자`:`AI가 읽는 중 · ${n}초`); },500);
+      { const hb=$('#repBusy b'); if(hb) hb.textContent=repShowDraft?'초안 완성 · AI가 문장을 다듬는 중':'AI가 보고서를 작성하고 있어요'; } if(repShowDraft) $('#report').classList.remove('busy'); }   // V175: 눈에 띄는 작성 중 띠
     try{ await Promise.race([rtplSync(), new Promise(ok=>setTimeout(ok,600))]); }catch(_){ }   // V139: 최신 양식·지시사항 — V178: 기다림은 0.6초까지만(서버가 저장된 양식·지시를 직접 붙이므로)
     if(repCtl!==ctl) return;
     try{
@@ -5804,7 +5930,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(err&&err.text && !prev.ai){ const t=(code==='cancelled'?'※ 중지로 일부만 작성됨\n':'※ 연결이 끊겨 일부만 작성됨\n')+err.text; e.ai=t; e.aiAuto=t; e.aiPartial=true; if(repView==='ai'){ body.value=t; repDocSync(); } e.at=now(); rpsave(); }
       else { Object.assign(e,prev); if(repView==='ai'){ body.value=e.ai||''; repDocSync(); } rpsave(); }
       if(HIDE_AI.includes(code)) CAP.sample=null;
-      st.textContent = code==='cancelled' ? (e.ai?'중지됨 — 일부만 작성 (편집 가능)':'중지됨') : ((err&&err.message)||AI_MSG[code]||AI_MSG.upstream_error)+(code!=='cancelled'&&!e.ai?' — 규칙 초안을 보여 드립니다':''); st.classList.add('warn');   // V141: 상태 줄은 작성 중·문제일 때만 보임
+      st.textContent = code==='cancelled' ? (e.ai?'중지됨 — 일부만 작성 (편집 가능)':'중지됨') : ((err&&err.message)||AI_MSG[code]||AI_MSG.upstream_error)+(code!=='cancelled'&&!e.ai?' — 규칙 초안을 보여 드려요':''); st.classList.add('warn');   // V141: 상태 줄은 작성 중·문제일 때만 보임
     }finally{
       if(repCtl===ctl){ repCtl=null; st.classList.remove('busy'); clearInterval(repBusyIv); $('#repBusy').hidden=true; $('#report').classList.remove('busy'); body.readOnly=!repEditing; $('#repTabAi').disabled=!e.ai; { const msg=st.textContent, w=st.classList.contains('warn'); setRepView(e.ai?repView:'draft'); st.textContent=msg; st.classList.toggle('warn',w); } syncRepUI(true); }   // V138: 작성 중 교수 확인이 끝났어도 편집 버튼이 보이게
     }
@@ -5929,27 +6055,27 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // V176: 보고서 사진(최대 6장) — 긴 변 720px JPEG로 줄여 이 보고서에 저장. 사진마다 캡션·설명. 신속 브리핑형은 첫 장이 1번 항목 오른쪽, 사진기록형은 전부
   function repPhDraw(){ const box=$('#repPh'); if(!box) return; const t=repType(cur), show=!!cur&&!repCtl&&t!=='info'&&(repEditing||t==='photo'); box.hidden=!show; if(!show){ box.innerHTML=''; return; }
     const ph=repPhotos(cur), mx=t==='brief'?1:6;
-    box.innerHTML=`<div class="rph-h"><b>📷 사진 ${ph.length}/${mx}</b><span>${t==='brief'?'첫 사진 1장이 ‘1. 발생개요’ 오른쪽에 들어갑니다':'사진마다 캡션·설명을 적으면 A4에 그대로 들어갑니다 — 같은 줄 두 장은 나란히 비교'}</span>${ph.length<mx?`<label class="btn primary sm">＋ 사진 ${ph.length?'더 ':''}추가<input type="file" accept="image/*" ${mx>1?'multiple':''} hidden data-phin="1"></label>`:''}</div>
+    box.innerHTML=`<div class="rph-h"><b>${pgIcon('photo')}사진 ${ph.length}/${mx}</b><span>${t==='brief'?'첫 사진 1장이 ‘1. 발생개요’ 오른쪽에 들어가요':'사진마다 캡션·설명을 적으면 A4에 그대로 들어가요 — 같은 줄 두 장은 나란히 비교'}</span>${ph.length<mx?`<label class="btn primary sm">＋ 사진 ${ph.length?'더 ':''}추가<input type="file" accept="image/*" ${mx>1?'multiple':''} hidden data-phin="1"></label>`:''}</div>
       <div class="rph-l">${ph.map((p,i)=>`<div class="rph-i" data-i="${i}"><img src="${p.img}" alt="사진 ${i+1}"><div class="rph-t"><input class="rph-c" maxlength="60" placeholder="캡션 (예: 도착 시 전경)" value="${esc(p.cap||'')}" aria-label="사진 ${i+1} 캡션">${t==='photo'?`<textarea class="rph-d" rows="2" maxlength="300" placeholder="설명 (예: 2층 창문 화염 분출, 연소 확대 중)" aria-label="사진 ${i+1} 설명">${esc(p.desc||'')}</textarea>`:''}</div><div class="rph-b">${mx>1?`<button type="button" data-ph="up" aria-label="앞으로" ${i?'':'disabled'}>↑</button><button type="button" data-ph="down" aria-label="뒤로" ${i<ph.length-1?'':'disabled'}>↓</button>`:''}<button type="button" data-ph="del" aria-label="사진 ${i+1} 빼기">빼기</button></div></div>`).join('')}</div>`; }
   const repPhMine=()=>{ if(!Array.isArray(cur.photos)||!cur.photos.length){ cur.photos=repPhotos(cur).map(x=>Object.assign({},x)); } cur.img=''; return cur.photos; };
   let repPhT=0; const repPhRefresh=soft=>{ rpsaveSoon(); clearTimeout(repPhT); repPhT=setTimeout(()=>{ if(!repEditing) repDocSync(); },soft?500:0); if(!soft) repPhDraw(); };
   $('#repPh').addEventListener('change',async e=>{ const inp=e.target.closest('[data-phin]'); if(!inp||!cur) return; const files=[...(inp.files||[])]; inp.value=''; const ph=repPhMine(), mx=repType(cur)==='brief'?1:6;
-    for(const fl of files){ if(ph.length>=mx){ toast(`사진은 ${mx}장까지입니다`); break; }
+    for(const fl of files){ if(ph.length>=mx){ toast(`사진은 ${mx}장까지예요`); break; }
       try{ const url=URL.createObjectURL(fl), im=await new Promise((ok,no)=>{ const x=new Image(); x.onload=()=>ok(x); x.onerror=no; x.src=url; });
         const sc=Math.min(1,720/Math.max(im.naturalWidth,im.naturalHeight)), c=document.createElement('canvas'); c.width=Math.round(im.naturalWidth*sc); c.height=Math.round(im.naturalHeight*sc);
         const g=c.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height); g.drawImage(im,0,0,c.width,c.height); URL.revokeObjectURL(url); ph.push({img:c.toDataURL('image/jpeg',0.74),cap:'',desc:''}); }
-      catch(_){ toast('사진을 읽지 못했습니다(다른 사진으로 해 보세요)'); } }
-    const ok=rpsave(); if(!ok) toast('저장 공간이 부족합니다 — 오래된 보고서나 사진을 지워 주세요'); repPhRefresh(); });
+      catch(_){ toast('사진을 읽지 못했어요(다른 사진으로 해 보세요)'); } }
+    const ok=rpsave(); if(!ok) toast('저장 공간이 부족해요 — 오래된 보고서나 사진을 지워 주세요'); repPhRefresh(); });
   $('#repPh').addEventListener('input',e=>{ const it=e.target.closest('.rph-i'); if(!it||!cur) return; const p=repPhMine()[+it.dataset.i]; if(!p) return;
     if(e.target.matches('.rph-c')) p.cap=e.target.value.slice(0,60); if(e.target.matches('.rph-d')) p.desc=e.target.value.slice(0,300); repPhRefresh(true); });
   $('#repPh').addEventListener('click',e=>{ const b=e.target.closest('[data-ph]'); if(!b||!cur) return; const ph=repPhMine(), i=+b.closest('.rph-i').dataset.i, a=b.dataset.ph;
     if(a==='up'&&i>0) [ph[i-1],ph[i]]=[ph[i],ph[i-1]]; else if(a==='down'&&i<ph.length-1) [ph[i+1],ph[i]]=[ph[i],ph[i+1]];
-    else if(a==='del'){ const old=ph.splice(i,1)[0]; toast('사진을 뺐습니다',()=>{ ph.splice(i,0,old); rpsave(); repPhRefresh(); }); }
+    else if(a==='del'){ const old=ph.splice(i,1)[0]; toast('사진을 뺐어요',()=>{ ph.splice(i,0,old); rpsave(); repPhRefresh(); }); }
     rpsave(); repPhRefresh(); });
   $('#repBusyStop').addEventListener('click',()=>{ if(repCtl) runAi(true); });
   $('#repEdit').addEventListener('click',()=>{
     if(!cur||repCtl) return;   // V140: 교수가 아니어도 결과(보이는 본문)를 고칠 수 있다
-    if(repEditing){ rpsave(); repEditing=false; toast('편집한 내용을 저장했습니다'); } else repEditing=true;
+    if(repEditing){ rpsave(); repEditing=false; toast('편집한 내용을 저장했어요'); } else repEditing=true;
     setRepView(repView); if(repEditing){ const b=$('#repBody'); b.focus(); }
   });
   $('#repBody').addEventListener('input',()=>{
@@ -5975,22 +6101,22 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function tplTab(t){ tplEl.querySelectorAll('[data-tt]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tt===t))); const ins=t==='inst';
     tq('.tp-tpl').hidden=ins; tq('.tp-inst').hidden=!ins; tq('[data-a="def"]').hidden=ins; tq('[data-a="pre"]').hidden=ins;
     if(ins){ tq('.tta').hidden=true; tq('.tpre').hidden=true; tq('.tin').focus(); } else { tq('.tta').hidden=false; tq('.tpre').hidden=true; tq('[data-a="pre"]').textContent='미리보기'; } }
-  function openTpl(){ if(!isProf()) return; tq('.tkeys').innerHTML=RTPL_KEYS().map(([k,d])=>`<button type="button" data-k="${esc(k)}" title="${esc(d)}">{${esc(k)}}</button>`).join(''); tq('.tin').value=RTPL.inst||''; tplTab('tpl'); tq('.tta').value=rtplText(); tq('.tta').hidden=false; tq('.tpre').hidden=true; tq('[data-a="pre"]').textContent='미리보기'; tq('.tmsg').textContent=RTPL.pend?'이 기기에만 저장된 양식입니다 — 서버에 연결되면 자동으로 모든 기기에 적용됩니다':''; tplEl.hidden=false; $('#report').inert=true; tq('.tta').focus(); }
+  function openTpl(){ if(!isProf()) return; tq('.tkeys').innerHTML=RTPL_KEYS().map(([k,d])=>`<button type="button" data-k="${esc(k)}" title="${esc(d)}">{${esc(k)}}</button>`).join(''); tq('.tin').value=RTPL.inst||''; tplTab('tpl'); tq('.tta').value=rtplText(); tq('.tta').hidden=false; tq('.tpre').hidden=true; tq('[data-a="pre"]').textContent='미리보기'; tq('.tmsg').textContent=RTPL.pend?'이 기기에만 저장된 양식이에요 — 서버에 연결되면 자동으로 모든 기기에 적용돼요':''; tplEl.hidden=false; $('#report').inert=true; tq('.tta').focus(); }
   const closeTpl=()=>{ tplEl.hidden=true; $('#report').inert=false; const b=$('#repTpl'); if(b&&!b.hidden) b.focus(); };
   async function rtplPut(text,inst){   // 서버에 저장(옛 서버면 이 기기에 맡겨 둠)
     if(typeof inst!=='string') inst=RTPL.inst||'';
     if(SRV.on&&PROF.tok){ const x=await api('/api/admin/ai',{json:{action:'tpl',text,inst},tok:PROF.tok});
       if(x.ok&&x.j&&x.j.ok&&'tpl' in x.j){ RTPL.text=x.j.tpl||''; RTPL.ts=x.j.tpl_ts||Date.now()/1000; RTPL.pend=false;
         if('inst' in x.j){ RTPL.inst=x.j.inst||''; RTPL.ipend=false; rtplSave(); return {ok:true, msg:x.j.msg}; }
-        RTPL.inst=inst; RTPL.ipend=true; rtplSave(); return {ok:true, msg:'양식은 저장했습니다 — 관리자 지시사항은 서버가 아직 옛 버전(6.2 필요)이라 이 기기에만 저장, 업데이트되면 자동으로 모든 기기에 적용'}; }
-      if(x.status===403) return {ok:false, msg:x.j.error||'교수 로그인이 필요합니다'};
-      if(!x.ok){ RTPL.text=text; RTPL.ts=Date.now()/1000; RTPL.pend=true; RTPL.inst=inst; RTPL.ipend=true; rtplSave(); return {ok:true, msg:`서버에 저장하지 못했습니다(${x.status||'연결 끊김'}) — 이 기기에 맡겨 두고 다음 연결 때 다시 올립니다`}; } }
+        RTPL.inst=inst; RTPL.ipend=true; rtplSave(); return {ok:true, msg:'양식은 저장했어요 — 관리자 지시사항은 서버가 아직 옛 버전(6.2 필요)이라 이 기기에만 저장, 업데이트되면 자동으로 모든 기기에 적용'}; }
+      if(x.status===403) return {ok:false, msg:x.j.error||'교수 로그인이 필요해요'};
+      if(!x.ok){ RTPL.text=text; RTPL.ts=Date.now()/1000; RTPL.pend=true; RTPL.inst=inst; RTPL.ipend=true; rtplSave(); return {ok:true, msg:`서버에 저장하지 못했어요(${x.status||'연결 끊김'}) — 이 기기에 맡겨 두고 다음 연결 때 다시 올려요`}; } }
     RTPL.text=text; RTPL.ts=Date.now()/1000; RTPL.pend=true; RTPL.inst=inst; RTPL.ipend=true; rtplSave();
-    return {ok:true, msg:'이 기기에 저장했습니다 — 서버가 아직 옛 버전이라, 5.1로 업데이트되면 자동으로 모든 기기에 적용됩니다'};
+    return {ok:true, msg:'이 기기에 저장했어요 — 서버가 아직 옛 버전이라, 5.1로 업데이트되면 자동으로 모든 기기에 적용돼요'};
   }
   async function rtplSync(){   // 서버 양식 받기 · 맡겨 둔 양식 올리기
     if(!SRV.on) return;
-    if((RTPL.pend||RTPL.ipend)&&isProf()&&PROF.tok){ const r=await rtplPut(RTPL.text,RTPL.inst); if(r.ok&&!RTPL.pend&&!RTPL.ipend) toast('맡겨 둔 보고서 양식·지시사항을 서버에 올렸습니다'); return; }
+    if((RTPL.pend||RTPL.ipend)&&isProf()&&PROF.tok){ const r=await rtplPut(RTPL.text,RTPL.inst); if(r.ok&&!RTPL.pend&&!RTPL.ipend) toast('맡겨 둔 보고서 양식·지시사항을 서버에 올렸어요'); return; }
     if(RTPL.pend) return;
     const r=await api('/api/report/tpl'); if(r.ok&&r.j&&r.j.ok&&typeof r.j.tpl==='string'){ RTPL.text=r.j.tpl.slice(0,8000); RTPL.ts=+r.j.ts||0; if(typeof r.j.inst==='string'&&!RTPL.ipend) RTPL.inst=r.j.inst.slice(0,3000); rtplSave(); }
   }
@@ -6001,13 +6127,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const k=e.target.closest('[data-k]'); if(k){ const ta=tq('.tta'), t='{'+k.dataset.k+'}', a=ta.selectionStart??ta.value.length, z=ta.selectionEnd??a; ta.value=ta.value.slice(0,a)+t+ta.value.slice(z); ta.focus(); ta.setSelectionRange(a+t.length,a+t.length); return; }
     const b=e.target.closest('[data-a]'); if(!b) return; const a=b.dataset.a;
     if(a==='x'){ closeTpl(); return; }
-    if(a==='def'){ tq('.tta').value=rtplDef(); tq('.tmsg').textContent='기본 양식을 불러왔습니다 — 저장해야 적용됩니다'; return; }
+    if(a==='def'){ tq('.tta').value=rtplDef(); tq('.tmsg').textContent='기본 양식을 불러왔어요 — 저장해야 적용돼요'; return; }
     if(a==='pre'){ const pre=tq('.tpre'), on=pre.hidden; if(on){ const f=cur&&cur.facts?cur.facts:reportFacts(); pre.textContent=reportDraft(f, fmtTs(cur?cur.ts:new Date().toISOString()), tq('.tta').value); }
       pre.hidden=!on; tq('.tta').hidden=on; b.textContent=on?'양식으로':'미리보기'; return; }
     if(a==='save'){ let t=tq('.tta').value.replace(/\r\n/g,'\n').slice(0,8000); if(t.trim()===rtplDef().trim()) t='';
       const ins=tq('.tin').value.replace(/\r\n/g,'\n').trim().slice(0,3000);
       b.disabled=true; const r=await rtplPut(t,ins); b.disabled=false; tq('.tmsg').textContent=r.msg||'';
-      if(r.ok){ if(cur&&cur.facts&&!cur.draftEdited){ cur.draft=cur.draftAuto=reportDraft(cur.facts, fmtTs(cur.ts)); rpsave(); setRepView('draft'); } toast(r.msg||'저장했습니다'); closeTpl(); } }
+      if(r.ok){ if(cur&&cur.facts&&!cur.draftEdited){ cur.draft=cur.draftAuto=reportDraft(cur.facts, fmtTs(cur.ts)); rpsave(); setRepView('draft'); } toast(r.msg||'저장했어요'); closeTpl(); } }
   });
   tplEl.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.stopPropagation(); closeTpl(); } });
   $('#repTpl').addEventListener('click',openTpl);
@@ -6020,7 +6146,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   $('#repTabAi').addEventListener('click',()=>{ if(cur&&(cur.ai||repCtl)) setRepView('ai'); });
 
   $('#repAi').addEventListener('click',()=>{ const b=$('#repAi');
-    if(!CAP.sample){ const st=$('#repStatus'); st.textContent = SRV.on ? 'AI 작성 꺼짐 — 서버 PC에서 gemini-key-setup.bat으로 Gemini API 키를 넣고 서버를 다시 켜면 켜집니다' : 'AI 작성 꺼짐 — SACHIL 서버에 연결되지 않았습니다(서버 PC가 꺼져 있는지 확인)'; st.classList.add('warn'); setTimeout(()=>st.classList.remove('warn'),2500); return; }
+    if(!CAP.sample){ const st=$('#repStatus'); st.textContent = SRV.on ? 'AI 작성 꺼짐 — 서버 PC에서 gemini-key-setup.bat으로 Gemini API 키를 넣고 서버를 다시 켜면 켜져요' : 'AI 작성 꺼짐 — SACHIL 서버에 연결되지 않았어요(서버 PC가 꺼져 있는지 확인)'; st.classList.add('warn'); setTimeout(()=>st.classList.remove('warn'),2500); return; }
     if(repCtl){ runAi(true); return; } if(cur&&cur.aiEdited) arm(b,'편집 내용 버리고 다시 작성',()=>runAi(true)); else runAi(true); });
   $('#repCopy').addEventListener('click',()=>copyText(repText(), $('#repCopy'), '복사'));
   // V133: PDF공유·PDF받기 — 본문을 A4 그림(캔버스, 기기 한글 글꼴)으로 그려 JPEG 페이지로 묶은 PDF(따로 글꼴·라이브러리 없이)
@@ -6327,11 +6453,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   document.addEventListener('click',e=>{ if(!shMenu.hidden&&!shMenu.contains(e.target)) shClose(); });
   shMenu.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.stopPropagation(); shClose(); $('#repShare').focus(); } });
   shMenu.addEventListener('click',async e=>{ const b=e.target.closest('[data-sh]'); if(!b||!cur) return; const kind=b.dataset.sh, lab=b.querySelector('span'), old=lab.textContent;
-    lab.textContent='만드는 중…'; let f; try{ f=await repFile(kind); }catch(_){ lab.textContent=old; toast('파일을 만들지 못했습니다'); return; }
+    lab.textContent='만드는 중…'; let f; try{ f=await repFile(kind); }catch(_){ lab.textContent=old; toast('파일을 만들지 못했어요'); return; }
     lab.textContent=old;
-    if(!(navigator.share&&navigator.canShare&&navigator.canShare({files:[f]}))){ shClose(); pdfDown(f); toast(`이 기기는 공유를 지원하지 않아 ${kind.toUpperCase()} 파일을 받았습니다`); return; }
+    if(!(navigator.share&&navigator.canShare&&navigator.canShare({files:[f]}))){ shClose(); pdfDown(f); toast(`이 기기는 공유를 지원하지 않아 ${kind.toUpperCase()} 파일을 받았어요`); return; }
     try{ await navigator.share({files:[f], title:'화재등 상황 보고서'}); shClose(); }
-    catch(err){ if(err&&err.name==='NotAllowedError'){ lab.textContent='준비됨 — 한 번 더 누르세요'; setTimeout(()=>{ if(lab.isConnected) lab.textContent=old; },6000); } else shClose(); } });   // 만드는 사이 터치 허용 시간이 지나면 한 번 더
+    catch(err){ if(err&&err.name==='NotAllowedError'){ lab.textContent='준비됨 — 한 번 더 눌러 주세요'; setTimeout(()=>{ if(lab.isConnected) lab.textContent=old; },6000); } else shClose(); } });   // 만드는 사이 터치 허용 시간이 지나면 한 번 더
   $('#repSave').addEventListener('click',async()=>{
     if(!cur||!repText().trim()) return; const btn=$('#repSave'); btn.textContent='PDF 만드는 중…';
     try{ pdfDown(await repPdfFile()); btn.textContent='받음'; }catch(_){ btn.textContent='받지 못함'; }
@@ -6343,9 +6469,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // V198: 실시간 미리보기 — 지금 입력으로 만들어질 규칙 초안(1~5 묶음)을 문서 모양으로. 지휘 활동 이하(CH 기록)는 안내 한 줄로
   const ILPV={open:false}, ILPV_MQ=matchMedia('(min-width:1100px)');
   const ilPvOn=()=>ILPV.open||ILPV_MQ.matches;
-  function ilPvHtml(){ let t=''; try{ t=reportDraft(reportFacts(), fmtTs(new Date().toISOString())); }catch(_){ return '<p class="il-pvn">미리보기를 만들지 못했습니다</p>'; }
+  function ilPvHtml(){ let t=''; try{ t=reportDraft(reportFacts(), fmtTs(new Date().toISOString())); }catch(_){ return '<p class="il-pvn">미리보기를 만들지 못했어요</p>'; }
     const L=String(t).split('\n'), i=L.findIndex(l=>/^\s*■.*지휘\s*활동/.test(l)); if(i>0) L.length=i;
-    return `<article class="rdoc">${repDocHtml(L.join('\n'))}</article>${i>0?'<p class="il-pvn">지휘 활동·시간대별 기록·확인 필요 사항은 CH 체크리스트와 시각 기록에서 자동으로 채워집니다.</p>':''}`; }
+    return `<article class="rdoc">${repDocHtml(L.join('\n'))}</article>${i>0?'<p class="il-pvn">지휘 활동·시간대별 기록·확인 필요 사항은 CH 체크리스트와 시각 기록에서 자동으로 채워져요.</p>':''}`; }
   function ilPvPaint(){ const b=document.getElementById('ilPvB'); if(!b) return;
     if(ilPvOn()){ const y=b.scrollTop; b.innerHTML=ilPvHtml(); b.scrollTop=y; } else b.innerHTML='';
     const u=ilUnits(), n=u.filter(x=>unitStatus(x).cls).length, s=document.getElementById('ilPvS'); if(s) s.textContent=`${n}/${u.length} 입력`;
@@ -6362,10 +6488,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       </div>`).join('');
     const units=ilUnits(), nHas=units.filter(u=>unitStatus(u).cls).length;   /* V198: 기록 초기화는 머리줄로(고정 막대에서 뺌) · 작성된 보고서는 바로가기 줄 끝 · PC·가로 태블릿은 오른쪽에 실시간 미리보기 */
     panel.innerHTML=`
-      <div class="panel-head il-head">
-        <div><span class="eyebrow">IL · Incident Log</span><h2 style="margin-top:4px">화재등 상황 보고서</h2></div>
-        <button type="button" class="btn ghost" id="ilReset" title="발생개요 등 현장 기록을 비웁니다(CH 체크·작성된 보고서는 그대로)">기록 초기화</button>
-      </div>
+      ${pgHead({g:'IL', t:PG_NAME.IL.t, s:PG_NAME.IL.s, hid:'ilHead', cls:'il-head', act:`<button type="button" class="btn ghost sm" id="ilReset" title="발생개요 등 현장 기록을 비워요(CH 체크·작성된 보고서는 그대로)">${matchMedia('(max-width:399px)').matches?'초기화':'기록 초기화'}</button>`})}
       <div class="il-lay">
       <div class="il-main">
       <div class="card timer ilbar" id="timerBar">
@@ -6380,9 +6503,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <div class="il-pvb rep-doc" id="ilPvB">${ilPvOn()?ilPvHtml():''}</div>
       </aside>
       <section class="il-reps">
-      <h3 class="il-h" id="sec-reps">작성된 보고서 <span class="c">${reports.length}</span></h3>
-      <div class="card replist">${rows || `<div class="rep-empty">${AS.ilEmpty?`<img src="${AS.ilEmpty}" alt="">`:''}<p>아직 보고서가 없습니다. 위 현장 기록과 <b>CH 체크리스트</b>를 채우고 <b>보고서 만들기</b>를 누르면 여기에 쌓입니다.</p><a class="btn" href="#board">체크리스트 열기</a></div>`}</div>
-      <p class="hint-row" style="margin:10px 4px 0;font-size:12px;color:var(--muted-2)">보고서는 이 기기에만 저장됩니다 · ${reports.length}건 (최대 ${MAX_REPORTS}건)${storageFull?' · <b>저장 공간 부족</b>':''}</p>
+      <h3 class="pg-sec il-h" id="sec-reps">작성된 보고서 <span class="pg-n">${reports.length}건</span></h3>
+      <div class="card replist">${rows || `<div class="rep-empty">${AS.ilEmpty?`<img src="${AS.ilEmpty}" alt="">`:''}<p>아직 보고서가 없어요. 위 현장 기록과 <b>CH 체크리스트</b>를 채우고 <b>보고서 만들기</b>를 누르면 여기에 쌓여요.</p><a class="btn" href="#board">체크리스트 열기</a></div>`}</div>
+      <p class="hint-row" style="margin:10px 4px 0;font-size:12px;color:var(--c-mute)">보고서는 이 기기에만 저장돼요 · ${reports.length}건 (최대 ${MAX_REPORTS}건)${storageFull?' · <b>저장 공간 부족</b>':''}</p>
       </section>
       </div>`;
     panel.querySelectorAll('[data-rep]').forEach(b=>b.addEventListener('click',()=>{ const r=reports.find(x=>x.id===b.dataset.rep); if(r) openReport(r); }));
@@ -6391,7 +6514,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     $('#ilReset').addEventListener('click',()=>{ const b=$('#ilReset'); arm(b,'현장 기록 지움?',()=>{
       const old=JSON.parse(JSON.stringify(state.situ));
       state.situ={inv:{},text:{},fields:{}}; addLog('[현장 기록] 초기화 (CH 체크는 유지)'); save(); renderReports(panel);
-      toast('현장 기록을 비웠습니다(CH 체크·작성된 보고서는 그대로)',()=>{ state.situ=old; save(); if(state.route==='log') render(); });
+      toast('현장 기록을 비웠어요(CH 체크·작성된 보고서는 그대로)',()=>{ state.situ=old; save(); if(state.route==='log') render(); });
     }); });
     bindJump(panel);
     ilSync().then(ch=>{ if(ch&&panel.isConnected&&state.route==='log') renderReports(panel); }).catch(()=>{});   // V174: 교수가 고친 최신 서식
