@@ -1790,6 +1790,145 @@ html body .chat:not(.botchat) > .chat-foot:not(.on):not(:has(.warn)){display:non
 .rtov .rtacts [data-rt="x"]{color:var(--c-ink)}
 @media (hover:hover) and (pointer:fine){ .rtov .rtacts .btn{min-height:40px} .rtov .rtbox .close{width:40px;height:40px} }
 </style>
+<style id="v226-ch">
+/* V226(ch): CH 현장지휘 체크리스트 — 화면 머리 pgHead 틀, 토큰(색·글자·둥글기), 타이머 Mono 28px, 칩 선택 = 오션 연한 바탕. 범위: #panel .board / .ch-head 만 */
+#panel .pg-head.ch-head{margin:var(--sp-3) 0 var(--sp-4)}
+/* 경과 시계 바(위에 붙는 카드) */
+#panel .board>.timer{border-color:var(--c-line-2);border-radius:var(--rad-m);box-shadow:var(--sh-1)}
+#panel .board .chclk{border-radius:var(--rad-s);background:var(--c-ink);padding:4px 10px 5px}
+#panel .board .chclk .lb{font-size:var(--fs-cap);font-weight:var(--fw-semi);color:#C9D3E6}
+#panel .board .chclk b{font-size:var(--fs-display);font-weight:var(--fw-bold);letter-spacing:-.02em;line-height:1.1;color:#fff}
+#panel .board .chclk:not(.live) b{color:#C9D3E6}
+#panel .board .timer .chrow .prog{font-family:var(--mono);font-size:var(--fs-h3);font-weight:var(--fw-bold);color:var(--c-ink)}
+#panel .board .timer .chrow .pct{font-size:var(--fs-cap);font-weight:var(--fw-semi);color:var(--c-mute)}
+#panel .board .timer .chrow #tmReset{border:1px solid var(--c-line-2);border-radius:var(--rad-s);background:var(--c-surface);color:var(--c-ink);font-size:var(--fs-sm);font-weight:var(--fw-semi)}
+#panel .board .timer .chrow #tmReset.accent{border-color:var(--c-danger);background:var(--c-danger-soft);color:var(--c-danger)}
+#panel .board .timer .chrow .jall{border:1px solid var(--c-line-2);border-radius:var(--rad-pill);background:var(--c-surface);color:var(--c-ink);font-size:var(--fs-sm);font-weight:var(--fw-semi)}
+#panel .board .timer .chrow .jall[aria-expanded="true"]{background:var(--c-ocean-soft);border-color:var(--c-ocean);color:var(--c-ink)}
+#panel .board .chseg{height:6px}
+#panel .board .chseg i{border-radius:2px;background:var(--c-line)}
+#panel .board .chseg i::after{background:var(--c-ocean)}
+#panel .board .chseg i.full::after{background:var(--c-ok)}
+/* 단계 바로가기 칩: 칩 규칙(알약, 13~14px/600, 선택 = 오션 연한 바탕 + 오션 테두리) */
+#panel .board .timer .jump button{border:1px solid var(--c-line-2);background:var(--c-surface);color:var(--c-ink);font-size:var(--fs-sub);font-weight:var(--fw-semi)}
+#panel .board .timer .jump button .c{font-family:var(--mono);font-size:var(--fs-cap);font-weight:var(--fw-semi);color:var(--c-mute)}
+#panel .board .timer .jump button.full{border-color:var(--c-ok)}
+#panel .board .timer .jump button.full .c{color:var(--c-ok);font-weight:var(--fw-bold)}
+#panel .board .timer .jump button.on{background:var(--c-ocean-soft);border-color:var(--c-ocean);color:var(--c-ink);box-shadow:inset 0 0 0 1px var(--c-ocean)}
+#panel .board .timer .jump button.on .c{color:var(--c-ink)}
+#panel .board .timer .jump button:focus-visible,#panel .board .timer .jall:focus-visible,#panel .board #tmReset:focus-visible,#panel .board .timer .jg button:focus-visible{outline:3px solid var(--c-ocean);outline-offset:2px}
+/* 전체 단계 펼침(폰·좁은 화면) */
+#panel .board .timer .jgrid{border-top-color:var(--c-line)}
+#panel .board .timer .jg-h.pg-sec{margin:4px 0 var(--sp-2)}
+#panel .board .timer .jg button{min-height:44px;border:1px solid var(--c-line-2);border-radius:var(--rad-s);color:var(--c-ink);font-size:var(--fs-sub);font-weight:var(--fw-semi)}
+#panel .board .timer .jg button b{font-size:var(--fs-cap);color:var(--c-mute)}
+#panel .board .timer .jg button .c{font-size:var(--fs-micro);font-weight:var(--fw-semi);color:var(--c-mute)}
+#panel .board .timer .jg button .bar{background:var(--c-ok)}
+#panel .board .timer .jg button.full{border-color:var(--c-ok)}
+#panel .board .timer .jg button.full .c{color:var(--c-ok)}
+#panel .board .timer .jg button.on{border-color:var(--c-ocean);background:var(--c-ocean-soft);box-shadow:inset 0 0 0 1px var(--c-ocean)}
+/* 단계 카드: 제목 17px/700, 번호 = 네이비 칸 + 노랑 글, 완료 = 초록 */
+#panel .board .phase{border-color:var(--c-line-2);border-radius:var(--rad-m)}
+#panel .board .phase.cur{border-color:var(--c-ink);box-shadow:inset 0 4px 0 var(--c-ember)}
+#panel .board .phase h3{font-size:var(--fs-h2);font-weight:var(--fw-bold);line-height:1.3;color:var(--c-ink)}
+#panel .board .phase h3 .no{min-width:24px;height:24px;border-radius:var(--rad-xs);background:var(--c-ink);color:var(--c-ember);font-size:var(--fs-cap);font-weight:var(--fw-bold);vertical-align:-4px}
+#panel .board .phase.done h3 .no{background:var(--c-ok);color:#fff}
+#panel .board .phase h3 .one{font-size:var(--fs-cap);font-weight:var(--fw-semi);color:var(--c-mute)}
+#panel .board .phase.done h3::after{border-radius:var(--rad-pill);background:var(--c-ok);color:#fff;font-size:var(--fs-micro);font-weight:var(--fw-bold)}
+#panel .board .phase .cnt{font-family:var(--mono);font-size:var(--fs-sub);font-weight:var(--fw-bold);color:var(--c-ink)}
+#panel .board .phase.done .cnt{color:var(--c-ok)}
+#panel .board .phase .phbar{background:var(--c-line)}
+#panel .board .phase .phbar::after{background:var(--c-ocean)}
+#panel .board .phase.done .phbar::after{background:var(--c-ok)}
+/* 항목: 체크 칸 테두리 대비 4.5:1, 기록 시각 12px Mono */
+#panel .board .item{border-top-color:var(--c-line)}
+#panel .board .item input[type="checkbox"]{border:2px solid var(--c-mute);border-radius:var(--rad-xs);background:var(--c-surface)}
+#panel .board .item input[type="checkbox"]:checked{background:var(--c-ember);border-color:var(--c-ember-2)}
+#panel .board .item input[type="checkbox"]:checked::after{border-color:var(--c-ink)}
+#panel .board .item input[type="checkbox"]:focus-visible{outline:3px solid var(--c-ocean);outline-offset:2px}
+#panel .board .item .tx{font-size:var(--fs-body);color:var(--c-ink)}
+#panel .board .item input[type="checkbox"]:checked ~ .tx{color:var(--c-sub);text-decoration-color:var(--c-mute)}
+#panel .board .phase .item .at{font-size:var(--fs-cap);font-weight:var(--fw-semi);color:var(--c-ember-text)}
+#panel .board .item.next input[type="checkbox"]{border-color:var(--c-ink);box-shadow:0 0 0 4px rgba(253,208,0,.6)}
+#panel .board .item.next .tx{font-weight:var(--fw-bold);color:var(--c-ink)}
+@media (hover:hover) and (pointer:fine){
+  #panel .board .item label:hover .tx{color:var(--c-ink)}
+  #panel .board .item label:hover input[type="checkbox"]:not(:checked){border-color:var(--c-ink)}
+  #panel .board .timer .jump button:not(.on):hover,#panel .board .timer .jg button:not(.on):hover,#panel .board .timer .chrow .jall:hover{border-color:var(--c-ink)}
+}
+/* 완료 카드: 그림(빈 화면·완료 규칙) 가운데 · 주 버튼 노랑 */
+#panel .board .done-card{flex-direction:column;align-items:center;gap:var(--sp-3);padding:var(--sp-5) var(--sp-4);border:2px solid var(--c-ok);border-radius:var(--rad-m);background:var(--c-ok-soft);text-align:center}
+#panel .board .done-card img{width:min(220px,60vw);height:auto;margin:0}
+#panel .board .done-card b{display:block;font-size:var(--fs-h2);font-weight:var(--fw-bold);color:var(--c-ok)}
+#panel .board .done-card p{margin:4px 0 var(--sp-3);font-size:var(--fs-sm);font-weight:var(--fw-mid);color:var(--c-ink-2)}
+#panel .board .done-card .btn.primary{min-height:var(--tap-min);padding:0 var(--sp-5);border-radius:var(--rad-s);border-color:var(--c-ember);background:var(--c-ember);color:var(--c-ink);font-size:var(--fs-sm);font-weight:var(--fw-bold)}
+#panel .board .done-card .btn.primary:hover{background:var(--c-ember-2);border-color:var(--c-ember-2);color:var(--c-ink)}
+@media (min-width:600px){ #panel .board .done-card img{width:260px} }
+/* 시각 기록 */
+#panel .board .logbox{border-radius:var(--rad-m)}
+#panel .board .logbox h3{font-size:var(--fs-h2);font-weight:var(--fw-bold);color:var(--c-ink)}
+#panel .board .logbox header h3 .lc{font-size:var(--fs-cap);font-weight:var(--fw-semi);color:var(--c-mute)}
+#panel .board .logbox .lgact{display:flex;gap:var(--sp-2);align-items:center}
+#panel .board .logbox .saved{font-size:var(--fs-cap);font-weight:var(--fw-semi);color:var(--c-mute)}
+#panel .board .logbox #copyLog{border-color:var(--c-line-2);border-radius:var(--rad-s);color:var(--c-ink);font-size:var(--fs-sm)}
+#panel .board .logform input{border-color:var(--c-line-2);border-radius:var(--rad-s);color:var(--c-ink)}
+#panel .board .logform input:focus{border-color:var(--c-ocean);box-shadow:0 0 0 3px var(--c-ocean-soft)}
+#panel .board .logform .btn.primary{min-width:64px;border-radius:var(--rad-s);background:var(--c-ink);border-color:var(--c-ink);color:#fff;font-size:var(--fs-sm);font-weight:var(--fw-bold)}
+#panel .board .logbox .log{font-size:var(--fs-sm);color:var(--c-ink)}
+#panel .board .logbox .log li{border-color:var(--c-line)}
+#panel .board .logbox .log .ts{font-weight:var(--fw-bold);color:var(--c-ink)}
+#panel .board .logbox .log .el{font-size:var(--fs-cap);color:var(--c-sub)}
+#panel .board .ch-meta{margin:0 0 var(--sp-2);padding:0 2px;font-size:var(--fs-cap);font-weight:var(--fw-semi);color:var(--c-mute)}
+/* 폰·좁은 화면(760px 미만): 첫 줄 = 시계 · 전체 · 초기화, 둘째 줄 = 진행 막대 + 5/50 */
+@media (max-width:759px){
+  #panel .board>.timer{column-gap:var(--sp-2);row-gap:var(--sp-2)}
+  #panel .board .timer .chrow{display:contents}
+  #panel .board .chclk{order:1;flex:none}
+  #panel .board .timer .chrow .jall{order:2;margin-left:auto}
+  #panel .board .timer .chrow #tmReset{order:3;flex:none}
+  #panel .board .chseg{order:4;flex:1 1 60%;min-width:0;align-self:center;margin:0}
+  #panel .board .timer .chrow .prog{order:5;flex:none;margin:0;font-size:var(--fs-sub);line-height:1}
+  #panel .board .timer .chrow .pct{order:6;display:inline;margin:0 0 0 -2px;line-height:1}
+  #panel .board .timer .jump{order:7;flex-basis:100%}
+  #panel .board .timer .jgrid{order:8}
+  #panel .board .timer .jump button{font-size:var(--fs-sm)}
+}
+@media (max-width:599px){
+  #panel .board>.timer{column-gap:6px}
+  #panel .board .chclk{padding:3px 8px 4px}
+  #panel .board .chclk .lb{font-size:var(--fs-cap)}
+  #panel .board .chclk b{font-size:var(--fs-display);gap:6px}
+  #panel .board .chclk{position:relative}
+  #panel .board .chclk.live b::before{position:absolute;top:8px;right:8px;width:8px;height:8px}
+  #panel .board .timer .chrow .jall{padding:0 12px}
+  #panel .board .timer .chrow #tmReset{padding:0 10px}
+  #panel .board .timer .jg button{font-size:var(--fs-sub)}
+}
+@media (max-width:399px){
+  #panel .board .timer .chrow .jall,#panel .board .timer .chrow #tmReset{font-size:var(--fs-sub);padding:0 9px}
+  #panel .board .timer .jump button{font-size:var(--fs-sub)}
+}
+/* 태블릿·PC(760px 이상) 왼쪽 레일 */
+@media (min-width:760px){
+  #panel .board .chclk{padding:10px 12px 11px}
+  #panel .board .chclk b{font-size:var(--fs-display)}
+  #panel .board .timer .chrow .prog{font-size:var(--fs-h3)}
+  #panel .board .timer .chrow .pct{font-size:var(--fs-sub);color:var(--c-ink)}
+  #panel .board .timer .jump button{border-radius:var(--rad-s);font-size:var(--fs-sm)}
+  #panel .board .timer .jump .pb{background:var(--c-line)}
+  #panel .board .timer .jump .pb::after{background:var(--c-ocean)}
+  #panel .board .timer .jump button.full .pb::after{background:var(--c-ok)}
+  #panel .board .timer .jump button.on .pb{background:var(--c-ocean-line)}
+  #panel .board .timer .jump button.on .pb::after{background:var(--c-ocean)}
+  #panel .board .timer .jump button.on.full .pb::after{background:var(--c-ok)}
+}
+@media (min-width:760px) and (hover:hover) and (pointer:fine){
+  #panel .board .timer .jump button{min-height:40px}
+}
+@media (min-width:760px) and (pointer:coarse){
+  #panel .board .timer .jump button{min-height:46px}
+}
+</style>
 </head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
@@ -5404,29 +5543,25 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function renderBoard(panel){
     const phases=CHECKLIST, checks=state.checks, half=Math.ceil(CHECKLIST.length/2);
     const total=totalItems(), done=phases.reduce((n,p,pi)=>n+clGot(p,pi,checks),0);
-    const illo = AS.first;
     const pct=total?Math.round(done/total*100):0, dn=pi=>clGot(phases[pi],pi,checks);
     let nextK=''; for(let pi=0;pi<phases.length&&!nextK;pi++) if(dn(pi)<clNeed(phases[pi])) for(let ii=0;ii<phases[pi].items.length;ii++) if(!checks[pi+'-'+ii]){ nextK=pi+'-'+ii; break; }   /* V198(ch): 다음에 할 항목(점검표처럼 지금 줄을 표시) */
     const chip=pi=>{ const p=phases[pi], d=dn(pi); return `<button type="button" data-j="ph-${pi}" class="${d===clNeed(p)?'full':''}">${pi+1} ${esc(p.name)} <span class="c">${d}/${clNeed(p)}</span><i class="pb" style="--p:${Math.round(d/clNeed(p)*100)}%" aria-hidden="true"></i></button>`; };
     panel.innerHTML=`
-      <div class="rolecard chrole">
-        ${illo?`<img src="${illo}" alt="">`:''}
-        <div class="txt"><span class="eyebrow">CH · CHecklist</span><h2>현장지휘 체크리스트</h2><p>${esc(phases[0].name)}부터 ${esc(phases[phases.length-1].name)}까지 ${phases.length}단계와 시각 기록. 체크하면 시각이 자동으로 남습니다. 항목은 교수가 SACHIL방재실에서 관리합니다.</p></div>
-      </div>
+      ${pgHead({g:'CH', t:PG_NAME.CH.t, s:`${phases[0].name}부터 ${phases[phases.length-1].name}까지 ${phases.length}단계 · 체크하면 시각이 자동으로 남아요`, id:'chTitle', cls:'ch-head'})}
       <div class="board">
         <div class="card timer ${state.timer.running?'live':''}" id="timerBar">
-          <div class="chrow"><div class="chclk${state.timer.running?' live':''}" title="첫 체크 때 경과 시간이 흐릅니다"><span class="lb">${state.timer.running?'경과':(state.timer.acc?'멈춤':'대기')} · <span id="tm">${clock(new Date())}</span></span><b id="tmEl" role="timer" aria-label="경과 시간">${hhmmss(elapsed())}</b></div><button type="button" class="btn ghost" id="tmReset" title="체크·시각 기록·타이머를 비웁니다(IL 현장 기록은 그대로)">체크 초기화</button><button type="button" class="jall" id="jumpAll" aria-expanded="${jumpOpen}" aria-controls="jgrid">${jumpOpen?'닫기 ▴':'전체 ▾'}</button><span class="prog" aria-label="진행">${done}/${total}</span><span class="pct" aria-hidden="true">${pct}%</span></div>
+          <div class="chrow"><div class="chclk${state.timer.running?' live':''}" title="첫 체크 때 경과 시간이 흘러요"><span class="lb">${state.timer.running?'경과':(state.timer.acc?'멈춤':'대기')} · <span id="tm">${clock(new Date())}</span></span><b id="tmEl" role="timer" aria-label="경과 시간">${hhmmss(elapsed())}</b></div><button type="button" class="btn ghost" id="tmReset" title="체크·시각 기록·타이머를 비워요(IL 현장 기록은 그대로예요)">체크 초기화</button><button type="button" class="jall" id="jumpAll" aria-expanded="${jumpOpen}" aria-controls="jgrid">${jumpOpen?'닫기 ▴':'전체 ▾'}</button><span class="prog" aria-label="진행">${done}/${total}</span><span class="pct" aria-hidden="true">${pct}%</span></div>
           <div class="chseg" aria-hidden="true">${phases.map((p,pi)=>{const d=dn(pi); return `<i class="${d===clNeed(p)?'full':''}" style="--p:${Math.round(d/clNeed(p)*100)}%"></i>`;}).join('')}</div>
           <nav class="jump" id="jump" aria-label="항목 바로가기">
             <div class="jl">${phases.slice(0,half).map((p,k)=>chip(k)).join('')}</div>
             <div class="jl">${phases.slice(half).map((p,k)=>chip(k+half)).join('')}<button type="button" data-j="sec-log">시각 기록</button></div>
           </nav>
           <div class="jgrid" id="jgrid" ${jumpOpen?'':'hidden'} aria-label="전체 항목">
-            <p class="jg-h">${phases.length}단계 · ${done}/${total}</p>
+            <div class="jg-h pg-sec">전체 ${phases.length}단계 <span class="pg-n">${done}/${total}</span></div>
             <div class="jg">${phases.map((p,pi)=>{const d=dn(pi); return `<button type="button" data-j="ph-${pi}" class="${d===clNeed(p)?'full':''}"><b>${pi+1}</b><span class="n">${esc(p.name)}</span><span class="c">${d}/${clNeed(p)}</span><i class="bar" style="--p:${Math.round(d/clNeed(p)*100)}%" aria-hidden="true"></i></button>`;}).join('')}</div>
           </div>
         </div>
-        ${done===total?`<div class="card done-card" role="status"><img src="img/board-done.webp" alt="" width="360" height="409" decoding="async" onerror="this.remove()"><div><b>${total}개 항목 모두 완료</b><p>경과 ${hhmmss(elapsed())} · IL에서 보고서로 정리하세요.</p><a class="btn primary" href="#log">화재등 상황 보고서로</a></div></div>`:''}
+        ${done===total?`<div class="card done-card" role="status"><img src="img/board-done.webp" alt="" width="360" height="409" decoding="async" onerror="this.remove()"><div><b>${total}개 항목을 모두 체크했어요</b><p>경과 ${hhmmss(elapsed())} · 이제 상황 보고서로 정리해 보세요</p><a class="btn primary" href="#log">화재등 상황 보고서로</a></div></div>`:''}
         <div class="phases">
           ${phases.map((p,pi)=>{const d=dn(pi);return `<section class="card phase ${d===clNeed(p)?'done':''}${nextK.split('-')[0]===String(pi)?' cur':''}" id="ph-${pi}">
               <header><h3><span class="no">${pi+1}</span>${esc(p.name)}${clOne(p)?'<small class="one">하나만 골라도 완료</small>':''}</h3><span class="cnt">${d}/${clNeed(p)}</span><i class="phbar" style="--p:${Math.round(d/clNeed(p)*100)}%" aria-hidden="true"></i></header>
@@ -5434,10 +5569,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
             </section>`;}).join('')}
         </div>
         <section class="card logbox" id="sec-log">
-          <header><h3>시각 기록<span class="lc" id="logCnt"></span></h3><div style="display:flex;gap:6px;align-items:center"><span class="saved">이 기기에 자동 저장</span><button type="button" class="btn ghost" id="copyLog">기록 복사</button></div></header>
+          <header><h3>시각 기록<span class="lc" id="logCnt"></span></h3><div class="lgact"><span class="saved">이 기기에 자동 저장</span><button type="button" class="btn ghost" id="copyLog">기록 복사</button></div></header>
           <form class="logform" id="logForm"><input id="logText" placeholder="예: 2층 진입 지시, 대응 1단계 건의" aria-label="기록 내용"><button class="btn primary" type="submit">기록</button></form>
           <ul class="log" id="logList"></ul>
         </section>
+        <p class="ch-meta">항목은 교수가 SACHIL방재실에서 관리해요</p>
       </div>`;
     renderLog();
     startTick();   // 현재 시각은 시작 전에도 흐름
@@ -5449,14 +5585,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(cb.checked){ if(!state.timer.running&&!state.timer.acc){ state.timer.start=Date.now(); state.timer.running=true; addLog('체크리스트 시작'); if(!state.situ.fields.dt){ state.situ.fields.dt=localDT(new Date()); addLog('[발생개요] 사고일시 자동 입력 '+showDT(state.situ.fields.dt)); } }   // 시작 버튼 없이 첫 체크 때 경과 시간이 흐름(보고서용)
         checks[k]=clock(new Date()); const [pi,ii]=k.split('-').map(Number); addLog(phases[pi].items[ii]+' ✔'); }
       else { const was=checks[k]; delete checks[k];   // V111: 실수로 풀어도 기록 시각을 되돌릴 수 있게
-        toast('체크를 풀었습니다',()=>{ checks[k]=was; save(); if(panel.isConnected) renderBoard(panel); }); }
+        toast('체크를 풀었어요',()=>{ checks[k]=was; save(); if(panel.isConnected) renderBoard(panel); }); }
       save(); renderBoard(panel);
       { const fc=panel.querySelector(`.item input[data-k="${k}"]`); if(fc) fc.focus({preventScroll:true}); }
     }));
-    $('#tmReset').addEventListener('click',()=>arm($('#tmReset'),'체크·시각 지움?',()=>{   // 현장 기록(발생개요 등)은 IL의 '기록 초기화'로
+    $('#tmReset').addEventListener('click',()=>arm($('#tmReset'),'정말 지울까요?',()=>{   // 현장 기록(발생개요 등)은 IL의 '기록 초기화'로
       const old={timer:{...state.timer}, checks:{...state.checks}, log:state.log.slice()};
       state.timer={running:false,start:0,acc:0}; state.checks={}; state.log=[]; save(); renderBoard(panel);
-      toast('체크·시각 기록을 비웠습니다(IL 현장 기록은 그대로)',()=>{ state.timer=old.timer; state.checks=old.checks; state.log=old.log; save(); if(old.timer.running) startTick(); if(state.route==='board') render(); });
+      toast('체크·시각 기록을 비웠어요(IL 현장 기록은 그대로예요)',()=>{ state.timer=old.timer; state.checks=old.checks; state.log=old.log; save(); if(old.timer.running) startTick(); if(state.route==='board') render(); });
     }));
     $('#logForm').addEventListener('submit',e=>{ e.preventDefault(); const v=$('#logText').value.trim(); if(!v) return; addLog(v); save(); $('#logText').value=''; renderLog(); });
     $('#copyLog').addEventListener('click',async()=>{
