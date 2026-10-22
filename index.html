@@ -2057,7 +2057,7 @@ html body .net-head .rn-pin:focus-visible,html body .net-head .ctool:focus-visib
   html body .net-head #dbRename .rnx{display:none}
   html body .net-head .pg-act .btn{padding:0 10px}
 }
-@media (max-width:399px){
+@media (max-width:386px){   /* V226 integ: 390 폰에서도 47 기호 칸이 보이게(디브리핑룸과 같은 틀) — 그보다 좁으면 숨김(도구 버튼 4개·제목 우선) */
   html body .net-head .pg-glyph{display:none}
 }
 
@@ -2565,6 +2565,28 @@ html:root body .profbar button{font-size:var(--fs-cap);font-weight:var(--fw-bold
 #pdfv .pv-foot{border-top-color:var(--c-line)}
 #pdfv .pv-seek input{accent-color:var(--c-ocean)}
 #pdfv .pv-foot output{color:var(--c-ink)}
+</style>
+<style id="v226-integ">
+/* V226 통합(integ): 담당 여러 곳이 겹치는 규칙만 — 마지막 head 블록(같은 선택자면 이김). 선택자 앞 :root 로 본문 쪽 옛 규칙보다 한 단계 위.
+   1) 주 버튼(.btn.primary) = 노랑 #FDD000 + 네이비 글(SPEC 5장). 담당 화면이 따로 정한 것(CH 기록·법령 칩 등)은 ID 선택자라 그대로 이김 */
+:root .btn.primary{background:var(--c-ember);border-color:var(--c-ember);color:var(--c-ink);font-weight:var(--fw-bold)}
+:root .btn.primary:hover{background:var(--c-ember-2);border-color:var(--c-ember-2);color:var(--c-ink)}
+:root .btn.primary:focus-visible{outline:3px solid var(--c-ocean);outline-offset:2px}
+:root .btn.primary:disabled,:root .btn.primary[aria-disabled="true"]{background:var(--c-line);border-color:var(--c-line);color:var(--c-mute);opacity:1;cursor:default}
+/* 노랑 바탕 위 글·기호는 항상 잉크(SPEC 1장): 옛 .btn.accent·입력창 보내기(.composer .send)는 --navy(=오션)였음 */
+:root .btn.accent,:root .btn.accent:hover{color:var(--c-ink)}
+html:root body .composer .send{color:var(--c-ink)}
+/* 한 화면 주 버튼 1개: 교수가 질의응답 섹션을 열면 위쪽 '자료 올리기'(교수 막대)와 아래 '질문 올리기'가 둘 다 노랑 → 교수 막대 쪽을 보조 버튼으로 */
+#panel:has(#qnaForm) .prof-up .btn.primary{background:var(--c-surface);border-color:var(--c-line-2);color:var(--c-ink)}
+#panel:has(#qnaForm) .prof-up .btn.primary:hover{background:var(--c-ocean-soft);border-color:var(--c-ocean)}
+/* 2) 화면 머리 제목 크기 하나로: 담당 블록의 옛 h2 규칙(#profForm h2·.bj2 .bjp>h2 = 17px, 교수 모드 .prof h2 = 18px)이 .pg-title을 덮지 않게.
+      보통 머리 = --fs-title(19/20/22px), 좁은 머리(is-compact: 대화방·창·시트) = --fs-h2(17px) */
+html:root body .pg-head h2.pg-title,html:root body .pg-head h1.pg-title,html:root body .pg-head h3.pg-title{font-size:var(--fs-title);margin:0;line-height:1.25}
+html:root body #profForm .pg-head h2.pg-title,html:root body .bj2 .bjp > .pg-head h2.pg-title{font-size:var(--fs-title)}   /* 교수 로그인·방재실: 담당 블록의 #profForm h2(17px)보다 위 */
+html:root body .pg-head.is-compact h2.pg-title,html:root body .pg-head.is-compact h1.pg-title,html:root body .pg-head.is-compact h3.pg-title{font-size:var(--fs-h2)}
+/* 3) 47망·디브리핑룸 빈 방 안내: 옛 검정 반투명 바탕(rgba(0,0,0,.07)) → 네이비 옅은 바탕, 그림이 있으면 바탕 없이(AI 첫 인사와 같게) */
+html:root body .convo .convo-note{background:rgba(11,27,63,.05);color:var(--c-sub)}
+html:root body .convo .convo-note:has(.convo-empty){background:transparent}
 </style>
 </head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
@@ -3924,7 +3946,7 @@ body.prof .top{box-shadow:inset 0 -3px 0 var(--navy)}
 .ilbar .ilrow .reps .c{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--navy);color:#fff;font-size:11.5px;display:inline-grid;place-items:center}
 .ilbar .ilrow #mkReport{margin-left:0}
 
-.prof h2{margin:6px 0 10px;font-size:18px}
+.prof h2:not(.pg-title){margin:6px 0 10px;font-size:18px}
 .aikeys{margin-top:14px}
 .pinf{display:grid;gap:8px;padding:10px 0;border-top:1px solid var(--line)}.pinf:first-of-type{border-top:0}.pinf textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-size:14px;background:var(--surface);color:var(--fg);resize:vertical}
 .room-note .rn-edit{margin:4px 0 6px 28px;min-height:32px;font-size:12.5px}
