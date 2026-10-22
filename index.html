@@ -1929,6 +1929,103 @@ html body .chat:not(.botchat) > .chat-foot:not(.on):not(:has(.warn)){display:non
   #panel .board .timer .jump button{min-height:46px}
 }
 </style>
+<style id="v226-ai">
+/* V226(ai): A · AI assistant 화면 — 공통 머리(pgHead .ai-head) · 토큰 · 칩 · 답 카드 정리. #panel 안 .ai-head / .botchat / .ai-gate 에만 */
+/* 머리: 태블릿·PC는 대화 칸(800px)과 같은 폭으로 가운데 */
+@media (min-width:700px){ #panel .pg-head.ai-head{max-width:832px;margin-left:auto;margin-right:auto;padding:0 16px;box-sizing:border-box} }
+#panel .pg-head.ai-head #chatClear{min-height:40px;padding:0 14px;border-radius:var(--rad-pill);font-size:var(--fs-sm);font-weight:var(--fw-semi);color:var(--c-ink)}
+#panel .pg-head.ai-head #chatClear.accent{border-color:var(--c-danger);color:var(--c-danger);background:var(--c-danger-soft)}
+@media (pointer:coarse){ #panel .pg-head.ai-head #chatClear{min-height:var(--tap-min)} }
+@media (max-width:599px){ #panel .pg-head.ai-head{margin-bottom:var(--sp-3)} }
+
+/* 첫 인사 그림(재채색본): 1장 크기 규칙 — 폭 min(220px,60vw) · 태블릿·PC 260px, 위 반신만(머리~책) */
+#panel .botchat .convo-empty.ai-hello{padding:var(--sp-2) 0 0;margin:0 0 var(--sp-3);background:transparent}
+#panel .botchat .convo-empty.ai-hello img{width:min(220px,60vw);max-width:none;height:auto;aspect-ratio:360/330;object-fit:cover;object-position:50% 0;margin:0 auto}
+@media (min-width:600px){ #panel .botchat .convo-empty.ai-hello img{width:260px} }
+
+/* 말풍선: 진한 글은 잉크 네이비, 테두리·둥글기 토큰 */
+#panel .botchat .msg.bot .bub{border-color:var(--c-line-2);border-radius:4px var(--rad-m) var(--rad-m) var(--rad-m);color:var(--c-ink);font-size:var(--fs-body)}
+#panel .botchat .msg.me .bub{color:var(--c-ink);font-size:var(--fs-body)}
+#panel .botchat .msg.bot > .av{border-radius:var(--rad-s)}
+#panel .botchat .msg.bot .who{font-size:var(--fs-cap);font-weight:var(--fw-bold);letter-spacing:0;color:var(--c-ink)}
+#panel .botchat .msg .t{font-size:var(--fs-cap);color:var(--c-mute)}
+@media (max-width:380px){ #panel .botchat .msg.bot .bub{font-size:var(--fs-body)} }
+@media (min-width:700px){ #panel .botchat .msg.bot .bub{font-size:var(--fs-body)} }
+
+/* 답 덩어리 이름표 · 결론 상자 · 근거 목록 */
+#panel .botchat .bub .lbl{font-size:var(--fs-cap);font-weight:var(--fw-bold);letter-spacing:0}
+#panel .botchat .bub .as-k{border-radius:var(--rad-s);font-size:var(--fs-body);color:#fff}
+#panel .botchat .bub .as-c{border-left-color:var(--c-caution)}
+#panel .botchat .bub .as-g .lbl,#panel .botchat .bub .as-w .lbl,#panel .botchat .bub .as-w{color:var(--c-mute)}
+#panel .botchat .bub .as-w{font-size:var(--fs-sm)}
+#panel .botchat .bub a.ref{font-weight:var(--fw-bold)}
+#panel .botchat .bub .src-h{border-top:1px solid var(--c-line);font-size:var(--fs-cap);font-weight:var(--fw-bold);letter-spacing:0;color:var(--c-ink)}
+#panel .botchat .bub ol.src li{background:var(--c-surface-2);border-color:var(--c-line);border-radius:var(--rad-xs)}
+#panel .botchat .bub ol.src a{color:var(--c-ocean);font-size:var(--fs-sub)}
+#panel .botchat .bub ol.src a b{font-size:var(--fs-micro);color:var(--c-ink)}
+#panel .botchat .bub ol.src q.snip{font-size:var(--fs-cap);color:var(--c-sub)}
+#panel .botchat .bub .mode{border-top-color:var(--c-line);font-size:var(--fs-cap);font-weight:var(--fw-mid);color:var(--c-sub)}
+
+/* 답 아래 행동: 보조 버튼 2개(흰 바탕+테두리) + 복사(글자 버튼) — 화면마다 노랑 주 버튼은 보내기 하나 */
+#panel .botchat .ans-act .to-srch,#panel .botchat .ans-act .full-ask,#panel .botchat .ans-act .ai-copy,#panel .botchat .ai-retry{border-radius:var(--rad-s);font-size:var(--fs-sm);font-weight:var(--fw-semi)}
+#panel .botchat .ans-act .to-srch,#panel .botchat .ans-act .full-ask,#panel .botchat .ai-retry{background:var(--c-surface);border:1px solid var(--c-line-2);color:var(--c-ink)}
+#panel .botchat .ans-act .to-srch{border-color:var(--c-ink);font-weight:var(--fw-bold)}
+#panel .botchat .ans-act .to-srch:hover,#panel .botchat .ans-act .full-ask:hover,#panel .botchat .ai-retry:hover{background:var(--c-ocean-soft);border-color:var(--c-ocean)}
+#panel .botchat .ans-act .ai-copy{color:var(--c-sub)}
+#panel .botchat .ans-act .ai-copy:hover{border-color:var(--c-line-2);color:var(--c-ink)}
+
+/* 실패 말풍선: 주의 색 띠 + 선 아이콘(⚠ 글자 대신 pgIcon) + 다시 묻기 */
+#panel .botchat .msg.bot .bub.ai-err{background:var(--c-caution-soft);border-color:#FEC84B;border-left:4px solid var(--c-caution)}
+#panel .botchat .bub.ai-err p::before{content:none}
+#panel .botchat .bub.ai-err > p:first-of-type{font-weight:var(--fw-bold);color:var(--c-ink)}
+#panel .botchat .bub.ai-err .ai-err-ic{float:left;width:20px;height:20px;margin:2px 8px 0 0;color:#B54708}
+#panel .botchat .ai-retry{margin-top:var(--sp-3);padding:0 18px;clear:both;font-weight:var(--fw-bold)}
+
+/* 기다림 · 글이 나오는 중 */
+#panel .botchat .bub.typing::after{font-size:var(--fs-sub);font-weight:var(--fw-semi);color:var(--c-ink)}
+#panel .botchat .bub.typing i{background:var(--c-ink)}
+#panel .botchat .bub.streaming::after{color:var(--c-ocean)}
+
+/* 추천 질문: 머리글은 화면 소제목(pg-sec)과 같은 모양 — 노랑 막대 + 13px/700 */
+#panel .botchat > .card .quick{border-top-color:var(--c-line)}
+#panel .botchat > .card .quick::before,#panel .botchat > .card:not(:has(.msg[data-mi])) .quick::before{content:"추천 질문";display:block;font-size:var(--fs-sub);font-weight:var(--fw-bold);letter-spacing:0;line-height:1.4;color:var(--c-ink);background:linear-gradient(var(--c-ember),var(--c-ember)) 0 50% / 4px 14px no-repeat;padding:0 2px 0 12px}
+/* 칩: 알약 · 14px/600 · PC 36px / 터치 44px */
+#panel .botchat > .card .quick button{min-height:36px;border-radius:var(--rad-pill);border-color:var(--c-line-2);color:var(--c-ink);font-size:var(--fs-sm);font-weight:var(--fw-semi)}
+#panel .botchat > .card .quick button:hover{border-color:var(--c-ocean);background:var(--c-ocean-soft)}
+/* 처음(대화 없음) 세로 목록은 칩이 아니라 목록 칸 — 둥글기 10, 높이 44 */
+#panel .botchat > .card:not(:has(.msg[data-mi])) .quick button{border-radius:var(--rad-s);min-height:var(--tap-min)}
+#panel .botchat > .card:not(:has(.msg[data-mi])) .quick button::after{color:var(--c-ocean)}
+/* 태블릿·PC 첫 화면: 추천 질문 2열 → 첫 인사 그림·인사말이 한 화면에 */
+@media (min-width:700px){
+  #panel .botchat > .card:not(:has(.msg[data-mi])) .quick{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-2)}
+  #panel .botchat > .card:not(:has(.msg[data-mi])) .quick::before{grid-column:1 / -1}
+}
+/* 폰: 추천 질문은 처음에도 한 줄 가로 넘김(그림·인사말 자리 확보) */
+@media (max-width:599px){
+  #panel .botchat > .card:not(:has(.msg[data-mi])) .quick{flex-direction:row;align-items:center;overflow-x:auto;gap:var(--sp-2);scrollbar-width:none}
+  #panel .botchat > .card:not(:has(.msg[data-mi])) .quick button{white-space:nowrap;border-radius:var(--rad-pill)}
+  #panel .botchat > .card:not(:has(.msg[data-mi])) .quick button::after{content:none}
+}
+@media (pointer:coarse){ #panel .botchat > .card .quick button{min-height:var(--tap-min)} }
+#panel .botchat button:focus-visible,#panel .botchat a:focus-visible,#panel .pg-head.ai-head button:focus-visible{outline:3px solid var(--c-ocean);outline-offset:2px}
+
+/* 낱말 안내 줄 */
+#panel .botchat .xhint.sm{border-radius:var(--rad-s);font-size:var(--fs-sub);color:var(--c-ink)}
+#panel .botchat .xhint.sm .btn{min-height:36px;font-size:var(--fs-sub);border-radius:var(--rad-pill)}
+@media (pointer:coarse){ #panel .botchat .xhint.sm .btn{min-height:var(--tap-min)} }
+
+/* 입장코드 화면: 머리는 pgHead, 카드는 평면(1px 테두리) · 확인 = 주 버튼(노랑) */
+#panel .ai-gate{border-top:1px solid var(--c-line);border-radius:var(--rad-m)}
+#panel .ai-gate .gate-h{margin:0;font-size:var(--fs-h2);font-weight:var(--fw-bold);color:var(--c-ink)}
+#panel .ai-gate .note{font-size:var(--fs-sub);color:var(--c-sub)}
+#panel .ai-gate input{font-size:var(--fs-h2)}
+#panel .ai-gate .note.err{font-size:var(--fs-sub);color:var(--c-danger);background:var(--c-danger-soft);border-left-color:var(--c-danger);border-radius:0 var(--rad-xs) var(--rad-xs) 0}
+#panel .ai-gate .acts .btn{border-radius:var(--rad-s);font-size:var(--fs-sm);font-weight:var(--fw-bold)}
+#panel .ai-gate .acts .btn.primary{background:var(--c-ember);border-color:var(--c-ember);color:var(--c-ink)}
+#panel .ai-gate .acts .btn.primary:hover{background:var(--c-ember-2);border-color:var(--c-ember-2)}
+@media (hover:hover) and (pointer:fine){ #panel .ai-gate .acts .btn{min-height:40px} }
+@media (min-width:700px){ #panel .pg-head.ai-head:has(+ .dbwrap > .ai-gate){max-width:520px;padding:0;margin-top:6vh} #panel .dbwrap:has(> .ai-gate){padding-top:0} #panel .dbwrap > .ai-gate{width:100%;box-sizing:border-box} }
+</style>
 </head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
@@ -6735,20 +6832,20 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   const cacheTag=m=>m.cached?' · 같은 질문의 저장된 답':'';
   const botModeHtml=m=> m.mode==='fast' ? `<span class="mode">AI 빠른 답 · 근거 표시 없이${cacheTag(m)} — 중요한 기준·수치는 Search로 원문 확인</span>`
-    : m.mode==='ai' ? `<span class="mode">AI 도우미 · ${(m.src||[]).some(x=>x.slug==='pub')?'건축물대장·소방용수(공공데이터)·':''}${(m.src||[]).some(x=>x.slug==='law')?'법령 원문(법제처)·':''}메뉴 자료 근거 답변${cacheTag(m)} — 중요한 내용은 원문으로 확인하세요</span>`
-    : m.mode==='general' ? `<span class="mode warn">AI 일반 설명 · 메뉴 자료에 근거 없음${(m.src||[]).some(x=>x.slug==='law')?' · 법제처 원문 링크 첨부':''}${cacheTag(m)} — 소속 기관 지침·원문으로 확인하세요</span>`
+    : m.mode==='ai' ? `<span class="mode">AI 도우미 · ${(m.src||[]).some(x=>x.slug==='pub')?'건축물대장·소방용수(공공데이터)·':''}${(m.src||[]).some(x=>x.slug==='law')?'법령 원문(법제처)·':''}메뉴 자료 근거 답변${cacheTag(m)} — 중요한 내용은 원문으로 확인해 주세요</span>`
+    : m.mode==='general' ? `<span class="mode warn">AI 일반 설명 · 메뉴 자료에 근거 없음${(m.src||[]).some(x=>x.slug==='law')?' · 법제처 원문 링크 첨부':''}${cacheTag(m)} — 소속 기관 지침·원문으로 확인해 주세요</span>`
     : m.mode==='extract' ? `<span class="mode">교수 에이전트 · 원문 발췌 정리${m.note?` · ${esc(m.note)}`:' · AI 키 연결 시 해설형 답변'}</span>` : '';
 
   function answer(qRaw){
     const q=qRaw.trim(), lq=q.toLowerCase();
     const has=(...ws)=>ws.some(w=>lq.includes(w));
-    if(has('안녕','하이','hello','반가')) return {text:'안녕하세요. SACHIL AI 도우미입니다. SOP·법령·절차 문서를 찾아 드리고, 체크리스트와 화재등 상황 보고서로 안내합니다. 아래 추천 질문을 눌러 보셔도 됩니다.'};
-    if(has('도움','사용법','뭐 할 수','뭘 할 수','기능')) return {text:'SACHIL은 이름이 곧 화면입니다.\nS 검색 — SOP·법령·절차·사례를 찾습니다.\nA AI 도우미 — 지금 보시는 화면.\nCH 체크리스트 — 출동부터 지휘소 운영까지 12단계, 경과 타이머.\nIL 화재등 상황 보고서 — 발생개요·화재 상황·인명피해 등을 눌러 고르고 보고서 만들기.\n47망·디브리핑룸(익명 의견·사진·PDF 공유)과 메뉴(14개 섹션)는 오른쪽 위 심벌에 있습니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
-    if(has('보고서','리포트','report')) return {text:'체크리스트 화면의 "보고서 작성"을 누르면 체크한 항목·발생개요·화재 상황·인명피해·화재 원인·조치 사항·향후 전망·시각 기록으로 보고서 초안이 바로 만들어지고 AI 작성본이 이어서 나옵니다. 만든 보고서는 IL 사고보고서 탭에 모이며, 두 본문 모두 직접 고칠 수 있습니다. 교관 확인 전 자료입니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'사고보고서 보기',slug:'log',type:'이동'}]};
-    if(has('상황판','체크리스트','타이머')) return {text:'체크리스트로 안내합니다. 첫 항목을 체크하면 경과 시간이 자동으로 시작되고, 체크한 시각이 남으며 사고일시가 자동으로 채워집니다.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'}]};
-    if(has('차이','범위','역할') && has('선착대장','지휘대장')) return {text:'초안 기준 역할 경계입니다. 확정 기준은 교관 승인 후 반영됩니다.\n· 선착대장 — 도착 보고, 초기 상황판단, 선착대 전술(진입·배연·용수), 대원 안전, 지휘권 이양 준비까지.\n· 지휘대장 — 지휘권 인수, 상황 재평가, 대응단계 판단·건의, 자원 요청·배치, 안전관리, 지휘소 운영, 통제단 전환 직전까지.\n· 통제단장 — 이 플랫폼 범위 밖(중앙소방학교).', cards:[{title:'SOP-현장지휘론',slug:'sop',type:'섹션'}]};
-    if(has('이의신청','평가 일정','평가일정','재평가')) return {text:'평가·이의신청 일정은 아직 준비 중입니다. 열리면 ICTC 평가일정에서 기수별로 확인할 수 있습니다.', cards:[{title:'ICTC 평가일정',slug:'ictc-eval',type:'섹션'},{title:'실기평가 이의신청은 언제까지 가능한가',slug:'faq',type:'Q&A'}]};
-    if(has('교육 일정','교육일정','입교','기수')) return {text:'교육 일정은 준비 중입니다. ICTC 교육일정 섹션에 기수별 시간표가 올라갑니다.', cards:[{title:'ICTC 교육일정',slug:'ictc-schedule',type:'섹션'}]};
+    if(has('안녕','하이','hello','반가')) return {text:'안녕하세요. SACHIL AI 도우미예요. SOP·법령·절차 문서를 찾아 드리고, 체크리스트와 화재등 상황 보고서로 안내해요. 아래 추천 질문을 눌러 봐도 돼요.'};
+    if(has('도움','사용법','뭐 할 수','뭘 할 수','기능')) return {text:'SACHIL은 이름이 곧 화면이에요.\nS 검색 — SOP·법령·절차·사례를 찾아요.\nA AI assistant — 지금 보고 있는 화면이에요.\nCH 체크리스트 — 출동부터 지휘소 운영까지 단계별 체크, 경과 타이머.\nIL 화재등 상황 보고서 — 발생개요·화재 개요·피해 현황 등을 눌러 고르고 보고서 만들기.\n47망·디브리핑룸(익명 의견·사진·PDF 공유)과 메뉴는 오른쪽 위 아이콘에 있어요.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'상황 보고서 보기',slug:'log',type:'이동'}]};
+    if(has('보고서','리포트','report')) return {text:'체크리스트 화면의 "보고서 작성"을 누르면 체크한 항목·발생개요·화재 개요·피해 현황·조치 사항·향후 전망·시각 기록으로 보고서 초안이 바로 만들어지고 AI 작성본이 이어서 나와요. 만든 보고서는 IL 상황 보고서 탭에 모이고, 두 본문 모두 직접 고칠 수 있어요. 교관 확인 전 자료예요.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'},{title:'상황 보고서 보기',slug:'log',type:'이동'}]};
+    if(has('상황판','체크리스트','타이머')) return {text:'체크리스트로 안내할게요. 첫 항목을 체크하면 경과 시간이 자동으로 시작되고, 체크한 시각이 남고 사고일시가 자동으로 채워져요.', cards:[{title:'체크리스트 열기',slug:'board',type:'이동'}]};
+    if(has('차이','범위','역할') && has('선착대장','지휘대장')) return {text:'초안 기준 역할 경계예요. 확정 기준은 교관 승인 뒤 반영돼요.\n· 선착대장 — 도착 보고, 초기 상황판단, 선착대 전술(진입·배연·용수), 대원 안전, 지휘권 이양 준비까지.\n· 지휘대장 — 지휘권 인수, 상황 재평가, 대응단계 판단·건의, 자원 요청·배치, 안전관리, 지휘소 운영, 통제단 전환 직전까지.\n· 통제단장 — 이 플랫폼 범위 밖(중앙소방학교).', cards:[{title:'SOP-현장지휘론',slug:'sop',type:'섹션'}]};
+    if(has('이의신청','평가 일정','평가일정','재평가')) return {text:'평가·이의신청 일정은 아직 준비 중이에요. 열리면 ICTC 평가일정에서 기수별로 확인할 수 있어요.', cards:[{title:'ICTC 평가일정',slug:'ictc-eval',type:'섹션'},{title:'실기평가 이의신청은 언제까지 가능한가',slug:'faq',type:'Q&A'}]};
+    if(has('교육 일정','교육일정','입교','기수')) return {text:'교육 일정은 준비 중이에요. ICTC 교육일정 섹션에 기수별 시간표가 올라가요.', cards:[{title:'ICTC 교육일정',slug:'ictc-schedule',type:'섹션'}]};
     // 검색 인덱스
     const terms=lq.split(/\s+/).filter(Boolean);
     const score=(hay,title)=>terms.reduce((n,t)=>n+(title.toLowerCase().includes(t)?3:0)+(hay.includes(t)?1:0),0);
@@ -6758,10 +6855,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const cards=[...docs.map(({d,sec})=>({title:d.title,slug:sec.slug,type:d.type})),...secs.filter(({s})=>!docs.some(h=>h.sec.slug===s.slug)).map(({s})=>({title:s.title,slug:s.slug,type:'섹션'}))];
       return {text:`“${q}”는 아래 메뉴에서 보실 수 있어요. 지금은 서버에 연결되지 않아서 자료 본문까지는 못 읽고 제목으로만 찾아 드렸어요.`, cards};
     }
-    return {text:'아직 답을 가진 질문이 아닙니다. 다른 표현으로 묻거나, 검색 탭에서 섹션을 둘러보세요. 서버가 연결되면 이 질문을 교관에게 바로 보낼 수 있습니다.', cards:[{title:'검색으로 이동',slug:'search',type:'이동'}]};
+    return {text:'아직 답을 가진 질문이 아니에요. 다른 표현으로 묻거나, 검색 탭에서 섹션을 둘러봐 주세요. 서버가 연결되면 이 질문을 교관에게 바로 보낼 수 있어요.', cards:[{title:'검색으로 이동',slug:'search',type:'이동'}]};
   }
 
-  const avHtml=()=>`<span class="av" aria-hidden="true">${AS.avatar?`<img src="${AS.avatar}" alt="">`:`<svg viewBox="0 0 48 48"><path d="M14 30 L24 16 L34 30" fill="none" stroke="#191919" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="35.5" r="3.6" fill="#191919"/></svg>`}</span>`;
+  const avHtml=()=>`<span class="av" aria-hidden="true">${AS.avatar?`<img src="${AS.avatar}" alt="">`:`<svg viewBox="0 0 48 48"><path d="M14 30 L24 16 L34 30" fill="none" stroke="#0B1B3F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="35.5" r="3.6" fill="#0B1B3F"/></svg>`}</span>`;
 
   // ---------- 채팅방 + 첨부 (이 기기에만 저장 · 서버는 마지막 단계) ----------
   const RMKEY='ictc_rooms_v9', RMSG='ictc_roommsgs_v10';
@@ -7073,10 +7170,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const aiCode=()=>{ try{ return localStorage.getItem(AICODE_KEY)||''; }catch(_){ return ''; } };
   const setAiCode=v=>{ try{ if(v) localStorage.setItem(AICODE_KEY,v); else localStorage.removeItem(AICODE_KEY); }catch(_){ } };
   function aiGate(panel,room){
-    panel.innerHTML=`<div class="dbwrap"><form class="card create ai-gate" id="aiGate" autocomplete="off">
-        <span class="eyebrow">A · AI assistant</span>
-        <h2 class="gate-h">입장코드를 넣어 주세요</h2>
-        <p class="note">교육 담당 교수에게 받은 코드입니다. 이 기기에서 한 번 맞히면 다음부터는 묻지 않습니다.</p>
+    panel.innerHTML=pgHead({g:'A', t:PG_NAME.A.t, s:PG_NAME.A.s, cls:'ai-head'})+`<div class="dbwrap"><form class="card create ai-gate" id="aiGate" autocomplete="off">
+        <h3 class="gate-h">입장코드를 넣어 주세요</h3>
+        <p class="note">교육 담당 교수에게 받은 코드예요. 이 기기에서 한 번 맞히면 다음부터는 묻지 않아요.</p>
         <div class="row"><label for="aiCodeIn">입장코드</label><input id="aiCodeIn" type="password" inputmode="numeric" maxlength="20" required enterkeyhint="go" autocomplete="off"></div>
         <p class="note err" id="aiCodeErr" role="alert" hidden></p>
         <div class="acts"><button type="button" class="btn ghost" id="aiHome">첫 화면으로</button><button type="submit" class="btn primary" id="aiCodeGo">확인</button></div>
@@ -7090,8 +7186,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(SRV.on){
         const r=await api('/api/ask',{json:{q:'',code:v}});   // 빈 질문: 코드만 확인(AI 호출 없음)
         btn.disabled=false;
-        if(r.status===403||r.status===429){ err.textContent=r.status===429?(r.j.error||'잠시 뒤 다시 시도하세요'):'코드가 맞지 않습니다'; err.hidden=false; inp.select(); return; }
-        if(r.status===0){ err.textContent='서버에 연결할 수 없습니다'; err.hidden=false; return; }
+        if(r.status===403||r.status===429){ err.textContent=r.status===429?(r.j.error||'잠시 뒤 다시 시도해 주세요'):'코드가 맞지 않아요'; err.hidden=false; inp.select(); return; }
+        if(r.status===0){ err.textContent='서버에 연결할 수 없어요'; err.hidden=false; return; }
       }
       setAiCode(v); renderBotRoom(panel,room);
     });
@@ -7102,34 +7198,35 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const pc0=panel.querySelector('#convo'), keepY=pc0&&pc0._stick===false?pc0.scrollTop:null;   // V192: 위로 올려 보던 중이면 답이 끝나도 그 자리 그대로   // V124: AI 도우미 공개 — 서버가 입장코드를 요구할 때만(403 need_code) 코드 화면
     const toSrch=(m,i)=>{ const u=chat.msgs[i-1]; if(!(u&&u.who==='me'&&u.text)) return '';
       const cp='<button type="button" class="ai-copy" data-copy aria-label="이 답 복사">복사</button>';   /* V198(ai): 답 아래 복사(길게 누르기·오른쪽 클릭 메뉴와 같은 복사) */
-      if(m.fast||m.mode==='fast') return `<div class="fast-src ans-act"><span>근거·원문은 <b>Search</b>에서 확인하세요</span><button type="button" class="btn ghost sm to-srch" data-srch="${esc(srchQ(u.text))}">Search에서 근거 찾기 →</button><button type="button" class="full-ask" data-full="${i}">근거와 함께 다시 묻기(느림)</button>${cp}</div>`;   // V189
+      if(m.fast||m.mode==='fast') return `<div class="fast-src ans-act"><span>근거·원문은 <b>Search</b>에서 확인해 주세요</span><button type="button" class="btn ghost sm to-srch" data-srch="${esc(srchQ(u.text))}">Search에서 근거 찾기 →</button><button type="button" class="full-ask" data-full="${i}">근거와 함께 다시 묻기(느림)</button>${cp}</div>`;   // V189
       return (m.mode==='ai'||m.mode==='extract'||m.mode==='general') ? `<div class="ans-act"><button type="button" class="to-srch" data-srch="${esc(u.text)}">Search에서 원문 더 찾기 →</button>${cp}</div>` : ''; };
     const srchQ=t=>{ const k=String(t).replace(/[?？!.]+$/,'').replace(/\s*(은|는|이|가|을|를|에서|에|의|와|과|도|좀|요)(?=\s|$)/g,' ').replace(/(무엇인가요|뭔가요|어떻게 하나요|어떻게 해야 하나요|알려줘|알려 주세요|설명해 ?줘|인가요|인지|하나요|되나요|할까요|나요)$/,'').replace(/\s+/g,' ').trim(); return k.length>=2?k.slice(0,60):String(t).slice(0,60); };   /* 질문 → 검색 낱말(조사·물음 끝 빼기) */
     const msgsHtml = chat.msgs.length ? chat.msgs.map((m,i)=> m.who==='me' ? msgMeHtml(m).replace('<div class="msg me"',`<div class="msg me" data-mi="${i}"`) : `
       <div class="msg bot" data-mi="${i}">${avHtml()}
-        <div class="bub${i===aiErrAt?' ai-err':''}">${botTextHtml(m)}${botSrcHtml(m)}${botModeHtml(m)}${toSrch(m,i)}${i===aiErrAt&&chat.msgs[i-1]&&chat.msgs[i-1].who==='me'&&chat.msgs[i-1].text?'<button type="button" class="ai-retry" data-retry>다시 묻기</button>':''}${m.cards&&m.cards.length?`<ul class="mini">${m.cards.map(c=>`<li><a href="#${esc(c.slug)}"><span class="tag">${esc(c.type)}</span><span>${esc(c.title)}</span><span class="arrow">→</span></a></li>`).join('')}</ul>`:''}</div>
+        <div class="bub${i===aiErrAt?' ai-err':''}">${i===aiErrAt?pgIcon('warn','is-warn ai-err-ic'):''}${botTextHtml(m)}${botSrcHtml(m)}${botModeHtml(m)}${toSrch(m,i)}${i===aiErrAt&&chat.msgs[i-1]&&chat.msgs[i-1].who==='me'&&chat.msgs[i-1].text?'<button type="button" class="ai-retry" data-retry>다시 묻기</button>':''}${m.cards&&m.cards.length?`<ul class="mini">${m.cards.map(c=>`<li><a href="#${esc(c.slug)}"><span class="tag">${esc(c.type)}</span><span>${esc(c.title)}</span><span class="arrow">→</span></a></li>`).join('')}</ul>`:''}</div>
         <span class="t">${esc(m.t)}</span>
       </div>`).join('') : '';
-    panel.innerHTML=roomHead(room, '', /* V141: 제목 아래 연결 안내 줄 없앰 */ `<button type="button" class="btn ghost" id="chatClear">대화 비우기</button>`)+`
+    panel.innerHTML=pgHead({g:'A', t:PG_NAME.A.t, s:PG_NAME.A.s, cls:'ai-head', act:'<button type="button" class="btn ghost sm" id="chatClear">대화 비우기</button>'})+`
       <div class="chat botchat">
         <div class="card">
           <div class="convo" id="convo">
-            ${msgsHtml || `<div class="convo-empty ai-hello"><img src="img/ai-hello.webp" alt="" width="360" height="675" decoding="async" onerror="this.parentNode.remove()"></div><div class="msg bot">${avHtml()}<div class="bub"><p>안녕하세요. SACHIL AI 도우미입니다. ${SRV.on?'메뉴에 첨부된 SOP·계획·교재를 근거로 답하고, 근거 쪽을 바로 열어 드립니다.':'체크리스트와 사고보고서, 메뉴로 안내합니다.'}</p>${SRV.on?'':'<span class="note">지금은 검색 인덱스 기반으로 문서 제목까지만 안내합니다. 사진·PDF는 받을 수 있지만 내용 분석은 AI 연결 후입니다.</span>'}</div></div>`}
+            ${msgsHtml || `<div class="convo-empty ai-hello"><img src="img/ai-hello.webp" alt="" width="360" height="675" decoding="async" onerror="this.parentNode.remove()"></div><div class="msg bot ai-hi">${avHtml()}<div class="bub"><p>안녕하세요. SACHIL AI 도우미예요. ${SRV.on?'메뉴에 첨부된 SOP·계획·교재를 근거로 답하고, 근거 쪽을 바로 열어 드려요.':'체크리스트와 상황 보고서, 메뉴로 안내해요.'}</p>${SRV.on?'':'<span class="note">지금은 검색 색인으로 문서 제목까지만 안내해요. 사진·PDF는 받을 수 있지만 내용 분석은 AI가 연결된 뒤에 할 수 있어요.</span>'}</div></div>`}
             ${chat.typing?`<div class="msg bot">${avHtml()}<div class="bub typing" aria-label="입력 중"><i></i><i></i><i></i></div></div>`:''}
           </div>
           <div class="quick" id="quick" aria-label="추천 질문">${quickHtml()}</div>
         </div>
-        <div class="xhint sm" id="kwHint" hidden><span>낱말 찾기는 <b>Search</b>가 더 빠르고 원문 그대로입니다.</span><button type="button" class="btn ghost" id="kwGo">Search에서 찾기</button></div>
+        <div class="xhint sm" id="kwHint" hidden><span>낱말 찾기는 <b>Search</b>가 더 빠르고 원문 그대로예요.</span><button type="button" class="btn ghost" id="kwGo">Search에서 찾기</button></div>
         ${composerHtml('상황·질문을 물어보세요',true)}
         <div class="chat-foot"><span>대화는 이 기기에만 저장 · ${fmtSize(storageUse())}${storageFull?' · <b class="warn">저장 공간 부족</b>':''}</span><span class="r"></span></div>
       </div>`;
     bindAtts(panel);
     if(keepY!==null){ const c=fitConvo(); if(c){ c._stick=false; c.scrollTop=keepY; } }
     else if(chat.msgs.length) scrollEndOf(panel);
+    else if(!chat.typing){ const c=fitConvo(); if(c){ c._stick=false; c.scrollTop=0; } }   /* V226(ai): 첫 인사 화면은 그림·인사가 위에서부터 보이게 */
     if(chatPrefill){ const inp=$('#chatText'); if(inp){ inp.value=chatPrefill; if(window.innerWidth>=600) inp.focus(); } chatPrefill=''; }
     const send=(text,att,full)=>{   // V189: 기본은 빠른 답(근거 없이) — full이면 근거(자료·법제처·공공데이터)까지
       const v=String(text||'').trim(); att=att||[]; if(!v&&!att.length) return;
-      if(chat.typing){ const ti=$('#chatText'); if(ti&&!ti.value) ti.value=v; if(att.length){ pending=att.concat(pending); renderPending(); } toast('앞 질문의 답을 기다리는 중입니다'); return; }   // V154: 기다리는 동안 보낸 글을 지우지 않음
+      if(chat.typing){ const ti=$('#chatText'); if(ti&&!ti.value) ti.value=v; if(att.length){ pending=att.concat(pending); renderPending(); } toast('앞 질문의 답을 기다리는 중이에요'); return; }   // V154: 기다리는 동안 보낸 글을 지우지 않음
       { const c0=$('#convo'); if(c0) c0._stick=true; }   // 새로 물으면 맨 아래로
       push('me',v,[],att); aiErrAt=-1; chat.typing=true; renderBotRoom(panel,room);
       if(SRV.on && v && !localIntent(v)){
@@ -7145,16 +7242,16 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
           clearInterval(wd);
           if((chat.gen||0)!==g0) return;   // 그사이 '대화 비우기' — 이전 질문의 답은 버림
           chat.typing=false;
-          if(r.aborted||(!r.ok&&r.j&&r.j.text)){ const part=String((r.j&&r.j.text)||acc||'').trim(); push('bot', part?part.replace(/\*\*/g,'')+'\n\n(답이 중간에 멈췄습니다 — 다시 묻기를 눌러 주세요)':'AI 응답이 늦어 멈췄습니다. 잠시 뒤 ‘다시 묻기’를 눌러 주세요.',[]); aiErrAt=chat.msgs.length-1; csave(); if(chat.room==='bot'&&state.route==='ai') renderBotRoom(panel,room); return; }
+          if(r.aborted||(!r.ok&&r.j&&r.j.text)){ const part=String((r.j&&r.j.text)||acc||'').trim(); push('bot', part?part.replace(/\*\*/g,'')+'\n\n(답이 중간에 멈췄어요 — 다시 묻기를 눌러 주세요)':'AI 응답이 늦어 멈췄어요. 잠시 뒤 ‘다시 묻기’를 눌러 주세요.',[]); aiErrAt=chat.msgs.length-1; csave(); if(chat.room==='bot'&&state.route==='ai') renderBotRoom(panel,room); return; }
           if(r.status===403&&r.j&&r.j.code==='need_code'){ chat.msgs.pop(); csave(); setAiCode(''); SRV.aiGate=true; if(chat.room==='bot'&&state.route==='ai') aiGate(panel,room); return; }   // 코드가 바뀜 → 다시 입력
           if(r.ok&&r.j.ok){ push('bot',(r.j.fast||r.j.mode==='fast')?String(r.j.answer||'').replace(/\n+근거\s*\n[\s\S]*$/,'').replace(/\s*\[(?:\d{1,2}|근거 부족)\]/g,''):String(r.j.answer||''),[]); const m=chat.msgs[chat.msgs.length-1]; m.mode=r.j.mode||''; m.note=String(r.j.note||''); m.cached=!!r.j.cached; m.fast=!!r.j.fast||r.j.mode==='fast'; m.src=(r.j.sources||[]).map(x=>({slug:x.slug,name:x.name,page:x.page,art:String(x.art||'').slice(0,60),snip:String(x.snippet||'').slice(0,180),url:/^https:\/\/(?:www\.law\.go\.kr|map\.kakao\.com)\//.test(String(x.url||''))?String(x.url):''})); csave(); }
-          else{ push('bot', r.status===0?'서버에 연결할 수 없습니다. 잠시 뒤 다시 물어보세요.':(r.j.error||'답변을 만들지 못했습니다.'),[]); aiErrAt=chat.msgs.length-1; }
+          else{ push('bot', r.status===0?'서버에 연결할 수 없어요. 잠시 뒤 다시 물어봐 주세요.':(r.j.error||'답변을 만들지 못했어요.'),[]); aiErrAt=chat.msgs.length-1; }
           if(chat.room==='bot'&&state.route==='ai'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp&&window.innerWidth>=600) inp.focus(); }
-        }).catch(()=>{ clearInterval(wd); if((chat.gen||0)!==g0) return; chat.typing=false; push('bot','답변을 만들지 못했습니다. 다시 물어보세요.',[]); aiErrAt=chat.msgs.length-1; if(chat.room==='bot'&&state.route==='ai') renderBotRoom(panel,room); });
+        }).catch(()=>{ clearInterval(wd); if((chat.gen||0)!==g0) return; chat.typing=false; push('bot','답변을 만들지 못했어요. 다시 물어봐 주세요.',[]); aiErrAt=chat.msgs.length-1; if(chat.room==='bot'&&state.route==='ai') renderBotRoom(panel,room); });
         return;
       }
       const delay=window.matchMedia('(prefers-reduced-motion: reduce)').matches?80:520;
-      setTimeout(()=>{ const a = v ? answer(v) : {text:`${att.length}개 파일을 받았습니다 (${att.map(x=>x.kind==='image'?'사진':'PDF').join(', ')}). 사진·PDF 내용 분석은 AI 연결 후 가능합니다. 지금은 이 기기에 보관만 합니다.`}; chat.typing=false; push('bot',a.text,a.cards); if(chat.room==='bot'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp && window.innerWidth>=600) inp.focus(); } },delay);
+      setTimeout(()=>{ const a = v ? answer(v) : {text:`파일 ${att.length}개를 받았어요(${att.map(x=>x.kind==='image'?'사진':'PDF').join(', ')}). 사진·PDF 내용 분석은 AI가 연결된 뒤에 할 수 있어요. 지금은 이 기기에만 보관해요.`}; chat.typing=false; push('bot',a.text,a.cards); if(chat.room==='bot'){ renderBotRoom(panel,room); const inp=$('#chatText'); if(inp && window.innerWidth>=600) inp.focus(); } },delay);
     };
     bindComposer(send);
     if(SRV.on&&SRV.bld&&SRV.kakao) loadKakao(SRV.kakao).catch(()=>{});   // V154: 주소 질문이 빨리 가도록 미리 불러 둠
