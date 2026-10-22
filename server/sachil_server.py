@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '15.3'
-APP_VERSION = 'V226'
+VERSION = '15.4'
+APP_VERSION = 'V227'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -3894,7 +3894,30 @@ def call_groq(system, msgs, max_tokens):
     return '', why, code
 
 
-def gemini_stream(system, msgs, max_tokens, on_text, effort='low'):
+GEMINI_THINK_OK = {}   # V227: 모델별로 실제로 받아 준 '생각 줄이기' 방식(level → budget → none) — 한 번 맞히면 다음부터 바로 그 방식
+GEMINI_THINK_ORDER = ('level', 'budget', 'none')
+
+
+def gemini_think_cfg(model, effort, how=''):
+    """V227: 생각(thinking) 줄이기 — Gemini 3 계열은 thinkingLevel('low'), 2.5 계열은 thinkingBudget(0). 안 받으면 다음 방식으로.
+    예전(V177)엔 thinkingBudget 0만 보내서, 최신 Flash가 거절(400 → 생각 켠 채 다시)하거나 무시하고 기본(중간) 깊이로 생각해 답이 늦었다."""
+    if effort not in ('low', 'medium'):
+        return 'none', None
+    how = how or GEMINI_THINK_OK.get(model) or 'level'
+    if how == 'level':
+        lv = str(CONF.get('gemini_think_level' if effort == 'low' else 'gemini_think_level_report') or 'low')
+        return how, {'thinkingLevel': lv if lv in ('minimal', 'low', 'medium', 'high') else 'low'}
+    if how == 'budget':
+        return how, {'thinkingBudget': int(CONF.get('gemini_think' if effort == 'low' else 'gemini_think_report') or 0)}
+    return 'none', None
+
+
+def gemini_think_next(how):
+    i = GEMINI_THINK_ORDER.index(how) if how in GEMINI_THINK_ORDER else len(GEMINI_THINK_ORDER) - 1
+    return GEMINI_THINK_ORDER[i + 1] if i + 1 < len(GEMINI_THINK_ORDER) else ''
+
+
+def gemini_stream(system, msgs, max_tokens, on_text, effort='low', how=''):
     """V177: Gemini를 글자가 나오는 대로 받기(streamGenerateContent, SSE). on_text(조각)를 부른다. (본문, 실패 사유, 오류 코드).
     실패하면 본문 없이 돌아오고, 부른 쪽이 보통 호출(다른 회사 대체 포함)로 다시 한다."""
     import urllib.request, urllib.error
@@ -3903,8 +3926,9 @@ def gemini_stream(system, msgs, max_tokens, on_text, effort='low'):
     body = {'systemInstruction': {'parts': [{'text': system}]},
             'contents': [{'role': 'model' if m['role'] == 'assistant' else 'user', 'parts': [{'text': m['content']}]} for m in msgs],
             'generationConfig': {'maxOutputTokens': max(int(max_tokens), 8192)}}
-    if effort in ('low', 'medium'):
-        body['generationConfig']['thinkingConfig'] = {'thinkingBudget': int(CONF.get('gemini_think' if effort == 'low' else 'gemini_think_report') or 0)}
+    how, tc = gemini_think_cfg(model, effort, how)
+    if tc:
+        body['generationConfig']['thinkingConfig'] = tc
     req = urllib.request.Request(f'{base}/models/{model}:streamGenerateContent?alt=sse', data=json.dumps(body).encode('utf-8'), method='POST',
                                  headers={'x-goog-api-key': CONF.get('gemini_api_key', ''), 'content-type': 'application/json'})
     out = []
@@ -3924,12 +3948,16 @@ def gemini_stream(system, msgs, max_tokens, on_text, effort='low'):
                         out.append(t)
                         on_text(t)
         text = ''.join(out).strip()
+        if text and tc:
+            GEMINI_THINK_OK[model] = how
         return (text, '', '') if text else ('', 'AI가 내용을 내지 않았습니다', 'empty_completion')
     except urllib.error.HTTPError as e:
-        if e.code == 400 and effort in ('low', 'medium') and not out:
+        if e.code == 400 and tc and not out:
             try:
-                if 'thinking' in e.read().decode('utf-8', 'replace').lower():
-                    return gemini_stream(system, msgs, max_tokens, on_text, '')
+                if 'think' in e.read().decode('utf-8', 'replace').lower():
+                    nx = gemini_think_next(how)
+                    print(f'[AI] {model}: 생각 줄이기 방식 {how} 거절 → {nx or "none"}', flush=True)
+                    return gemini_stream(system, msgs, max_tokens, on_text, effort if nx else '', nx or 'none')
             except Exception:
                 pass
         return ''.join(out).strip(), f'Gemini 스트림 오류 {e.code}', 'upstream_error'
@@ -3938,7 +3966,7 @@ def gemini_stream(system, msgs, max_tokens, on_text, effort='low'):
         return ''.join(out).strip(), 'AI 연결이 끊겼습니다', 'upstream_error'
 
 
-def call_gemini(system, msgs, max_tokens, effort=''):
+def call_gemini(system, msgs, max_tokens, effort='', how=''):
     """Google Gemini API(generateContent) 한 번 호출. 키는 머리글(x-goog-api-key)로만 보낸다(주소에 넣지 않음)."""
     import urllib.request, urllib.error, ssl
     model = re.sub(r'[^A-Za-z0-9.\-_]', '', str(CONF.get('gemini_model') or 'gemini-flash-latest')) or 'gemini-flash-latest'
@@ -3946,8 +3974,9 @@ def call_gemini(system, msgs, max_tokens, effort=''):
     body = {'systemInstruction': {'parts': [{'text': system}]},
             'contents': [{'role': 'model' if m['role'] == 'assistant' else 'user', 'parts': [{'text': m['content']}]} for m in msgs],
             'generationConfig': {'maxOutputTokens': max(int(max_tokens), 8192)}}   # 생각(thinking) 몫까지 넉넉히
-    if effort in ('low', 'medium'):   # V177: AI 도우미(low)는 gemini_think, V178: 보고서(medium)는 gemini_think_report — 기본 0 = 바로 씀. 모델이 안 받으면 아래에서 빼고 다시
-        body['generationConfig']['thinkingConfig'] = {'thinkingBudget': int(CONF.get('gemini_think' if effort == 'low' else 'gemini_think_report') or 0)}
+    how, tc = gemini_think_cfg(model, effort, how)   # V227: AI 도우미(low)·보고서(medium) 모두 생각 최소 — 모델이 안 받으면 아래에서 다음 방식으로
+    if tc:
+        body['generationConfig']['thinkingConfig'] = tc
     req = urllib.request.Request(f'{base}/models/{model}:generateContent', data=json.dumps(body).encode('utf-8'), method='POST',
                                  headers={'x-goog-api-key': CONF.get('gemini_api_key', ''), 'content-type': 'application/json'})
     code, why = 'upstream_error', ''
@@ -3960,6 +3989,8 @@ def call_gemini(system, msgs, max_tokens, effort=''):
             return '', 'AI가 이 요청에는 답하지 않았습니다(안전 정책)', 'refusal'
         c = cands[0]
         text = ''.join(p.get('text', '') for p in ((c.get('content') or {}).get('parts') or []) if not p.get('thought')).strip()
+        if text and tc:
+            GEMINI_THINK_OK[model] = how
         if not text:
             fr = c.get('finishReason')
             return '', ('AI 답변이 길이 한도에서 끊겼습니다' if fr == 'MAX_TOKENS' else
@@ -3972,8 +4003,10 @@ def call_gemini(system, msgs, max_tokens, effort=''):
         except Exception:
             err = {}
         msg = json.dumps(err, ensure_ascii=False)
-        if e.code == 400 and effort in ('low', 'medium') and 'thinking' in msg.lower():
-            return call_gemini(system, msgs, max_tokens, '')   # 생각 줄이기를 모르는 모델 — 그대로 다시
+        if e.code == 400 and tc and 'think' in msg.lower():   # 이 방식의 생각 줄이기를 모르는 모델 — 다음 방식으로 다시
+            nx = gemini_think_next(how)
+            print(f'[AI] {model}: 생각 줄이기 방식 {how} 거절 → {nx or "none"}', flush=True)
+            return call_gemini(system, msgs, max_tokens, effort if nx else '', nx or 'none')
         if 'API_KEY_INVALID' in msg or e.code in (401,):
             why = 'Gemini API 키가 틀렸습니다'
         elif e.code == 403:
