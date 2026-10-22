@@ -1543,6 +1543,128 @@ html body .chat:not(.botchat) > .chat-foot:not(.on):not(:has(.warn)){display:non
   };
 })();
 </script>
+<style id="v226-srch">
+/* V226(srch): S 검색 화면 — 공통 머리(pgHead)·묶음 제목(pg-sec)·토큰(글자 9단계·둥글기 5단계·칩·버튼 규칙). SPEC.md 7장 srch
+   이 블록은 </head> 앞이라 본문 쪽 v198-srch보다 먼저 읽힘 → 선택자 앞에 :root 를 붙여 한 단계 올린다(검색 화면 선택자로만 한정) */
+
+/* 1) 검색 첫 화면 — 머리(기호 S + 검색 + 한 줄 요약) 가운데, 결과 화면의 고정 검색줄에서는 숨김 */
+:root #hero > .pg-head{justify-content:center;width:100%;max-width:640px;margin:0}
+:root #hero > .pg-head .pg-txt{flex:0 1 auto}
+:root body:not(.home) #hero > .pg-head{display:none}
+@media (min-width:1024px){ :root body.home .hero-art{width:260px;margin-bottom:0} }
+:root #hero .search input{color:var(--c-ink)}
+:root #hero .search input::placeholder{color:var(--c-mute)}
+:root #hero .search .clear{color:var(--c-mute)}
+:root body.home .search form{border-color:var(--c-line-2);box-shadow:var(--sh-1)}
+:root body.home .search form:focus-within,:root body.compact:not(.nosearch):not(.home) .search form:focus-within{border-color:var(--c-ocean);box-shadow:0 0 0 4px var(--c-ocean-soft),var(--sh-1)}
+:root #hero .search .go:focus-visible{outline:2px solid var(--c-ocean);outline-offset:2px}
+:root #hero .hint{font-size:var(--fs-cap);font-weight:var(--fw-mid);color:var(--c-mute)}
+:root #hero .hint kbd{font-size:var(--fs-micro);border-radius:var(--rad-xs);color:var(--c-ink)}
+
+/* 2) 최근 검색(첫 화면 목록 · 결과 화면에서 검색창을 누르면 펼침) */
+:root #recentQ.has{border-color:var(--c-line);border-radius:var(--rad-m)}
+:root body.compact:not(.nosearch):not(.home) .hero:focus-within #recentQ.has{box-shadow:var(--sh-2)}
+:root #recentQ.has .rqh{font-size:var(--fs-cap);font-weight:var(--fw-bold);color:var(--c-sub)}
+:root #recentQ.has .rqh small{font-size:var(--fs-cap);font-weight:var(--fw-semi);color:var(--c-mute)}
+:root #recentQ.has .rqclr{font-size:var(--fs-sub);font-weight:var(--fw-semi);color:var(--c-sub);border-radius:var(--rad-s)}
+:root #recentQ.has .rq{border-radius:var(--rad-s)}
+:root #recentQ.has .rq [data-rq]{color:var(--c-ink);font-size:var(--fs-body)}
+:root #recentQ.has .rq [data-rq]::before{background:var(--c-mute)}
+:root #recentQ.has .rq .x{color:var(--c-mute);border-radius:var(--rad-s)}
+:root #recentQ.has .rq:active{background:var(--c-ocean-soft)}
+:root #recentQ.has button:focus-visible{outline-color:var(--c-ocean)}
+@media (hover:hover) and (pointer:fine){
+  :root #recentQ.has .rq:hover{background:var(--c-ocean-soft)}
+  :root #recentQ.has .rq:hover [data-rq]{color:var(--c-ocean)}
+  :root #recentQ.has .rq .x:hover{background:var(--c-ocean-line);color:var(--c-ink)}
+  :root #recentQ.has .rqclr:hover{background:var(--c-surface-2);color:var(--c-ink)}
+}
+
+/* 3) 결과 머리(pgHead) — 긴 검색어는 17px·최대 3줄 */
+:root #panel .pg-head.srch-head{margin:var(--sp-1) 0 var(--sp-3)}
+:root #panel .srch-head .pg-title{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+:root #panel .srch-head.is-long .pg-title{font-size:var(--fs-h2);line-height:1.35}
+:root #panel .srch-head .pg-sub:empty{display:none}
+
+/* 4) 결과 묶음 바로가기 칩 — 칩 규칙(알약, 36px PC / 44px 터치, 14px/600, 숫자는 11px 배지) */
+:root #panel .srch-jump{gap:var(--sp-2);margin:0 -2px var(--sp-5)}
+:root #panel .srch-jump button{min-height:36px;padding:0 14px;border:1px solid var(--c-line-2);border-radius:var(--rad-pill);background:var(--c-surface);color:var(--c-ink);font-size:var(--fs-sm);font-weight:var(--fw-semi)}
+:root #panel .srch-jump button b{min-width:20px;padding:0 6px;border-radius:var(--rad-pill);background:var(--c-ocean-soft);color:var(--c-ocean);font-family:var(--mono);font-size:var(--fs-micro);font-weight:var(--fw-bold);line-height:20px;text-align:center}
+:root #panel .srch-jump button.ai{border-color:var(--c-ocean);color:var(--c-ocean)}
+:root #panel .srch-jump button:focus-visible{outline:2px solid var(--c-ocean);outline-offset:1px}
+@media (hover:hover) and (pointer:fine){ :root #panel .srch-jump button:hover{border-color:var(--c-ocean);background:var(--c-ocean-soft);color:var(--c-ocean)} }
+@media (pointer:coarse){ :root #panel .srch-jump button{min-height:44px;padding:0 16px} }
+
+/* 5) 묶음 제목 = pg-sec(노랑 막대 + 13px/700 네이비). 묶음 사이 24px */
+:root #panel .srch-grid .pg-sec{margin:0 0 var(--sp-3)}
+:root #panel .srch-main > .pg-sec:not(:first-child){margin-top:var(--sp-6)}
+:root #panel .srch-main > .xhint:first-child + .pg-sec{margin-top:0}
+:root #panel .srch-side > [data-jg]:not(:empty) ~ [data-jg]:not(:empty),:root #panel .srch-side:has(> :not(:empty)) + .srch-main{margin-top:var(--sp-6)}
+@media (min-width:1024px){ :root #panel .srch-grid:has(> .srch-side > :not(:empty)) > .srch-main{margin-top:0} }
+:root #panel .srch-grid .srch-note{margin:var(--sp-2) var(--sp-1) 0;font-size:var(--fs-sub);font-weight:var(--fw-mid);line-height:1.55;color:var(--c-sub)}
+:root #panel .srch-grid .srch-note .pg-ic{margin-right:2px}
+:root #panel .srch-grid .srch-note .btn.sm[data-srch-retry]{border-color:var(--c-line-2);border-radius:var(--rad-s);color:var(--c-ink);font-size:var(--fs-sm)}
+
+/* 6) 결과 목록(본문·자료 파일·법령 원문·소방용수) */
+:root #panel .srch-grid .results{border-color:var(--c-line);border-radius:var(--rad-m)}
+:root #panel .srch-grid .result .t{font-size:var(--fs-h3);font-weight:var(--fw-bold);color:var(--c-ocean)}
+:root #panel .srch-grid .result .d{font-size:var(--fs-sub);color:var(--c-mute)}
+:root #panel .srch-grid .hitp .snip{font-size:var(--fs-sm);color:var(--c-ink)}
+:root #panel .srch-grid .result .art,:root #panel .srch-grid .lawtx .art{font-size:var(--fs-micro);font-weight:var(--fw-bold);border-radius:var(--rad-xs);color:var(--c-ocean);background:var(--c-ocean-soft)}
+:root #panel .srch-grid .result .ico{border-radius:var(--rad-xs);font-size:var(--fs-cap)}
+:root #panel .srch-grid .hitp .ico,:root #panel .srch-grid .result.doc .ico{border-color:var(--c-line-2);color:var(--c-ink)}
+:root #srchLaw .result .ico{font-size:var(--fs-micro);font-weight:var(--fw-bold);background:var(--c-ocean-soft);color:var(--c-ocean)}
+:root #srchFfus .result .ico{background:var(--c-ocean-soft);color:var(--c-ocean);font-size:var(--fs-cap)}
+:root #srchFfus .results > .result:first-child .ico{background:var(--c-ink);color:var(--c-ember)}
+:root #panel .srch-grid .result .arrow{color:var(--c-mute)}
+:root #panel .srch-grid .result:focus-visible{outline-color:var(--c-ocean)}
+:root #panel .srch-grid .result:active{background:var(--c-ocean-soft)}
+@media (hover:hover) and (pointer:fine){
+  :root #panel .srch-grid .results > a.result:hover{background:var(--c-ocean-soft);box-shadow:inset 3px 0 0 var(--c-ocean)}
+  :root #panel .srch-grid .results > a.result:hover .arrow{color:var(--c-ocean)}
+}
+:root #panel .srch-grid .hitp .snip mark,:root #panel .srch-grid .hitp .t mark{background:var(--c-ember-soft);color:var(--c-ink)}
+:root #panel .srch-grid .srch-more .btn{border-color:var(--c-line-2);border-radius:var(--rad-s);color:var(--c-ink);font-size:var(--fs-sm)}
+@media (hover:hover) and (pointer:fine){ :root #panel .srch-grid .srch-more .btn:hover{border-color:var(--c-ocean);background:var(--c-ocean-soft);color:var(--c-ocean)} }
+
+/* 7) 건축물대장 — 사실표(제목 17px/700, 칸 이름 13px 회색, 값 14px/700 네이비) */
+:root #panel .srch-grid .bldc .t{border-bottom-color:var(--c-ink);font-size:var(--fs-h2)}
+:root #panel .srch-grid .bldc .t b{font-weight:var(--fw-bold);color:var(--c-ink)}
+:root #panel .srch-grid .bldc .t small{font-size:var(--fs-cap);color:var(--c-mute)}
+:root #panel .srch-grid .bldg dt{font-size:var(--fs-sub);color:var(--c-mute)}
+:root #panel .srch-grid .bldg dd{font-size:var(--fs-sm);color:var(--c-ink)}
+:root #panel .srch-grid .bldg dt,:root #panel .srch-grid .bldg dd{border-top-color:var(--c-line)}
+:root #panel .srch-grid .bldc .d{font-size:var(--fs-sub);color:var(--c-sub)}
+
+/* 8) 법령 조문 — 원문 인용(왼쪽 줄), 버튼은 보조 버튼(흰 바탕 + 테두리) */
+:root #panel .srch-grid .lawtx .t{font-size:var(--fs-h3);color:var(--c-ink)}
+:root #panel .srch-grid .lawtx .t b{font-weight:var(--fw-bold)}
+:root #panel .srch-grid .lawtx .d{font-size:var(--fs-cap);font-weight:var(--fw-semi);color:var(--c-mute)}
+:root #panel .srch-grid .lawtx .lx{font-size:var(--fs-sm);color:var(--c-ink);border-left-color:var(--c-line-2)}
+:root #panel .srch-grid .lawtx .lxa .btn{border-color:var(--c-line-2);border-radius:var(--rad-s);color:var(--c-ink);font-size:var(--fs-sm)}
+@media (hover:hover) and (pointer:fine){ :root #panel .srch-grid .lawtx .lxa .btn:hover{border-color:var(--c-ocean);background:var(--c-ocean-soft);color:var(--c-ocean)} }
+
+/* 9) AI로 넘기기·문장 안내 — 주 버튼(노랑)은 위 검색 버튼 하나 → 여기는 보조 버튼 */
+:root #panel .srch-grid .ask-ai,:root #panel .srch-grid .xhint{background:var(--c-ocean-soft);border:1px solid var(--c-ocean-line);border-radius:var(--rad-m)}
+:root #panel .srch-grid .ask-ai p,:root #panel .srch-grid .xhint{font-size:var(--fs-sm);color:var(--c-ink)}
+:root #panel .srch-grid [data-ask-ai].btn.primary{min-height:44px;padding:0 18px;border:1px solid var(--c-line-2);border-radius:var(--rad-s);background:var(--c-surface);color:var(--c-ink);font-size:var(--fs-sm);font-weight:var(--fw-bold)}
+:root #panel .srch-grid [data-ask-ai].btn.primary:focus-visible{outline:2px solid var(--c-ocean);outline-offset:2px}
+@media (hover:hover) and (pointer:fine){ :root #panel .srch-grid [data-ask-ai].btn.primary:hover{border-color:var(--c-ocean);color:var(--c-ocean);background:var(--c-surface)} }
+
+/* 10) 메뉴 바로가기 칩 · 공공데이터 예시 칩 — 칩 규칙(알약, 36/44px, 14px/600) */
+:root #panel .srch-grid .menu-chips a,:root #panel .srch-grid .pubex{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border:1px solid var(--c-line-2);border-radius:var(--rad-pill);background:var(--c-surface);color:var(--c-ink);font-size:var(--fs-sm);font-weight:var(--fw-semi);vertical-align:middle}
+:root #panel .srch-grid .pubex{margin:2px 0}
+@media (hover:hover) and (pointer:fine){ :root #panel .srch-grid .menu-chips a:hover,:root #panel .srch-grid .pubex:hover{border-color:var(--c-ocean);background:var(--c-ocean-soft);color:var(--c-ocean)} }
+@media (pointer:coarse){ :root #panel .srch-grid .menu-chips a,:root #panel .srch-grid .pubex{min-height:44px;padding:0 16px} }
+:root #panel .srch-grid .menu-chips a:focus-visible,:root #panel .srch-grid .pubex:focus-visible{outline:2px solid var(--c-ocean);outline-offset:1px}
+:root #panel .srch-grid .pubhint{margin:var(--sp-6) var(--sp-1) 0;line-height:2.4}
+:root #panel .srch-grid .pubhint > .pg-ic{color:var(--c-ocean)}
+
+/* 11) 결과 없음 */
+:root #panel .srch-grid .card.empty{border-color:var(--c-line);border-radius:var(--rad-m);color:var(--c-sub);font-size:var(--fs-sm)}
+:root #panel .srch-grid .card.empty b{color:var(--c-ink);font-size:var(--fs-h3)}
+@media (max-width:599px){ :root #panel .srch-head.is-long .pg-title{font-size:var(--fs-h3)} }
+</style>
 </head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
@@ -2510,11 +2632,11 @@ footer b{color:var(--muted);font-weight:600}
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
         <input id="q" type="search" placeholder="SOP, 법령, 전술, 사례, 건축물대장(주소)… 무엇이든 검색" aria-label="검색어" enterkeyhint="search" inputmode="search">
         <button type="button" class="clear" id="clearBtn" aria-label="지우기">×</button>
-        <button type="submit" class="go" aria-label="Search"><img src="data:image/webp;base64,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" alt="" width="84" height="22" decoding="async"></button>
+        <button type="submit" class="go" aria-label="검색"><img src="data:image/webp;base64,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" alt="" width="84" height="22" decoding="async"></button>
       </form>
     </div>
     <div id="recentQ" role="group" aria-label="최근 검색"></div>
-    <p class="hint">어디서든 <kbd>/</kbd> 를 누르면 검색창으로 이동합니다</p>
+    <p class="hint">어디서든 <kbd>/</kbd> 를 누르면 검색창으로 이동해요</p>
   </section>
 
   <section class="panel wrap" id="panel"></section>
@@ -4254,47 +4376,47 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     return `<div class="card bldc"><p class="t"><b>${esc([x.name,x.dong].filter(Boolean).join(' ')||'건물명 없음')}</b><small>${esc([x.main,x.kind].filter(Boolean).join(' · '))}</small></p><dl class="bldg">${it.map(r=>`<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}</dl><p class="d">${esc(x.road||x.addr||'')}</p></div>`; };
   async function bldSearch(bq,tok){
     const box=$('#srchBld'); if(!box) return; const live=()=>tok===SEARCHGEN&&document.getElementById('srchBld')===box;
-    const fail=t=>{ if(!live()) return; if(bq.ex) box.innerHTML=`<div class="group-title">건축물대장</div><p class="srch-note">${t}</p>`; else box.innerHTML=''; };
-    if(!SRV.on){ fail('건축물대장 조회는 서버(47망)에 연결됐을 때 됩니다'); return; }
-    if(!SRV.bld){ fail(isProf()?'공공데이터포털 인증키가 아직 없습니다 — 메뉴 → <b>SACHIL방재실</b> → 서버·AI → <b>공공데이터포털 인증키</b>에 등록하세요':'건축물대장 조회가 아직 설정되지 않았습니다(교수에게 요청)'); return; }
-    if(!SRV.kakao){ fail('주소를 찾으려면 카카오맵 키가 필요합니다(방재실 → 지도 키)'); return; }
-    try{ await loadKakao(SRV.kakao); }catch(_){ fail('주소 검색(카카오)을 불러오지 못했습니다'); return; }
+    const fail=t=>{ if(!live()) return; if(bq.ex) box.innerHTML=`<div class="pg-sec">건축물대장</div><p class="srch-note">${t}</p>`; else box.innerHTML=''; };
+    if(!SRV.on){ fail('건축물대장 조회는 서버(47망)에 연결됐을 때 돼요'); return; }
+    if(!SRV.bld){ fail(isProf()?'공공데이터포털 인증키가 아직 없어요 — 메뉴 → <b>SACHIL방재실</b> → 서버·AI → <b>공공데이터포털 인증키</b>에 등록해 주세요':'건축물대장 조회가 아직 설정되지 않았어요(교수에게 요청해 주세요)'); return; }
+    if(!SRV.kakao){ fail('주소를 찾으려면 카카오맵 키가 필요해요(방재실 → 지도 키)'); return; }
+    try{ await loadKakao(SRV.kakao); }catch(_){ fail('주소 검색(카카오)을 불러오지 못했어요'); return; }
     if(bq.reg){ const r=await Promise.race([new Promise(ok=>new kakao.maps.services.Geocoder().addressSearch(bq.a,(r2,s2)=>ok(s2===kakao.maps.services.Status.OK?r2:[]))),sleep(5000).then(()=>[])]);
       if(!live()) return; const h=(r||[]).find(x=>x.x&&x.y&&(x.address||x.road_address)), A=h&&(h.address||h.road_address);
       if(!h){ box.innerHTML=''; return; }
-      box.innerHTML=`<div class="group-title">공공데이터 · ${esc(A.address_name||bq.a)}</div><p class="srch-note">동네 이름으로 찾아 <b>그 동네 중심에서 가까운 소방용수시설</b>을 보여 줍니다. 건축물대장은 번지까지 넣으면 나옵니다(예: ${esc((A.region_3depth_name||'구월동')+' 1138')}).</p>`;
-      box.insertAdjacentHTML('afterend','<div id="srchFfus" data-jg><div class="group-title">가까운 소방용수시설</div><p class="srch-note srch-load">찾는 중…</p></div>');
+      box.innerHTML=`<div class="pg-sec">공공데이터 · ${esc(A.address_name||bq.a)}</div><p class="srch-note">동네 이름으로 찾아 <b>그 동네 중심에서 가까운 소방용수시설</b>을 보여 줘요. 건축물대장은 번지까지 넣으면 나와요(예: ${esc((A.region_3depth_name||'구월동')+' 1138')}).</p>`;
+      box.insertAdjacentHTML('afterend','<div id="srchFfus" data-jg><div class="pg-sec">가까운 소방용수시설</div><p class="srch-note srch-load">찾는 중…</p></div>');
       ffusSearch(A.region_1depth_name||'', A.region_2depth_name||'', +h.y, +h.x, tok); return; }
     const g=await geoHit(bq.a,bq.place), hit=g&&g.hit;
     if(!live()) return;
-    if(!hit){ if(bq.place&&!bq.ex){ box.innerHTML=`<div class="group-title">공공데이터 · 건축물대장</div><p class="srch-note">‘${esc(bq.place)}’의 주소를 카카오에서 찾지 못했습니다 — 주소(예: 구월동 1138)로 검색하면 건축물대장·소방용수시설을 조회합니다</p>`; return; } fail('주소를 찾지 못했습니다 — 시·구·동과 번지(예: 구월동 1138) 또는 도로명과 건물번호(예: 정각로 29)로 검색하세요'); return; }
+    if(!hit){ if(bq.place&&!bq.ex){ box.innerHTML=`<div class="pg-sec">공공데이터 · 건축물대장</div><p class="srch-note">‘${esc(bq.place)}’의 주소를 카카오에서 찾지 못했어요 — 주소(예: 구월동 1138)로 검색하면 건축물대장·소방용수시설을 조회해요</p>`; return; } fail('주소를 찾지 못했어요 — 시·구·동과 번지(예: 구월동 1138) 또는 도로명과 건물번호(예: 정각로 29)로 검색해 주세요'); return; }
     const A=hit.address, lab=(g.label?g.label+' · ':'')+A.address_name;
-    box.innerHTML=`<div class="group-title">건축물대장 · ${esc(lab)}</div><p class="srch-note srch-load">건축물대장을 찾는 중…</p>`;
-    box.insertAdjacentHTML('afterend','<div id="srchFfus" data-jg><div class="group-title">가까운 소방용수시설</div><p class="srch-note srch-load">찾는 중…</p></div>');
+    box.innerHTML=`<div class="pg-sec">건축물대장 · ${esc(lab)}</div><p class="srch-note srch-load">건축물대장을 찾는 중…</p>`;
+    box.insertAdjacentHTML('afterend','<div id="srchFfus" data-jg><div class="pg-sec">가까운 소방용수시설</div><p class="srch-note srch-load">찾는 중…</p></div>');
     ffusSearch(A.region_1depth_name||'', A.region_2depth_name||'', +hit.y, +hit.x, tok);
     const x=await apiS(`/api/bld?b=${A.b_code}&bun=${encodeURIComponent(A.main_address_no)}&ji=${encodeURIComponent(A.sub_address_no||'0')}&mt=${A.mountain_yn==='Y'?1:0}`);
     if(!live()) return;
-    const head=`<div class="group-title">건축물대장 · ${esc(lab)}</div>`;
-    if(!x.ok||!x.j||x.j.ok===false){ box.innerHTML=head+`<p class="srch-note">❌ ${esc((x.j&&x.j.error)||'서버에 연결하지 못했습니다(서버 업데이트가 필요할 수 있음)')} ${RETRY}</p>`; return; }
+    const head=`<div class="pg-sec">건축물대장 · ${esc(lab)}</div>`;
+    if(!x.ok||!x.j||x.j.ok===false){ box.innerHTML=head+`<p class="srch-note">${pgIcon('bad','is-bad')} ${esc((x.j&&x.j.error)||'서버에 연결하지 못했어요(서버 업데이트가 필요할 수 있어요)')} ${RETRY}</p>`; return; }
     const rows=x.j.rows||[];
-    if(!rows.length){ box.innerHTML=head+'<p class="srch-note">이 번지에 등록된 건축물대장(표제부)이 없습니다 — 빈 땅이거나, 큰 단지는 대표 번지가 다를 수 있습니다</p>'; return; }
-    box.innerHTML=head+`<div class="results">${rows.slice(0,3).map(bldRow).join('')}</div>${rows.length>3?`<div class="srch-more"><button type="button" class="btn ghost" id="bldMore">다른 동 ${rows.length-3}개 더 보기</button></div>`:''}<p class="srch-note">국토교통부 건축물대장(표제부) 기준 — 증축·용도 변경 등 실제와 다를 수 있습니다</p>`;
+    if(!rows.length){ box.innerHTML=head+'<p class="srch-note">이 번지에 등록된 건축물대장(표제부)이 없어요 — 빈 땅이거나, 큰 단지는 대표 번지가 다를 수 있어요</p>'; return; }
+    box.innerHTML=head+`<div class="results">${rows.slice(0,3).map(bldRow).join('')}</div>${rows.length>3?`<div class="srch-more"><button type="button" class="btn ghost" id="bldMore">다른 동 ${rows.length-3}개 더 보기</button></div>`:''}<p class="srch-note">국토교통부 건축물대장(표제부) 기준 — 증축·용도 변경 등 실제와 다를 수 있어요</p>`;
     const mb=$('#bldMore'); if(mb) mb.addEventListener('click',()=>{ mb.parentNode.outerHTML=`<div class="results" style="margin-top:10px">${rows.slice(3).map(bldRow).join('')}</div>`; }); }
   const LAW_T={law:'법령',admrul:'행정규칙',ordin:'자치법규'};
   // V157: 검색 — 법제처 현행 조문을 원문 그대로(앞 몇 줄, 누르면 전체) + 조문 링크
   async function lawTextSearch(q,tok){
     const el=$('#srchLawTxt'); if(!el) return;
-    el.innerHTML='<div class="group-title">법령 조문 · 법제처 현행</div><p class="srch-note srch-load">법제처에서 관련 조문을 찾는 중…</p>';
+    el.innerHTML='<div class="pg-sec">법령 조문 · 법제처 현행</div><p class="srch-note srch-load">법제처에서 관련 조문을 찾는 중…</p>';
     const x=await apiS('/api/lawtext?q='+encodeURIComponent(q));
     if(tok!==SEARCHGEN||document.getElementById('srchLawTxt')!==el) return;
     const rows=(x.ok&&x.j&&x.j.ok&&x.j.rows)||[];
     if(!rows.length){ el.innerHTML=''; return; }
     const okUrl=u=>/^https:\/\/(?:www\.)?law\.go\.kr\//.test(String(u||''))?String(u):'https://www.law.go.kr/';
-    el.innerHTML='<div class="group-title">법령 조문 · 법제처 현행</div><div class="results">'+rows.map((r,i)=>`<div class="card lawtx">
+    el.innerHTML='<div class="pg-sec">법령 조문 · 법제처 현행</div><div class="results">'+rows.map((r,i)=>`<div class="card lawtx">
         <p class="t"><b>${esc(r.name)}</b> <span class="art">${esc(r.art)}</span></p>
         <p class="d">${r.eff?`시행 ${esc(r.eff)} · `:''}법제처 국가법령정보센터</p>
         <p class="lx" id="lx${i}">${esc(r.text)}</p>
-        <div class="lxa"><button type="button" class="btn ghost sm" data-lx="${i}" aria-expanded="false">조문 전체</button><a class="btn ghost sm" href="${esc(okUrl(r.url))}" target="_blank" rel="noopener">법제처 원문 →</a></div></div>`).join('')+'</div><p class="srch-note">첨부 자료와 별도로 법제처 현행 법령에서 찾은 조문입니다 — 최종 판단은 원문으로 확인하세요</p>';
+        <div class="lxa"><button type="button" class="btn ghost sm" data-lx="${i}" aria-expanded="false">조문 전체</button><a class="btn ghost sm" href="${esc(okUrl(r.url))}" target="_blank" rel="noopener">법제처 원문 →</a></div></div>`).join('')+'</div><p class="srch-note">첨부 자료와 별도로 법제처 현행 법령에서 찾은 조문이에요 — 최종 판단은 원문으로 확인해 주세요</p>';
     el.querySelectorAll('[data-lx]').forEach(b=>b.addEventListener('click',()=>{ const p=document.getElementById('lx'+b.dataset.lx); const on=p.classList.toggle('open'); b.setAttribute('aria-expanded',String(on)); b.textContent=on?'접기':'조문 전체'; })); }
   async function lawSearch(q,tok){
     const el=$('#srchLaw'); if(!el) return;
@@ -4302,24 +4424,24 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(tok!==SEARCHGEN||document.getElementById('srchLaw')!==el||!x.ok||!x.j||!x.j.ok) return;
     const rows=x.j.rows||[]; if(!rows.length) return;
     const ord=['law','admrul','ordin'];
-    el.innerHTML='<div class="group-title">법령 원문 · 법제처</div><div class="results">'+rows.slice().sort((a,b)=>ord.indexOf(a.t)-ord.indexOf(b.t)).map(r=>`<a class="card result" href="${/^https:\/\/(?:www\.)?law\.go\.kr\//.test(String(r.url||''))?esc(r.url):'https://www.law.go.kr/'}" target="_blank" rel="noopener">
+    el.innerHTML='<div class="pg-sec">법령 원문 · 법제처</div><div class="results">'+rows.slice().sort((a,b)=>ord.indexOf(a.t)-ord.indexOf(b.t)).map(r=>`<a class="card result" href="${/^https:\/\/(?:www\.)?law\.go\.kr\//.test(String(r.url||''))?esc(r.url):'https://www.law.go.kr/'}" target="_blank" rel="noopener">
         <span class="ico">${esc(r.t==='law'?(/시행령$/.test(r.name)?'시행령':/시행규칙$/.test(r.name)?'시행규칙':r.kind||'법령'):LAW_T[r.t])}</span>
         <span class="body"><p class="t">${esc(r.name)}${r.art?` <span class="art">${esc(r.art)}</span>`:''}</p><p class="d">${esc([r.t==='law'?'':r.kind,r.org,r.eff?'시행 '+r.eff:''].filter(Boolean).join(' · '))}</p></span>
-        <span class="arrow">→</span></a>`).join('')+'</div>'+(x.j.skip&&x.j.skip.length?`<p class="srch-note">${esc(x.j.skip.join('·'))} 검색은 법제처 OPEN API 신청 화면에서 해당 활용 API를 체크하면 함께 나옵니다</p>`:'<p class="srch-note">누르면 법제처 국가법령정보센터의 현행 원문이 열립니다</p>'); }
+        <span class="arrow">→</span></a>`).join('')+'</div>'+(x.j.skip&&x.j.skip.length?`<p class="srch-note">${esc(x.j.skip.join('·'))} 검색은 법제처 OPEN API 신청 화면에서 해당 활용 API를 체크하면 함께 나와요</p>`:'<p class="srch-note">누르면 법제처 국가법령정보센터의 현행 원문이 열려요</p>'); }
   const FFUS_T={};   // 시설유형 코드 → 이름(자료에 이름이 없을 때만 코드 그대로)
   async function ffusSearch(sd,sg,lat,lng,tok){
     const el=$('#srchFfus'); if(!el) return;
     const x=await apiS(`/api/ffus?sd=${encodeURIComponent(sd)}&sg=${encodeURIComponent(sg)}&lat=${lat}&lng=${lng}`);
     if(tok!==SEARCHGEN||document.getElementById('srchFfus')!==el) return;
-    const head='<div class="group-title">가까운 소방용수시설 · 반경 1,000m</div>';
-    if(!x.ok||!x.j||x.j.ok===false){ el.innerHTML=head+`<p class="srch-note">❌ ${esc((x.j&&x.j.error)||'서버에 연결하지 못했습니다(서버 업데이트가 필요할 수 있음)')} ${RETRY}</p>`; return; }
+    const head='<div class="pg-sec">가까운 소방용수시설 · 반경 1,000m</div>';
+    if(!x.ok||!x.j||x.j.ok===false){ el.innerHTML=head+`<p class="srch-note">${pgIcon('bad','is-bad')} ${esc((x.j&&x.j.error)||'서버에 연결하지 못했어요(서버 업데이트가 필요할 수 있어요)')} ${RETRY}</p>`; return; }
     const R=x.j.rows||{}, near=R.near||[];
-    if(!near.length){ el.innerHTML=head+`<p class="srch-note">${R.total?`반경 1,000m 안에 등록된 시설이 없습니다(${esc(sg)} 자료 ${R.total}건 중)`:`${esc(sd+' '+sg)} 소방용수시설 자료가 표준데이터에 없습니다 — 지자체가 아직 올리지 않았을 수 있습니다`}</p>`; return; }
+    if(!near.length){ el.innerHTML=head+`<p class="srch-note">${R.total?`반경 1,000m 안에 등록된 시설이 없어요(${esc(sg)} 자료 ${R.total}건 중)`:`${esc(sd+' '+sg)} 소방용수시설 자료가 표준데이터에 없어요 — 지자체가 아직 올리지 않았을 수 있어요`}</p>`; return; }
     const nm=r=>r.type||(r.code&&!/^\d+$/.test(r.code)?r.code:FFUS_T[r.code]||(r.code?'유형 '+r.code:'소방용수'));
     el.innerHTML=head+`<div class="results">${near.map(r=>`<a class="card result" href="https://map.kakao.com/link/map/${encodeURIComponent(nm(r))},${r.lat},${r.lng}" target="_blank" rel="noopener">
         <span class="ico">${r.d}m</span>
         <span class="body"><p class="t">${esc(nm(r))}${r.no?` <span class="art">${esc(r.no)}</span>`:''}</p><p class="d">${esc([r.at||r.addr,r.guard?'보호틀 '+r.guard:'',r.pr?'수압 '+r.pr:'',r.ctr].filter(Boolean).join(' · '))}</p></span>
-        <span class="arrow">→</span></a>`).join('')}</div><p class="srch-note">전국소방용수시설표준데이터 기준${near[0].ref?' · 기준일 '+esc(near[0].ref):''} — 현장에서는 실제 위치·사용 가능 여부를 확인하세요</p>`; }
+        <span class="arrow">→</span></a>`).join('')}</div><p class="srch-note">전국소방용수시설표준데이터 기준${near[0].ref?' · 기준일 '+esc(near[0].ref):''} — 현장에서는 실제 위치·사용 가능 여부를 확인해 주세요</p>`; }
   const isKeyword=t=>{ t=String(t||'').trim(); return !!t && t.split(/\s+/).length<=2 && t.length<=14 && !isSentence(t); };
   // V184: 최근 검색 — 이 기기에만(최대 8개). 긴 문장·전화번호처럼 보이는 숫자는 남기지 않음
   const RQ_KEY='sachil_recent_q_v1';
@@ -4339,12 +4461,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function jumpDraw(){
     const nav=$('#srchJump'); if(!nav||state.route!=='search') return;
     const g=JUMP.map(([id,n])=>{ const el=document.getElementById(id); if(!el||!el.innerHTML.trim()) return null;
-      const body=id==='srchBodyG'?document.getElementById('srchBody'):el.classList.contains('group-title')?el.nextElementSibling:el; if(!body) return null;
+      const body=id==='srchBodyG'?document.getElementById('srchBody'):el.classList.contains('pg-sec')?el.nextElementSibling:el; if(!body) return null;
       if(body.querySelector('.srch-load')) return {id,n,c:'…'};
       if(id==='srchBld'&&!body.querySelector('.card')) return null;
       const c=id==='srchBodyG'?(body.dataset.n||''):String(body.querySelectorAll('.card,.menu-chips a').length);
       if(c==='0'||(id==='srchFfus'&&!body.querySelector('.card'))) return null;
-      if(id==='srchBld'){ const t=(el.querySelector('.group-title')||{}).textContent||''; if(/^공공데이터/.test(t)) n='공공데이터'; }
+      if(id==='srchBld'){ const t=(el.querySelector('.pg-sec')||{}).textContent||''; if(/^공공데이터/.test(t)) n='공공데이터'; }
       return {id,n,c}; }).filter(Boolean);
     const ai=document.getElementById('srchAiG');
     const html=g.length>=2?g.map(x=>`<button type="button" data-jump="${x.id}">${esc(x.n)}${x.c?` <b>${esc(x.c)}</b>`:''}</button>`).join('')+(ai?'<button type="button" class="ai" data-jump="srchAiG">AI 답 정리</button>':''):'';
@@ -4357,11 +4479,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // V184: 늦거나 실패한 묶음 — '다시 시도'(같은 검색을 다시 실행)
   const RETRY='<button type="button" class="btn ghost sm" data-srch-retry>다시 시도</button>';
   function srchSlow(tok){ if(tok!==SEARCHGEN||state.route!=='search') return;
-    document.querySelectorAll('#panel .srch-load:not(.slow)').forEach(p=>{ p.classList.add('slow'); p.insertAdjacentHTML('beforeend',` — 응답이 늦습니다(통신 상태 확인) ${RETRY}`); }); }
+    document.querySelectorAll('#panel .srch-load:not(.slow)').forEach(p=>{ p.classList.add('slow'); p.insertAdjacentHTML('beforeend',` — 응답이 늦어요(통신 상태를 확인해 주세요) ${RETRY}`); }); }
   const pdfName=n=>String(n).replace(/\.pdf$/i,'');
   function renderSearch(panel){
     const q=state.query.trim();
     rqDraw();   // V184: 최근 검색 칩(첫 화면)·펼침 목록(결과 화면)
+    { const sb=$('#searchBox'); if(sb&&!$('#hero > .pg-head')) sb.insertAdjacentHTML('beforebegin',pgHead({g:'S', t:PG_NAME.S.t, s:PG_NAME.S.s, cls:'pg-center', hid:'srchHomeHead'})); }   /* V226: 검색 첫 화면 머리(기호 S + 검색 + 한 줄 요약) — 결과 화면에서는 CSS로 숨김 */
     if(!q){ panel.innerHTML=''; return; }
     const tok=++SEARCHGEN;
     const terms=q.toLowerCase().split(/\s+/).filter(Boolean);
@@ -4372,21 +4495,21 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     fileHits.sort((a,b)=>b.score-a.score); fileHits.splice(8);
     const mkHl=ts=>{ const list=[...new Set(ts.filter(Boolean))].sort((a,b)=>b.length-a.length); if(!list.length) return t=>esc(t); const re=new RegExp('('+list.map(rx).join('|')+')','ig'); return txt=>String(txt).split(re).map((p,i)=>i%2?'<mark>'+esc(p)+'</mark>':esc(p)).join(''); };
     const hl=mkHl(terms);
-    let html=`<div class="panel-head" aria-live="polite"><h2${q.length>18?' class="long"':''}>“${esc(q)}” 검색 결과</h2><span class="sub" id="srchSub">${SRV.on?'본문 검색 중…':''}</span></div>`;
+    let html=pgHead({g:'S', tHtml:'“'+esc(q)+'” 검색 결과', sHtml:SRV.on?'본문 검색 중…':'찾는 중…', sid:'srchSub', cls:'srch-head'+(q.length>18?' is-long':'')}).replace('id="srchSub"','id="srchSub" aria-live="polite"');   /* V226: 공통 화면 머리(기호 S + 제목 + 요약=결과 수) */
     const bq=bldQuery(q);
     html+='<nav class="srch-jump" id="srchJump" aria-label="결과 묶음 바로가기" hidden></nav>';   /* V184 */
     html+='<div class="srch-grid"><aside class="srch-side" id="srchSide" aria-label="공공데이터·법령">';   /* V198: PC·탭 가로는 오른쪽 칸(공공데이터·법령), 좁은 화면은 지금 순서 그대로 위에 */
-    if(bq) html+='<div id="srchBld" data-jg><div class="group-title">건축물대장</div><p class="srch-note srch-load">주소를 찾는 중…</p></div>';
+    if(bq) html+='<div id="srchBld" data-jg><div class="pg-sec">건축물대장</div><p class="srch-note srch-load">주소를 찾는 중…</p></div>';
     let pubHint='';   /* V181: 공공데이터 안내는 결과 아래로(검색 결과를 먼저) */
-    if(!bq&&SRV.on&&SRV.bld) pubHint=`<p class="srch-note pubhint">🏢 공공데이터포털 실시간 조회는 <b>주소·건물 이름·동네</b>로 검색할 때 함께 나옵니다 — 예: ${['구월동 1138','인천 남동구청','구월동'].map(x=>`<button type="button" class="pubex" data-pubex="${esc(x)}">${esc(x)}</button>`).join(' ')}</p>`;
+    if(!bq&&SRV.on&&SRV.bld) pubHint=`<p class="srch-note pubhint">${pgIcon('doc')} 공공데이터포털 실시간 조회는 <b>주소·건물 이름·동네</b>로 검색할 때 함께 나와요 — 예: ${['구월동 1138','인천 남동구청','구월동'].map(x=>`<button type="button" class="pubex" data-pubex="${esc(x)}">${esc(x)}</button>`).join(' ')}</p>`;
     const lawTxtOn=SRV.on&&!(bq&&!/법|조례|기준|고시|규칙|시행령|조문/.test(q));   // V157: 주소만 찾는 검색은 빼고
     if(lawTxtOn) html+='<div id="srchLawTxt" data-jg></div>';   // V157: 법제처 현행 조문 원문(첨부 PDF 밖)
     if(SRV.on) html+='<div id="srchLaw" data-jg></div>';   // V150: 법제처 원문 링크(법령 관련 검색일 때만 채워짐)
     html+='</aside><div class="srch-main">';   /* V198: 왼쪽 칸 — 자료 파일·본문·AI·메뉴 */
-    if(isSentence(q)&&!bq) html+=`<div class="xhint"><span>문장으로 물으셨네요. <b>AI assistant</b>가 자료를 근거로 답을 정리해 드립니다.</span><a class="btn primary" href="#ai" data-ask-ai>AI에게 묻기</a></div>`;
+    if(isSentence(q)&&!bq) html+=`<div class="xhint"><span>문장으로 물으셨네요. <b>AI assistant</b>가 자료를 근거로 답을 정리해 드려요.</span><a class="btn primary" href="#ai" data-ask-ai>AI에게 묻기</a></div>`;
     // 1) 자료 파일 — 파일 이름이 맞는 것(서버에 올린 실제 파일)
     if(fileHits.length){
-      html+='<div class="group-title" id="srchFileG" data-jg>자료 파일 · 이름 일치</div><div class="results">'+fileHits.map(({f,sec})=>`
+      html+='<div class="pg-sec" id="srchFileG" data-jg>자료 파일 · 이름 일치</div><div class="results">'+fileHits.map(({f,sec})=>`
         <a class="card result doc" href="${libHref(sec.slug,f)}" ${f.inline?'target="_blank" rel="noopener"':'download'}${f.ext==='pdf'?` data-pdfv="${esc(f.name)}"`:''}>
           <span class="ico">${esc(f.ext.toUpperCase())}</span>
           <span class="body"><p class="t">${hl(f.name.replace(/\.[^.]+$/,''))}</p><p class="d">${esc(sec.title)} · ${fmtSize(f.size)}</p></span>
@@ -4394,12 +4517,12 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         </a>`).join('')+'</div>';
     }
     // 2) 본문 — PDF 속 내용(쪽 단위). 누르면 그 쪽으로 열린다
-    html+=`<div class="group-title" id="srchBodyG" data-jg>본문 · 자료 속 내용</div><div id="srchBody">${SRV.on?'<p class="srch-note srch-load">자료 본문을 찾는 중…</p>':'<p class="srch-note">본문 검색은 서버(sachil_server.py)로 열었을 때 메뉴에 첨부된 PDF를 대상으로 동작합니다.</p>'}</div>`;
+    html+=`<div class="pg-sec" id="srchBodyG" data-jg>본문 · 자료 속 내용</div><div id="srchBody">${SRV.on?'<p class="srch-note srch-load">자료 본문을 찾는 중…</p>':'<p class="srch-note">본문 검색은 서버(sachil_server.py)로 열었을 때 메뉴에 첨부된 PDF를 대상으로 동작해요.</p>'}</div>`;
     // 3) AI 도우미 — 검색은 찾기, AI는 답하기
-    html+=`<div class="group-title" id="srchAiG" data-jg>AI assistant</div><div class="card ask-ai"><p id="askAiP">이 검색 결과(같은 자료·같은 쪽)를 근거로 <b>AI가 답을 정리</b>합니다. 답의 [번호]를 누르면 원문 쪽이 열립니다.</p><a class="btn primary" href="#ai" data-ask-ai>이 결과로 AI에게 묻기</a></div>`;
+    html+=`<div class="pg-sec" id="srchAiG" data-jg>AI assistant</div><div class="card ask-ai"><p id="askAiP">이 검색 결과(같은 자료·같은 쪽)를 근거로 <b>AI가 답을 정리</b>해요. 답의 [번호]를 누르면 원문 쪽이 열려요.</p><a class="btn primary" href="#ai" data-ask-ai>이 결과로 AI에게 묻기</a></div>`;
     // 4) 메뉴 바로가기 — 12개 메뉴 중 관련된 곳
     if(secHits.length){
-      html+='<div class="group-title" id="srchMenuG" data-jg>메뉴 바로가기</div><div class="menu-chips">'+secHits.map(({s})=>`<a href="#${s.slug}">${s.icon?`<img src="${s.icon}" alt="">`:''}${esc(s.title)}</a>`).join('')+'</div>';
+      html+='<div class="pg-sec" id="srchMenuG" data-jg>메뉴 바로가기</div><div class="menu-chips">'+secHits.map(({s})=>`<a href="#${s.slug}">${s.icon?`<img src="${s.icon}" alt="">`:''}${esc(s.title)}</a>`).join('')+'</div>';
     }
     panel.innerHTML=html+pubHint+'</div></div>';
     panel.querySelectorAll('[data-ask-ai]').forEach(a=>a.addEventListener('click',()=>{ autoAsk=q; }));
@@ -4414,16 +4537,16 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(tok!==SEARCHGEN) return;
       sub.textContent=[fileHits.length?`자료 파일 ${fileHits.length}`:'', SRV.on?`본문 ${n}`:'', secHits.length?`메뉴 ${secHits.length}`:''].filter(Boolean).join(' · ');
       if(!fileHits.length && !n && !secHits.length && !SRV.on){
-        $('#srchBody').insertAdjacentHTML('beforebegin',`<div class="card empty">${AS.empty?`<img src="${AS.empty}" alt="">`:''}<p><b>일치하는 결과가 없습니다.</b></p><p>다른 표현으로 검색하거나 메뉴에서 섹션을 고르세요.</p></div>`);
+        $('#srchBody').insertAdjacentHTML('beforebegin',`<div class="card empty">${AS.empty?`<img src="${AS.empty}" alt="">`:''}<p><b>일치하는 결과가 없어요.</b></p><p>다른 표현으로 검색하거나 메뉴에서 섹션을 골라 주세요.</p></div>`);
       }
     };
     if(!SRV.on){ done(0); return; }
     apiS('/api/search?q='+encodeURIComponent(q)).then(r=>{
       if(tok!==SEARCHGEN || state.route!=='search' || state.query.trim()!==q) return;
       const box=$('#srchBody'); if(!box) return;
-      if(!r.ok){ box.innerHTML=`<p class="srch-note">본문 검색에 실패했습니다. 서버 연결을 확인하세요. ${RETRY}</p>`; done(0); return; }
+      if(!r.ok){ box.innerHTML=`<p class="srch-note">${pgIcon('bad','is-bad')} 본문 검색에 실패했어요. 서버 연결을 확인해 주세요. ${RETRY}</p>`; done(0); return; }
       const hits=r.j.hits||[], st=r.j.status||{}; const bh=mkHl([...(r.j.terms||[]), ...terms]);
-      const stTxt = st.pending ? `자료 읽는 중 — 남은 파일 ${st.pending}개(완료되면 더 많이 찾습니다)` : (st.files?`PDF ${st.files}개 · ${st.pages}쪽에서 찾았습니다`:'메뉴에 첨부된 PDF가 아직 없습니다');
+      const stTxt = st.pending ? `자료 읽는 중 — 남은 파일 ${st.pending}개(완료되면 더 많이 찾아요)` : (st.files?`PDF ${st.files}개 · ${st.pages}쪽에서 찾았어요`:'메뉴에 첨부된 PDF가 아직 없어요');
       const row=h=>`<a class="card result hitp" href="${libHref(h.slug,{name:h.name})}" target="_blank" rel="noopener" data-pdfv="${esc(h.name)}" data-page="${h.page}">
           <span class="ico">${h.page}쪽</span>
           <span class="body"><p class="t">${bh(pdfName(h.name))}${h.art?` <span class="art">${esc(h.art)}</span>`:''}</p><p class="d snip">${bh(deGlyph(h.snippet))}</p></span>
@@ -4431,9 +4554,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       box.dataset.n=String(hits.length);
       box.innerHTML = hits.length
         ? `<div class="results">${hits.slice(0,6).map(row).join('')}</div>${hits.length>6?`<div class="srch-more" id="srchMoreBox"><button type="button" class="btn ghost" id="srchMore">본문 결과 ${hits.length-6}건 더 보기</button></div>`:''}<p class="srch-note">${esc(stTxt)}</p>`
-        : `<p class="srch-note">본문에서 찾지 못했습니다. ${esc(stTxt)}</p>`;
-      if(!hits.length&&!fileHits.length&&!bq) box.insertAdjacentHTML('beforebegin',`<div class="card empty srch-none"><p><b>‘${esc(trunc(q,24))}’와 일치하는 자료가 없습니다.</b></p><p>낱말을 줄이거나(예: 위험물, RIT) 다른 표현으로 찾아 보세요. 상황을 문장으로 물으려면 아래 <b>AI 도우미</b>를 쓰세요.</p></div>`);   /* V181: 서버 연결 중에도 '결과 없음'을 분명히 */
-      if(hits.length){ const p=$('#askAiP'); if(p) p.innerHTML=`이 검색 결과를 근거로 <b>AI가 답을 정리</b>합니다 · 근거 후보: ${(()=>{ const g=new Map(); hits.slice(0,4).forEach(h=>{ if(!g.has(h.name)) g.set(h.name,[]); if(!g.get(h.name).includes(h.page)) g.get(h.name).push(h.page); }); return [...g].slice(0,2).map(([n,ps])=>`<b>${esc(trunc(pdfName(n),24))}</b> ${ps.join('·')}쪽`).join(', '); })()}`; }
+        : `<p class="srch-note">본문에서 찾지 못했어요. ${esc(stTxt)}</p>`;
+      if(!hits.length&&!fileHits.length&&!bq) box.insertAdjacentHTML('beforebegin',`<div class="card empty srch-none"><p><b>‘${esc(trunc(q,24))}’와 일치하는 자료가 없어요.</b></p><p>낱말을 줄이거나(예: 위험물, RIT) 다른 표현으로 찾아 보세요. 상황을 문장으로 물으려면 아래 <b>AI assistant</b>에게 물어보세요.</p></div>`);   /* V181: 서버 연결 중에도 '결과 없음'을 분명히 */
+      if(hits.length){ const p=$('#askAiP'); if(p) p.innerHTML=`이 검색 결과를 근거로 <b>AI가 답을 정리</b>해요 · 근거 후보: ${(()=>{ const g=new Map(); hits.slice(0,4).forEach(h=>{ if(!g.has(h.name)) g.set(h.name,[]); if(!g.get(h.name).includes(h.page)) g.get(h.name).push(h.page); }); return [...g].slice(0,2).map(([n,ps])=>`<b>${esc(trunc(pdfName(n),24))}</b> ${ps.join('·')}쪽`).join(', '); })()}`; }
       const mb=$('#srchMore'); if(mb){ mb.addEventListener('click',()=>{ SRCH_MORE=q; $('#srchMoreBox').outerHTML=`<div class="results" style="margin-top:10px">${hits.slice(6).map(row).join('')}</div>`; }); if(SRCH_MORE===q) mb.click(); }   // V184: 펼쳐 본 결과는 돌아와도 펼친 채
       done(hits.length,st);
     });
