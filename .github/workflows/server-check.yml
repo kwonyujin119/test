@@ -1,0 +1,32 @@
+name: Server check
+
+# 서버(app.sachil47.com)가 살아 있는지·버전·자동 업데이트 상태를 확인(공개 /api/me만 읽음, 키·비밀값 없음)
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/server-check.yml'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: /api/me
+        run: |
+          for i in 1 2 3; do
+            body=$(curl -s -m 20 -H 'X-SACHIL: 1' https://app.sachil47.com/api/me) && [ -n "$body" ] && break
+            sleep 5
+          done
+          echo "$body" | python3 -c "
+          import sys, json
+          try:
+              j = json.load(sys.stdin)
+          except Exception:
+              print('응답이 JSON이 아님(서버 꺼짐·터널 끊김?)'); sys.exit(1)
+          print('server version :', j.get('version'))
+          print('app version    :', j.get('app_version') or j.get('app'))
+          for k in ('auto_update', 'bat_old', 'ai', 'ai_provider'):
+              if k in j:
+                  v = j[k]
+                  print(f'{k:15}:', v if not isinstance(v, dict) else {x: v[x] for x in v if 'key' not in x.lower()})
+          "
