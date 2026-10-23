@@ -8,4 +8,4 @@
   3. 서버만 바꾸면 '서버만' 표에 추가, 서버 동작이 바뀌면 `VERSION`도 올리고 `server/SACHIL47-server-update.zip` 다시 묶기
 - 공개 저장소: 개인정보가 든 자료(PDF 등)·API 키는 올리지 않는다.
 - 메뉴 섹션 순서: '업데이트 내역'(`updates`)은 항상 맨 마지막. 새 섹션은 그 바로 앞에 넣는다.
-- **서버 업데이트 알림(사용자 지시, 상시)**: 앱을 올릴 때는 서버 버전도 함께 올리고 zip을 다시 묶는다. 서버를 다시 켜야 하는 업데이트를 머지하면, 곧바로 Claude 세션 **'47망'**(사용자 PC, session_01NkB88N4uBRybUNDTmxFYGJ)에 `send_message`로 알린다. 알림에는 '47망' 세션이 **AskUserQuestion 플로팅으로 진행 여부를 물은 뒤**, 사용자가 '진행'을 누르면 다음 순서로 진행하라고 적는다: 백업(data/config.json·chat.db) → 서버 창 닫기 → zip 덮어쓰기 → start-domain.bat로 다시 켜기 → /api/me 버전 확인 → 결과 보고. 사용자는 클릭만 하면 되게 한다. 승인 없이 PC에 배포하지 않는다.
+- **서버 업데이트 확인(사용자 지시, 상시)**: 앱을 올릴 때는 서버 버전도 함께 올리고 zip을 다시 묶는다. PC 서버는 자동 업데이트(`auto_update`, 5분마다 GitHub main의 서버 파일을 받아 스스로 다시 켬)로 반영되므로 '47망' 세션에 알림을 보내지 않는다. 머지한 뒤 5~10분 지나 GitHub Actions **'Server check'**(`.github/workflows/server-check.yml`, workflow_dispatch)를 실행해 `server version`이 새 번호인지 확인하고 사용자에게 알린다. 버전이 안 올라가면(자동 업데이트 꺼짐·옛 start-domain.bat 등) 그때만 사용자에게 PC에서 할 일(백업 data/config.json·chat.db → 서버 창 닫기 → zip 덮어쓰기 → start-domain.bat로 다시 켜기)을 안내한다.
