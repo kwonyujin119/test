@@ -3567,7 +3567,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v227</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v228</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4586,8 +4586,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V227', SRV_VER='15.4';
+  const APP_VER='V228', SRV_VER='15.5';
   const UPDATES=[
+    {v:'V228', d:'2026-10-23', t:['보고서 만들기: 항목 번호·구성을 IL과 똑같이 — 1 발생개요 · 2 화재 개요 · 3 피해 현황 · 4 진행 사항(예전에 저장한 양식·AI 작성본도 자동으로 맞춤)','보고서 A4 배치 개선: 위 1 발생개요(한 단, 사진이 없으면 항목을 좌우로) · 가운데 2 화재 개요 | 3 피해 현황 · 아래 4 진행 사항(조치 사항 | 향후 전망) — 오른쪽 빈칸 줄임','2단 안의 피해 표 글자를 조금 줄여 머리 글자가 두 줄로 쪼개지지 않게, 예전 양식에서 재산피해가 ‘해당 칸 없음’으로 나오던 문제 수정']},
     {v:'V227', d:'2026-10-22', t:['AI 답·보고서 만들기 속도 개선: 최신 AI 모델이 답하기 전에 오래 \'생각\'하던 설정을 고쳐 바로 쓰게 함(서버 15.4로 업데이트해야 적용)']},
     {v:'V226', d:'2026-10-22', t:['모든 화면 머리를 한 모양으로 통일: 기호 + 제목 + 한 줄 요약(대화방·창은 작은 머리)','그림·아이콘 색을 시그니처 색(남색·노랑)으로 통일 — 예전 검정 그림과 어긋나던 색 정리, 앱 아이콘 파랑도 시그니처 색으로','화면 속 이모지 아이콘을 선 아이콘으로 바꾸고, 글자 크기·둥글기·버튼 모양을 한 규칙으로 정리(주 버튼은 노랑 하나)','안내 문구를 해요체로, 이름 통일(사고보고서 → 상황 보고서)','폰·태블릿·PC 6가지 화면에서 겹침·잘림 점검']},
     {v:'V225', d:'2026-10-22', t:['안드로이드 앱(APK) 추가: SACHIL:47 웹앱을 그대로 담고, 초과근무 확인 시각에 휴대폰 알람처럼 — 잠금 화면·다른 앱 위로 가운데 팝업 [초과근무 계속]·[초과근무 종료]·[5분 뒤] + 알람음·강한 진동(누를 때까지 반복)','앱에서 ‘다른 앱 위에 팝업 허용하기’를 한 번 켜 두면 쓰는 중인 앱 위로 바로 뜸 · 앱을 닫아 두어도 울림','팝업에서 누른 결과는 앱을 다시 열 때 기록에 반영 · 웹(브라우저)은 지금과 같음']},
@@ -6365,6 +6366,22 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // V138: 시간대별 기록에서 '칸에 적은 시각'(장소·대상·피해 숫자 등 입력 기록)은 뺀다 — 현장 사건(체크·발령·조치·조사 중)만
   const INPUT_LOG_F=()=>{ const labs=[...new Set(['사고일시','장소','대상','발생개요','세부 조치 내용','남은 조치·인계',...IL_ALL.flatMap(b=>b.fields.filter(x=>['text','long','datetime'].includes(x.type)).map(x=>x.label))])].filter(Boolean);
     return new RegExp('\\)\\s+\\[[^\\]]+\\]\\s*(?:(?:'+labs.map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')(?:[: ]|$)|.*자동 입력)'); };
+  // V228: 보고서 ■ 항목을 IL 묶음 번호·구성으로 맞춘다 — 1 발생개요 · 2 화재 개요 · 3 피해 현황(○ 인명·○ 재산) · 4 진행 사항(○ 조치·○ 전망), 나머지는 그 뒤 순서대로 5, 6…
+  //   교수가 예전에 저장한 양식(4 조치 사항 · 5 향후 전망, 화재 원인·성상 따로 등)이나 AI 작성본도 같은 번호·구성이 되게(이름으로 찾아 묶고 번호를 다시 매김)
+  function ilRepNorm(text){
+    const src=String(text||'').replace(/\r/g,'').split('\n').filter(r=>!/^\s*\[\[\/?나란히\]\]\s*$/.test(r)), pre=[], secs=[]; let c=null;
+    src.forEach(r=>{ if(/^\s*■/.test(r)){ c={h:r,b:[]}; secs.push(c); } else (c?c.b:pre).push(r); });
+    if(!secs.length) return String(text||'');
+    const ttl=x=>String(x.h).replace(/^\s*■\s*(\d+\s*[.)]\s*)?/,'').trim(), nm=x=>ttl(x).replace(/\s+/g,''), trim=a=>{ const b=a.slice(); while(b.length&&!b[0].trim()) b.shift(); while(b.length&&!b[b.length-1].trim()) b.pop(); return b; };
+    const takeAll=re=>{ const got=secs.filter(x=>re.test(nm(x))); got.forEach(x=>secs.splice(secs.indexOf(x),1)); return got; };
+    const merge=(re,whole,name)=>{ const got=takeAll(re); if(!got.length) return null; const w=got.find(x=>whole.test(nm(x)));
+      if(got.length===1) return w||{h:'■ '+name, b:got[0].b};   /* 하나뿐이면 묶음 이름으로만 바꿈(○ 없이) */
+      return {h:'■ '+name, b:got.flatMap(x=>x===w?trim(x.b):['○ '+ttl(x),...trim(x.b)])}; };
+    const groups=[merge(/^(발생|사고)개요/,/^(발생|사고)개요/,'발생개요'), merge(/^화재(개요|원인|성상|상황|현황)/,/^화재개요/,'화재 개요'),
+      merge(/^(피해현황|인명피해|재산피해)/,/^피해현황/,'피해 현황'), merge(/^(진행사항|조치사항|향후전망)/,/^진행사항/,'진행 사항')].filter(Boolean);
+    const L=trim(pre); if(L.length) L.push('');
+    groups.concat(secs).forEach((x,i)=>{ L.push(`■ ${i+1}. ${ttl(x)}`,...trim(x.b),''); });
+    while(L.length&&!L[L.length-1]) L.pop(); return L.join('\n'); }
   function reportDraft(f, stamp, tpl){
     const lines=a=>a.join('\n'), IL_RE=INPUT_LOG_F();
     // V174: 시간대별 기록 = 현장 사건만(칸에 적은 글·CH 체크 항목은 '지휘 활동'에 이미 있으므로 뺌), 많으면 앞 18건 + 외 n건
@@ -6391,8 +6408,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     { const cov=id=>(IL_FIRE.includes(id)&&T.includes('{화재현황}'))||(IL_DMG.includes(id)&&T.includes('{피해현황}'));
       const miss=f.situ.filter(b=>!T.includes('{'+ilKey(b)+'}')&&!cov(b.id));   // 교수가 예전에 저장한 양식에 없는 칸은 '지휘 활동' 앞에 끼워 넣어 빠지지 않게
       if(miss.length){ const blk=miss.map(b=>`■ ${b.name}\n{${ilKey(b)}}`).join('\n\n'), at=T.search(/^■.*지휘/m); T=at>0?T.slice(0,at)+blk+'\n\n'+T.slice(at):T+'\n\n'+blk; } }
-    T=T.replace(/^\{재산피해\}$/m,'- 해당 칸 없음');   // 예전 양식의 재산 피해 칸
-    return T.replace(/\{([가-힣]+)\}/g,(m,k)=>k in V?V[k]:m);
+    if(!f.situ.some(b=>ilKey(b)==='재산피해')) T=T.replace(/^\{재산피해\}$/m,'- 해당 칸 없음');   // 예전 양식의 재산 피해 칸(V228: 지금 IL에 재산피해 칸이 있으면 그 값으로)
+    return ilRepNorm(T.replace(/\{([가-힣]+)\}/g,(m,k)=>k in V?V[k]:m));
   }
   function reportPrompt(e){
     const f=e.facts;
@@ -6740,7 +6757,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const norm=t=>String(t||'').replace(/[\s·.,()]/g,''), body=norm(text), miss=heads.filter(h=>!body.includes(norm(h)));
     return {miss, msg: !heads.length?'교관 확인 전':miss.length?`양식 항목 ${miss.length}개 빠짐(${miss.slice(0,3).join('·')}${miss.length>3?' 등':''})`:`양식 ■ ${heads.length}개 모두 반영`};
   }
-  function repText(){ return cur ? (repView==='ai' ? cur.ai : cur.draft) : ''; }
+  function repText(){ return cur ? ilRepNorm(repView==='ai' ? cur.ai : cur.draft) : ''; }   /* V228: 옛 보고서도 IL 번호·구성으로 */
   // V140: 보고서 미리보기 — 글을 줄 종류(제목·보고일시·■ 소제목·○ 하위·- 내용·※ 부연)로 나눠 문서처럼 보여 준다(편집할 때만 글 상자)
   function repDocHtml(text){
     const lines=String(text||'').replace(/\r/g,'').split('\n'); let out='', list=false, seenT=false, metaOk=true;
@@ -7077,17 +7094,18 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     rFoot(g,W,M,1,1); return rOut([cv],mode); }
   // V174·V175: 화재등 상황 보고서 A4 — 머리 띠·제목·보고일시, ■ 항목 띠, '- 이름: 값'은 이름 칸+값 칸, '|' 줄은 표, [[나란히]]는 좌우 두 단, 첫 항목 오른쪽에 사진(편집에서 넣음)
   //   한 쪽에 꽉 맞게: 넘치면 글자를 줄이고(68%까지) 남으면 간격을 넓힌다(1.45배까지)
-  // V201: A4 세 띠 — 상단(1 발생 개요 | 2 화재 개요) · 중단(3 피해 현황: 인명 | 재산) · 하단(4 진행 사항: 조치 | 전망). 제목으로 찾으므로 AI 작성본·옛 양식도 같은 모양
-  function repBands(rows){
+  // V228: A4 세 띠 — 상단(1 발생개요 한 단, 오른쪽에 사진) · 중단(2 화재 개요 | 3 피해 현황) · 하단(4 진행 사항: 조치 사항 | 향후 전망). 제목으로 찾으므로 AI 작성본·옛 양식도 같은 모양
+  function repBands(rows, pic){
     const src=rows.filter(r=>!/^\s*\[\[\/?나란히\]\]\s*$/.test(r)), pre=[], secs=[]; let cur=null;
     src.forEach(r=>{ if(/^\s*■/.test(r)){ cur={h:r,b:[]}; secs.push(cur); } else (cur?cur.b:pre).push(r); });
     const nm=x=>String(x.h).replace(/^\s*■\s*(\d+\s*[.)]\s*)?/,'').replace(/\s+/g,''), trim=a=>{ const c=a.slice(); while(c.length&&!c[c.length-1].trim()) c.pop(); return c; };
     const subs=b=>b.filter(r=>/^\s*[○◦]/.test(r)).length;
     const out=pre.slice();
     for(let k=0;k<secs.length;k++){ const a=secs[k], z=secs[k+1], na=nm(a), nz=z?nm(z):'';
-      if(z&&/발생개요/.test(na)&&/화재(개요|현황|상황)/.test(nz)){ out.push('[[나란히]]',a.h,...trim(a.b),z.h,...trim(z.b),'[[/나란히]]',''); k++; continue; }
+      if(!pic&&/^(발생|사고)개요/.test(na)&&trim(a.b).filter(r=>r.trim()).length>=4&&!a.b.some(r=>/^\s*([○◦]|\|)/.test(r))){ out.push(a.h,'[[나란히]]',...trim(a.b),'[[/나란히]]',''); continue; }   /* V228: 사진이 없으면 발생개요 항목을 좌우로 나눠 오른쪽 빈칸을 채움 */
+      if(z&&/화재(개요|현황|상황)/.test(na)&&/피해현황/.test(nz)){ out.push('[[나란히]]',a.h,...trim(a.b),z.h,...trim(z.b),'[[/나란히]]',''); k++; continue; }
       if(z&&/조치사항/.test(na)&&/향후전망/.test(nz)){ out.push('[[나란히]]',a.h,...trim(a.b),z.h,...trim(z.b),'[[/나란히]]',''); k++; continue; }
-      if(/피해현황|진행사항/.test(na)&&subs(a.b)>=2){ const b=trim(a.b), f=b.findIndex(r=>/^\s*[○◦]/.test(r)); out.push(a.h,...b.slice(0,f),'[[나란히]]',...b.slice(f),'[[/나란히]]',''); continue; }
+      if(/진행사항/.test(na)&&subs(a.b)>=2){ const b=trim(a.b), f=b.findIndex(r=>/^\s*[○◦]/.test(r)); out.push(a.h,...b.slice(0,f),'[[나란히]]',...b.slice(f),'[[/나란히]]',''); continue; }
       out.push(a.h,...a.b); }
     return out; }
   async function repPdf(text, mode, img){
@@ -7098,7 +7116,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const B={title:{s:48,w:800,h:80,c:'#0B1B3F'}, meta:{s:22,w:500,h:42,c:'#475467'}, sec:{s:27,w:800,h:54,c:'#0B1B3F'}, sub:{s:25,w:800,h:40,c:'#1A1A1A'},
       item:{s:25,w:400,h:36,c:'#1A1A1A'}, note:{s:21,w:400,h:32,c:'#667085'}, gap:{s:0,h:10}};
     const KV=/^([^\d:：|][^:：|]{0,13})[:：]\s+(.*)$/;
-    const raw=repBands(String(text||'').replace(/\r/g,'').replace(/\s+$/,'').split('\n'));
+    const raw=repBands(String(text||'').replace(/\r/g,'').replace(/\s+$/,'').split('\n'), !!pic);
     const layout=f=>{ const fnt=(k,w)=>`${w||B[k].w} ${Math.round(B[k].s*f)}px ${FF}`, hh=k=>Math.round(B[k].h*f), BX=Math.round(10*f), TX=Math.round(38*f);
       const wrap=(t,font,lim)=>{ g.font=font; const r=[]; let rest=String(t); if(lim<40) lim=40;
         while(rest.length){ let n=rest.length; if(g.measureText(rest).width>lim){ n=1; while(n<rest.length&&g.measureText(rest.slice(0,n+1)).width<=lim) n++; const sp=rest.lastIndexOf(' ',n); if(sp>n*0.55) n=sp+1; }
@@ -7109,7 +7127,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         while(i<rows.length){ const r=rows[i], t=r.trim();
           if(!t){ if(out.length&&out[out.length-1].k!=='gap') out.push({k:'gap',h:hh('gap')}); i++; continue; }
           if(t==='[[나란히]]'){ let j=i+1; const inner=[]; while(j<rows.length&&rows[j].trim()!=='[[/나란히]]'){ inner.push(rows[j]); j++; }
-            const mk=/^\s*[○◦]/.test(inner[0]||'')?/^\s*[○◦]/:/^\s*■/, cut=inner.findIndex((x,k)=>k>0&&mk.test(x)); const gap=Math.round(28*f), cw=Math.floor((width-gap)/2);
+            const mk=/^\s*[○◦]/.test(inner[0]||'')?/^\s*[○◦]/:/^\s*■/; let cut=inner.findIndex((x,k)=>k>0&&mk.test(x)); if(cut<0&&!inner.some(x=>/^\s*[○◦■]/.test(x))){ const nb=inner.map((x,k)=>x.trim()?k:-1).filter(k=>k>=0); cut=nb.length>=2?nb[Math.ceil(nb.length/2)]:-1; } const gap=Math.round(28*f), cw=Math.floor((width-gap)/2);
             if(cut>0){ const Lr=build(inner.slice(0,cut),cw), Rr=build(inner.slice(cut),cw); const sum=a=>a.reduce((n,l)=>n+l.h,0);
               out.push({k:'cols',L:Lr,R:Rr,cw,gap,h:Math.max(sum(Lr),sum(Rr))}); } else out.push(...build(inner,width));
             i=j+1; prevItem=null; continue; }
@@ -7127,10 +7145,10 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
               out.push({k:'pic',sub,pw:pw2,ph,lw,h:Math.max(sub.reduce((n,l)=>n+l.h,0),ph+Math.round(12*f))}); i=j; }
             continue; }
           if(/^\|/.test(t)){ const rws=[]; while(i<rows.length&&/^\|/.test(rows[i].trim())){ rws.push(rows[i].trim().replace(/^\||\|$/g,'').split('|').map(x=>x.trim())); i++; }
-            const nc=Math.max(...rws.map(x=>x.length)), cw=width/nc, pad=Math.round(10*f), lh=Math.round(30*f);
-            const cells=rws.map((rw,ri)=>Array.from({length:nc},(_,ci)=>wrap(rw[ci]||'',fnt('item',ri?400:700),cw-2*pad)));
+            const nc=Math.max(...rws.map(x=>x.length)), cw=width/nc, tf=width<maxW?0.84:1, pad=Math.round(10*f*tf), lh=Math.round(30*f*tf), tfn=w=>`${w} ${Math.round(B.item.s*f*tf)}px ${FF}`;   /* V228: 2단 안 표는 글자 84% */
+            const cells=rws.map((rw,ri)=>Array.from({length:nc},(_,ci)=>wrap(rw[ci]||'',tfn(ri?400:700),cw-2*pad)));
             const rh=cells.map(rw=>Math.max(...rw.map(x=>x.length))*lh+2*pad);
-            out.push({k:'table',cells,cw,rh,lh,pad,h:rh.reduce((a,b)=>a+b,0)+Math.round(12*f)}); prevItem=null; continue; }
+            out.push({k:'table',cells,cw,rh,lh,pad,tfn,h:rh.reduce((a,b)=>a+b,0)+Math.round(12*f)}); prevItem=null; continue; }
           if(/^[○◦]/.test(t)){ out.push({k:'sub',t:t.replace(/^[○◦]\s*/,''),h:hh('sub')}); i++; continue; }
           if(/^※/.test(t)){ wrap(t,fnt('note'),width).forEach((x,k)=>out.push({k:'note',t:x,x:0,h:hh('note')})); i++; continue; }
           if(/^\s{2,}/.test(r)&&prevItem!==null){ wrap(t,fnt('item'),width-prevItem).forEach(x=>out.push({k:'item',t:x,x:prevItem,h:hh('item')})); i++; continue; }
@@ -7156,7 +7174,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         if(l.k==='pic'){ draw(l.sub,x0,l.lw,yy); const px=x0+width-l.pw, py=yy+6*f; g.fillStyle='#F2F4F7'; g.fillRect(px-4,py-4,l.pw+8,l.ph+8); g.drawImage(pic,px,py,l.pw,l.ph); g.strokeStyle='#D0D5DD'; g.lineWidth=1; g.strokeRect(px-4,py-4,l.pw+8,l.ph+8); yy+=h; return; }
         if(l.k==='table'){ let ty=yy+4*f; const tw=l.cw*l.cells[0].length;
           l.cells.forEach((rw,ri)=>{ const rh=l.rh[ri]*(sp>1?Math.min(sp,1.25):1); if(!ri){ g.fillStyle='#EEF2F8'; g.fillRect(x0,ty,tw,rh); }
-            rw.forEach((cl,ci)=>{ g.font=L.fnt('item',ri?400:700); cl.forEach((t,k)=>{ const tw2=g.measureText(t).width; g.fillStyle=ri?(/파악 중/.test(t)?'#B54708':'#1A1A1A'):'#0B1B3F'; g.fillText(t,x0+ci*l.cw+(l.cw-tw2)/2,ty+rh/2+(k-(cl.length-1)/2)*l.lh); }); });
+            rw.forEach((cl,ci)=>{ g.font=l.tfn?l.tfn(ri?400:700):L.fnt('item',ri?400:700); cl.forEach((t,k)=>{ const tw2=g.measureText(t).width; g.fillStyle=ri?(/파악 중/.test(t)?'#B54708':'#1A1A1A'):'#0B1B3F'; g.fillText(t,x0+ci*l.cw+(l.cw-tw2)/2,ty+rh/2+(k-(cl.length-1)/2)*l.lh); }); });
             g.strokeStyle='#98A2B3'; g.lineWidth=1; g.strokeRect(x0,ty,tw,rh); for(let c=1;c<rw.length;c++){ g.beginPath(); g.moveTo(x0+c*l.cw,ty); g.lineTo(x0+c*l.cw,ty+rh); g.stroke(); }
             ty+=rh; });
           g.fillStyle='#0B1B3F'; g.fillRect(x0,yy+4*f,tw,2); yy+=h; return; }
