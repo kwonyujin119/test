@@ -1493,7 +1493,7 @@ html body .chat:not(.botchat) > .chat-foot:not(.on):not(:has(.warn)){display:non
     doc:'<path d="M6 3h8l4 4v14H6Z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>'
   };
   window.pgIcon=function(k,cls){ const d=ICON[k]; if(!d) return ''; return SV(d,' class="pg-ic'+(cls?' '+cls:'')+'"'); };
-  const DB_SVG='<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 7.5C4 5.6 5.6 4 7.5 4h9C18.4 4 20 5.6 20 7.5v5c0 1.9-1.6 3.5-3.5 3.5H10l-4 3.5V16C4.9 15.6 4 14.2 4 12.5v-5Z" fill="#fff" stroke="#244EA2" stroke-width="2" stroke-linejoin="round"/><path d="M22 10.5c1.2.4 2 1.6 2 2.9v4.1c0 1.4-.9 2.6-2 3v3l-3.4-2.9H13c-1.3 0-2.4-.7-3-1.8" fill="none" stroke="#244EA2" stroke-width="2" stroke-linejoin="round"/></svg>';
+  const DB_SVG='<svg class="db-sym" viewBox="120 130 1010 1010" aria-hidden="true"><ellipse cx="820" cy="693" rx="290" ry="252" fill="#fff"/><path d="M1020 850C1036 900 1058 940 1080 968c8 14-4 26-20 22-50-14-102-40-155-68Z" fill="#fff"/><g fill="#FDD000" stroke="#FDD000" stroke-width="56" stroke-linejoin="round"><ellipse cx="495" cy="550" rx="352" ry="272"/><path d="M250 730C232 780 208 822 182 856c-10 14 3 28 18 22 50-18 100-46 152-72Z"/></g><g fill="#fff"><ellipse cx="495" cy="550" rx="352" ry="272"/><path d="M250 730C232 780 208 822 182 856c-10 14 3 28 18 22 50-18 100-46 152-72Z"/></g></svg>';
   window.pgGlyph=function(g,img){
     if(img) return '<span class="pg-glyph is-img" aria-hidden="true"><img src="'+E(img)+'" alt=""></span>';
     switch(g){
@@ -2588,6 +2588,13 @@ html:root body .pg-head.is-compact h2.pg-title,html:root body .pg-head.is-compac
 html:root body .convo .convo-note{background:rgba(11,27,63,.05);color:var(--c-sub)}
 html:root body .convo .convo-note:has(.convo-empty){background:transparent}
 </style>
+<style id="v229-db">
+/* V229: 디브리핑룸 심벌(노랑 칸 + 흰 말풍선 둘) — 칸을 넉넉히 채우게 */
+:root .pg-glyph svg.db-sym{width:78%;height:78%}
+:root #dbBtn .dbi svg.db-sym{width:26px;height:26px}
+:root .hz-k .ic svg.db-sym{width:80%;height:80%}
+:root .hs-ic svg.db-sym{width:78%;height:78%}
+</style>
 </head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
@@ -3531,7 +3538,7 @@ footer b{color:var(--muted);font-weight:600}
     </div>
     <div class="top-right">
       <a class="ico" href="#chat" id="chatBtn" aria-label="47망" title="47망"><img src="icons/icon-96.png" alt="" width="30" height="30"></a>
-      <a class="ico" href="#debrief" id="dbBtn" aria-label="디브리핑룸" title="디브리핑룸"><span class="dbi"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 7.5C4 5.6 5.6 4 7.5 4h9C18.4 4 20 5.6 20 7.5v5c0 1.9-1.6 3.5-3.5 3.5H10l-4 3.5V16C4.9 15.6 4 14.2 4 12.5v-5Z" fill="#fff" stroke="#244EA2" stroke-width="2" stroke-linejoin="round"/><path d="M22 10.5c1.2.4 2 1.6 2 2.9v4.1c0 1.4-.9 2.6-2 3v3l-3.4-2.9H13c-1.3 0-2.4-.7-3-1.8" fill="none" stroke="#244EA2" stroke-width="2" stroke-linejoin="round"/></svg></span></a>
+      <a class="ico" href="#debrief" id="dbBtn" aria-label="디브리핑룸" title="디브리핑룸"><span class="dbi"><svg class="db-sym" viewBox="120 130 1010 1010" aria-hidden="true"><ellipse cx="820" cy="693" rx="290" ry="252" fill="#fff"/><path d="M1020 850C1036 900 1058 940 1080 968c8 14-4 26-20 22-50-14-102-40-155-68Z" fill="#fff"/><g fill="#FDD000" stroke="#FDD000" stroke-width="56" stroke-linejoin="round"><ellipse cx="495" cy="550" rx="352" ry="272"/><path d="M250 730C232 780 208 822 182 856c-10 14 3 28 18 22 50-18 100-46 152-72Z"/></g><g fill="#fff"><ellipse cx="495" cy="550" rx="352" ry="272"/><path d="M250 730C232 780 208 822 182 856c-10 14 3 28 18 22 50-18 100-46 152-72Z"/></g></svg></span></a>
       <nav class="top-nav" aria-label="주요 기능">
         <a href="#search" data-route="search" id="navSearch"><b><i class="sg sg-S" role="img" aria-label="S"></i></b><span class="lbl">검색</span></a>
         <a href="#ai" data-route="ai"><b><i class="sg sg-A" role="img" aria-label="A"></i></b><span class="lbl">AI assistant</span></a>
@@ -3567,7 +3574,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v228</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v229</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4586,8 +4593,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V228', SRV_VER='15.5';
+  const APP_VER='V229', SRV_VER='15.6';
   const UPDATES=[
+    {v:'V229', d:'2026-10-23', t:['디브리핑룸 아이콘·심벌을 새 그림(노랑 바탕 + 흰 말풍선 둘)으로 모두 바꿈 — 머리줄 버튼·첫 화면(디자인·간편 모드)·디브리핑룸 화면 머리·사용법 안내']},
     {v:'V228', d:'2026-10-23', t:['보고서 만들기: 항목 번호·구성을 IL과 똑같이 — 1 발생개요 · 2 화재 개요 · 3 피해 현황 · 4 진행 사항(예전에 저장한 양식·AI 작성본도 자동으로 맞춤)','보고서 A4 배치 개선: 위 1 발생개요(한 단, 사진이 없으면 항목을 좌우로) · 가운데 2 화재 개요 | 3 피해 현황 · 아래 4 진행 사항(조치 사항 | 향후 전망) — 오른쪽 빈칸 줄임','2단 안의 피해 표 글자를 조금 줄여 머리 글자가 두 줄로 쪼개지지 않게, 예전 양식에서 재산피해가 ‘해당 칸 없음’으로 나오던 문제 수정']},
     {v:'V227', d:'2026-10-22', t:['AI 답·보고서 만들기 속도 개선: 최신 AI 모델이 답하기 전에 오래 \'생각\'하던 설정을 고쳐 바로 쓰게 함(서버 15.4로 업데이트해야 적용)']},
     {v:'V226', d:'2026-10-22', t:['모든 화면 머리를 한 모양으로 통일: 기호 + 제목 + 한 줄 요약(대화방·창은 작은 머리)','그림·아이콘 색을 시그니처 색(남색·노랑)으로 통일 — 예전 검정 그림과 어긋나던 색 정리, 앱 아이콘 파랑도 시그니처 색으로','화면 속 이모지 아이콘을 선 아이콘으로 바꾸고, 글자 크기·둥글기·버튼 모양을 한 규칙으로 정리(주 버튼은 노랑 하나)','안내 문구를 해요체로, 이름 통일(사고보고서 → 상황 보고서)','폰·태블릿·PC 6가지 화면에서 겹침·잘림 점검']},
@@ -7876,7 +7884,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   window.__toast=(m,u)=>toast(m,u);   /* V208: 다른 스크립트(초과근무)에서 알림 띠 */
   const HUB=[
     {go:'chat', k:'47', y:true, t:'47망', d:PG_NAME['47'].s, ic:'<img src="icons/icon-96.png" alt="" width="40" height="40">'},
-    {go:'debrief', k:'DB', y:true, t:'디브리핑룸', d:PG_NAME.DB.s, ic:'<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 7.5C4 5.6 5.6 4 7.5 4h9C18.4 4 20 5.6 20 7.5v5c0 1.9-1.6 3.5-3.5 3.5H10l-4 3.5V16C4.9 15.6 4 14.2 4 12.5v-5Z" fill="#fff" stroke="#244EA2" stroke-width="2" stroke-linejoin="round"/><path d="M22 10.5c1.2.4 2 1.6 2 2.9v4.1c0 1.4-.9 2.6-2 3v3l-3.4-2.9H13c-1.3 0-2.4-.7-3-1.8" fill="none" stroke="#244EA2" stroke-width="2" stroke-linejoin="round"/></svg>'},
+    {go:'debrief', k:'DB', y:true, t:'디브리핑룸', d:PG_NAME.DB.s, ic:'<svg class="db-sym" viewBox="120 130 1010 1010" aria-hidden="true"><ellipse cx="820" cy="693" rx="290" ry="252" fill="#fff"/><path d="M1020 850C1036 900 1058 940 1080 968c8 14-4 26-20 22-50-14-102-40-155-68Z" fill="#fff"/><g fill="#FDD000" stroke="#FDD000" stroke-width="56" stroke-linejoin="round"><ellipse cx="495" cy="550" rx="352" ry="272"/><path d="M250 730C232 780 208 822 182 856c-10 14 3 28 18 22 50-18 100-46 152-72Z"/></g><g fill="#fff"><ellipse cx="495" cy="550" rx="352" ry="272"/><path d="M250 730C232 780 208 822 182 856c-10 14 3 28 18 22 50-18 100-46 152-72Z"/></g></svg>'},
     {go:'search', k:'S', t:PG_NAME.S.en, d:PG_NAME.S.s},
     {go:'ai', k:'A', t:PG_NAME.A.en, d:PG_NAME.A.s},
     {go:'board', k:'CH', t:PG_NAME.CH.en, d:PG_NAME.CH.s},
