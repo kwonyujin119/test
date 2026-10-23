@@ -45,8 +45,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '15.6'
-APP_VERSION = 'V229'
+VERSION = '15.7'
+APP_VERSION = 'V230'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -1196,7 +1196,7 @@ class H(BaseHTTPRequestHandler):
                 sources.append({'slug': 'law', 'name': lk['name'], 'page': 0, 'art': lk['art'], 'url': lk['url'], 'snippet': '법제처 국가법령정보센터 원문'})
         if not hits and ai_ready():   # 메뉴 자료에 근거가 없으면 AI 일반 지식으로 짧게([근거 부족] 표시)
             ok, why = ai_allowed(self.ip(), self.is_prof())
-            if ok and j.get('stream') and ai_provider() == 'gemini':   # V177: 글자가 나오는 대로 보냄
+            if ok and j.get('stream') and ai_live_provider() == 'gemini':   # V177: 글자가 나오는 대로 보냄
                 gm = history_msgs(hist)
                 gm.append({'role': 'user', 'content': f'질문: {qtext}'})
                 return self.ask_stream(AI_GEN_SYS, gm, 2000, 'general', sources, st, ck if not hist else '', '')
@@ -1217,7 +1217,7 @@ class H(BaseHTTPRequestHandler):
         mode, note, ans = 'extract', '', ''
         if ai_ready():
             ok, why = ai_allowed(self.ip(), self.is_prof())
-            if ok and j.get('stream') and ai_provider() == 'gemini':   # V177: 글자가 나오는 대로 보냄
+            if ok and j.get('stream') and ai_live_provider() == 'gemini':   # V177: 글자가 나오는 대로 보냄
                 return self.ask_stream(AI_SYS, ask_msgs(qtext, hits, hist), 3000, 'ai', sources, st, ck if not hist else '', extract_as_format(extract_answer(qtext, hits, terms), ''))
             if ok:
                 ans, why = ask_llm(qtext, hits, hist)
@@ -1248,7 +1248,7 @@ class H(BaseHTTPRequestHandler):
         ref = '\n\n'.join(f'- {re.sub(r"[.]pdf$", "", h["name"], flags=re.I)} {h["page"]}쪽: {str(h.get("ctx") or h["text"])[:700]}' for h in hits)
         msgs = history_msgs(hist)
         msgs.append({'role': 'user', 'content': (f'<참고>\n{ref}\n</참고>\n\n' if ref else '') + f'질문: {qtext}'})
-        if j.get('stream') and ai_provider() == 'gemini':
+        if j.get('stream') and ai_live_provider() == 'gemini':
             return self.ask_stream(AI_FAST_SYS, msgs, 1200, 'fast', [], st, ck, '')
         text, why, _c = call_llm(AI_FAST_SYS, msgs, 1200, 'low', CONF.get('ai_assist_model') or 'claude-haiku-5-5')
         ans = order_answer(text) if text else ''
@@ -1271,6 +1271,8 @@ class H(BaseHTTPRequestHandler):
             with AI_BUSY_LOCK:
                 AI_BUSY[0] -= 1
         if not text or code:   # 스트림 실패 → 보통 호출(재시도·다른 회사)로
+            if not text and ai_has()[1:]:
+                ai_mark_down('gemini', why or code or '스트림 글자 없음')   # V230: Gemini를 다시 기다리지 않고 바로 예비 AI로
             ev({'wait': 1})   # V191: 앱에 '아직 살아 있음'(다른 AI로 넘기는 중)
             t2, why2, _c = call_llm(sysmsg, msgs, max_tokens, 'low', CONF.get('ai_assist_model') or 'claude-haiku-5-5')
             if t2:
@@ -1329,6 +1331,9 @@ class H(BaseHTTPRequestHandler):
             with AI_BUSY_LOCK:
                 AI_BUSY[0] -= 1
         if not text or code:
+            if not text and ai_has()[1:]:
+                ai_mark_down('gemini', why or code or '스트림 글자 없음')   # V230: 보고서도 Gemini를 다시(최대 180초) 기다리지 않고 예비 AI로
+            ev({'wait': 1})
             t2, why2, code2 = call_llm(sysmsg, msgs, 8000, 'medium')
             if t2:
                 text, code = t2, ''
@@ -1371,7 +1376,7 @@ class H(BaseHTTPRequestHandler):
         ok, why = ai_allowed(self.ip(), self.is_prof())
         if not ok:
             return self.send(200, {'ok': False, 'code': 'rate_limited', 'error': why}, log=False)
-        if j.get('stream') and ai_provider() == 'gemini':   # V178: 보고서도 글자가 나오는 대로
+        if j.get('stream') and ai_live_provider() == 'gemini':   # V178: 보고서도 글자가 나오는 대로
             return self.report_stream(sysmsg, prompt, key, now)
         text, why, code = call_llm(sysmsg, [{'role': 'user', 'content': prompt}], 8000, 'medium')
         if not text:
@@ -3761,6 +3766,36 @@ def ai_ready():
     return bool(ai_provider())
 
 
+AI_DOWN = {}   # V230: 회사별 '잠시 쉬기' — {회사: (이때까지, 이유)}. 스트림이 글자 없이 끊기거나 일시 오류가 나면 그동안 건너뛰고 예비 AI로 바로
+
+
+def ai_mark_down(p, why):
+    sec = int(CONF.get('ai_down_sec') or 600)
+    AI_DOWN[p] = (time.time() + sec, str(why or '')[:160])
+    msg = f'{AI_NAMES.get(p, p)} {sec // 60}분 쉬고 예비 AI로: {str(why or "")[:120]}'
+    print('[AI]', msg, flush=True)
+    try:
+        upd_log('AI ' + msg)
+    except Exception:
+        pass
+
+
+def ai_is_down(p):
+    v = AI_DOWN.get(p)
+    return bool(v and v[0] > time.time())
+
+
+def ai_live_provider():
+    """V230: 지금 실제로 먼저 쓸 회사 — 정한 회사가 쉬는 중이면 키가 있는 다음 회사(모두 쉬면 원래 회사)."""
+    prov = ai_provider()
+    if not prov or not ai_is_down(prov):
+        return prov
+    for p in [prov] + [x for x in ai_has() if x != prov]:
+        if not ai_is_down(p):
+            return p
+    return prov
+
+
 AI_BUSY = [0]   # 지금 AI 호출 중인 수(자동 업데이트가 이때는 기다린다)
 AI_BUSY_LOCK = threading.Lock()
 
@@ -3779,7 +3814,7 @@ def _call_llm(system, msgs, max_tokens, effort='', model=''):
     """설정된 AI 회사로 호출. (본문, 실패 사유, 오류 코드).
     V101: 일시 오류(바쁨·분당 한도 429·연결 끊김)는 2초 뒤 한 번 더 시도하고, 그래도 안 되면 다른 회사 키가 있으면 그쪽으로."""
     # V103: 먼저 쓸 회사가 실패(한도 초과 등)하면 키가 있는 다른 회사(gemini → groq → claude 순)로 넘긴다
-    prov = ai_provider()
+    prov = ai_live_provider()   # V230: 쉬는 중인 회사는 건너뜀
     if not prov:
         return '', 'AI 키 미연결', 'not_granted'
     def call(p):
@@ -3794,8 +3829,10 @@ def _call_llm(system, msgs, max_tokens, effort='', model=''):
         text, why2, code = call(prov)
         why = why2 or why
     if not text and code != 'refusal':
+        if code in ('rate_limited', 'upstream_error') and ai_has()[1:]:
+            ai_mark_down(prov, why or code)   # V230: 다음 요청부터 한동안 바로 예비 AI로
         fails = [f'{AI_NAMES.get(prov, prov)}: {why or code}']
-        for other in [p for p in ai_has() if p != prov]:
+        for other in [p for p in ai_has() if p != prov and not ai_is_down(p)]:
             t2, w2, c2 = call(other)
             if t2:
                 print(f'[AI] {AI_NAMES[prov]} 실패({why}) → {AI_NAMES[other]}가 대신 답함', flush=True)
@@ -3933,7 +3970,7 @@ def gemini_stream(system, msgs, max_tokens, on_text, effort='low', how=''):
                                  headers={'x-goog-api-key': CONF.get('gemini_api_key', ''), 'content-type': 'application/json'})
     out = []
     try:
-        with urllib.request.urlopen(req, timeout=int(CONF.get('ai_stream_timeout') or 25)) as r:   # V191: 25초 동안 한 글자도 안 오면 끊고 다른 AI로(예전 120초 — 앱이 '입력 중'으로 멈춰 보였다)
+        with urllib.request.urlopen(req, timeout=int(CONF.get('ai_stream_timeout') or 15)) as r:   # V191·V230: 15초 동안 한 글자도 안 오면 끊고 다른 AI로(예전 120초 → 25초 → 15초)
             for raw in r:
                 line = raw.decode('utf-8', 'replace').strip()
                 if not line.startswith('data:'):
@@ -3952,18 +3989,23 @@ def gemini_stream(system, msgs, max_tokens, on_text, effort='low', how=''):
             GEMINI_THINK_OK[model] = how
         return (text, '', '') if text else ('', 'AI가 내용을 내지 않았습니다', 'empty_completion')
     except urllib.error.HTTPError as e:
-        if e.code == 400 and tc and not out:
-            try:
-                if 'think' in e.read().decode('utf-8', 'replace').lower():
-                    nx = gemini_think_next(how)
-                    print(f'[AI] {model}: 생각 줄이기 방식 {how} 거절 → {nx or "none"}', flush=True)
-                    return gemini_stream(system, msgs, max_tokens, on_text, effort if nx else '', nx or 'none')
-            except Exception:
-                pass
-        return ''.join(out).strip(), f'Gemini 스트림 오류 {e.code}', 'upstream_error'
+        try:
+            body = e.read().decode('utf-8', 'replace')
+        except Exception:
+            body = ''
+        if e.code == 400 and tc and not out and 'think' in body.lower():
+            nx = gemini_think_next(how)
+            print(f'[AI] {model}: 생각 줄이기 방식 {how} 거절 → {nx or "none"}', flush=True)
+            return gemini_stream(system, msgs, max_tokens, on_text, effort if nx else '', nx or 'none')
+        try:
+            em = str((json.loads(body).get('error') or {}).get('message') or '')[:120]
+        except Exception:
+            em = body[:120]
+        print(f'[AI] Gemini 스트림 오류 {e.code} ({model}): {em}', flush=True)   # V230: 왜 안 되는지 서버 창에
+        return ''.join(out).strip(), f'Gemini 스트림 오류 {e.code}' + (' 한도 초과' if e.code == 429 else ''), 'rate_limited' if e.code in (429, 500, 503) else 'upstream_error'
     except Exception as e:
-        print('[AI] 스트림 끊김:', str(e)[:120], flush=True)
-        return ''.join(out).strip(), 'AI 연결이 끊겼습니다', 'upstream_error'
+        print(f'[AI] Gemini 스트림 끊김({model}, 받은 조각 {len(out)}개):', str(e)[:120], flush=True)
+        return ''.join(out).strip(), ('Gemini 응답 없음(시간 초과)' if not out else 'AI 연결이 끊겼습니다'), 'upstream_error'
 
 
 def call_gemini(system, msgs, max_tokens, effort='', how=''):
@@ -3981,7 +4023,7 @@ def call_gemini(system, msgs, max_tokens, effort='', how=''):
                                  headers={'x-goog-api-key': CONF.get('gemini_api_key', ''), 'content-type': 'application/json'})
     code, why = 'upstream_error', ''
     try:
-        with urllib.request.urlopen(req, timeout=180) as r:
+        with urllib.request.urlopen(req, timeout=int(CONF.get('gemini_timeout') or 60)) as r:
             j = json.loads(r.read().decode('utf-8'))
         fb = (j.get('promptFeedback') or {}).get('blockReason')
         cands = j.get('candidates') or []
