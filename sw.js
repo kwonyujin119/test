@@ -3,6 +3,7 @@
 // 서버(app.sachil47.com) 채팅·메뉴 요청에는 관여하지 않는다.
 // 화면(HTML)은 브라우저 캐시(github.io 10분)를 건너뛰고 매번 새 버전을 확인한다 — 바뀐 게 없으면 304로 가볍게 끝남.
 const SHELL = 'sachil-shell-v1', SHELL_KEY = new URL('./', self.location).href;
+const isShell = u => { const p = new URL(u).pathname, k = new URL(SHELL_KEY).pathname; return p === k || p === k + 'index.html'; };
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch', e => {
@@ -13,10 +14,11 @@ self.addEventListener('fetch', e => {
       fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' })
         .then(r => {
           if (r.redirected) return Response.redirect(r.url, 302);
-          if (r.ok && (r.headers.get('content-type') || '').includes('text/html')) { const c = r.clone(); caches.open(SHELL).then(s => s.put(SHELL_KEY, c)).catch(() => {}); }
+          // V231: 앱 첫 화면(index.html)만 보관한다 — 같은 주소 아래 다른 페이지(album/ 등)가 오프라인용 화면을 덮어쓰지 않게
+          if (r.ok && isShell(req.url) && (r.headers.get('content-type') || '').includes('text/html')) { const c = r.clone(); caches.open(SHELL).then(s => s.put(SHELL_KEY, c)).catch(() => {}); }
           return r;
         })
-        .catch(() => fetch(req).catch(() => caches.match(SHELL_KEY, { cacheName: SHELL }).then(m => m || Response.error())))
+        .catch(() => fetch(req).catch(() => (isShell(req.url) ? caches.match(SHELL_KEY, { cacheName: SHELL }) : Promise.resolve(null)).then(m => m || Response.error())))
     );
     return;
   }
