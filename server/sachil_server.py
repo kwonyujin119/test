@@ -22,6 +22,7 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(BASE, 'data')
 FILES = os.path.join(DATA, 'files')
 THUMBS = os.path.join(DATA, 'thumbs')   # 메뉴 PDF 첫 쪽 미리보기 그림(V86, 교수 화면이 만들어 올림)
+ALBUM = os.path.join(DATA, 'album')     # 15.8: 사진 앨범(album/ 페이지) 원본·미리보기 — 47망 첨부와 별개 폴더
 CONF_PATH = os.path.join(DATA, 'config.json')
 APP_PATH = os.path.join(BASE, 'sachil.html')
 LOG_PATH = os.path.join(DATA, 'access.log')
@@ -45,8 +46,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '15.7'
-APP_VERSION = 'V230'
+VERSION = '15.8'
+APP_VERSION = 'V231'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -56,8 +57,13 @@ LIB_MAX = 60 * 1024 * 1024             # 교수 메뉴 자료 업로드 파일 1
 QNA_HITS, QNA_LOCK = {}, threading.Lock()   # 질의응답 질문 IP별 횟수
 SESSION_DAYS = 7    # V90: 7일 동안 쓰지 않으면 자동 로그아웃(쓸 때마다 다시 7일)
 LOGIN_FAILS, LOGIN_WINDOW = 8, 600      # 10분에 8번 틀리면 잠금
+ALBUM_MAX = 30 * 1024 * 1024            # 15.8: 사진 앨범 — 사진 1장 30MB
+ALBUM_THUMB_MAX = 400 * 1024            # 앨범 미리보기(화면이 만든 JPEG) 1장 400KB
+ALBUM_WHO = ('유진', '아름')             # 앨범에 들어오는 사람(올린 사람 표시·필터)
+ALBUM_DAYS = 180                        # 앨범 로그인 유지 기간(쓸 때마다 다시 연장)
 
 os.makedirs(FILES, exist_ok=True)
+os.makedirs(ALBUM, exist_ok=True)
 for _slug, _dir in SECTIONS:
     os.makedirs(os.path.join(LIB, _dir), exist_ok=True)
 
@@ -127,6 +133,8 @@ def load_conf():
         'ai_assist_model': 'claude-haiku-5-5',   # AI 도우미 전용 모델(가장 저렴). 보고서는 ai_model
         'ai_code': '',                  # AI 도우미 입장코드. 비우면 코드 없이 누구나 사용(V124부터 기본 공개)
         'allowed_origins': ['https://kwonyujin119.github.io'],   # 이 서버에 접속을 허용할 외부 앱 주소(github.io)
+        'album_code_hash': '',          # 15.8: 사진 앨범(album/) 입장 암호(해시로만 저장). 비어 있으면 관리자 코드로만 입장. 바꾸기: --set-album-code 새암호(또는 앨범 화면 ⋯ 메뉴)
+        'album_max_mb': 20480,          # 15.8: 사진 앨범 저장 총량(MB, 기본 20GB)
         'app_url': 'https://kwonyujin119.github.io/test/',       # 교육생에게 줄 앱 주소(뒤에 ?srv=서버주소 가 붙음)
     }
     if conf.get('ai_code') == '5081' and not conf.get('ai_open_v124'):   # V124: AI 도우미 공개 — 예전 기본 입장코드를 한 번 비움(다시 걸면 그대로 둠)
@@ -194,6 +202,24 @@ def is_admin_code(code):
     return bool(h) and secrets.compare_digest(admin_hash(code), h)
 
 
+def conf_disk(key, default=''):
+    """15.8: 서버가 켜진 채로 album-code-setup.bat이 고친 값을 바로 쓰도록 config.json에서 그 항목만 다시 읽는다."""
+    try:
+        with open(CONF_PATH, encoding='utf-8') as f:
+            v = json.load(f).get(key, default)
+        with CONF_LOCK:
+            CONF[key] = v
+        return v
+    except (OSError, ValueError):
+        return CONF.get(key, default)
+
+
+def is_album_code(code):
+    """15.8: 사진 앨범 암호(config album_code_hash). 비어 있으면 False — 그때는 관리자 코드로만 들어온다."""
+    h = str(conf_disk('album_code_hash') or '')
+    return bool(h) and bool(norm_code(code)) and secrets.compare_digest(admin_hash(code), h)
+
+
 # ---------------------------------------------------------------- DB
 DB_LOCK = threading.Lock()
 DB = sqlite3.connect(os.path.join(DATA, 'chat.db'), check_same_thread=False)
@@ -210,6 +236,9 @@ CREATE TABLE IF NOT EXISTS reads(room INTEGER, user INTEGER, last_id INTEGER, se
 CREATE TABLE IF NOT EXISTS qna(id INTEGER PRIMARY KEY AUTOINCREMENT, ts REAL, name TEXT, q TEXT, a TEXT, a_ts REAL, ip TEXT);
 CREATE TABLE IF NOT EXISTS members(room INTEGER, user INTEGER, joined REAL, PRIMARY KEY(room, user));
 CREATE TABLE IF NOT EXISTS maps(room INTEGER PRIMARY KEY, data TEXT, ts REAL);
+CREATE TABLE IF NOT EXISTS album(id TEXT PRIMARY KEY, who TEXT, name TEXT, mime TEXT, size INTEGER, w INTEGER, h INTEGER, memo TEXT, taken REAL, ts REAL, thumb INTEGER DEFAULT 0);
+CREATE INDEX IF NOT EXISTS ix_album_taken ON album(taken);
+CREATE TABLE IF NOT EXISTS album_sessions(token TEXT PRIMARY KEY, who TEXT, admin INTEGER, created REAL, seen REAL, ip TEXT);
 INSERT OR IGNORE INTO members SELECT room, user, seen FROM reads;
 ''')
 try:   # 예전 DB에 답장 칸 추가
@@ -819,6 +848,8 @@ class H(BaseHTTPRequestHandler):
                 return self.asset_get(m.group(1), m.group(2))
             if path == '/healthz':
                 return self.send(200, {'ok': True})
+            if path.startswith('/api/album/'):   # 15.8: 사진 앨범(별도 암호·토큰)
+                return self.album_get(path, args)
             if path == '/api/lib':
                 return self.lib_list()
             if path == '/api/qna':
@@ -947,6 +978,8 @@ class H(BaseHTTPRequestHandler):
         try:
             if not self.guard():
                 return self.err(403, '허용되지 않은 요청입니다')
+            if path.startswith('/api/album/'):   # 15.8: 사진 앨범
+                return self.album_post(path, urllib.parse.parse_qs(qs))
             if path == '/api/login':
                 return self.login()
             if path == '/api/ask':
@@ -1013,6 +1046,8 @@ class H(BaseHTTPRequestHandler):
         try:
             if not self.guard():
                 return self.err(403, '허용되지 않은 요청입니다')
+            if path.startswith('/api/album/'):   # 15.8: 사진 앨범
+                return self.album_delete(path)
             self.user = self.get_user()
             if not self.user:
                 return self.err(401, '로그인이 필요합니다')
@@ -2337,6 +2372,220 @@ class H(BaseHTTPRequestHandler):
         if not os.path.exists(p):
             return self.err(404, '파일이 없습니다')
         return self.send_file(p, f['mime'], "inline; filename*=UTF-8''" + urllib.parse.quote(f['name']), 'private, max-age=3600')
+
+    # --- 사진 앨범(15.8): album/ 페이지 전용. 47망 대화명·교수 로그인과 별개의 암호(album_code_hash 또는 관리자 코드)와 토큰을 쓴다.
+    #     사진은 data\album\<id>(원본)·<id>.t.jpg(화면이 만든 미리보기)에, 목록은 album 표에. 47망 첨부 용량(MAX_STORE)과는 따로 센다(album_max_mb).
+    def album_token(self):
+        a = re.fullmatch(r'Bearer ([A-Za-z0-9_\-]{20,})', (self.headers.get('Authorization') or '').strip())
+        if a:
+            return a.group(1)
+        t = urllib.parse.parse_qs(self.path.partition('?')[2]).get('t', [''])[0]   # <img src=…?t=토큰>
+        return t if re.fullmatch(r'[A-Za-z0-9_\-]{20,}', t) else None
+
+    def album_auth(self):
+        """토큰이 맞으면 {'who','admin','token'}을 돌려주고 self.user(접속 기록용)도 채운다. 아니면 None."""
+        tok = self.album_token()
+        if not tok:
+            return None
+        r = q('SELECT * FROM album_sessions WHERE token=?', (th(tok),), one=True)
+        if not r:
+            return None
+        now = time.time()
+        if now - (r['seen'] or 0) > ALBUM_DAYS * 86400:
+            q('DELETE FROM album_sessions WHERE token=?', (r['token'],), commit=True)
+            return None
+        if now - (r['seen'] or 0) > 600:
+            q('UPDATE album_sessions SET seen=? WHERE token=?', (now, r['token']), commit=True)
+        u = {'who': r['who'], 'admin': bool(r['admin']), 'token': r['token']}
+        self.user = {'id': 0, 'name': '앨범·' + r['who'], 'role': 'album'}
+        return u
+
+    @staticmethod
+    def album_row(r):
+        return {'id': r['id'], 'who': r['who'], 'name': r['name'], 'mime': r['mime'], 'size': r['size'], 'w': r['w'], 'h': r['h'],
+                'memo': r['memo'] or '', 'taken': r['taken'], 'ts': r['ts'], 'thumb': bool(r['thumb'])}
+
+    @staticmethod
+    def album_usage():
+        r = q('SELECT COUNT(*) n, COALESCE(SUM(size),0) s FROM album', one=True)
+        return {'count': r['n'], 'bytes': r['s'], 'max_bytes': int(to_int(str(CONF.get('album_max_mb') or 20480), 20480, 1, 10 ** 7)) * 1024 * 1024}
+
+    def album_get(self, path, args):
+        if path == '/api/album/ping':   # 로그인 전 — 서버가 살아 있는지·암호가 따로 있는지
+            return self.send(200, {'ok': True, 'server': 'sachil', 'version': VERSION, 'who': list(ALBUM_WHO), 'has_code': bool(conf_disk('album_code_hash'))}, log=False)
+        u = self.album_auth()
+        if not u:
+            return self.err(401, '앨범 로그인이 필요합니다')
+        if path == '/api/album/me':
+            return self.send(200, dict(ok=True, who=u['who'], admin=u['admin'], has_code=bool(CONF.get('album_code_hash')), version=VERSION, **self.album_usage()), log=False)
+        if path == '/api/album/photos':
+            rows = q('SELECT * FROM album ORDER BY taken DESC, ts DESC LIMIT 20000')
+            return self.send(200, dict(ok=True, photos=[self.album_row(r) for r in rows], **self.album_usage()), log=False)
+        m = re.fullmatch(r'/api/album/(file|thumb)/([a-f0-9]{24})', path)
+        if m:
+            r = q('SELECT * FROM album WHERE id=?', (m.group(2),), one=True)
+            if not r:
+                return self.err(404, '사진이 없습니다')
+            fp = os.path.join(ALBUM, r['id'])
+            if m.group(1) == 'thumb' and r['thumb'] and os.path.exists(fp + '.t.jpg'):
+                return self.send_file(fp + '.t.jpg', 'image/jpeg', 'inline', 'private, max-age=31536000, immutable')
+            if not os.path.exists(fp):
+                return self.err(404, '사진 파일이 없습니다')
+            disp = ('attachment' if args.get('dl') else 'inline') + "; filename*=UTF-8''" + urllib.parse.quote(r['name'] or 'photo')
+            return self.send_file(fp, r['mime'], disp, 'private, max-age=31536000, immutable')
+        return self.err(404, '없는 주소입니다')
+
+    def album_post(self, path, args):
+        if path == '/api/album/login':
+            return self.album_login()
+        u = self.album_auth()
+        if not u:
+            return self.err(401, '앨범 로그인이 필요합니다')
+        if path == '/api/album/logout':
+            q('DELETE FROM album_sessions WHERE token=?', (u['token'],), commit=True)
+            return self.send(200, {'ok': True})
+        if path == '/api/album/upload':
+            return self.album_upload(u, args)
+        m = re.fullmatch(r'/api/album/thumb/([a-f0-9]{24})', path)
+        if m:
+            return self.album_thumb_put(m.group(1))
+        m = re.fullmatch(r'/api/album/photos/([a-f0-9]{24})', path)
+        if m:   # 메모·날짜 고치기
+            b = self.body_json()
+            r = q('SELECT id FROM album WHERE id=?', (m.group(1),), one=True)
+            if not r:
+                return self.err(404, '사진이 없습니다')
+            if 'memo' in b:
+                memo = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', str(b.get('memo') or '')).strip()[:300]
+                q('UPDATE album SET memo=? WHERE id=?', (memo, r['id']), commit=True)
+            if 'taken' in b:
+                tk = to_int(str(b.get('taken') or ''), None, 0, 4102444800000)   # ms
+                if tk:
+                    q('UPDATE album SET taken=? WHERE id=?', (tk / 1000.0, r['id']), commit=True)
+            return self.send(200, {'ok': True, 'photo': self.album_row(q('SELECT * FROM album WHERE id=?', (r['id'],), one=True))})
+        if path == '/api/album/code':   # 앨범 암호 정하기(관리자 코드로 들어온 사람만). 빈 값이면 지움(관리자 코드로만 입장)
+            if not u['admin']:
+                return self.err(403, '관리자 코드로 들어온 사람만 암호를 바꿀 수 있습니다')
+            b = self.body_json()
+            new = norm_code(b.get('code'))
+            if new and len(new) < 4:
+                return self.err(400, '암호는 4자 이상으로 정하세요')
+            CONF['album_code_hash'] = admin_hash(new) if new else ''
+            write_conf(CONF)
+            q('DELETE FROM album_sessions WHERE admin=0', commit=True)   # 예전 암호로 들어와 있던 쪽은 다시 로그인
+            return self.send(200, {'ok': True, 'has_code': bool(new)})
+        return self.err(404, '없는 주소입니다')
+
+    def album_delete(self, path):
+        u = self.album_auth()
+        if not u:
+            return self.err(401, '앨범 로그인이 필요합니다')
+        m = re.fullmatch(r'/api/album/photos/([a-f0-9]{24})', path)
+        if not m:
+            return self.err(404, '없는 주소입니다')
+        r = q('SELECT * FROM album WHERE id=?', (m.group(1),), one=True)
+        if not r:
+            return self.err(404, '사진이 없습니다')
+        fp = os.path.join(ALBUM, r['id'])
+        for p in (fp, fp + '.t.jpg'):
+            try:
+                if os.path.exists(p):
+                    os.remove(p)
+            except OSError as e:
+                print('[앨범] 파일 삭제 실패:', p, e, flush=True)
+        q('DELETE FROM album WHERE id=?', (r['id'],), commit=True)
+        print(f"[앨범] {u['who']} 삭제: {r['name']} ({(r['size'] or 0) // 1024}KB, 올린 사람 {r['who']})", flush=True)
+        return self.send(200, dict(ok=True, **self.album_usage()))
+
+    def album_login(self):
+        ip = self.ip()
+        now = time.time()
+        key = 'album:' + ip
+        with FAILS_LOCK:
+            lst = [t for t in FAILS.get(key, []) if now - t < LOGIN_WINDOW]
+            FAILS[key] = lst
+            if len(lst) >= LOGIN_FAILS:
+                return self.err(429, '여러 번 틀려 10분간 잠겼습니다. 잠시 후 다시 시도하세요')
+        b = self.body_json()
+        who = str(b.get('who') or '').strip()
+        code = str(b.get('code') or '')
+        if who not in ALBUM_WHO:
+            return self.err(400, '누구인지 고르세요')
+        admin = bool(norm_code(code)) and is_admin_code(code)
+        if not admin and not is_album_code(code):
+            with FAILS_LOCK:
+                FAILS.setdefault(key, []).append(now)
+            self.alog(401, 'album-login-fail')
+            return self.send(401, {'ok': False, 'error': '암호가 맞지 않습니다'}, log=False)
+        token = secrets.token_urlsafe(32)
+        q('INSERT INTO album_sessions(token,who,admin,created,seen,ip) VALUES(?,?,?,?,?,?)', (th(token), who, 1 if admin else 0, now, now, ip), commit=True)
+        q('DELETE FROM album_sessions WHERE seen<?', (now - ALBUM_DAYS * 86400,), commit=True)
+        self.user = {'id': 0, 'name': '앨범·' + who, 'role': 'album'}
+        return self.send(200, {'ok': True, 'token': token, 'who': who, 'admin': admin, 'has_code': bool(CONF.get('album_code_hash'))})
+
+    def album_upload(self, u, args):
+        """원본을 그대로 받는다(본문 = 파일). 이름·메모·찍은 시각·크기는 주소 뒤(?name=&memo=&taken=&w=&h=)로."""
+        n = self.clen()
+        if n <= 0:
+            return self.err(400, '빈 파일입니다')
+        if n > ALBUM_MAX:
+            self.close_connection = True
+            return self.err(413, '사진 1장은 30MB 이하만 올릴 수 있습니다')
+        use = self.album_usage()
+        if use['bytes'] + n > use['max_bytes']:
+            self.close_connection = True
+            return self.err(507, '앨범 저장 공간이 찼습니다(config.json의 album_max_mb를 늘리거나 사진을 지워 주세요)')
+        name = re.sub(r'[\x00-\x1f\x7f<>:"/\\|?*]', '', (args.get('name') or [''])[0]).strip()[:120]
+        memo = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', (args.get('memo') or [''])[0]).strip()[:300]
+        taken = to_int((args.get('taken') or [''])[0], None, 0, 4102444800000)
+        w = to_int((args.get('w') or [''])[0], 0, 0, 100000)
+        h = to_int((args.get('h') or [''])[0], 0, 0, 100000)
+        fid = secrets.token_hex(12)
+        fp = os.path.join(ALBUM, fid)
+        tmp = fp + '.up'
+        head = b''
+        left = n
+        try:
+            with open(tmp, 'wb') as f:
+                while left > 0:
+                    b = self.rfile.read(min(262144, left))
+                    if not b:
+                        raise ConnectionError('업로드가 끊겼습니다')
+                    if len(head) < 16:
+                        head += b[:16]
+                    f.write(b)
+                    left -= len(b)
+            self._body_read = True
+            kind = sniff(head[:16])
+            if not kind or kind[0] != 'image':
+                return self.err(415, '사진(JPG·PNG·WEBP·GIF)만 올릴 수 있습니다')
+            os.replace(tmp, fp)
+        finally:
+            if os.path.exists(tmp):
+                os.remove(tmp)
+        now = time.time()
+        q('INSERT INTO album(id,who,name,mime,size,w,h,memo,taken,ts,thumb) VALUES(?,?,?,?,?,?,?,?,?,?,0)',
+          (fid, u['who'], name or ('사진' + kind[2]), kind[1], n, w, h, memo, (taken / 1000.0) if taken else now, now), commit=True)
+        print(f"[앨범] {u['who']} 올림: {name or fid} ({n // 1024}KB)", flush=True)
+        return self.send(200, dict(ok=True, photo=self.album_row(q('SELECT * FROM album WHERE id=?', (fid,), one=True)), **self.album_usage()))
+
+    def album_thumb_put(self, fid):
+        r = q('SELECT id FROM album WHERE id=?', (fid,), one=True)
+        if not r:
+            return self.err(404, '사진이 없습니다')
+        n = self.clen()
+        if n <= 0 or n > ALBUM_THUMB_MAX:
+            self.close_connection = True
+            return self.err(413, '미리보기 그림이 너무 큽니다')
+        data = self.rfile.read(n)
+        self._body_read = True
+        if len(data) != n or not data.startswith(b'\xff\xd8\xff'):
+            return self.err(415, 'JPEG만 받습니다')
+        with open(os.path.join(ALBUM, fid + '.t.jpg'), 'wb') as f:
+            f.write(data)
+        q('UPDATE album SET thumb=1 WHERE id=?', (fid,), commit=True)
+        return self.send(200, {'ok': True}, log=False)
+
 
 
 # ---------------------------------------------------------------- 실행
@@ -4595,6 +4844,16 @@ def rotate_logs():
 
 def main():
     rotate_logs()
+    if '--set-album-code' in sys.argv:   # 15.8: 사진 앨범 암호(해시로만 저장). 빈 값이면 지움 → 관리자 코드로만 입장
+        i = sys.argv.index('--set-album-code')
+        new = norm_code(' '.join(sys.argv[i + 1:]))
+        if new and len(new) < 4:
+            print('앨범 암호는 4자 이상으로 정하세요.')
+            sys.exit(1)
+        CONF['album_code_hash'] = admin_hash(new) if new else ''
+        write_conf(CONF)
+        print(('사진 앨범 암호 저장 완료' if new else '사진 앨범 암호를 지웠습니다(관리자 코드로만 입장)') + ' — 앨범 주소: ' + str(CONF.get('app_url') or '').rstrip('/') + '/album/')
+        return
     if '--set-admin-code' in sys.argv:
         i = sys.argv.index('--set-admin-code')
         new = norm_code(' '.join(sys.argv[i + 1:]))
@@ -4730,6 +4989,7 @@ def main():
         '관리자 코드: ********   ← 본인만 (관리자 입장·교수 로그인. 바꾸기: --set-admin-code 새코드)',
         f'47망(디브리핑룸): 매주 월 04시 오래된 대화 {int(float(CONF.get("weekly_trim_ratio") or 0) * 100)}% 정리 (최근 대화 유지)',
         f'메뉴 자료 폴더: {LIB}',
+        f'사진 앨범:   {str(CONF.get("app_url") or "").rstrip("/")}/album/  (암호: ' + ('따로 정해 둠' if CONF.get('album_code_hash') else '관리자 코드 — 따로 정하기: --set-album-code 새암호') + ')',
         (f'자동 업데이트: {CONF.get("update_check_min") or 5}분마다 확인해 새 버전이면 곧바로 교체, 그 밖에는 2시간마다 다시 켬 (끄기: config.json의 auto_update를 false)' if CONF.get('auto_update') else '자동 업데이트: 꺼짐'),
         (f'AI 도우미:   {AI_NAMES[ai_provider()]} 연결 (' + (f'모델 {CONF.get("gemini_model")}' if ai_provider() == 'gemini' else f'모델 {CONF.get("groq_model")}' if ai_provider() == 'groq' else f'도우미 {CONF.get("ai_assist_model")} · 보고서 {CONF.get("ai_model")}') + f', 하루 {CONF.get("ai_daily_limit") or "무제한"}회' + (', 입장코드 사용' if CONF.get('ai_code') else '') + ')'
          + (' · 예비: ' + '·'.join(AI_NAMES[p] for p in ai_has() if p != ai_provider()) if len(ai_has()) > 1 else '')) if ai_ready()
