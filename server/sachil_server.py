@@ -75,6 +75,7 @@ def admin_hash(code):
 
 
 ADMIN_HASH_DEFAULT = '8f10e3c36e2248787d879a69c83a7b9407a567a10d06a6223ff70aafa93217a2'
+ALBUM_HASH_DEFAULT = '97b7fb184c3def03f40019386d003f720d63ad01af7d809adb4e08a68593e404'   # 15.8: 사진 앨범 기본 접속코드(사용자가 정한 4자리)의 해시. 바꾸기: --set-album-code
 
 
 def load_conf():
@@ -133,7 +134,7 @@ def load_conf():
         'ai_assist_model': 'claude-haiku-5-5',   # AI 도우미 전용 모델(가장 저렴). 보고서는 ai_model
         'ai_code': '',                  # AI 도우미 입장코드. 비우면 코드 없이 누구나 사용(V124부터 기본 공개)
         'allowed_origins': ['https://kwonyujin119.github.io'],   # 이 서버에 접속을 허용할 외부 앱 주소(github.io)
-        'album_code_hash': '',          # 15.8: 사진 앨범 입장 암호(해시로만 저장). 비어 있으면 관리자 코드로만 입장. 바꾸기: --set-album-code 새암호(또는 앨범 화면 ⋯ 메뉴)
+        'album_code_hash': ALBUM_HASH_DEFAULT,   # 15.8: 사진 앨범 접속코드(해시로만 저장). 비우면 관리자 코드로만 입장. 바꾸기: --set-album-code 새코드(또는 앨범 화면 ⋯ 메뉴)
         'album_max_mb': 20480,          # 15.8: 사진 앨범 저장 총량(MB, 기본 20GB)
         'album_url': 'https://kwonyujin119.github.io/test3/',   # 15.8: 사진 앨범 화면 주소(저장소 kwonyujin119/test3). 안내 문구에만 씀
         'app_url': 'https://kwonyujin119.github.io/test/',       # 교육생에게 줄 앱 주소(뒤에 ?srv=서버주소 가 붙음)
@@ -203,20 +204,21 @@ def is_admin_code(code):
     return bool(h) and secrets.compare_digest(admin_hash(code), h)
 
 
-def conf_disk(key, default=''):
-    """15.8: 서버가 켜진 채로 album-code-setup.bat이 고친 값을 바로 쓰도록 config.json에서 그 항목만 다시 읽는다."""
+def conf_disk(key):
+    """15.8: 서버가 켜진 채로 album-code-setup.bat이 고친 값을 바로 쓰도록 config.json에서 그 항목만 다시 읽는다(파일에 없으면 지금 값 유지)."""
     try:
         with open(CONF_PATH, encoding='utf-8') as f:
-            v = json.load(f).get(key, default)
-        with CONF_LOCK:
-            CONF[key] = v
-        return v
+            d = json.load(f)
+        if key in d:
+            with CONF_LOCK:
+                CONF[key] = d[key]
     except (OSError, ValueError):
-        return CONF.get(key, default)
+        pass
+    return CONF.get(key)
 
 
 def is_album_code(code):
-    """15.8: 사진 앨범 암호(config album_code_hash). 비어 있으면 False — 그때는 관리자 코드로만 들어온다."""
+    """15.8: 사진 앨범 접속코드(config album_code_hash). 비어 있으면 False — 그때는 관리자 코드로만 들어온다."""
     h = str(conf_disk('album_code_hash') or '')
     return bool(h) and bool(norm_code(code)) and secrets.compare_digest(admin_hash(code), h)
 
@@ -2398,7 +2400,7 @@ class H(BaseHTTPRequestHandler):
         if now - (r['seen'] or 0) > 600:
             q('UPDATE album_sessions SET seen=? WHERE token=?', (now, r['token']), commit=True)
         u = {'who': r['who'], 'admin': bool(r['admin']), 'token': r['token']}
-        self.user = {'id': 0, 'name': '앨범·' + r['who'], 'role': 'album'}
+        self.user = {'id': 0, 'name': '앨범' + ('·' + r['who'] if r['who'] else ''), 'role': 'album'}
         return u
 
     @staticmethod
@@ -2466,11 +2468,11 @@ class H(BaseHTTPRequestHandler):
             return self.send(200, {'ok': True, 'photo': self.album_row(q('SELECT * FROM album WHERE id=?', (r['id'],), one=True))})
         if path == '/api/album/code':   # 앨범 암호 정하기(관리자 코드로 들어온 사람만). 빈 값이면 지움(관리자 코드로만 입장)
             if not u['admin']:
-                return self.err(403, '관리자 코드로 들어온 사람만 암호를 바꿀 수 있습니다')
+                return self.err(403, '관리자 코드로 들어온 사람만 접속코드를 바꿀 수 있습니다')
             b = self.body_json()
             new = norm_code(b.get('code'))
             if new and len(new) < 4:
-                return self.err(400, '암호는 4자 이상으로 정하세요')
+                return self.err(400, '접속코드는 4자 이상으로 정하세요')
             CONF['album_code_hash'] = admin_hash(new) if new else ''
             write_conf(CONF)
             q('DELETE FROM album_sessions WHERE admin=0', commit=True)   # 예전 암호로 들어와 있던 쪽은 다시 로그인
@@ -2495,7 +2497,7 @@ class H(BaseHTTPRequestHandler):
             except OSError as e:
                 print('[앨범] 파일 삭제 실패:', p, e, flush=True)
         q('DELETE FROM album WHERE id=?', (r['id'],), commit=True)
-        print(f"[앨범] {u['who']} 삭제: {r['name']} ({(r['size'] or 0) // 1024}KB, 올린 사람 {r['who']})", flush=True)
+        print(f"[앨범] 삭제: {r['name']} ({(r['size'] or 0) // 1024}KB)", flush=True)
         return self.send(200, dict(ok=True, **self.album_usage()))
 
     def album_login(self):
@@ -2509,19 +2511,19 @@ class H(BaseHTTPRequestHandler):
                 return self.err(429, '여러 번 틀려 10분간 잠겼습니다. 잠시 후 다시 시도하세요')
         b = self.body_json()
         who = str(b.get('who') or '').strip()
+        if who not in ALBUM_WHO:   # 접속코드 하나로 들어오므로 구분은 선택(없으면 빈 값)
+            who = ''
         code = str(b.get('code') or '')
-        if who not in ALBUM_WHO:
-            return self.err(400, '누구인지 고르세요')
         admin = bool(norm_code(code)) and is_admin_code(code)
         if not admin and not is_album_code(code):
             with FAILS_LOCK:
                 FAILS.setdefault(key, []).append(now)
             self.alog(401, 'album-login-fail')
-            return self.send(401, {'ok': False, 'error': '암호가 맞지 않습니다'}, log=False)
+            return self.send(401, {'ok': False, 'error': '접속코드가 맞지 않습니다'}, log=False)
         token = secrets.token_urlsafe(32)
         q('INSERT INTO album_sessions(token,who,admin,created,seen,ip) VALUES(?,?,?,?,?,?)', (th(token), who, 1 if admin else 0, now, now, ip), commit=True)
         q('DELETE FROM album_sessions WHERE seen<?', (now - ALBUM_DAYS * 86400,), commit=True)
-        self.user = {'id': 0, 'name': '앨범·' + who, 'role': 'album'}
+        self.user = {'id': 0, 'name': '앨범' + ('·' + who if who else ''), 'role': 'album'}
         return self.send(200, {'ok': True, 'token': token, 'who': who, 'admin': admin, 'has_code': bool(CONF.get('album_code_hash'))})
 
     def album_upload(self, u, args):
@@ -2567,7 +2569,7 @@ class H(BaseHTTPRequestHandler):
         now = time.time()
         q('INSERT INTO album(id,who,name,mime,size,w,h,memo,taken,ts,thumb) VALUES(?,?,?,?,?,?,?,?,?,?,0)',
           (fid, u['who'], name or ('사진' + kind[2]), kind[1], n, w, h, memo, (taken / 1000.0) if taken else now, now), commit=True)
-        print(f"[앨범] {u['who']} 올림: {name or fid} ({n // 1024}KB)", flush=True)
+        print(f"[앨범] 올림: {name or fid} ({n // 1024}KB)", flush=True)
         return self.send(200, dict(ok=True, photo=self.album_row(q('SELECT * FROM album WHERE id=?', (fid,), one=True)), **self.album_usage()))
 
     def album_thumb_put(self, fid):
@@ -4849,11 +4851,11 @@ def main():
         i = sys.argv.index('--set-album-code')
         new = norm_code(' '.join(sys.argv[i + 1:]))
         if new and len(new) < 4:
-            print('앨범 암호는 4자 이상으로 정하세요.')
+            print('앨범 접속코드는 4자 이상으로 정하세요.')
             sys.exit(1)
         CONF['album_code_hash'] = admin_hash(new) if new else ''
         write_conf(CONF)
-        print(('사진 앨범 암호 저장 완료' if new else '사진 앨범 암호를 지웠습니다(관리자 코드로만 입장)') + ' — 앨범 주소: ' + str(CONF.get('album_url') or ''))
+        print(('사진 앨범 접속코드 저장 완료' if new else '사진 앨범 접속코드를 지웠습니다(관리자 코드로만 입장)') + ' — 앨범 주소: ' + str(CONF.get('album_url') or ''))
         return
     if '--set-admin-code' in sys.argv:
         i = sys.argv.index('--set-admin-code')
@@ -4990,7 +4992,7 @@ def main():
         '관리자 코드: ********   ← 본인만 (관리자 입장·교수 로그인. 바꾸기: --set-admin-code 새코드)',
         f'47망(디브리핑룸): 매주 월 04시 오래된 대화 {int(float(CONF.get("weekly_trim_ratio") or 0) * 100)}% 정리 (최근 대화 유지)',
         f'메뉴 자료 폴더: {LIB}',
-        f'사진 앨범:   {CONF.get("album_url") or ""}  (암호: ' + ('따로 정해 둠' if CONF.get('album_code_hash') else '관리자 코드 — 따로 정하기: --set-album-code 새암호') + ')',
+        f'사진 앨범:   {CONF.get("album_url") or ""}  (접속코드: ' + ('설정됨 — 바꾸기: --set-album-code 새코드' if CONF.get('album_code_hash') else '없음, 관리자 코드로만 입장') + ')',
         (f'자동 업데이트: {CONF.get("update_check_min") or 5}분마다 확인해 새 버전이면 곧바로 교체, 그 밖에는 2시간마다 다시 켬 (끄기: config.json의 auto_update를 false)' if CONF.get('auto_update') else '자동 업데이트: 꺼짐'),
         (f'AI 도우미:   {AI_NAMES[ai_provider()]} 연결 (' + (f'모델 {CONF.get("gemini_model")}' if ai_provider() == 'gemini' else f'모델 {CONF.get("groq_model")}' if ai_provider() == 'groq' else f'도우미 {CONF.get("ai_assist_model")} · 보고서 {CONF.get("ai_model")}') + f', 하루 {CONF.get("ai_daily_limit") or "무제한"}회' + (', 입장코드 사용' if CONF.get('ai_code') else '') + ')'
          + (' · 예비: ' + '·'.join(AI_NAMES[p] for p in ai_has() if p != ai_provider()) if len(ai_has()) > 1 else '')) if ai_ready()
