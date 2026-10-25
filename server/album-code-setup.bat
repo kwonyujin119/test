@@ -2,7 +2,7 @@
 chcp 65001 >nul
 cd /d "%~dp0"
 title SACHIL:47 album password setup
-rem Sets the password of the photo album page (https://kwonyujin119.github.io/test/album/).
+rem Sets the password of the photo album page (https://kwonyujin119.github.io/test3/).
 rem The password is stored in data\config.json as a hash only. Until one is set, only the admin code opens the album.
 
 set "PY="

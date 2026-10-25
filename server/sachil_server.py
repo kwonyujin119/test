@@ -22,7 +22,7 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(BASE, 'data')
 FILES = os.path.join(DATA, 'files')
 THUMBS = os.path.join(DATA, 'thumbs')   # 메뉴 PDF 첫 쪽 미리보기 그림(V86, 교수 화면이 만들어 올림)
-ALBUM = os.path.join(DATA, 'album')     # 15.8: 사진 앨범(album/ 페이지) 원본·미리보기 — 47망 첨부와 별개 폴더
+ALBUM = os.path.join(DATA, 'album')     # 15.8: 사진 앨범(github.io/test3 화면) 원본·미리보기 — 47망 첨부와 별개 폴더
 CONF_PATH = os.path.join(DATA, 'config.json')
 APP_PATH = os.path.join(BASE, 'sachil.html')
 LOG_PATH = os.path.join(DATA, 'access.log')
@@ -133,8 +133,9 @@ def load_conf():
         'ai_assist_model': 'claude-haiku-5-5',   # AI 도우미 전용 모델(가장 저렴). 보고서는 ai_model
         'ai_code': '',                  # AI 도우미 입장코드. 비우면 코드 없이 누구나 사용(V124부터 기본 공개)
         'allowed_origins': ['https://kwonyujin119.github.io'],   # 이 서버에 접속을 허용할 외부 앱 주소(github.io)
-        'album_code_hash': '',          # 15.8: 사진 앨범(album/) 입장 암호(해시로만 저장). 비어 있으면 관리자 코드로만 입장. 바꾸기: --set-album-code 새암호(또는 앨범 화면 ⋯ 메뉴)
+        'album_code_hash': '',          # 15.8: 사진 앨범 입장 암호(해시로만 저장). 비어 있으면 관리자 코드로만 입장. 바꾸기: --set-album-code 새암호(또는 앨범 화면 ⋯ 메뉴)
         'album_max_mb': 20480,          # 15.8: 사진 앨범 저장 총량(MB, 기본 20GB)
+        'album_url': 'https://kwonyujin119.github.io/test3/',   # 15.8: 사진 앨범 화면 주소(저장소 kwonyujin119/test3). 안내 문구에만 씀
         'app_url': 'https://kwonyujin119.github.io/test/',       # 교육생에게 줄 앱 주소(뒤에 ?srv=서버주소 가 붙음)
     }
     if conf.get('ai_code') == '5081' and not conf.get('ai_open_v124'):   # V124: AI 도우미 공개 — 예전 기본 입장코드를 한 번 비움(다시 걸면 그대로 둠)
@@ -2373,7 +2374,7 @@ class H(BaseHTTPRequestHandler):
             return self.err(404, '파일이 없습니다')
         return self.send_file(p, f['mime'], "inline; filename*=UTF-8''" + urllib.parse.quote(f['name']), 'private, max-age=3600')
 
-    # --- 사진 앨범(15.8): album/ 페이지 전용. 47망 대화명·교수 로그인과 별개의 암호(album_code_hash 또는 관리자 코드)와 토큰을 쓴다.
+    # --- 사진 앨범(15.8): 앨범 화면(저장소 kwonyujin119/test3 → github.io/test3/) 전용. 47망 대화명·교수 로그인과 별개의 암호(album_code_hash 또는 관리자 코드)와 토큰을 쓴다.
     #     사진은 data\album\<id>(원본)·<id>.t.jpg(화면이 만든 미리보기)에, 목록은 album 표에. 47망 첨부 용량(MAX_STORE)과는 따로 센다(album_max_mb).
     def album_token(self):
         a = re.fullmatch(r'Bearer ([A-Za-z0-9_\-]{20,})', (self.headers.get('Authorization') or '').strip())
@@ -4852,7 +4853,7 @@ def main():
             sys.exit(1)
         CONF['album_code_hash'] = admin_hash(new) if new else ''
         write_conf(CONF)
-        print(('사진 앨범 암호 저장 완료' if new else '사진 앨범 암호를 지웠습니다(관리자 코드로만 입장)') + ' — 앨범 주소: ' + str(CONF.get('app_url') or '').rstrip('/') + '/album/')
+        print(('사진 앨범 암호 저장 완료' if new else '사진 앨범 암호를 지웠습니다(관리자 코드로만 입장)') + ' — 앨범 주소: ' + str(CONF.get('album_url') or ''))
         return
     if '--set-admin-code' in sys.argv:
         i = sys.argv.index('--set-admin-code')
@@ -4989,7 +4990,7 @@ def main():
         '관리자 코드: ********   ← 본인만 (관리자 입장·교수 로그인. 바꾸기: --set-admin-code 새코드)',
         f'47망(디브리핑룸): 매주 월 04시 오래된 대화 {int(float(CONF.get("weekly_trim_ratio") or 0) * 100)}% 정리 (최근 대화 유지)',
         f'메뉴 자료 폴더: {LIB}',
-        f'사진 앨범:   {str(CONF.get("app_url") or "").rstrip("/")}/album/  (암호: ' + ('따로 정해 둠' if CONF.get('album_code_hash') else '관리자 코드 — 따로 정하기: --set-album-code 새암호') + ')',
+        f'사진 앨범:   {CONF.get("album_url") or ""}  (암호: ' + ('따로 정해 둠' if CONF.get('album_code_hash') else '관리자 코드 — 따로 정하기: --set-album-code 새암호') + ')',
         (f'자동 업데이트: {CONF.get("update_check_min") or 5}분마다 확인해 새 버전이면 곧바로 교체, 그 밖에는 2시간마다 다시 켬 (끄기: config.json의 auto_update를 false)' if CONF.get('auto_update') else '자동 업데이트: 꺼짐'),
         (f'AI 도우미:   {AI_NAMES[ai_provider()]} 연결 (' + (f'모델 {CONF.get("gemini_model")}' if ai_provider() == 'gemini' else f'모델 {CONF.get("groq_model")}' if ai_provider() == 'groq' else f'도우미 {CONF.get("ai_assist_model")} · 보고서 {CONF.get("ai_model")}') + f', 하루 {CONF.get("ai_daily_limit") or "무제한"}회' + (', 입장코드 사용' if CONF.get('ai_code') else '') + ')'
          + (' · 예비: ' + '·'.join(AI_NAMES[p] for p in ai_has() if p != ai_provider()) if len(ai_has()) > 1 else '')) if ai_ready()
