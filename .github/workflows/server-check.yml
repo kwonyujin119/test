@@ -11,6 +11,9 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
+      - name: /api/album/ping (15.8+)
+        run: |
+          code=$(curl -s -m 20 -o /tmp/ping.json -w '%{http_code}' https://app.sachil47.com/api/album/ping); echo "album ping HTTP $code"; cat /tmp/ping.json 2>/dev/null; echo
       - name: /api/me
         run: |
           for i in 1 2 3; do
@@ -25,6 +28,7 @@ jobs:
               print('응답이 JSON이 아님(서버 꺼짐·터널 끊김?)'); sys.exit(1)
           print('server version :', j.get('version'))
           print('app version    :', j.get('app_version') or j.get('app'))
+          print('album api      :', 'OK' if j.get('version','0').split('.')[0:2] >= ['15','8'] else 'NO (needs 15.8+)')
           for k in ('auto_update', 'bat_old', 'ai', 'ai_provider'):
               if k in j:
                   v = j[k]
