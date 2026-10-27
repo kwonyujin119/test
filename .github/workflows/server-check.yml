@@ -1,6 +1,7 @@
 name: Server check
 
 # 서버(app.sachil47.com)가 살아 있는지·버전·자동 업데이트 상태를 확인(공개 /api/me만 읽음, 키·비밀값 없음)
+# 15.8부터는 /api/album/ping(앨범 API)도 함께 확인한다
 on:
   workflow_dispatch:
   push:
