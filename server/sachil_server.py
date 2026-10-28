@@ -44,10 +44,10 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.doc': ('application/msword', False), '.docx': ('application/vnd.openxmlformats-officedocument.wordprocessingml.document', False),
     '.ppt': ('application/vnd.ms-powerpoint', False), '.pptx': ('application/vnd.openxmlformats-officedocument.presentationml.presentation', False),
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
-    '.zip': ('application/zip', False),
+    '.zip': ('application/zip', False), '.csv': ('text/csv; charset=utf-8', False),   # 15.12: CSV(엑셀에서 저장한 표)
 }
-VERSION = '15.11'
-APP_VERSION = 'V234'
+VERSION = '15.12'
+APP_VERSION = 'V235'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -2762,6 +2762,8 @@ class DocIndex:
         return os.path.join(IDX_DIR, hashlib.sha1(key.encode('utf-8')).hexdigest()[:24] + '.json')
 
     def _extract(self, fp, ext):
+        if ext in ('.xlsx', '.csv'):
+            return sheet_pages(fp, ext)
         if ext == '.txt':
             for enc in ('utf-8-sig', 'cp949'):
                 try:
@@ -2793,7 +2795,7 @@ class DocIndex:
         for slug, d in SECTIONS:
             for f in H.lib_files(slug):
                 ext = '.' + f['ext']
-                if ext not in ('.pdf', '.txt'):
+                if ext not in ('.pdf', '.txt', '.xlsx', '.csv'):   # 15.12: 엑셀(xlsx)·CSV도 본문 검색
                     continue
                 key = f'{slug}/{f["name"]}'
                 docs.append((slug, f['name'], ext, f['size'], round(f['mtime'], 3), key))
@@ -3285,6 +3287,108 @@ def law_links(q):
         url = 'https://www.law.go.kr/법령/' + urllib.parse.quote(n.replace(' ', '')) + ('/' + urllib.parse.quote(art) if art else '')
         out.append({'name': n, 'art': art, 'url': url})
     return out[:2]
+
+
+SHEET_ROWS = 40          # 15.12: 엑셀·CSV는 40행씩 한 묶음(검색 결과 한 줄)
+SHEET_MAX_ROWS = 20000   # 너무 큰 표는 앞부분만(색인 메모리·시간)
+
+
+def _sheet_chunks(title, rows):
+    out, hdr = [], None
+    for i in range(0, len(rows), SHEET_ROWS):
+        part = rows[i:i + SHEET_ROWS]
+        if hdr is None and part:
+            hdr = part[0]
+        head = f'[{title} · {i + 1}~{i + len(part)}행]' + (f' (머리줄: {hdr})' if i and hdr else '')
+        out.append(head + '\n' + '\n'.join(part))
+    return out
+
+
+def sheet_pages(fp, ext):
+    """15.12: 엑셀(.xlsx)·CSV를 검색용 글로 — 시트마다 40행씩 '[시트 · 1~40행]' 묶음. 추가 라이브러리 없이(xlsx = zip 안의 XML)."""
+    import zipfile, csv, io
+    import xml.etree.ElementTree as ET
+    clean = lambda v: re.sub(r'\s+', ' ', str(v or '')).strip()
+    if ext == '.csv':
+        raw = open(fp, 'rb').read(30_000_000)
+        for enc in ('utf-8-sig', 'cp949'):
+            try:
+                txt = raw.decode(enc)
+                break
+            except UnicodeDecodeError:
+                continue
+        else:
+            txt = raw.decode('utf-8', 'replace')
+        rows = []
+        for r in csv.reader(io.StringIO(txt)):
+            line = ' | '.join(c for c in (clean(x) for x in r[:60]) if c)
+            if line:
+                rows.append(line)
+            if len(rows) >= SHEET_MAX_ROWS:
+                break
+        return _sheet_chunks(os.path.splitext(os.path.basename(fp))[0][:30], rows) or ['']
+    NS = '{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'
+    RNS = '{http://schemas.openxmlformats.org/officeDocument/2006/relationships}'
+    with zipfile.ZipFile(fp) as z:
+        names = set(z.namelist())
+        def xml(n):
+            if n not in names or z.getinfo(n).file_size > 200_000_000:
+                return None
+            with z.open(n) as f:
+                return ET.parse(f).getroot()
+        ss = []
+        r = xml('xl/sharedStrings.xml')
+        if r is not None:
+            for si in r.iter(NS + 'si'):
+                ss.append(''.join(t.text or '' for t in si.iter(NS + 't')))
+        rel = {}
+        r = xml('xl/_rels/workbook.xml.rels')
+        if r is not None:
+            for x in r:
+                t = x.get('Target') or ''
+                rel[x.get('Id')] = t.lstrip('/') if t.startswith('/') else 'xl/' + t
+        sheets = []
+        r = xml('xl/workbook.xml')
+        if r is not None:
+            for sh in r.iter(NS + 'sheet'):
+                if sh.get('state') in ('hidden', 'veryHidden'):
+                    continue
+                sheets.append((sh.get('name') or '시트', rel.get(sh.get(RNS + 'id')) or ''))
+        if not sheets:
+            sheets = [(os.path.splitext(os.path.basename(n))[0], n) for n in sorted(names) if re.match(r'xl/worksheets/sheet\d+\.xml$', n)]
+        pages, total = [], 0
+        for title, path in sheets:
+            if path not in names:
+                continue
+            rows = []
+            with z.open(path) as f:
+                for ev, el in ET.iterparse(f):
+                    if el.tag != NS + 'row':
+                        continue
+                    cells = []
+                    for c in el.iter(NS + 'c'):
+                        t, v = c.get('t'), c.find(NS + 'v')
+                        if t == 's' and v is not None and (v.text or '').isdigit() and int(v.text) < len(ss):
+                            val = ss[int(v.text)]
+                        elif t == 'inlineStr':
+                            val = ''.join(x.text or '' for x in c.iter(NS + 't'))
+                        else:
+                            val = v.text if v is not None else ''
+                        val = clean(val)
+                        if val:
+                            cells.append(val)
+                        if len(cells) >= 60:
+                            break
+                    el.clear()
+                    if cells:
+                        rows.append(' | '.join(cells))
+                    if total + len(rows) >= SHEET_MAX_ROWS:
+                        break
+            total += len(rows)
+            pages += _sheet_chunks(clean(title)[:30], rows)
+            if total >= SHEET_MAX_ROWS:
+                break
+        return pages or ['']
 
 
 BLD_CACHE = {}   # (법정동코드, 번지) → (시각, 결과) — 같은 건물은 하루 동안 다시 묻지 않게(초당 호출 제한)
