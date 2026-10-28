@@ -46,14 +46,15 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False), '.csv': ('text/csv; charset=utf-8', False),   # 15.12: CSV(엑셀에서 저장한 표)
 }
-VERSION = '15.13'
-APP_VERSION = 'V236'
+VERSION = '15.14'
+APP_VERSION = 'V237'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
 MAX_STORE = 3 * 1024 * 1024 * 1024     # 첨부 총량 3GB
 UPLOAD_DAY_MAX = 200 * 1024 * 1024     # V111: 한 사람 하루 첨부 200MB(교수 제외)
-LIB_MAX = 60 * 1024 * 1024             # 교수 메뉴 자료 업로드 파일 1개 60MB
+LIB_MAX = 0                            # 15.14: 교수 메뉴 자료 파일 크기 제한 없음(0) — config lib_max_mb로 다시 둘 수 있음
+LIB_PART_MAX = 95 * 1024 * 1024       # 15.14: 한 번에 받는 조각 최대(Cloudflare 무료 100MB 한도 아래) — 큰 파일은 앱이 나눠 보내고 서버가 이어 붙임
 QNA_HITS, QNA_LOCK = {}, threading.Lock()   # 질의응답 질문 IP별 횟수
 SESSION_DAYS = 7    # V90: 7일 동안 쓰지 않으면 자동 로그아웃(쓸 때마다 다시 7일)
 LOGIN_FAILS, LOGIN_WINDOW = 8, 600      # 10분에 8번 틀리면 잠금
@@ -817,7 +818,7 @@ class H(BaseHTTPRequestHandler):
         if not self.cors_origin():
             return self.send(403, b'', 'text/plain', log=False)
         return self.send(204, b'', 'text/plain', {'Access-Control-Allow-Methods': 'GET, POST, DELETE, HEAD',
-                                                  'Access-Control-Allow-Headers': 'X-SACHIL, Content-Type, X-Filename, Authorization, Range',
+                                                  'Access-Control-Allow-Headers': 'X-SACHIL, Content-Type, X-Filename, X-Part-Size, Authorization, Range',
                                                   'Access-Control-Max-Age': '600'}, log=False)
 
     def guard(self):
@@ -1023,7 +1024,7 @@ class H(BaseHTTPRequestHandler):
                 return self.admin_ai()
             m = re.fullmatch(r'/api/lib/([a-z\-]{2,20})/upload', path)
             if m:
-                return self.lib_upload(m.group(1))
+                return self.lib_upload(m.group(1), urllib.parse.parse_qs(qs))
             m = re.fullmatch(r'/api/lib/([a-z\-]{2,20})/thumb', path)
             if m:
                 return self.lib_thumb(m.group(1), urllib.parse.parse_qs(qs))
@@ -1764,17 +1765,35 @@ class H(BaseHTTPRequestHandler):
         return self.send(200, dict(status(), msg=f'{AI_NAMES[prov]} 키 저장·시험 성공 — 바로 적용됩니다'), log=False)
 
     # --- 교수(관리자) 메뉴 자료 올리기·지우기 (V79)
-    def lib_upload(self, slug):
+    def lib_upload(self, slug, args=None):
+        """교수 메뉴 자료 올리기. 15.14: 크기 제한 없음 — 큰 파일은 ?uid=…&part=i&parts=n 조각으로 와서 차례로 이어 붙이고, 마지막 조각에서 검사·교체."""
         if self.user['role'] != 'admin':
             return self.err(403, '교수(관리자)만 올릴 수 있습니다')
         if slug not in SEC_DIR:
             return self.err(404, '없는 메뉴입니다')
+        args = args or {}
         n = self.clen()
         if n <= 0:
             return self.err(400, '빈 파일입니다')
-        if n > LIB_MAX:
+        if n > LIB_PART_MAX:
             self.close_connection = True
-            return self.err(413, '파일은 60MB 이하만 올릴 수 있습니다')
+            return self.err(413, '한 번에 보내는 조각이 너무 큽니다(앱을 새로고침해 다시 올려 주세요)')
+        uid = re.sub(r'[^0-9a-f]', '', (args.get('uid') or [''])[0])[:32]
+        part, parts = to_int((args.get('part') or ['0'])[0], 0), to_int((args.get('parts') or ['1'])[0], 1)
+        if uid and (len(uid) < 12 or not 0 <= part < parts <= 100000):
+            self.close_connection = True
+            return self.err(400, '조각 번호가 맞지 않습니다')
+        mx = int(float(CONF.get('lib_max_mb') or 0) * 1048576) or LIB_MAX
+        if mx and n > mx:   # (제한을 config로 다시 둔 경우) 조각이 모인 전체 크기는 마지막 조각에서 다시 확인
+            self.close_connection = True
+            return self.err(413, f'파일은 {mx // 1048576}MB 이하만 올릴 수 있습니다')
+        try:
+            free = shutil.disk_usage(LIB if os.path.isdir(LIB) else BASE).free
+        except OSError:
+            free = 0
+        if free and free < n + 512 * 1048576:   # 디스크가 거의 찼으면 받지 않음(서버 PC가 멈추지 않게)
+            self.close_connection = True
+            return self.err(507, '서버 PC 저장 공간이 부족합니다(500MB 이상 남겨 주세요)')
         name = urllib.parse.unquote(self.headers.get('X-Filename') or '')
         name = re.sub(r'[\x00-\x1f\x7f<>:"/\\|?*]', '', name).strip().strip('.')[:120]
         ext = os.path.splitext(name)[1].lower()
@@ -1786,10 +1805,34 @@ class H(BaseHTTPRequestHandler):
         fp = os.path.join(d, name)
         if not os.path.realpath(fp).startswith(os.path.realpath(d) + os.sep):
             return self.err(400, '파일 이름을 쓸 수 없습니다')
-        tmp = os.path.join(d, '.up-' + secrets.token_hex(6))
+        tmp = os.path.join(d, '.up-' + (('c' + uid) if uid else secrets.token_hex(6)))
+        last = (not uid) or part == parts - 1
+        have = 0
+        if uid:
+            if part == 0:   # 하루 넘게 버려진 조각 파일 정리
+                for x in os.listdir(d):
+                    xp = os.path.join(d, x)
+                    try:
+                        if x.startswith('.up-c') and time.time() - os.path.getmtime(xp) > 86400:
+                            os.remove(xp)
+                    except OSError:
+                        pass
+            have = os.path.getsize(tmp) if os.path.exists(tmp) else 0
+            if part == 0 and have:
+                os.remove(tmp)   # 같은 uid로 처음부터 다시
+                have = 0
+            if part and not os.path.exists(tmp):
+                self.close_connection = True
+                return self.err(409, '앞 조각이 없습니다 — 처음부터 다시 올려 주세요')
+            # 앞 조각들의 길이가 맞는지(조각 크기는 앱이 정한 같은 크기) — 순서가 어긋나면 처음부터
+            size_hint = to_int(self.headers.get('X-Part-Size') or '0', 0)
+            if part and size_hint and have != part * size_hint:
+                self.close_connection = True
+                return self.err(409, '조각 순서가 어긋났습니다 — 처음부터 다시 올려 주세요')
         left = n
+        ok_done = False
         try:
-            with open(tmp, 'wb') as f:
+            with open(tmp, 'ab' if uid else 'wb') as f:
                 while left > 0:
                     b = self.rfile.read(min(262144, left))
                     if not b:
@@ -1797,6 +1840,12 @@ class H(BaseHTTPRequestHandler):
                     f.write(b)
                     left -= len(b)
             self._body_read = True
+            if not last:
+                ok_done = True
+                return self.send(200, {'ok': True, 'part': part, 'parts': parts})
+            total = os.path.getsize(tmp)
+            if mx and total > mx:
+                raise ValueError(f'파일은 {mx // 1048576}MB 이하만 올릴 수 있습니다')
             if ext == '.pdf':
                 with open(tmp, 'rb') as f:
                     if not f.read(5).startswith(b'%PDF'):
@@ -1806,8 +1855,21 @@ class H(BaseHTTPRequestHandler):
                 os.makedirs(trash, exist_ok=True)
                 os.replace(fp, os.path.join(trash, time.strftime('%Y%m%d-%H%M%S-') + name))
             os.replace(tmp, fp)
-        finally:
+            n = total
+        except ValueError as e:
             if os.path.exists(tmp):
+                os.remove(tmp)
+            return self.err(400, str(e))
+        except Exception:
+            if uid and not last and os.path.exists(tmp):   # 중간 조각이 끊기면 그 조각 앞까지로 되돌려 같은 조각을 다시 받을 수 있게
+                try:
+                    with open(tmp, 'r+b') as f:
+                        f.truncate(have)
+                except OSError:
+                    pass
+            raise
+        finally:
+            if not ok_done and os.path.exists(tmp) and (not uid or last):
                 os.remove(tmp)
         print(f'[자료] 교수 업로드: {SEC_DIR[slug]}/{name} ({n // 1024}KB)', flush=True)
         return self.send(200, {'ok': True, 'files': self.lib_files(slug)})
