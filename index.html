@@ -3587,7 +3587,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v232</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v233</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4606,8 +4606,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V232', SRV_VER='15.9';
+  const APP_VER='V233', SRV_VER='15.10';
   const UPDATES=[
+    {v:'V233', d:'2026-10-28', t:['검색 건축물대장: 장소 이름(예: 공단소방서)으로 찾을 때 그 번지에 대장이 없으면 도로명주소의 대표 지번 → 지도 위치의 번지 순서로 다시 찾아 보여 줌(어느 번지로 찾았는지 함께 표시)','서버 15.10: 그 번지에 없으면 같은 본번의 다른 번지(633-1 등)에서도 찾음']},
     {v:'V232', d:'2026-10-28', t:['47망 CP: 현장지휘소·차량대기소 표시를 누르면 바로 길찾기 — [카카오맵] · [T맵](휴대폰에 T맵 앱이 있을 때)','47망 소화전: 지도 위 소화전 표시가 실제 자리보다 위(북쪽)로 밀려 보이던 문제 수정 — 동그라미 가운데가 정확한 좌표에 오게(확대·축소해도 같은 자리)','소화전 정보 창 길안내도 카카오맵 · T맵 둘 다']},
     {v:'V231', d:'2026-10-25', t:['서버 15.8: 사진 앨범 기능 추가 — 화면은 별도 저장소(github.io/test3)에 있고 접속코드 하나로 입장, 사진은 GitHub가 아니라 PC 서버 data/album 폴더에만 저장','오프라인용으로 보관하는 화면은 앱 첫 화면(index.html)만 — 같은 주소 아래 다른 페이지가 그 자리를 덮어쓰지 않게 고침']},
     {v:'V230', d:'2026-10-23', t:['AI 보고서·AI 답이 멈추던 문제: Gemini가 글자를 보내지 않으면 15초 안에 예비 AI(Groq)로 넘기고, 10분 동안은 Gemini를 기다리지 않고 바로 예비 AI로(서버 15.7로 업데이트해야 적용)','보고서는 예전엔 Gemini를 한 번 더(최대 3분) 기다려 앱이 먼저 포기했음 — 이제 바로 예비 AI가 씀']},
@@ -5313,7 +5314,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const res=await Promise.race([new Promise(r=>new kakao.maps.services.Places().keywordSearch(((a.split(place)[0].trim().split(/\s+/).pop()||'').match(/^[가-힣]{2,6}$/)?a.split(place)[0].trim().split(/\s+/).pop()+' ':'')+place,(x,st)=>r(st===kakao.maps.services.Status.OK?x:[]))),sleep(5000).then(()=>[])]);
     const key=place.replace(/\s/g,''), c=(res||[]).filter(x=>String(x.place_name||'').replace(/\s/g,'').includes(key)&&x.address_name);
     const pl=c.find(x=>/^인천/.test(x.address_name))||c[0]; if(!pl) return null;
-    const h=ok(await geo(pl.address_name)); return h?{hit:h,label:String(pl.place_name).slice(0,30)}:null; }
+    const h=ok(await geo(pl.address_name)); return h?{hit:h,label:String(pl.place_name).slice(0,30),pl}:null; }
   // V151: AI 도우미 — 질문에 주소가 있으면 카카오로 위치를 구해 함께 보낸다(서버가 건축물대장·소방용수시설을 조회해 근거로)
   async function geoFor(t){
     if(!SRV.on||!SRV.bld||!SRV.kakao) return null; const a=bldAddrOf(t), pl=a?'':placeOf(t); if(!a&&!pl) return null;
@@ -5351,9 +5352,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!live()) return;
     const head=`<div class="pg-sec">건축물대장 · ${esc(lab)}</div>`;
     if(!x.ok||!x.j||x.j.ok===false){ box.innerHTML=head+`<p class="srch-note">${pgIcon('bad','is-bad')} ${esc((x.j&&x.j.error)||'서버에 연결하지 못했어요(서버 업데이트가 필요할 수 있어요)')} ${RETRY}</p>`; return; }
-    const rows=x.j.rows||[];
-    if(!rows.length){ box.innerHTML=head+'<p class="srch-note">이 번지에 등록된 건축물대장(표제부)이 없어요 — 빈 땅이거나, 큰 단지는 대표 번지가 다를 수 있어요</p>'; return; }
-    box.innerHTML=head+`<div class="results">${rows.slice(0,3).map(bldRow).join('')}</div>${rows.length>3?`<div class="srch-more"><button type="button" class="btn ghost" id="bldMore">다른 동 ${rows.length-3}개 더 보기</button></div>`:''}<p class="srch-note">국토교통부 건축물대장(표제부) 기준 — 증축·용도 변경 등 실제와 다를 수 있어요</p>`;
+    let rows=x.j.rows||[], alt='';
+    if(!rows.length){   /* V233: 그 번지에 대장이 없으면 — 장소의 도로명주소가 가리키는 대표 지번 → 지도 핀이 놓인 번지 순서로 다시(큰 부지는 건물이 다른 번지에 등록됨) */
+      const tried=new Set([A.main_address_no+'-'+(A.sub_address_no||'0')]), cands=[], pl=g.pl, OKS=kakao.maps.services.Status.OK;
+      if(pl&&pl.road_address_name){ const r=await Promise.race([new Promise(ok=>new kakao.maps.services.Geocoder().addressSearch(pl.road_address_name,(r2,s2)=>ok(s2===OKS?r2:[]))),sleep(4000).then(()=>[])]); const a2=((r||[]).find(z=>z.address)||{}).address; if(a2) cands.push([a2,'도로명주소 대표 지번']); }
+      if(pl&&pl.x&&pl.y){ const r=await Promise.race([new Promise(ok=>new kakao.maps.services.Geocoder().coord2Address(+pl.x,+pl.y,(r2,s2)=>ok(s2===OKS?r2:[]))),sleep(4000).then(()=>[])]); const a3=((r||[])[0]||{}).address; if(a3) cands.push([a3,'지도 위치의 번지']); }
+      for(const [a2,why] of cands){ if(!live()) return; const b2=a2.b_code||A.b_code, k2=a2.main_address_no+'-'+(a2.sub_address_no||'0'); if(!a2.main_address_no||!/^\d{10}$/.test(b2)||tried.has(k2)) continue; tried.add(k2);
+        const y=await apiS(`/api/bld?b=${b2}&bun=${encodeURIComponent(a2.main_address_no)}&ji=${encodeURIComponent(a2.sub_address_no||'0')}&mt=${a2.mountain_yn==='Y'?1:0}`);
+        if(y.ok&&y.j&&y.j.ok!==false&&(y.j.rows||[]).length){ rows=y.j.rows; alt=`${esc(a2.address_name||k2)} (${why})`; break; } }
+      if(!live()) return; }
+    if(!rows.length){ box.innerHTML=head+'<p class="srch-note">이 번지(와 도로명주소·지도 위치의 번지)에 등록된 건축물대장(표제부)이 없어요 — 빈 땅이거나, 큰 부지는 건물이 다른 번지로 등록돼 있을 수 있어요. 건물 주소(예: 남동서로 208)로 다시 검색해 보세요</p>'; return; }
+    box.innerHTML=head+(alt?`<p class="srch-note">${A.address_name?esc(A.address_name)+'에는 대장이 없어 ':''}<b>${alt}</b>로 찾았어요</p>`:rows[0]&&rows[0].near?`<p class="srch-note">${esc(A.address_name||'이 번지')}에는 대장이 없어 <b>같은 본번의 다른 번지</b>에서 찾았어요(아래 주소 확인)</p>`:'')+`<div class="results">${rows.slice(0,3).map(bldRow).join('')}</div>${rows.length>3?`<div class="srch-more"><button type="button" class="btn ghost" id="bldMore">다른 동 ${rows.length-3}개 더 보기</button></div>`:''}<p class="srch-note">국토교통부 건축물대장(표제부) 기준 — 증축·용도 변경 등 실제와 다를 수 있어요</p>`;
     const mb=$('#bldMore'); if(mb) mb.addEventListener('click',()=>{ mb.parentNode.outerHTML=`<div class="results" style="margin-top:10px">${rows.slice(3).map(bldRow).join('')}</div>`; }); }
   const LAW_T={law:'법령',admrul:'행정규칙',ordin:'자치법규'};
   // V157: 검색 — 법제처 현행 조문을 원문 그대로(앞 몇 줄, 누르면 전체) + 조문 링크
