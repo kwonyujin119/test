@@ -46,8 +46,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False),
 }
-VERSION = '15.9'
-APP_VERSION = 'V232'
+VERSION = '15.10'
+APP_VERSION = 'V233'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -3301,6 +3301,10 @@ def bld_lookup(bcode, bun, ji, mt):
     if c and time.time() - c[0] < 86400:
         return c[1]
     rows = _bld_get(bcode, bun, ji, mt)
+    if not rows:   # 15.10: 그 번지에 없으면 같은 본번의 모든 부번(633-1, 633-2 …)에서 — 큰 부지는 건물이 부번으로 등록된 경우가 많다
+        rows = _bld_get(bcode, bun, None, mt)
+        for x in rows:
+            x['near'] = '1'
     if len(BLD_CACHE) > 300:
         BLD_CACHE.clear()
     BLD_CACHE[key] = (time.time(), rows)
@@ -3310,7 +3314,7 @@ def bld_lookup(bcode, bun, ji, mt):
 def _bld_get(bcode, bun, ji, mt, k=None):
     k = k or CONF.get('bld_key')
     url = ('https://apis.data.go.kr/1613000/BldRgstHubService/getBrTitleInfo?serviceKey=' + urllib.parse.quote(k, safe='')
-           + f'&sigunguCd={bcode[:5]}&bjdongCd={bcode[5:]}&platGbCd={1 if mt else 0}&bun={int(bun):04d}&ji={int(ji or 0):04d}'
+           + f'&sigunguCd={bcode[:5]}&bjdongCd={bcode[5:]}&platGbCd={1 if mt else 0}&bun={int(bun):04d}' + ('' if ji is None else f'&ji={int(ji or 0):04d}')
            + '&_type=json&numOfRows=30&pageNo=1')
     try:
         t = fetch_text(url, 2_000_000, 20)
