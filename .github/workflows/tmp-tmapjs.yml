@@ -7,8 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          curl -s -m 30 "https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=x" -o l.js; head -c 600 l.js; echo
-          for u in $(grep -o 'https\?://[^"'"'"' )]*\.js[^"'"'"' )]*' l.js | sort -u); do echo "== $u"; curl -s -m 60 "$u" -o m.js; wc -c m.js;
-            grep -o '.\{220\}Marker.\{0,40\}offset.\{260\}' m.js | head -5;
-            grep -o '.\{160\}defaultOffset.\{200\}' m.js | head -3;
-            grep -o '.\{200\}iconSize.\{0,30\}/2.\{200\}' m.js | head -4; done
+          for u in https://topopentile1.tmap.co.kr/scriptSDKV2/tmapjs2.min.js https://topopentile2.tmap.co.kr/scriptSDKV2/tmapjs2.min.js https://topopentile1.tmap.co.kr/scriptSDKV2/tmapjs2.min.js?version=20231206; do
+            echo "== $u"; curl -s -m 60 "$u" -o m.js; wc -c m.js; head -c 200 m.js; echo
+            grep -o '.\{300\}iconSize.\{300\}' m.js | head -6
+            echo ---- offset; grep -o '.\{200\}\.offset.\{200\}' m.js | head -6
+            [ -s m.js ] && break; done
