@@ -1,7 +1,7 @@
 name: Server check
 
 # 서버(app.sachil47.com)가 살아 있는지·버전을 확인(공개 /api/me만 읽음, 키·비밀값 없음)
-# main에 서버 파일이 올라가면 자동으로: 6분 기다린 뒤(PC 서버 자동 업데이트 시간) 저장소의 VERSION과 같은지 확인
+# main에 서버 파일이 올라가면 자동으로: 1분마다(최대 12분, PC 서버 자동 업데이트 시간) 저장소의 VERSION과 같아질 때까지 확인
 on:
   workflow_dispatch:
   push:
