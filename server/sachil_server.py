@@ -46,8 +46,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False), '.csv': ('text/csv; charset=utf-8', False),   # 15.12: CSV(엑셀에서 저장한 표)
 }
-VERSION = '15.14'
-APP_VERSION = 'V237'
+VERSION = '15.15'
+APP_VERSION = 'V238'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -2844,7 +2844,10 @@ class DocIndex:
             except Exception:
                 raise RuntimeError('암호가 걸린 PDF')
         pages = []
+        tot = len(r.pages)
+        self.prog = [0, tot]   # 15.15: 몇 쪽째 읽는지(검색 화면에 보임)
         for p in r.pages:
+            self.prog[0] += 1
             try:
                 pages.append(p.extract_text() or '')
             except Exception:
@@ -3012,7 +3015,8 @@ class DocIndex:
         return terms, out
 
     def status(self):
-        return {'files': self.files, 'pages': self.pages, 'busy': self.busy, 'pending': self.pending,
+        pg = getattr(self, 'prog', None) or [0, 0]
+        return {'files': self.files, 'pages': self.pages, 'busy': self.busy, 'pending': self.pending, 'prog': list(pg) if self.busy else [0, 0],
                 'failed': [{'name': k, 'why': v} for k, v in list(self.failed.items())[:20]], 'ready': self.sig is not None,
                 'ai': ai_ready()}
 
