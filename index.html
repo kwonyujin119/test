@@ -3615,7 +3615,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v236</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v237</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4634,8 +4634,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V236', SRV_VER='15.13';
+  const APP_VER='V237', SRV_VER='15.14';
   const UPDATES=[
+    {v:'V237', d:'2026-10-28', t:['메뉴 자료 올리기 크기 제한(60MB) 없앰 — 큰 파일은 48MB씩 나눠 올리고 서버가 이어 붙여요(인터넷이 잠깐 끊기면 그 조각만 다시)','서버 15.14 이상에서 동작 — 서버가 옛 버전이면 60MB 넘는 파일은 올리기 전에 알려 줌','서버 PC 저장 공간이 500MB 아래로 남으면 받지 않음(서버 멈춤 방지)']},
     {v:'V236', d:'2026-10-28', t:['메뉴 자료 올리기: 파일마다 진행 막대(%·MB)와 결과(✓ 올림 완료 / ✗ 실패 + 이유)를 남겨 올라갔는지 한눈에 — 화면을 다시 그려도 10분 동안 유지','방금 올린 파일은 목록에서 초록 테두리 + ‘방금 올림’ 표시, 실패는 연결 문제일 때 [다시] 버튼','올리는 동안 다른 파일 올리기 막음·앱을 닫으려 하면 경고, 60MB 넘는 파일·올릴 수 없는 형식은 올리기 전에 바로 알려 줌']},
     {v:'V235', d:'2026-10-28', t:['메뉴 자료: 엑셀(xlsx)·CSV도 올리면 검색에서 내용까지 찾아요 — 시트마다 40행씩 묶어 [시트 · 행] 표시, 결과를 누르면 파일 받기(서버 15.12)','검색 결과에 엑셀은 ‘엑셀’로 표시 · 옛 .xls는 올릴 수는 있지만 검색은 안 돼요(xlsx로 저장해 올려 주세요)']},
     {v:'V234', d:'2026-10-28', t:['첫 화면(디자인 모드) 왼쪽 아래 디브리핑룸 심벌이 옛 모양처럼 보이던 문제 수정 — 흰 칸에 흰 말풍선이 묻혔던 것을 노랑 칸(흰 테두리)으로']},
@@ -6042,7 +6043,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(a==='save'){ b.disabled=true; const r=await api('/api/admin/ai',{json:{action:'contacts',text:ta?ta.value:''},tok:PROF.tok}); b.disabled=false; if(r.ok&&r.j&&r.j.ok!==false){ toast(r.j.msg||'저장했어요'); CT.edit=false; await ctLoad(true); redraw(); } else toast((r.j&&r.j.error)||'저장하지 못했어요(서버 업데이트가 필요할 수 있어요)'); } }); }
   // V236: 자료 올리기 — 파일마다 진행 막대(%)·결과(올림 완료 ✓ / 실패 ✗ + 이유·다시)를 남겨 '올라갔는지' 한눈에. 화면을 다시 그려도 10분 동안 결과 유지
   const UPST={};   // slug → {items:[{f,name,size,st:'wait'|'up'|'ok'|'bad',pct,why}], busy, at}
-  const LIB_EXT=/\.(pdf|jpe?g|png|webp|gif|mp4|txt|hwpx?|docx?|pptx?|xlsx?|csv|zip)$/i, LIB_MAX=60*1024*1024;
+  const LIB_EXT=/\.(pdf|jpe?g|png|webp|gif|mp4|txt|hwpx?|docx?|pptx?|xlsx?|csv|zip)$/i, LIB_OLD_MAX=60*1024*1024, LIB_CHUNK=48*1024*1024;   /* V237: 크기 제한 없음 — 48MB보다 크면 나눠 보내 서버(15.14+)가 이어 붙임(Cloudflare 한 번 100MB 한도) */
+  const libChunkOk=()=>SRV.ver&&!verLt(SRV.ver,'15.14');
   const fmtB=n=>n>=1048576?(n/1048576).toFixed(1)+'MB':Math.max(1,Math.round(n/1024))+'KB';
   function upItemHtml(it,i){ const ic=it.st==='ok'?pgIcon('check','is-ok'):it.st==='bad'?pgIcon('bad','is-bad'):'';
     const tx=it.st==='ok'?'올림 완료 — 목록에 들어갔어요':it.st==='bad'?'실패 — '+esc(it.why||'올리지 못했어요'):it.st==='up'?`올리는 중 ${it.pct|0}% · ${fmtB(it.size*(it.pct||0)/100)} / ${fmtB(it.size)}`:'기다리는 중';
@@ -6051,7 +6053,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const ok=u.items.filter(x=>x.st==='ok').length, bad=u.items.filter(x=>x.st==='bad').length;
     const sum=u.busy?`올리는 중 ${ok+bad}/${u.items.length} — 다 끝날 때까지 이 화면을 닫지 마세요`:`${ok?`${pgIcon('check','is-ok')} ${ok}개 올림 완료`:''}${ok&&bad?' · ':''}${bad?`${pgIcon('bad','is-bad')} ${bad}개 실패`:''}${ok?' · 본문 검색·AI 반영은 1분쯤 걸려요':''}`;
     return `<div class="pu-res${u.busy?' busy':bad?' has-bad':' done'}" aria-live="polite"><p class="pu-sum">${sum}</p><ul class="pu-list">${u.items.map(upItemHtml).join('')}</ul>${u.busy?'':'<button type="button" class="pu-close" aria-label="결과 닫기">'+pgIcon('close')+'</button>'}</div>`; }
-  function profLibBar(slug){ return isProf()&&SRV.on?`<div class="prof-up${UPST[slug]&&UPST[slug].busy?' busy':''}" data-slug="${esc(slug)}"><label class="btn primary"><input type="file" id="libUp" multiple hidden${UPST[slug]&&UPST[slug].busy?' disabled':''}>자료 올리기</label><span class="pu-drop">또는 파일을 여기로 끌어다 놓기 · PDF·엑셀(xlsx·csv)은 본문 검색돼요(옛 .xls는 xlsx로 저장해 올려 주세요)</span><span class="pu-st" id="libUpSt" aria-live="polite"></span>${upStateHtml(slug)}</div>`:''; }
+  function profLibBar(slug){ return isProf()&&SRV.on?`<div class="prof-up${UPST[slug]&&UPST[slug].busy?' busy':''}" data-slug="${esc(slug)}"><label class="btn primary"><input type="file" id="libUp" multiple hidden${UPST[slug]&&UPST[slug].busy?' disabled':''}>자료 올리기</label><span class="pu-drop">또는 파일을 여기로 끌어다 놓기 · PDF·엑셀(xlsx·csv)은 본문 검색돼요(옛 .xls는 xlsx로 저장해 올려 주세요) · 크기 제한 없음(큰 파일은 나눠 올라가요)</span><span class="pu-st" id="libUpSt" aria-live="polite"></span>${upStateHtml(slug)}</div>`:''; }
   function upPaint(slug){ const box=document.querySelector(`.prof-up[data-slug="${CSS.escape(slug)}"]`); if(!box) return; const old=box.querySelector('.pu-res'), h=upStateHtml(slug);
     if(old) old.outerHTML=h||''; else if(h) box.insertAdjacentHTML('beforeend',h);
     box.classList.toggle('busy',!!(UPST[slug]&&UPST[slug].busy)); const inp=box.querySelector('#libUp'); if(inp) inp.disabled=!!(UPST[slug]&&UPST[slug].busy); }
@@ -6060,7 +6062,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   async function profUpload(slug,files,done){
     let u=UPST[slug]; if(u&&u.busy){ toast('지금 올리는 중이에요 — 끝난 뒤 다시 올려 주세요'); return; }
     u=UPST[slug]={busy:true, at:Date.now(), items:[...files].map(f=>({f, name:f.name, size:f.size, st:'wait', pct:0}))};
-    u.items.forEach(it=>{ if(!LIB_EXT.test(it.name)){ it.st='bad'; it.why='올릴 수 없는 파일 형식이에요'; it.f=null; } else if(it.size>LIB_MAX){ it.st='bad'; it.why='60MB를 넘어요'; it.f=null; } else if(!it.size){ it.st='bad'; it.why='빈 파일이에요'; it.f=null; } });
+    u.items.forEach(it=>{ if(!LIB_EXT.test(it.name)){ it.st='bad'; it.why='올릴 수 없는 파일 형식이에요'; it.f=null; } else if(it.size>LIB_OLD_MAX&&!libChunkOk()){ it.st='bad'; it.why=`60MB가 넘는 파일은 서버를 15.14 이상으로 업데이트해야 올릴 수 있어요(지금 서버 ${SRV.ver||'?'})`; it.f=null; } else if(!it.size){ it.st='bad'; it.why='빈 파일이에요'; it.f=null; } });
     upPaint(slug);
     for(const it of u.items){ if(it.st!=='wait') continue; await upOne(slug,it); }
     u.busy=false; u.at=Date.now();
@@ -6070,13 +6072,20 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   async function upOne(slug,it){
     it.st='up'; it.pct=0; upPaint(slug); let last=0;
-    const r=await apiUp(`/api/lib/${slug}/upload`, it.f, {'Content-Type':it.f.type||'application/octet-stream','X-Filename':encodeURIComponent(it.name)},
-      (a,b)=>{ it.pct=Math.min(99,Math.round(a/b*100)); const t=Date.now(); if(t-last>150){ last=t; const box=document.querySelector(`.prof-up[data-slug="${CSS.escape(slug)}"] .pu-it.st-up`); if(box){ const bar=box.querySelector('.pu-bar i'), tx=box.querySelector('.pu-tx'); if(bar) bar.style.width=it.pct+'%'; if(tx) tx.textContent=`올리는 중 ${it.pct}% · ${fmtB(it.size*it.pct/100)} / ${fmtB(it.size)}`; } else upPaint(slug); } },
-      PROF.tok, 15*60*1000);
+    const prog=(a,b)=>{ it.pct=Math.min(99,Math.round(a/b*100)); const t=Date.now(); if(t-last>150){ last=t; const box=document.querySelector(`.prof-up[data-slug="${CSS.escape(slug)}"] .pu-it.st-up`); if(box){ const bar=box.querySelector('.pu-bar i'), tx=box.querySelector('.pu-tx'); if(bar) bar.style.width=it.pct+'%'; if(tx) tx.textContent=`올리는 중 ${it.pct}% · ${fmtB(it.size*it.pct/100)} / ${fmtB(it.size)}`; } else upPaint(slug); } };
+    const hd={'Content-Type':it.f.type||'application/octet-stream','X-Filename':encodeURIComponent(it.name)};
+    let r;
+    if(it.size>LIB_CHUNK&&libChunkOk()){   /* V237: 큰 파일은 48MB씩 — 조각마다 실패하면 2번까지 다시 */
+      const parts=Math.ceil(it.size/LIB_CHUNK), uid=[...crypto.getRandomValues(new Uint8Array(12))].map(x=>x.toString(16).padStart(2,'0')).join('');
+      for(let i=0;i<parts;i++){ const blob=it.f.slice(i*LIB_CHUNK,Math.min(it.size,(i+1)*LIB_CHUNK));
+        for(let k=0;k<3;k++){ r=await apiUp(`/api/lib/${slug}/upload?uid=${uid}&part=${i}&parts=${parts}`, blob, Object.assign({'X-Part-Size':String(LIB_CHUNK)},hd), (a)=>prog(i*LIB_CHUNK+a,it.size), PROF.tok, 15*60*1000);
+          if(r.ok||(r.status>=400&&r.status<500&&r.status!==408&&r.status!==429)) break; await sleep(1500*(k+1)); }
+        if(!r.ok) break; }
+    } else r=await apiUp(`/api/lib/${slug}/upload`, it.f, hd, prog, PROF.tok, 15*60*1000);
     const files=r.ok&&r.j&&Array.isArray(r.j.files)?r.j.files:null, got=files&&files.some(x=>x.name===it.name.replace(/[\x00-\x1f\x7f<>:"/\\|?*]/g,'').trim());   /* 서버가 돌려준 목록에 그 이름이 있어야 '올림 완료' */
     if(r.ok&&got){ it.st='ok'; it.pct=100; it.f=null; if(SRV.lib) SRV.lib[slug]=files; }
     else { it.st='bad'; if(r.ok||(r.status>=400&&r.status<500&&r.status!==408&&r.status!==429)) it.f=null;   /* 서버가 거절한 파일(형식·크기)은 '다시'를 숨김 — 연결 끊김·서버 바쁨만 다시 */
-      it.why=(r.j&&r.j.error)||(r.ok?'서버 목록에서 확인되지 않아요':r.status===413?'파일이 너무 커요(60MB 이하)':r.status===401||r.status===403?'교수 로그인이 끊겼어요 — 다시 로그인':'서버에 연결하지 못했어요'); }
+      it.why=(r.j&&r.j.error)||(r.ok?'서버 목록에서 확인되지 않아요':r.status===413?'파일이 너무 커요(서버 업데이트가 필요할 수 있어요)':r.status===401||r.status===403?'교수 로그인이 끊겼어요 — 다시 로그인':'서버에 연결하지 못했어요'); }
     upPaint(slug);
   }
   // 목록에서 방금 올린 파일 표시(10분)
