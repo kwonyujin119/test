@@ -2635,6 +2635,8 @@ html:root body .convo .convo-note:has(.convo-empty){background:transparent}
 .libfile .new-b{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:99px;background:#067647;color:#fff;font-size:12px;font-weight:700;font-family:inherit}
 @keyframes newPulse{50%{outline-color:rgba(6,118,71,.25)}}
 @media (prefers-reduced-motion:reduce){ .lib .libfile.is-new{animation:none} .pu-bar i{transition:none} }
+.srch-pend{display:flex;align-items:center;gap:8px;margin:0 0 10px;padding:10px 12px;border-radius:10px;background:#FFFAEB;border:1px solid #FEDF89;color:#93370D!important;font-weight:600}
+.srch-pend .pg-ic{flex:none;width:18px;height:18px}
 </style>
 </head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
@@ -3615,7 +3617,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v237</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v238</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4634,8 +4636,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V237', SRV_VER='15.14';
+  const APP_VER='V238', SRV_VER='15.15';
   const UPDATES=[
+    {v:'V238', d:'2026-10-28', t:['검색: 새로 올린 자료를 서버가 아직 읽는 중이면 검색 결과 맨 위에 ‘어떤 파일 · 몇 쪽째(예: 212/640쪽)’를 표시 — 다 읽으면 그 내용도 찾아요(큰 파일은 몇 분)']},
     {v:'V237', d:'2026-10-28', t:['메뉴 자료 올리기 크기 제한(60MB) 없앰 — 큰 파일은 48MB씩 나눠 올리고 서버가 이어 붙여요(인터넷이 잠깐 끊기면 그 조각만 다시)','서버 15.14 이상에서 동작 — 서버가 옛 버전이면 60MB 넘는 파일은 올리기 전에 알려 줌','서버 PC 저장 공간이 500MB 아래로 남으면 받지 않음(서버 멈춤 방지)']},
     {v:'V236', d:'2026-10-28', t:['메뉴 자료 올리기: 파일마다 진행 막대(%·MB)와 결과(✓ 올림 완료 / ✗ 실패 + 이유)를 남겨 올라갔는지 한눈에 — 화면을 다시 그려도 10분 동안 유지','방금 올린 파일은 목록에서 초록 테두리 + ‘방금 올림’ 표시, 실패는 연결 문제일 때 [다시] 버튼','올리는 동안 다른 파일 올리기 막음·앱을 닫으려 하면 경고, 60MB 넘는 파일·올릴 수 없는 형식은 올리기 전에 바로 알려 줌']},
     {v:'V235', d:'2026-10-28', t:['메뉴 자료: 엑셀(xlsx)·CSV도 올리면 검색에서 내용까지 찾아요 — 시트마다 40행씩 묶어 [시트 · 행] 표시, 결과를 누르면 파일 받기(서버 15.12)','검색 결과에 엑셀은 ‘엑셀’로 표시 · 옛 .xls는 올릴 수는 있지만 검색은 안 돼요(xlsx로 저장해 올려 주세요)']},
@@ -5540,16 +5543,17 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const box=$('#srchBody'); if(!box) return;
       if(!r.ok){ box.innerHTML=`<p class="srch-note">${pgIcon('bad','is-bad')} 본문 검색에 실패했어요. 서버 연결을 확인해 주세요. ${RETRY}</p>`; done(0); return; }
       const hits=r.j.hits||[], st=r.j.status||{}; const bh=mkHl([...(r.j.terms||[]), ...terms]);
-      const stTxt = st.pending ? `자료 읽는 중 — 남은 파일 ${st.pending}개(완료되면 더 많이 찾아요)` : (st.files?`자료 ${st.files}개(PDF·엑셀) · ${st.pages}쪽·묶음에서 찾았어요`:'메뉴에 첨부된 PDF가 아직 없어요');
+      const stTxt = st.pending ? `새 자료를 검색용으로 읽는 중${st.busy?` — ‘${pdfName(st.busy)}’${st.prog&&st.prog[1]?` ${st.prog[0]}/${st.prog[1]}쪽`:''}`:''} · 남은 파일 ${st.pending}개(다 읽으면 그 내용도 찾아요 — 큰 파일은 몇 분 걸려요)` : (st.files?`자료 ${st.files}개(PDF·엑셀) · ${st.pages}쪽·묶음에서 찾았어요`:'메뉴에 첨부된 PDF가 아직 없어요');
       const row=h=>{ const sh=/\.(xlsx|csv)$/i.test(h.name);   /* V235: 엑셀·CSV 본문 — '쪽' 대신 '엑셀', 누르면 파일 받기 */
         return `<a class="card result hitp${sh?' hit-sheet':''}" href="${libHref(h.slug,{name:h.name})}" ${sh?'download':`target="_blank" rel="noopener" data-pdfv="${esc(h.name)}" data-page="${h.page}"`}>
           <span class="ico">${sh?(/csv$/i.test(h.name)?'CSV':'엑셀'):h.page+'쪽'}</span>
           <span class="body"><p class="t">${bh(pdfName(h.name))}${h.art?` <span class="art">${esc(h.art)}</span>`:''}</p><p class="d snip">${bh(deGlyph(h.snippet))}</p></span>
           <span class="arrow">→</span></a>`; };
       box.dataset.n=String(hits.length);
-      box.innerHTML = hits.length
+      const pend=st.pending?`<p class="srch-note srch-pend">${pgIcon('clock')} ${esc(stTxt)}</p>`:'';   /* V238: 새 자료를 읽는 중이면 맨 위에 눈에 띄게 */
+      box.innerHTML = pend + (hits.length
         ? `<div class="results">${hits.slice(0,6).map(row).join('')}</div>${hits.length>6?`<div class="srch-more" id="srchMoreBox"><button type="button" class="btn ghost" id="srchMore">본문 결과 ${hits.length-6}건 더 보기</button></div>`:''}<p class="srch-note">${esc(stTxt)}</p>`
-        : `<p class="srch-note">본문에서 찾지 못했어요. ${esc(stTxt)}</p>`;
+        : `<p class="srch-note">본문에서 찾지 못했어요.${st.pending?'':' '+esc(stTxt)}</p>`);
       if(!hits.length&&!fileHits.length&&!bq) box.insertAdjacentHTML('beforebegin',`<div class="card empty srch-none"><p><b>‘${esc(trunc(q,24))}’와 일치하는 자료가 없어요.</b></p><p>낱말을 줄이거나(예: 위험물, RIT) 다른 표현으로 찾아 보세요. 상황을 문장으로 물으려면 아래 <b>AI assistant</b>에게 물어보세요.</p></div>`);   /* V181: 서버 연결 중에도 '결과 없음'을 분명히 */
       if(hits.length){ const p=$('#askAiP'); if(p) p.innerHTML=`이 검색 결과를 근거로 <b>AI가 답을 정리</b>해요 · 근거 후보: ${(()=>{ const g=new Map(); hits.slice(0,4).forEach(h=>{ if(!g.has(h.name)) g.set(h.name,[]); if(!g.get(h.name).includes(h.page)) g.get(h.name).push(h.page); }); return [...g].slice(0,2).map(([n,ps])=>`<b>${esc(trunc(pdfName(n),24))}</b> ${ps.join('·')}쪽`).join(', '); })()}`; }
       const mb=$('#srchMore'); if(mb){ mb.addEventListener('click',()=>{ SRCH_MORE=q; $('#srchMoreBox').outerHTML=`<div class="results" style="margin-top:10px">${hits.slice(6).map(row).join('')}</div>`; }); if(SRCH_MORE===q) mb.click(); }   // V184: 펼쳐 본 결과는 돌아와도 펼친 채
