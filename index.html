@@ -2595,6 +2595,19 @@ html:root body .convo .convo-note:has(.convo-empty){background:transparent}
 :root .hz-k .ic svg.db-sym{width:80%;height:80%}
 :root .hs-ic svg.db-sym{width:78%;height:78%}
 </style>
+<style id="v231-nav">
+/* V231: 길찾기 버튼(CP 현장지휘소·차량대기소 고른 막대, 소화전 정보 창) */
+.mapov .msel .mnav{display:flex;align-items:center;gap:6px;padding:2px 2px 4px;border-bottom:1px solid var(--c-line,#E4E7EC);margin-bottom:4px;font-size:13px;font-weight:700;color:var(--c-ink,#0B1B3F);white-space:nowrap}
+.mapov .msel .mnav .pg-ic{width:16px;height:16px}
+.nvb{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 12px;border-radius:999px;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap}
+.nvb-k{background:#FEE500;color:#191600}
+.nvb-t{background:#244EA2;color:#fff}
+.nvb:focus-visible{outline:3px solid #244EA2;outline-offset:2px}
+@media (pointer:coarse){ .nvb{min-height:44px} }
+@media (hover:hover) and (pointer:fine){ .nvb-t{display:none} }   /* PC에는 T맵 앱이 없음 */
+#hydov .hpop .hnavs{display:flex;gap:6px;margin-top:8px}
+#hydov .hpop .hnavs .nvb{flex:1}
+</style>
 </head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
@@ -3574,7 +3587,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v231</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v232</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4593,8 +4606,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V231', SRV_VER='15.8';
+  const APP_VER='V232', SRV_VER='15.9';
   const UPDATES=[
+    {v:'V232', d:'2026-10-28', t:['47망 CP: 현장지휘소·차량대기소 표시를 누르면 바로 길찾기 — [카카오맵] · [T맵](휴대폰에 T맵 앱이 있을 때)','47망 소화전: 지도 위 소화전 표시가 실제 자리보다 위(북쪽)로 밀려 보이던 문제 수정 — 동그라미 가운데가 정확한 좌표에 오게(확대·축소해도 같은 자리)','소화전 정보 창 길안내도 카카오맵 · T맵 둘 다']},
     {v:'V231', d:'2026-10-25', t:['서버 15.8: 사진 앨범 기능 추가 — 화면은 별도 저장소(github.io/test3)에 있고 접속코드 하나로 입장, 사진은 GitHub가 아니라 PC 서버 data/album 폴더에만 저장','오프라인용으로 보관하는 화면은 앱 첫 화면(index.html)만 — 같은 주소 아래 다른 페이지가 그 자리를 덮어쓰지 않게 고침']},
     {v:'V230', d:'2026-10-23', t:['AI 보고서·AI 답이 멈추던 문제: Gemini가 글자를 보내지 않으면 15초 안에 예비 AI(Groq)로 넘기고, 10분 동안은 Gemini를 기다리지 않고 바로 예비 AI로(서버 15.7로 업데이트해야 적용)','보고서는 예전엔 Gemini를 한 번 더(최대 3분) 기다려 앱이 먼저 포기했음 — 이제 바로 예비 AI가 씀']},
     {v:'V229', d:'2026-10-23', t:['디브리핑룸 아이콘·심벌을 새 그림(노랑 바탕 + 흰 말풍선 둘)으로 모두 바꿈 — 머리줄 버튼·첫 화면(디자인·간편 모드)·디브리핑룸 화면 머리·사용법 안내']},
@@ -8418,6 +8432,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const destPt=(lat,lng,deg,m)=>{ const r=deg*Math.PI/180; return [lat+m*Math.cos(r)/111320, lng+m*Math.sin(r)/(111320*Math.cos(lat*Math.PI/180))]; };
   const bearing=(a,b)=>{ const dy=b.lat-a.lat, dx=(b.lng-a.lng)*Math.cos(a.lat*Math.PI/180); return ((Math.atan2(dx,dy)*180/Math.PI)+360)%360; };
   const distM=(a,b)=>{ const dy=(b.lat-a.lat)*111320, dx=(b.lng-a.lng)*111320*Math.cos(a.lat*Math.PI/180); return Math.hypot(dx,dy); };
+  // V231: 길찾기 — 카카오맵(웹 주소: 앱이 있으면 앱으로) · T맵(tmap:// 앱 길안내) — 좌표는 WGS84 그대로
+  function navLinks(name,lat,lng){ const nm=String(name||'목적지').replace(/,/g,' ').slice(0,40), y=(+lat).toFixed(6), x=(+lng).toFixed(6);
+    const kk=`https://map.kakao.com/link/to/${encodeURIComponent(nm)},${y},${x}`;
+    const tm=`tmap://route?goalname=${encodeURIComponent(nm)}&goalx=${x}&goaly=${y}`;   /* T맵 앱 바로 길안내(x=경도, y=위도) — 휴대폰에 T맵이 있어야 함(PC에선 버튼 숨김) */
+    return `<a class="nvb nvb-k" href="${kk}" target="_blank" rel="noopener">카카오맵</a><a class="nvb nvb-t" href="${tm}" rel="noopener">T맵</a>`; }
   function mapDraw(){
     if(!MAPS.map||MAPS.drag) return;   // 끄는 중에는 다시 그리지 않는다
     MAPS.ov.forEach(o=>o.setMap(null)); MAPS.ov=[];
@@ -8503,7 +8522,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     // V123: 누른 표시 바로 위에 🗑·✕만(정보는 아래 안내 줄에) — 지도를 움직이면 닫힘
     const bar=mq('.msel'); bar.hidden=false; mapCpClose();
     const isF=/^fire/.test(k), cst=isF&&FST[v.st]?v.st:''; bar.classList.toggle('fire',isF);
-    bar.innerHTML=(isF?`<div class="fsts">${['init','done'].map(x=>`<button type="button" class="fsb fsb-${x}${cst===x?' on':''}" data-st="${x}" aria-pressed="${cst===x}">${flame(FST[x].c)}<span>${FST[x].n}</span></button>`).join('')}</div>`:'')+`<div class="mrow"><button type="button" class="del" aria-label="${esc(mkName(k))} 삭제"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="x" aria-label="닫기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button></div>`;
+    const navOk=/^(icp|staging)$/.test(baseK(k));   /* V231: 현장지휘소·차량대기소는 바로 길찾기 */
+    bar.innerHTML=(navOk?`<div class="mnav" role="group" aria-label="${esc(mkName(k))} 길찾기">${pgIcon('pin')}<span>길찾기</span>${navLinks(mkName(k),v.lat,v.lng)}</div>`:'')+(isF?`<div class="fsts">${['init','done'].map(x=>`<button type="button" class="fsb fsb-${x}${cst===x?' on':''}" data-st="${x}" aria-pressed="${cst===x}">${flame(FST[x].c)}<span>${FST[x].n}</span></button>`).join('')}</div>`:'')+`<div class="mrow"><button type="button" class="del" aria-label="${esc(mkName(k))} 삭제"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="x" aria-label="닫기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button></div>`;
     { const mk=mapEl.querySelector(`.kmap .mk[data-k="${k}"]`), box=mq('.mbox').getBoundingClientRect();
       if(mk){ const r=mk.getBoundingClientRect(), w=bar.offsetWidth, h=bar.offsetHeight; let x=r.left-box.left+r.width/2-w/2, y=r.top-box.top-h-8; if(y<6) y=r.bottom-box.top+8;
         y=Math.min(y, box.height-h-6);   // V138: 아래로 뒤집어도 지도 밖(안내 줄·버튼)을 덮지 않게
@@ -8693,6 +8713,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const HYD={p:null, map:null, mk:[], bm:null, list:[], base:null, ref:null, fires:[], found:[], rad:500, rid:0, key:'', seq:0};
   const D8=['북','북동','동','남동','남','남서','서','북서'], fmtM=m=>m<1000?Math.round(m)+'m':(m/1000).toFixed(1)+'km';
   const svgUrl=t=>'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(t);
+  const tmMid=n=>{ try{ return new (Tmapv2.Point||Tmapv2.base.Point)(n/2,n/2); }catch(_){ return undefined; } };   /* V231: T맵 마커는 기본이 그림 아래 가운데=좌표 → 동그라미 아이콘은 가운데를 좌표에(소화전이 북쪽으로 밀려 보이던 문제) */
   const HYD_ICON=svgUrl('<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26"><circle cx="13" cy="13" r="11" fill="#D92D20" stroke="#fff" stroke-width="2.5"/><text x="13" y="17.5" font-size="12" font-weight="700" text-anchor="middle" fill="#fff" font-family="sans-serif">소</text></svg>');
   const BASE_ICON=svgUrl('<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><circle cx="15" cy="15" r="13" fill="#fff" stroke="#D92D20" stroke-width="3"/><text x="15" y="20" font-size="14" text-anchor="middle">🔥</text></svg>');
   function loadTmap(key){
@@ -8804,14 +8825,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function hydMarkBase(){
     if(!HYD.map) return;
     try{ if(HYD.bm) HYD.bm.setMap(null); HYD.bm=null; const b=HYD.base; if(!b) return;
-      HYD.bm=new Tmapv2.Marker({position:new Tmapv2.LatLng(b.lat,b.lng), icon:b.k&&/^fire/.test(b.k)?BASE_ICON:PIN_ICON, iconSize:new Tmapv2.Size(b.k&&/^fire/.test(b.k)?30:26,b.k&&/^fire/.test(b.k)?30:26), map:HYD.map, title:b.name}); }catch(_){ }
+      { const n=b.k&&/^fire/.test(b.k)?30:26; HYD.bm=new Tmapv2.Marker({position:new Tmapv2.LatLng(b.lat,b.lng), icon:n===30?BASE_ICON:PIN_ICON, iconSize:new Tmapv2.Size(n,n), offset:tmMid(n), map:HYD.map, title:b.name}); } }catch(_){ }
   }
   function hydDraw(){
     hq('.hlist').innerHTML=HYD.list.map((p,i)=>`<li><button type="button" data-i="${i}"><b>${esc(p.name)}</b><span>${p.dir}쪽 ${fmtM(p.m)}${p.addr?' · '+esc(p.addr):''}</span></button></li>`).join('');
     hydPop(-1); hydSum();
     if(!HYD.map) return;
     HYD.mk.forEach(m=>{ try{ m.setMap(null); }catch(_){ } }); HYD.mk=[];
-    HYD.list.forEach((p,i)=>{ try{ const mk=new Tmapv2.Marker({position:new Tmapv2.LatLng(p.lat,p.lng), icon:HYD_ICON, iconSize:new Tmapv2.Size(26,26), map:HYD.map, title:p.name}); HYD.mk.push(mk);
+    HYD.list.forEach((p,i)=>{ try{ const mk=new Tmapv2.Marker({position:new Tmapv2.LatLng(p.lat,p.lng), icon:HYD_ICON, iconSize:new Tmapv2.Size(26,26), offset:tmMid(26), map:HYD.map, title:p.name}); HYD.mk.push(mk);
       let lt=0; const on=()=>{ const t=Date.now(); if(t-lt<450) return; lt=t; hydPop(i); };   // V156: 지도 위 소화전을 누르면 정보 플로팅(터치·클릭 겹침 방지)
       try{ mk.addListener('click',on); }catch(_){ } try{ mk.addListener('touchend',on); }catch(_){ } }catch(_){ } });
   }
@@ -8823,7 +8844,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     hq('.hlist').querySelectorAll('button.on').forEach(x=>x.classList.remove('on'));
     if(!p){ el.hidden=true; el.innerHTML=''; return; }
     const b=hq(`.hlist [data-i="${i}"]`); if(b) b.classList.add('on');
-    el.innerHTML=`<button type="button" class="hp-x" aria-label="닫기">×</button><b>${esc(p.name)}</b><p class="hp-d">${esc((HYD.ref&&HYD.ref.name)||'기준')}에서 ${p.dir}쪽 ${fmtM(p.m)}</p>${p.addr?`<p class="hp-m">${esc(p.addr)}</p>`:''}<a class="hnav" href="https://map.kakao.com/link/to/${encodeURIComponent(String(p.name).replace(/,/g,' '))},${(+p.lat).toFixed(6)},${(+p.lng).toFixed(6)}" target="_blank" rel="noopener">길안내</a>`;
+    el.innerHTML=`<button type="button" class="hp-x" aria-label="닫기">×</button><b>${esc(p.name)}</b><p class="hp-d">${esc((HYD.ref&&HYD.ref.name)||'기준')}에서 ${p.dir}쪽 ${fmtM(p.m)}</p>${p.addr?`<p class="hp-m">${esc(p.addr)}</p>`:''}<div class="hnavs">${navLinks(p.name,p.lat,p.lng)}</div>`;
     el.hidden=false; }
   hq('.hsum').addEventListener('click',()=>hydPanel(hq('.hpanel').hidden));
   hq('.hpop').addEventListener('click',e=>{ if(e.target.closest('.hp-x')) hydPop(-1); });
