@@ -1,0 +1,25 @@
+name: tmp xlsx check
+on:
+  push:
+    paths: ['.github/workflows/tmp-xlsx.yml']
+jobs:
+  look:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          H='X-SACHIL: 1'; B=https://app.sachil47.com
+          curl -s -m 20 -H "$H" $B/api/me | python3 -c "import sys,json;print('server',json.load(sys.stdin).get('version'))"
+          curl -s -m 30 -H "$H" $B/api/lib > lib.json
+          python3 - <<'P'
+          import json
+          j=json.load(open('lib.json'))
+          xs=[(s,f['name'],f.get('size')) for s,fs in (j.get('lib') or {}).items() for f in fs if f['name'].lower().endswith(('.xlsx','.xls','.csv'))]
+          print('엑셀/CSV 파일:', xs if xs else '없음')
+          open('xs.txt','w').write('\n'.join(n for _,n,_ in xs))
+          P
+          curl -s -m 30 -G -H "$H" --data-urlencode "q=특정소방대상물" $B/api/search | python3 -c "
+          import sys,json
+          j=json.load(sys.stdin); st=j.get('status') or {}
+          print('status files',st.get('files'),'pages',st.get('pages'),'pending',st.get('pending'),'busy',st.get('busy'),'prog',st.get('prog'))
+          print('failed',[(f['name'],f['why']) for f in st.get('failed') or []])
+          for h in (j.get('hits') or [])[:8]: print(' hit:',h['slug'],h['name'],h['page'],'|',h['snippet'][:90].replace(chr(10),' '))"
