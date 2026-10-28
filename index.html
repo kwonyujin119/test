@@ -2593,6 +2593,7 @@ html:root body .convo .convo-note:has(.convo-empty){background:transparent}
 :root .pg-glyph svg.db-sym{width:78%;height:78%}
 :root #dbBtn .dbi svg.db-sym{width:26px;height:26px}
 :root .hz-k .ic svg.db-sym{width:80%;height:80%}
+:root .hz-k[data-k="debrief"] .ic{background:#FDD000;box-shadow:0 0 0 2px #fff,0 2px 8px rgba(36,78,162,.22)}   /* V234: 흰 칸이면 흰 말풍선이 묻혀 옛 심벌처럼 보였음 — 받은 그림처럼 노랑 칸(노랑 타일 위라 흰 테두리로 구분) */
 :root .hs-ic svg.db-sym{width:78%;height:78%}
 </style>
 <style id="v231-nav">
@@ -3587,7 +3588,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v233</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v234</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4606,8 +4607,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V233', SRV_VER='15.10';
+  const APP_VER='V234', SRV_VER='15.11';
   const UPDATES=[
+    {v:'V234', d:'2026-10-28', t:['첫 화면(디자인 모드) 왼쪽 아래 디브리핑룸 심벌이 옛 모양처럼 보이던 문제 수정 — 흰 칸에 흰 말풍선이 묻혔던 것을 노랑 칸(흰 테두리)으로']},
     {v:'V233', d:'2026-10-28', t:['검색 건축물대장: 장소 이름(예: 공단소방서)으로 찾을 때 그 번지에 대장이 없으면 도로명주소의 대표 지번 → 지도 위치의 번지 순서로 다시 찾아 보여 줌(어느 번지로 찾았는지 함께 표시)','서버 15.10: 그 번지에 없으면 같은 본번의 다른 번지(633-1 등)에서도 찾음']},
     {v:'V232', d:'2026-10-28', t:['47망 CP: 현장지휘소·차량대기소 표시를 누르면 바로 길찾기 — [카카오맵] · [T맵](휴대폰에 T맵 앱이 있을 때)','47망 소화전: 지도 위 소화전 표시가 실제 자리보다 위(북쪽)로 밀려 보이던 문제 수정 — 동그라미 가운데가 정확한 좌표에 오게(확대·축소해도 같은 자리)','소화전 정보 창 길안내도 카카오맵 · T맵 둘 다']},
     {v:'V231', d:'2026-10-25', t:['서버 15.8: 사진 앨범 기능 추가 — 화면은 별도 저장소(github.io/test3)에 있고 접속코드 하나로 입장, 사진은 GitHub가 아니라 PC 서버 data/album 폴더에만 저장','오프라인용으로 보관하는 화면은 앱 첫 화면(index.html)만 — 같은 주소 아래 다른 페이지가 그 자리를 덮어쓰지 않게 고침']},
