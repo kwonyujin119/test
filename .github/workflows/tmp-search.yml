@@ -17,3 +17,4 @@ jobs:
           for h in (j.get('hits') or [])[:5]: print(' hit:',h.get('slug'),h.get('name'),h.get('page'))"
           done
           echo "== version"; curl -s -m 20 -H 'X-SACHIL: 1' https://app.sachil47.com/api/me | python3 -c "import sys,json;print(json.load(sys.stdin).get('version'))"
+# 1793185563
