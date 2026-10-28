@@ -1,32 +1,40 @@
 name: Server check
 
-# 서버(app.sachil47.com)가 살아 있는지·버전·자동 업데이트 상태를 확인(공개 /api/me만 읽음, 키·비밀값 없음)
+# 서버(app.sachil47.com)가 살아 있는지·버전을 확인(공개 /api/me만 읽음, 키·비밀값 없음)
+# main에 서버 파일이 올라가면 자동으로: 1분마다(최대 12분, PC 서버 자동 업데이트 시간) 저장소의 VERSION과 같아질 때까지 확인
 on:
   workflow_dispatch:
   push:
     paths:
       - '.github/workflows/server-check.yml'
+      - 'server/sachil_server.py'
 
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: server/sachil_server.py
+          sparse-checkout-cone-mode: false
       - name: /api/me
         run: |
-          for i in 1 2 3; do
-            body=$(curl -s -m 20 -H 'X-SACHIL: 1' https://app.sachil47.com/api/me) && [ -n "$body" ] && break
-            sleep 5
+          want=$(grep -m1 "^VERSION = " server/sachil_server.py | cut -d"'" -f2)
+          echo "repo VERSION   : $want"
+          if [ "$GITHUB_EVENT_NAME" = push ] && [ "$GITHUB_REF" = refs/heads/main ]; then tries=12; else tries=1; fi
+          for n in $(seq 1 $tries); do
+            [ $n -gt 1 ] && sleep 60
+            body=$(curl -s -m 20 -H 'X-SACHIL: 1' https://app.sachil47.com/api/me || true)
+            got=$(echo "$body" | python3 -c "import sys,json
+          try: print(json.load(sys.stdin).get('version') or '')
+          except Exception: print('')")
+            echo "try $n: server version = ${got:-(응답 없음)}"
+            [ "$got" = "$want" ] && break
           done
-          echo "$body" | python3 -c "
-          import sys, json
+          echo "$body" | python3 -c "import sys,json
           try:
               j = json.load(sys.stdin)
+              print('ai             :', j.get('ai'))
           except Exception:
-              print('응답이 JSON이 아님(서버 꺼짐·터널 끊김?)'); sys.exit(1)
-          print('server version :', j.get('version'))
-          print('app version    :', j.get('app_version') or j.get('app'))
-          for k in ('auto_update', 'bat_old', 'ai', 'ai_provider'):
-              if k in j:
-                  v = j[k]
-                  print(f'{k:15}:', v if not isinstance(v, dict) else {x: v[x] for x in v if 'key' not in x.lower()})
-          "
+              print('응답이 JSON이 아님(서버 꺼짐·터널 끊김?)')"
+          if [ "$got" = "$want" ]; then echo "OK — 서버 $got"; else echo "::warning::서버 버전 ${got:-없음} ≠ 저장소 $want (자동 업데이트 꺼짐·옛 start-domain.bat·서버 꺼짐 확인)"; [ "$tries" -gt 1 ] && exit 1 || true; fi
