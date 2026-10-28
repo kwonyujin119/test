@@ -1,0 +1,14 @@
+name: tmp tmapjs
+on:
+  push:
+    paths: ['.github/workflows/tmp-tmapjs.yml']
+jobs:
+  look:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -s -m 30 "https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=x" -o l.js; head -c 600 l.js; echo
+          for u in $(grep -o 'https\?://[^"'"'"' )]*\.js[^"'"'"' )]*' l.js | sort -u); do echo "== $u"; curl -s -m 60 "$u" -o m.js; wc -c m.js;
+            grep -o '.\{220\}Marker.\{0,40\}offset.\{260\}' m.js | head -5;
+            grep -o '.\{160\}defaultOffset.\{200\}' m.js | head -3;
+            grep -o '.\{200\}iconSize.\{0,30\}/2.\{200\}' m.js | head -4; done
