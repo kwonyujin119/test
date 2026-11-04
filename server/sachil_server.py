@@ -46,8 +46,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False), '.csv': ('text/csv; charset=utf-8', False),   # 15.12: CSV(엑셀에서 저장한 표)
 }
-VERSION = '15.16'
-APP_VERSION = 'V239'
+VERSION = '15.17'
+APP_VERSION = 'V240'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -243,6 +243,7 @@ CREATE TABLE IF NOT EXISTS maps(room INTEGER PRIMARY KEY, data TEXT, ts REAL);
 CREATE TABLE IF NOT EXISTS album(id TEXT PRIMARY KEY, who TEXT, name TEXT, mime TEXT, size INTEGER, w INTEGER, h INTEGER, memo TEXT, taken REAL, ts REAL, thumb INTEGER DEFAULT 0);
 CREATE INDEX IF NOT EXISTS ix_album_taken ON album(taken);
 CREATE TABLE IF NOT EXISTS album_sessions(token TEXT PRIMARY KEY, who TEXT, admin INTEGER, created REAL, seen REAL, ip TEXT);
+CREATE TABLE IF NOT EXISTS lab_q(id INTEGER PRIMARY KEY AUTOINCREMENT, topic TEXT, q TEXT, note TEXT, by TEXT, ts REAL, ets REAL);
 INSERT OR IGNORE INTO members SELECT room, user, seen FROM reads;
 ''')
 try:   # 예전 DB에 답장 칸 추가
@@ -1695,6 +1696,26 @@ class H(BaseHTTPRequestHandler):
             BLD_CACHE.clear()
             ffus_clear()
             return self.send(200, dict(status(), msg='연결 완료 — ' + txt), log=False)
+        if act == 'labq':   # 15.17: 지휘역량강화센터 연구실 '질문 모음' — 교수만 읽고 쓴다(서버 chat.db, 공개 저장소·일반 사용자에겐 없음)
+            op = str(j.get('op') or 'list')
+            topic = str(j.get('topic') or '')[:10] if str(j.get('topic') or '') in ('water', 'hydrant', 'coupling', 'etc') else 'etc'
+            qtext = str(j.get('q') or '').strip()[:2000]
+            note = str(j.get('note') or '').strip()[:4000]
+            qid = to_int(str(j.get('id') or '0'), 0)
+            if op == 'add':
+                if not qtext:
+                    return self.err(400, '질문을 적어 주세요')
+                if (q('SELECT COUNT(*) c FROM lab_q', one=True) or {'c': 0})['c'] >= 2000:
+                    return self.err(400, '질문이 너무 많습니다(2000개)')
+                q('INSERT INTO lab_q(topic,q,note,by,ts,ets) VALUES(?,?,?,?,?,?)', (topic, qtext, note, self.user['name'], time.time(), time.time()), commit=True)
+            elif op == 'edit':
+                if not qtext or not q('SELECT id FROM lab_q WHERE id=?', (qid,), one=True):
+                    return self.err(404, '없는 질문입니다')
+                q('UPDATE lab_q SET topic=?, q=?, note=?, ets=? WHERE id=?', (topic, qtext, note, time.time(), qid), commit=True)
+            elif op == 'del':
+                q('DELETE FROM lab_q WHERE id=?', (qid,), commit=True)
+            rows = q('SELECT id, topic, q, note, by, ts, ets FROM lab_q ORDER BY id DESC LIMIT 2000')
+            return self.send(200, {'ok': True, 'items': [dict(r) for r in rows]}, log=False)
         if act == 'contacts':   # V154: 교수 — 전화 목록 고치기('구분|기관명|번호' 한 줄씩). 빈 값이면 PDF 자동 목록으로
             t = str(j.get('text') or '')[:20000]
             if j.get('auto'):
