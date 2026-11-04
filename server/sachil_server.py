@@ -46,8 +46,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False), '.csv': ('text/csv; charset=utf-8', False),   # 15.12: CSV(엑셀에서 저장한 표)
 }
-VERSION = '15.17'
-APP_VERSION = 'V240'
+VERSION = '15.18'
+APP_VERSION = 'V241'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
@@ -243,6 +243,7 @@ CREATE TABLE IF NOT EXISTS maps(room INTEGER PRIMARY KEY, data TEXT, ts REAL);
 CREATE TABLE IF NOT EXISTS album(id TEXT PRIMARY KEY, who TEXT, name TEXT, mime TEXT, size INTEGER, w INTEGER, h INTEGER, memo TEXT, taken REAL, ts REAL, thumb INTEGER DEFAULT 0);
 CREATE INDEX IF NOT EXISTS ix_album_taken ON album(taken);
 CREATE TABLE IF NOT EXISTS album_sessions(token TEXT PRIMARY KEY, who TEXT, admin INTEGER, created REAL, seen REAL, ip TEXT);
+CREATE TABLE IF NOT EXISTS lab_doc(id INTEGER PRIMARY KEY AUTOINCREMENT, ord INTEGER, title TEXT, summary TEXT, body TEXT, file TEXT, fsize INTEGER, by TEXT, ts REAL);
 CREATE TABLE IF NOT EXISTS lab_q(id INTEGER PRIMARY KEY AUTOINCREMENT, topic TEXT, q TEXT, note TEXT, by TEXT, ts REAL, ets REAL);
 INSERT OR IGNORE INTO members SELECT room, user, seen FROM reads;
 ''')
@@ -933,6 +934,8 @@ class H(BaseHTTPRequestHandler):
             if m:
                 return self.lib_get(m.group(1), urllib.parse.unquote(m.group(2)))
             self.user = self.get_user()
+            if path == '/api/lab/file':   # 15.18: 연구실 원본 파일(hwpx 등) 내려받기 — 교수만
+                return self.lab_file_get(urllib.parse.parse_qs(qs))
             if path == '/api/report/tpl':   # V125: 교수가 정한 보고서 규칙 초안 양식(모든 기기 공통). 비어 있으면 앱 기본 양식
                 return self.send(200, {'ok': True, 'tpl': str(CONF.get('report_tpl') or ''), 'inst': str(CONF.get('report_inst') or ''), 'ts': CONF.get('report_tpl_ts') or 0}, log=False)   # V136: inst = 관리자 지시사항
             if path == '/api/ilform':   # V174: IL 화재등 상황 보고서 입력 서식(교수가 방재실에서 고침). 비어 있으면 앱 기본 서식
@@ -1021,6 +1024,10 @@ class H(BaseHTTPRequestHandler):
             m = re.fullmatch(r'/api/rooms/(\d{1,12})/read', path)
             if m:
                 return self.read_mark(int(m.group(1)))
+            if path == '/api/lab':   # 15.18: 지휘역량강화센터 연구실 문서(교수 전용)
+                return self.lab_api()
+            if path == '/api/lab/file':
+                return self.lab_file_put(urllib.parse.parse_qs(qs))
             if path == '/api/admin/ai':
                 return self.admin_ai()
             m = re.fullmatch(r'/api/lib/([a-z\-]{2,20})/upload', path)
@@ -1786,6 +1793,120 @@ class H(BaseHTTPRequestHandler):
         return self.send(200, dict(status(), msg=f'{AI_NAMES[prov]} 키 저장·시험 성공 — 바로 적용됩니다'), log=False)
 
     # --- 교수(관리자) 메뉴 자료 올리기·지우기 (V79)
+    # --- 15.18: 지휘역량강화센터 연구실 — 연구 과제 문서(제목·요약·본문 HTML) + 원본 파일(hwpx 등). 교수만 읽고 쓴다
+    LAB_TAGS = ('p', 'h3', 'h4', 'b', 'strong', 'i', 'em', 'u', 'ul', 'ol', 'li', 'br', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'blockquote')
+    LAB_EXT = ('.hwpx', '.hwp', '.pdf', '.docx', '.xlsx', '.pptx', '.jpg', '.jpeg', '.png', '.zip', '.txt')
+
+    def lab_clean(self, html):
+        """본문 HTML은 허용한 태그만(속성 모두 버림) — 교수만 쓰지만 화면에 그대로 넣으므로 스크립트·이벤트 속성을 막는다."""
+        html = re.sub(r'(?is)<(script|style|iframe|object|embed)[^>]*>.*?</\1>', '', str(html or ''))[:400000]
+        def tag(m):
+            close, name = m.group(1), m.group(2).lower()
+            if name not in self.LAB_TAGS:
+                return ''
+            return f'<{close}{name}>' if name != 'br' else '<br>'
+        return re.sub(r'<\s*(/?)\s*([a-zA-Z0-9]+)[^>]*>', tag, html)
+
+    def lab_rows(self):
+        return [dict(r) for r in q('SELECT id, ord, title, summary, body, file, fsize, by, ts FROM lab_doc ORDER BY ord, id')]
+
+    def lab_api(self):
+        if not self.user or self.user['role'] != 'admin':
+            return self.err(403, '교수(관리자)만 쓸 수 있습니다')
+        j = self.body_json(1_500_000)
+        op = str(j.get('op') or 'list')
+        did = to_int(str(j.get('id') or '0'), 0)
+        if op == 'seed' and not q('SELECT id FROM lab_doc LIMIT 1', one=True):   # 처음 한 번 — 앱의 기본 과제 3개
+            for i, d in enumerate((j.get('docs') or [])[:20]):
+                q('INSERT INTO lab_doc(ord,title,summary,body,file,fsize,by,ts) VALUES(?,?,?,?,?,?,?,?)',
+                  (i + 1, str(d.get('title') or '')[:200], str(d.get('summary') or '')[:500], self.lab_clean(d.get('body')), '', 0, self.user['name'], time.time()), commit=True)
+        elif op == 'save':
+            title = str(j.get('title') or '').strip()[:200]
+            if not title:
+                return self.err(400, '제목을 적어 주세요')
+            vals = (title, str(j.get('summary') or '').strip()[:500], self.lab_clean(j.get('body')), self.user['name'], time.time())
+            if did and q('SELECT id FROM lab_doc WHERE id=?', (did,), one=True):
+                q('UPDATE lab_doc SET title=?, summary=?, body=?, by=?, ts=? WHERE id=?', vals + (did,), commit=True)
+            else:
+                if (q('SELECT COUNT(*) c FROM lab_doc', one=True) or {'c': 0})['c'] >= 50:
+                    return self.err(400, '과제는 50개까지입니다')
+                mx = (q('SELECT MAX(ord) m FROM lab_doc', one=True) or {'m': 0})['m'] or 0
+                did = q('INSERT INTO lab_doc(ord,title,summary,body,file,fsize,by,ts) VALUES(?,?,?,?,?,?,?,?)', (mx + 1,) + vals[:3] + ('', 0) + vals[3:], commit=True)
+        elif op == 'del':
+            r = q('SELECT file FROM lab_doc WHERE id=?', (did,), one=True)
+            if r and r['file']:
+                try:
+                    os.remove(os.path.join(DATA, 'lab', r['file']))
+                except OSError:
+                    pass
+            q('DELETE FROM lab_doc WHERE id=?', (did,), commit=True)
+        elif op == 'order':
+            for i, x in enumerate((j.get('ids') or [])[:50]):
+                q('UPDATE lab_doc SET ord=? WHERE id=?', (i + 1, to_int(str(x), 0)), commit=True)
+        elif op == 'unfile':
+            r = q('SELECT file FROM lab_doc WHERE id=?', (did,), one=True)
+            if r and r['file']:
+                try:
+                    os.remove(os.path.join(DATA, 'lab', r['file']))
+                except OSError:
+                    pass
+            q("UPDATE lab_doc SET file='', fsize=0 WHERE id=?", (did,), commit=True)
+        return self.send(200, {'ok': True, 'id': did, 'items': self.lab_rows()}, log=False)
+
+    def lab_file_put(self, args):
+        if not self.user or self.user['role'] != 'admin':
+            return self.err(403, '교수(관리자)만 올릴 수 있습니다')
+        did = to_int((args.get('id') or ['0'])[0], 0)
+        if not q('SELECT id FROM lab_doc WHERE id=?', (did,), one=True):
+            return self.err(404, '없는 과제입니다')
+        n = self.clen()
+        if n <= 0 or n > LIB_PART_MAX:
+            self.close_connection = True
+            return self.err(413, '파일은 95MB 이하만 올릴 수 있습니다')
+        name = re.sub(r'[\x00-\x1f\x7f<>:"/\\|?*]', '', urllib.parse.unquote(self.headers.get('X-Filename') or '')).strip().strip('.')[:120]
+        ext = os.path.splitext(name)[1].lower()
+        if not name or ext not in self.LAB_EXT:
+            self.close_connection = True
+            return self.err(415, '올릴 수 없는 파일 형식입니다(hwpx·hwp·pdf·docx·xlsx·pptx·그림)')
+        d = os.path.join(DATA, 'lab')
+        os.makedirs(d, exist_ok=True)
+        fn = f'{did}-{secrets.token_hex(4)}{ext}'
+        tmp = os.path.join(d, '.up-' + fn)
+        left = n
+        try:
+            with open(tmp, 'wb') as f:
+                while left > 0:
+                    b = self.rfile.read(min(262144, left))
+                    if not b:
+                        raise ConnectionError('업로드가 끊겼습니다')
+                    f.write(b)
+                    left -= len(b)
+            self._body_read = True
+            old = q('SELECT file FROM lab_doc WHERE id=?', (did,), one=True)
+            os.replace(tmp, os.path.join(d, fn))
+            if old and old['file']:
+                try:
+                    os.remove(os.path.join(d, old['file']))
+                except OSError:
+                    pass
+            q('UPDATE lab_doc SET file=?, fsize=?, ts=? WHERE id=?', (name + '|' + fn, n, time.time(), did), commit=True)
+        finally:
+            if os.path.exists(tmp):
+                os.remove(tmp)
+        return self.send(200, {'ok': True, 'items': self.lab_rows()}, log=False)
+
+    def lab_file_get(self, args):
+        if not self.user or self.user['role'] != 'admin':
+            return self.err(403, '교수(관리자)만 받을 수 있습니다')
+        r = q('SELECT file FROM lab_doc WHERE id=?', (to_int((args.get('id') or ['0'])[0], 0),), one=True)
+        if not r or '|' not in (r['file'] or ''):
+            return self.err(404, '파일이 없습니다')
+        name, fn = r['file'].split('|', 1)
+        mime = LIB_TYPES.get(os.path.splitext(name)[1].lower(), ('application/octet-stream', False))[0]
+        if name.lower().endswith('.hwpx'):
+            mime = 'application/hwp+zip'
+        return self.send_file(os.path.join(DATA, 'lab', fn), mime, "attachment; filename*=UTF-8''" + urllib.parse.quote(name), 'no-store')
+
     def lib_upload(self, slug, args=None):
         """교수 메뉴 자료 올리기. 15.14: 크기 제한 없음 — 큰 파일은 ?uid=…&part=i&parts=n 조각으로 와서 차례로 이어 붙이고, 마지막 조각에서 검사·교체."""
         if self.user['role'] != 'admin':

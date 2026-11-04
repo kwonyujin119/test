@@ -1487,6 +1487,7 @@ html body .chat:not(.botchat) > .chat-foot:not(.on):not(:has(.warn)){display:non
     fire:'<path d="M12 21a6 6 0 0 0 6-6c0-4-3-6-4.5-10C11 7 9.5 8.5 9.5 11c-1-.5-1.8-1.5-2-2.5C6.5 10 6 12 6 15a6 6 0 0 0 6 6Z"/>',
     edit:'<path d="M4 20h4L19 9l-4-4L4 16Z"/><path d="m13.5 6.5 4 4"/>',
     check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+    doc:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
     key:'<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l2.5 2.5M14 9l2 2"/>',
     chat:'<path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4V16A2.5 2.5 0 0 1 4 13.5Z"/>',
     menu:'<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>',
@@ -2702,6 +2703,44 @@ html:root body .convo .convo-note:has(.convo-empty){background:transparent}
 .lab-q tr.ed td{background:#FFFAEB}
 @media (pointer:coarse){ .lab-qt span,.lab-q td.act .btn{min-height:44px} }
 @media (max-width:599px){ .lab-q td.act{grid-column:2;text-align:left} .lab-q td.act .btn{margin:4px 6px 0 0} }
+
+/* V241: 연구실 문서(목록·보기·편집) — Notion·Confluence 문서 화면처럼 */
+.lab-tools{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
+.lab-card{display:flex;align-items:stretch;gap:6px}
+.lab-card .lab-b{flex:1;min-width:0}
+.lab-tx small{font-size:12px;color:#667085;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.lab-tx small .pg-ic{width:14px;height:14px}
+.lab-ord{display:flex;flex-direction:column;gap:4px;justify-content:center}
+.lab-acts{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.lab-acts .btn{display:inline-flex;align-items:center;gap:6px}
+.lab-acts .pg-ic{width:16px;height:16px}
+.lab-acts .lab-del{color:#B42318;margin-left:auto}
+.lab-file{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 12px;padding:10px 12px;border-radius:10px;background:#F2F4F7;font-size:14px}
+.lab-file .pg-ic{width:16px;height:16px}
+.linkish{border:0;background:none;padding:0;font:inherit;font-weight:700;color:#244EA2;text-decoration:underline;cursor:pointer}
+.lab-art{max-width:780px;font-size:16px;line-height:1.75;color:#1D2939;overflow-wrap:anywhere}
+.lab-art h3,.lab-art h4{margin:22px 0 8px;font-size:18px;font-weight:700;color:#0B1B3F;padding-left:10px;border-left:4px solid #FDD000}
+.lab-art p{margin:8px 0}
+.lab-art ul,.lab-art ol{margin:8px 0;padding-left:24px}
+.lab-art li{margin:4px 0}
+.lab-art table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+.lab-art td,.lab-art th{border:1px solid #D0D5DD;padding:8px 10px;vertical-align:top;text-align:left}
+.lab-art th{background:#EEF2F8;font-weight:700}
+.lab-art blockquote{margin:12px 0;padding:8px 14px;border-left:4px solid #98A2B3;background:#F9FAFB;color:#475467}
+.lab-e .lab-ebar{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 0 10px;background:var(--surface,#fff);border-bottom:1px solid var(--c-line,#E4E7EC);margin-bottom:12px}
+.lab-ebar .lab-st{flex:1;min-width:120px;font-size:13px;color:#667085}
+.lab-ebar label.btn{display:inline-flex;align-items:center;gap:6px}
+.lab-ti,.lab-su{display:block;width:100%;box-sizing:border-box;border:0;border-bottom:1px solid var(--c-line,#E4E7EC);padding:10px 2px;font:inherit;background:transparent;color:var(--c-ink,#0B1B3F)}
+.lab-ti{font-size:22px;font-weight:700}
+.lab-su{font-size:15px;color:#475467}
+.lab-ti:focus,.lab-su:focus{outline:0;border-bottom:2px solid #244EA2}
+.lab-tb{position:sticky;top:56px;z-index:1;display:flex;flex-wrap:wrap;gap:4px;margin:12px 0 8px;padding:6px;border:1px solid var(--c-line,#E4E7EC);border-radius:10px;background:#F9FAFB}
+.lab-tb button{min-height:36px;padding:0 12px;border:1px solid transparent;border-radius:8px;background:none;font:inherit;font-size:14px;font-weight:600;color:#344054}
+.lab-tb button:hover{background:#fff;border-color:#D0D5DD}
+.lab-ed{min-height:320px;padding:12px 14px;border:1px solid var(--c-line,#E4E7EC);border-radius:12px;background:#fff}
+.lab-ed:focus{outline:2px solid #244EA2;outline-offset:1px}
+.lab-ed:empty::before{content:attr(data-ph);color:#98A2B3}
+@media (pointer:coarse){ .lab-tb button{min-height:44px} }
 </style>
 </head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
@@ -3682,7 +3721,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v240</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v241</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4663,7 +4702,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {slug:'fobj',          ab:'특정', title:'특정소방대상물', desc:'특정소방대상물 분류와 소방시설 설치 기준', kw:'특정소방대상물 소방대상물 용도 분류 소방시설 설치 기준 근린생활 판매 업무 숙박 노유자 의료 공동주택 복합건축물'},
     {slug:'signature',     ab:'SIG',  title:'SACHIL 시그니처', desc:'SACHIL 심벌·로고·시그니처 컬러', kw:'시그니처 심벌 로고 브랜드 컬러 색상 SACHIL 47 아이콘 디자인', local:true},
     {slug:'bangjae',       ab:'방재', title:'SACHIL방재실', desc:'교수 전용 · 메뉴 자료·AI 키·지도 키·서버 관리', kw:'', local:true, prof:true},
-    {slug:'lab',           ab:'연구', title:'지휘역량강화센터 연구실', desc:'교수 전용 · 연구 과제 3가지와 질문 모음', kw:'', local:true, prof:true},   /* V239: 교수 로그인 때만 */
+    {slug:'lab',           ab:'연구', title:'지휘역량강화센터 연구실', desc:'교수 전용 · 연구 과제 문서(hwpx)와 질문 모음', kw:'', local:true, prof:true},   /* V239: 교수 로그인 때만 */
     {slug:'updates',       ab:'내역', title:'업데이트 내역', desc:'버전별 개선·업데이트 기록', kw:'업데이트 버전 내역 변경 개선 보강 패치 기록 새 기능', local:true}
   ];
   // 예시 인덱스: 본문 연결 전, 문서 '제목' 수준. 조문 제목은 원문 확인 전 예시로 표시한다.
@@ -4702,8 +4741,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V240', SRV_VER='15.17';
+  const APP_VER='V241', SRV_VER='15.18';
   const UPDATES=[
+    {v:'V241', d:'2026-11-04', t:['연구실: 연구 과제를 직접 쓰고 저장 — 새 과제 추가·편집(제목·요약·본문: 소제목·굵게·글머리·번호·표)·순서 바꾸기·삭제, 쓰는 중 이 기기에 자동 임시 저장','한글(hwpx) 방식: ‘hwpx로 저장’하면 한글에서 바로 열리고, 한글에서 만든 hwpx를 불러와 새 과제로(원본 파일도 함께 보관·내려받기)','서버에 교수 전용으로 저장(서버 15.18) — 서버가 옛 버전이면 이 기기에 저장해 두었다가 서버가 업데이트되면 올라감']},
     {v:'V240', d:'2026-11-04', t:['연구실 ‘질문 모음’: 교수가 직접 질문을 올리고(관련 과제 · 질문 · 메모) 고치고 지울 수 있게 — 과제별로 거르기, 서버에 교수 전용으로 저장(서버 15.17)']},
     {v:'V239', d:'2026-11-04', t:['메뉴 SACHIL에 ‘지휘역량강화센터 연구실’ 추가(방재실 다음 칸, 교수 로그인 때만 보임)','연구 과제 3가지(상수도 흐름 구조 · 소화전 급수량/방수 거리/방수량 실증 · 소방차량 100mm 보수구 구조 변경)와 질문 모음(주요 질의응답 전체를 표로, 답변 대기만 거르기)']},
     {v:'V238', d:'2026-10-28', t:['검색: 새로 올린 자료를 서버가 아직 읽는 중이면 검색 결과 맨 위에 ‘어떤 파일 · 몇 쪽째(예: 212/640쪽)’를 표시 — 다 읽으면 그 내용도 찾아요(큰 파일은 몇 분)']},
@@ -5099,7 +5139,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(SHEET_SEP[s.slug]){ const d=document.createElement('div'); d.className='sheet-sep pg-sec'; d.setAttribute('role','separator'); d.innerHTML=`<span>${esc(SHEET_SEP[s.slug])}</span>`; sheetGrid.appendChild(d); }
     const g=document.createElement('a'); g.href='#'+s.slug; g.dataset.slug=s.slug;
     g.innerHTML=`<span class="ab">${s.icon?`<img class="ico-img" src="${s.icon}" alt="">`:esc(s.ab)}</span><span class="tt">${esc(s.title)}<span class="dd">${esc(s.desc)}</span></span>`;
-    if(s.prof){ g.hidden=true; g.classList.add('profonly'); g.addEventListener('click',e=>{ e.preventDefault(); closeSheet(); if(s.slug==='lab'){ state.labOpen=null; go('lab'); } else openBangjae(); }); }   // V108: 교수 로그인 때만 보이고, 화면 이동 없이 떠 있는 창으로
+    if(s.prof){ g.hidden=true; g.classList.add('profonly'); g.addEventListener('click',e=>{ e.preventDefault(); closeSheet(); if(s.slug==='lab'){ state.labOpen=null; state.labEdit=false; state.labReload=true; go('lab'); } else openBangjae(); }); }   // V108: 교수 로그인 때만 보이고, 화면 이동 없이 떠 있는 창으로
     else g.addEventListener('click',closeSheet);
     sheetGrid.appendChild(g);
   });
@@ -5653,35 +5693,231 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   }
   function secPager(cur){ const l=SECTIONS.filter(x=>!x.prof), i=l.findIndex(x=>x.slug===cur); if(i<0) return ''; const p=l[i-1], n=l[i+1];
     return `<nav class="sx-pager" aria-label="이전·다음 섹션">${p?`<a class="prev" href="#${p.slug}"><small>‹ 이전</small><b>${esc(p.title)}</b></a>`:'<span></span>'}${n?`<a class="next" href="#${n.slug}"><small>다음 ›</small><b>${esc(n.title)}</b></a>`:'<span></span>'}</nav>`; }
-  // V239: 지휘역량강화센터 연구실(교수 전용) — 연구 과제 3가지 + 질문 모음(주요 질의응답 전체를 한 화면 표로)
-  const LAB=[
-    {k:'water', no:1, t:'상수도 흐름 구조(취수에서 소방용수까지)에 관한 연구', s:'수운영관리실 · 정수장 · 배수지에 관한 이해',
-      body:()=>`<p class="lab-lead">물이 소화전에 닿기까지의 길을 따라가며 각 시설의 역할과 소방용수에 주는 영향을 이해합니다.</p>
-        <ol class="lab-flow" aria-label="상수도 흐름">${['취수','정수장','배수지','배수관','소화전(소방용수)'].map(x=>`<li>${x}</li>`).join('')}</ol>
-        <div class="lab-items">${[['수운영관리실','상수도 전체 흐름(유량·수압·수위)을 실시간으로 보고 조절하는 곳 — 화재 때 수압·유량 협조 창구'],['정수장','취수한 원수를 정수해 보내는 곳 — 처리 용량·송수 방식'],['배수지','정수를 모아 두었다가 지역으로 내려보내는 곳 — 저류량·높이(수압)·급수 구역']].map(([a,b])=>`<div class="lab-it"><b>${a}</b><p>${b}</p></div>`).join('')}</div>`},
-    {k:'hydrant', no:2, t:'소화전 급수량 / 방수 거리 / 방수량 실증 연구', s:'단계적으로 화재경계지구 → 산업단지 → 대응2단계 발생 지역 → 인천 전지역',
-      body:()=>`<p class="lab-lead">소화전의 실제 급수량·방수 거리·방수량을 현장에서 재어, 지역별로 믿을 수 있는 기준을 만듭니다.</p>
-        <div class="lab-items">${[['급수량','소화전 1개에서 실제로 받을 수 있는 물의 양'],['방수 거리','소화전 급수로 닿는 방수 거리'],['방수량','노즐 끝에서 나오는 실제 방수량']].map(([a,b])=>`<div class="lab-it"><b>${a}</b><p>${b}</p></div>`).join('')}</div>
-        <h4 class="pg-sec">단계</h4>
-        <ol class="lab-steps">${['화재경계지구','산업단지','대응2단계 발생 지역','인천 전지역'].map((x,i)=>`<li><span class="n">${i+1}단계</span><b>${x}</b></li>`).join('')}</ol>`},
-    {k:'coupling', no:3, t:'소방차량 100mm 보수구 구조 변경에 관한 연구', s:'소방차량 100mm 보수구의 구조 변경',
-      body:()=>`<p class="lab-lead">소방차량 100mm 보수구의 구조를 바꿔 급수·연결 효율을 높이는 방안을 연구합니다.</p><p class="lab-note">세부 내용은 준비 중이에요.</p>`},
-    {k:'qna', no:4, t:'질문 모음', s:'연구 질문을 직접 올리고 과제별로 한눈에', body:null}];
+  // V239·V241: 지휘역량강화센터 연구실(교수 전용) — 연구 과제 문서(직접 쓰기·저장, hwpx 불러오기·저장) + 질문 모음
   const LABT={water:'상수도 흐름',hydrant:'소화전 실증',coupling:'100mm 보수구',etc:'기타'};   /* V240: 질문 모음 과제 꼬리표 */
+  const LAB_SEED=[
+    {title:'상수도 흐름 구조(취수에서 소방용수까지)에 관한 연구', summary:'수운영관리실 · 정수장 · 배수지에 관한 이해',
+      body:'<p>물이 소화전에 닿기까지의 길을 따라가며 각 시설의 역할과 소방용수에 주는 영향을 이해합니다.</p><h4>상수도 흐름</h4><p>취수 → 정수장 → 배수지 → 배수관 → 소화전(소방용수)</p><h4>주요 시설</h4><ul><li><b>수운영관리실</b> — 상수도 전체 흐름(유량·수압·수위)을 보고 조절하는 곳, 화재 때 수압·유량 협조 창구</li><li><b>정수장</b> — 취수한 원수를 정수해 보내는 곳, 처리 용량·송수 방식</li><li><b>배수지</b> — 정수를 모아 두었다가 지역으로 내려보내는 곳, 저류량·높이(수압)·급수 구역</li></ul>'},
+    {title:'소화전 급수량 / 방수 거리 / 방수량 실증 연구', summary:'단계적으로 화재경계지구 → 산업단지 → 대응2단계 발생 지역 → 인천 전지역',
+      body:'<p>소화전의 실제 급수량·방수 거리·방수량을 현장에서 재어, 지역별로 믿을 수 있는 기준을 만듭니다.</p><h4>측정 항목</h4><ul><li><b>급수량</b> — 소화전 1개에서 실제로 받을 수 있는 물의 양</li><li><b>방수 거리</b> — 소화전 급수로 닿는 방수 거리</li><li><b>방수량</b> — 노즐 끝에서 나오는 실제 방수량</li></ul><h4>단계</h4><ol><li>화재경계지구</li><li>산업단지</li><li>대응2단계 발생 지역</li><li>인천 전지역</li></ol>'},
+    {title:'소방차량 100mm 보수구 구조 변경에 관한 연구', summary:'소방차량 100mm 보수구의 구조 변경',
+      body:'<p>소방차량 100mm 보수구의 구조를 바꿔 급수·연결 효율을 높이는 방안을 연구합니다.</p><p>세부 내용은 준비 중이에요.</p>'}];
+  // 본문 HTML은 허용한 태그만(서버와 같은 규칙) — 붙여넣기·hwpx 불러오기·저장 모두 이 함수를 거친다
+  const LAB_OK=new Set(['P','H3','H4','B','STRONG','I','EM','U','UL','OL','LI','BR','TABLE','TBODY','THEAD','TR','TD','TH','BLOCKQUOTE']);
+  function labClean(html){ const t=document.createElement('template'); t.innerHTML=String(html||'');
+    const walk=n=>{ [...n.childNodes].forEach(c=>{ if(c.nodeType===3) return; if(c.nodeType!==1){ c.remove(); return; }
+      if(/^(SCRIPT|STYLE|IFRAME|OBJECT|EMBED|META|LINK)$/.test(c.tagName)){ c.remove(); return; }
+      walk(c);
+      if(c.tagName==='DIV'||c.tagName==='SECTION'){ const p=document.createElement('p'); while(c.firstChild) p.appendChild(c.firstChild); c.replaceWith(p); return; }
+      if(/^H[1-2]$/.test(c.tagName)||c.tagName==='H5'||c.tagName==='H6'){ const h=document.createElement('h4'); while(c.firstChild) h.appendChild(c.firstChild); c.replaceWith(h); return; }
+      if(!LAB_OK.has(c.tagName)){ c.replaceWith(...c.childNodes); return; }
+      [...c.attributes].forEach(a=>c.removeAttribute(a.name)); }); };
+    walk(t.content); return t.innerHTML.replace(/<p>\s*<\/p>/g,'').trim(); }
+  // ---------- hwpx(한글 표준 문서) 읽기·쓰기 — test0 한글 작업장과 같은 방식(브라우저 내장 압축, 외부 라이브러리 없음) ----------
+  const HWPX=(()=>{
+    const CRC=new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=c&1?0xEDB88320^(c>>>1):c>>>1; CRC[n]=c>>>0; }
+    const crc32=u=>{ let c=0xFFFFFFFF; for(let i=0;i<u.length;i++) c=CRC[(c^u[i])&255]^(c>>>8); return (c^0xFFFFFFFF)>>>0; };
+    const pipe=async(u,st)=>new Uint8Array(await new Response(new Blob([u]).stream().pipeThrough(st)).arrayBuffer());
+    async function read(buf){ const u8=new Uint8Array(buf), dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength); let eo=-1;
+      for(let i=u8.length-22;i>=Math.max(0,u8.length-65557);i--) if(dv.getUint32(i,true)===0x06054b50){ eo=i; break; }
+      if(eo<0) throw new Error('hwpx 파일이 아니에요 — 한글에서 ‘다른 이름으로 저장 → 한글 표준 문서(*.hwpx)’로 저장해 올려 주세요(옛 .hwp는 못 읽어요)');
+      const cnt=dv.getUint16(eo+10,true); let p=dv.getUint32(eo+16,true); const out=new Map(), td=new TextDecoder();
+      for(let n=0;n<cnt;n++){ if(dv.getUint32(p,true)!==0x02014b50) throw new Error('파일이 손상됐어요');
+        const meth=dv.getUint16(p+10,true), cs=dv.getUint32(p+20,true), nl=dv.getUint16(p+28,true), xl=dv.getUint16(p+30,true), cl=dv.getUint16(p+32,true), lo=dv.getUint32(p+42,true);
+        const name=td.decode(u8.subarray(p+46,p+46+nl)); p+=46+nl+xl+cl;
+        const st=lo+30+dv.getUint16(lo+26,true)+dv.getUint16(lo+28,true), raw=u8.subarray(st,st+cs);
+        if(name.endsWith('/')) continue; out.set(name, meth===0?raw.slice():meth===8?await pipe(raw,new DecompressionStream('deflate-raw')):null); }
+      return out; }
+    async function write(entries){ const enc=new TextEncoder(), d=new Date(), tm=(d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1), dt=((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate();
+      const loc=[], cen=[]; let off=0;
+      for(const e of entries){ const data=typeof e.data==='string'?enc.encode(e.data):e.data, nb=enc.encode(e.name), crc=crc32(data);
+        let meth=e.store?0:8, body=data; if(meth===8){ body=await pipe(data,new CompressionStream('deflate-raw')); if(body.length>=data.length){ meth=0; body=data; } }
+        const lh=new Uint8Array(30+nb.length), lv=new DataView(lh.buffer); lv.setUint32(0,0x04034b50,true); lv.setUint16(4,20,true); lv.setUint16(6,0x800,true); lv.setUint16(8,meth,true); lv.setUint16(10,tm,true); lv.setUint16(12,dt,true); lv.setUint32(14,crc,true); lv.setUint32(18,body.length,true); lv.setUint32(22,data.length,true); lv.setUint16(26,nb.length,true); lh.set(nb,30);
+        const ch=new Uint8Array(46+nb.length), cv=new DataView(ch.buffer); cv.setUint32(0,0x02014b50,true); cv.setUint16(4,20,true); cv.setUint16(6,20,true); cv.setUint16(8,0x800,true); cv.setUint16(10,meth,true); cv.setUint16(12,tm,true); cv.setUint16(14,dt,true); cv.setUint32(16,crc,true); cv.setUint32(20,body.length,true); cv.setUint32(24,data.length,true); cv.setUint16(28,nb.length,true); cv.setUint32(42,off,true); ch.set(nb,46);
+        loc.push(lh,body); cen.push(ch); off+=lh.length+body.length; }
+      const cd=cen.reduce((a,c)=>a+c.length,0), end=new Uint8Array(22), ev=new DataView(end.buffer); ev.setUint32(0,0x06054b50,true); ev.setUint16(8,entries.length,true); ev.setUint16(10,entries.length,true); ev.setUint32(12,cd,true); ev.setUint32(16,off,true);
+      return new Blob([...loc,...cen,end],{type:'application/hwp+zip'}); }
+    const XH='<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
+    const NS='xmlns:ha="http://www.hancom.co.kr/hwpml/2011/app" xmlns:hp="http://www.hancom.co.kr/hwpml/2011/paragraph" xmlns:hp10="http://www.hancom.co.kr/hwpml/2016/paragraph" xmlns:hs="http://www.hancom.co.kr/hwpml/2011/section" xmlns:hc="http://www.hancom.co.kr/hwpml/2011/core" xmlns:hh="http://www.hancom.co.kr/hwpml/2011/head" xmlns:hhs="http://www.hancom.co.kr/hwpml/2011/history" xmlns:hm="http://www.hancom.co.kr/hwpml/2011/master-page" xmlns:hpf="http://www.hancom.co.kr/schema/2011/hpf" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf/" xmlns:ooxmlchart="http://www.hancom.co.kr/hwpml/2016/ooxmlchart" xmlns:hwpunitchar="http://www.hancom.co.kr/hwpml/2016/HwpUnitChar" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"';
+    const LG=['hangul','latin','hanja','japanese','other','symbol','user'], all=v=>LG.map(l=>`${l}="${v}"`).join(' ');
+    const xe=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    /* 글자 모양: 0 본문 10pt · 1 본문 굵게 · 2 제목 18pt 굵게 · 3 소제목 13pt 굵게 · 4 요약 10pt 회색 · 5 쪽번호용 9pt */
+    const cp=(id,h,font,bold,color)=>`<hh:charPr id="${id}" height="${h}" textColor="${color||'#000000'}" shadeColor="none" useFontSpace="0" useKerning="0" symMark="NONE" borderFillIDRef="2"><hh:fontRef ${all(font)}/><hh:ratio ${all(100)}/><hh:spacing ${all(0)}/><hh:relSz ${all(100)}/><hh:offset ${all(0)}/>${bold?'<hh:bold/>':''}<hh:underline type="NONE" shape="SOLID" color="#000000"/><hh:strikeout shape="NONE" color="#000000"/><hh:outline type="NONE"/><hh:shadow type="NONE" color="#B2B2B2" offsetX="10" offsetY="10"/></hh:charPr>`;
+    const mg=(o,mul)=>['intent','left','right','prev','next'].map(k=>`<hc:${k} value="${(o[k]||0)*mul}" unit="HWPUNIT"/>`).join('');
+    /* 문단 모양: 0 양쪽 · 1 가운데(제목) · 2 들여쓴 목록 · 3 표 칸 */
+    const pp=(id,o)=>`<hh:paraPr id="${id}" tabPrIDRef="0" condense="0" fontLineHeight="0" snapToGrid="1" suppressLineNumbers="0" checked="0"><hh:align horizontal="${o.align||'JUSTIFY'}" vertical="BASELINE"/><hh:heading type="NONE" idRef="0" level="0"/><hh:breakSetting breakLatinWord="KEEP_WORD" breakNonLatinWord="KEEP_WORD" widowOrphan="0" keepWithNext="0" keepLines="0" pageBreakBefore="0" lineWrap="BREAK"/><hh:autoSpacing eAsianEng="0" eAsianNum="0"/><hp:switch><hp:case hp:required-namespace="http://www.hancom.co.kr/hwpml/2016/HwpUnitChar"><hh:margin>${mg(o,1)}</hh:margin><hh:lineSpacing type="PERCENT" value="${o.ls||160}" unit="HWPUNIT"/></hp:case><hp:default><hh:margin>${mg(o,2)}</hh:margin><hh:lineSpacing type="PERCENT" value="${o.ls||160}" unit="HWPUNIT"/></hp:default></hp:switch><hh:border borderFillIDRef="2" offsetLeft="0" offsetRight="0" offsetTop="0" offsetBottom="0" connect="0" ignoreMargin="0"/></hh:paraPr>`;
+    const side=(t,w)=>['left','right','top','bottom'].map(x=>`<hh:${x}Border type="${t}" width="${w}" color="#000000"/>`).join('');
+    const bf=(id,t,w,fill)=>`<hh:borderFill id="${id}" threeD="0" shadow="0" centerLine="NONE" breakCellSeparateLine="0"><hh:slash type="NONE" Crooked="0" isCounter="0"/><hh:backSlash type="NONE" Crooked="0" isCounter="0"/>${side(t,w)}<hh:diagonal type="SOLID" width="0.1 mm" color="#000000"/>${fill?'<hc:fillBrush><hc:winBrush faceColor="none" hatchColor="#999999" alpha="0"/></hc:fillBrush>':''}</hh:borderFill>`;
+    function header(){ const ti='<hh:typeInfo familyType="FCAT_GOTHIC" weight="6" proportion="4" contrast="0" strokeVariation="1" armStyle="1" letterform="1" midline="1" xHeight="1"/>';
+      const ff=LG.map(l=>`<hh:fontface lang="${l.toUpperCase()}" fontCnt="2"><hh:font id="0" face="함초롬돋움" type="TTF" isEmbedded="0">${ti}</hh:font><hh:font id="1" face="함초롬바탕" type="TTF" isEmbedded="0">${ti}</hh:font></hh:fontface>`).join('');
+      const cps=[cp(0,1000,1),cp(1,1000,1,1),cp(2,1800,0,1),cp(3,1300,0,1),cp(4,1000,1,0,'#555555'),cp(5,900,0)];
+      const pps=[pp(0,{}),pp(1,{align:'CENTER'}),pp(2,{left:1500,intent:-1500}),pp(3,{align:'LEFT',ls:130})];
+      const sty=`<hh:style id="0" type="PARA" name="바탕글" engName="Normal" paraPrIDRef="0" charPrIDRef="0" nextStyleIDRef="0" langID="1042" lockForm="0"/>`;
+      return XH+`<hh:head ${NS} version="1.4" secCnt="1"><hh:beginNum page="1" footnote="1" endnote="1" pic="1" tbl="1" equation="1"/><hh:refList><hh:fontfaces itemCnt="7">${ff}</hh:fontfaces><hh:borderFills itemCnt="3">${bf(1,'NONE','0.1 mm')}${bf(2,'NONE','0.1 mm',true)}${bf(3,'SOLID','0.12 mm')}</hh:borderFills><hh:charProperties itemCnt="${cps.length}">${cps.join('')}</hh:charProperties><hh:tabProperties itemCnt="1"><hh:tabPr id="0" autoTabLeft="0" autoTabRight="0"/></hh:tabProperties><hh:numberings itemCnt="0"/><hh:paraProperties itemCnt="${pps.length}">${pps.join('')}</hh:paraProperties><hh:styles itemCnt="1">${sty}</hh:styles></hh:refList><hh:compatibleDocument targetProgram="HWP201X"><hh:layoutCompatibility/></hh:compatibleDocument><hh:docOption><hh:linkinfo path="" pageInherit="0" footnoteInherit="0"/></hh:docOption><hh:trackchageConfig flags="56"/></hh:head>`; }
+    const secPr=`<hp:secPr id="" textDirection="HORIZONTAL" spaceColumns="1134" tabStop="8000" tabStopVal="4000" tabStopUnit="HWPUNIT" outlineShapeIDRef="0" memoShapeIDRef="0" textVerticalWidthHead="0" masterPageCnt="0"><hp:grid lineGrid="0" charGrid="0" wonggojiFormat="0"/><hp:startNum pageStartsOn="BOTH" page="0" pic="0" tbl="0" equation="0"/><hp:visibility hideFirstHeader="0" hideFirstFooter="0" hideFirstMasterPage="0" border="SHOW_ALL" fill="SHOW_ALL" hideFirstPageNum="0" hideFirstEmptyLine="0" showLineNumber="0"/><hp:lineNumberShape restartType="0" countBy="0" distance="0" startNumber="0"/><hp:pagePr landscape="WIDELY" width="59528" height="84188" gutterType="LEFT_ONLY"><hp:margin header="4252" footer="4252" gutter="0" left="8504" right="8504" top="5668" bottom="4252"/></hp:pagePr><hp:footNotePr><hp:autoNumFormat type="DIGIT" userChar="" prefixChar="" suffixChar=")" supscript="0"/><hp:noteLine length="-1" type="SOLID" width="0.12 mm" color="#000000"/><hp:noteSpacing betweenNotes="283" belowLine="567" aboveLine="850"/><hp:numbering type="CONTINUOUS" newNum="1"/><hp:placement place="EACH_COLUMN" beneathText="0"/></hp:footNotePr><hp:endNotePr><hp:autoNumFormat type="DIGIT" userChar="" prefixChar="" suffixChar=")" supscript="0"/><hp:noteLine length="14692344" type="SOLID" width="0.12 mm" color="#000000"/><hp:noteSpacing betweenNotes="0" belowLine="567" aboveLine="850"/><hp:numbering type="CONTINUOUS" newNum="1"/><hp:placement place="END_OF_DOCUMENT" beneathText="0"/></hp:endNotePr>${['BOTH','EVEN','ODD'].map(t=>`<hp:pageBorderFill type="${t}" borderFillIDRef="1" textBorder="PAPER" headerInside="0" footerInside="0" fillArea="PAPER"><hp:offset left="1417" right="1417" top="1417" bottom="1417"/></hp:pageBorderFill>`).join('')}</hp:secPr>`;
+    /* 본문 HTML → 문단(글자 조각) 목록. 굵은 글(b·strong)은 굵은 글자 모양으로 */
+    function runsOf(el,bold){ const out=[]; el.childNodes.forEach(c=>{ if(c.nodeType===3){ if(c.nodeValue) out.push([c.nodeValue,bold]); } else if(c.nodeType===1){ if(c.tagName==='BR') out.push(['\n',bold]); else out.push(...runsOf(c,bold||/^(B|STRONG)$/.test(c.tagName))); } }); return out; }
+    let pid=1;
+    const para=(runs,pr,base)=>{ const r=runs.length?runs:[['',0]]; return `<hp:p id="${pid++}" paraPrIDRef="${pr}" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0">${r.map(([t,b])=>`<hp:run charPrIDRef="${base===0&&b?1:base}"><hp:t>${xe(String(t).replace(/\n/g,' '))}</hp:t></hp:run>`).join('')}</hp:p>`; };
+    function table(tb){ const rows=[...tb.querySelectorAll('tr')]; const nc=Math.max(1,...rows.map(r=>r.children.length)), W=42520, cw=Math.floor(W/nc), rh=1800;
+      const cells=rows.map((r,ri)=>`<hp:tr>${Array.from({length:nc},(_,ci)=>{ const c=r.children[ci]; return `<hp:tc name="" header="${ri===0&&c&&c.tagName==='TH'?1:0}" hasMargin="0" protect="0" editable="0" dirty="0" borderFillIDRef="3"><hp:subList id="" textDirection="HORIZONTAL" lineWrap="BREAK" vertAlign="CENTER" linkListIDRef="0" linkListNextIDRef="0" textWidth="0" textHeight="0" hasTextRef="0" hasNumRef="0">${para(c?runsOf(c,c.tagName==='TH'):[],3,0)}</hp:subList><hp:cellAddr colAddr="${ci}" rowAddr="${ri}"/><hp:cellSpan colSpan="1" rowSpan="1"/><hp:cellSz width="${cw}" height="${rh}"/><hp:cellMargin left="510" right="510" top="141" bottom="141"/></hp:tc>`; }).join('')}</hp:tr>`).join('');
+      return `<hp:p id="${pid++}" paraPrIDRef="0" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="0"><hp:tbl id="${1000+pid}" zOrder="0" numberingType="TABLE" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" pageBreak="CELL" repeatHeader="1" rowCnt="${rows.length}" colCnt="${nc}" cellSpacing="0" borderFillIDRef="3" noAdjust="0"><hp:sz width="${cw*nc}" widthRelTo="ABSOLUTE" height="${rh*rows.length}" heightRelTo="ABSOLUTE" protect="0"/><hp:pos treatAsChar="1" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="COLUMN" vertAlign="TOP" horzAlign="LEFT" vertOffset="0" horzOffset="0"/><hp:outMargin left="0" right="0" top="0" bottom="283"/><hp:inMargin left="510" right="510" top="141" bottom="141"/>${cells}</hp:tbl></hp:run><hp:run charPrIDRef="0"><hp:t/></hp:run></hp:p>`; }
+    async function exportDoc(doc){ pid=1; const t=document.createElement('template'); t.innerHTML=labClean(doc.body);
+      const ps=[para([[doc.title||'제목 없음',0]],1,2)]; if(doc.summary) ps.push(para([[doc.summary,0]],1,4)); ps.push(para([],0,0));
+      const blk=el=>{ const tg=el.tagName;
+        if(tg==='H3'||tg==='H4'){ ps.push(para([['',0]],0,0)); ps.push(para(runsOf(el,0).map(([x])=>[x,0]),0,3)); return; }
+        if(tg==='UL'||tg==='OL'){ [...el.children].forEach((li,i)=>ps.push(para([[tg==='OL'?`${i+1}. `:'• ',0],...runsOf(li,0)],2,0))); return; }
+        if(tg==='TABLE'){ ps.push(table(el)); return; }
+        if(tg==='BLOCKQUOTE'){ ps.push(para([['※ ',0],...runsOf(el,0)],2,0)); return; }
+        ps.push(para(runsOf(el,0),0,0)); };
+      [...t.content.childNodes].forEach(n=>{ if(n.nodeType===1) blk(n); else if(n.nodeType===3&&n.nodeValue.trim()) ps.push(para([[n.nodeValue.trim(),0]],0,0)); });
+      const first=ps[0].replace('<hp:run charPrIDRef="2">',`<hp:run charPrIDRef="2">${secPr}<hp:ctrl><hp:colPr id="" type="NEWSPAPER" layout="LEFT" colCount="1" sameSz="1" sameGap="0"/></hp:ctrl></hp:run><hp:run charPrIDRef="2">`);
+      const sec=XH+`<hs:sec ${NS}>${first}${ps.slice(1).join('')}</hs:sec>`, now=new Date().toISOString().replace(/\.\d+Z$/,'Z');
+      return write([{name:'mimetype',data:'application/hwp+zip',store:true},
+        {name:'version.xml',data:XH+'<hv:HCFVersion xmlns:hv="http://www.hancom.co.kr/hwpml/2011/version" tagetApplication="WORDPROCESSOR" major="5" minor="1" micro="0" buildNumber="1" os="1" xmlVersion="1.4" application="Hancom Office Hangul" appVersion="9, 1, 1, 5656 WIN32LEWindows_10"/>',store:true},
+        {name:'Contents/header.xml',data:header()},{name:'Contents/section0.xml',data:sec},
+        {name:'Preview/PrvText.txt',data:String(doc.title||'').slice(0,200)},
+        {name:'settings.xml',data:XH+'<ha:HWPApplicationSetting xmlns:ha="http://www.hancom.co.kr/hwpml/2011/app" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"><ha:CaretPosition listIDRef="0" paraIDRef="0" pos="0"/></ha:HWPApplicationSetting>'},
+        {name:'META-INF/container.rdf',data:XH+'<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description rdf:about=""><ns0:hasPart xmlns:ns0="http://www.hancom.co.kr/hwpml/2016/meta/pkg#" rdf:resource="Contents/header.xml"/></rdf:Description><rdf:Description rdf:about="Contents/header.xml"><rdf:type rdf:resource="http://www.hancom.co.kr/hwpml/2016/meta/pkg#HeaderFile"/></rdf:Description><rdf:Description rdf:about=""><ns0:hasPart xmlns:ns0="http://www.hancom.co.kr/hwpml/2016/meta/pkg#" rdf:resource="Contents/section0.xml"/></rdf:Description><rdf:Description rdf:about="Contents/section0.xml"><rdf:type rdf:resource="http://www.hancom.co.kr/hwpml/2016/meta/pkg#SectionFile"/></rdf:Description><rdf:Description rdf:about=""><rdf:type rdf:resource="http://www.hancom.co.kr/hwpml/2016/meta/pkg#Document"/></rdf:Description></rdf:RDF>'},
+        {name:'Contents/content.hpf',data:XH+`<opf:package ${NS} version="" unique-identifier="" id=""><opf:metadata><opf:title>${xe(doc.title||'')}</opf:title><opf:language>ko</opf:language><opf:meta name="creator" content="text">SACHIL:47 연구실</opf:meta><opf:meta name="CreatedDate" content="text">${now}</opf:meta><opf:meta name="ModifiedDate" content="text">${now}</opf:meta></opf:metadata><opf:manifest><opf:item id="header" href="Contents/header.xml" media-type="application/xml"/><opf:item id="section0" href="Contents/section0.xml" media-type="application/xml"/><opf:item id="settings" href="settings.xml" media-type="application/xml"/></opf:manifest><opf:spine><opf:itemref idref="header" linear="yes"/><opf:itemref idref="section0" linear="yes"/></opf:spine></opf:package>`},
+        {name:'META-INF/container.xml',data:XH+'<ocf:container xmlns:ocf="urn:oasis:names:tc:opendocument:xmlns:container" xmlns:hpf="http://www.hancom.co.kr/schema/2011/hpf"><ocf:rootfiles><ocf:rootfile full-path="Contents/content.hpf" media-type="application/hwpml-package+xml"/><ocf:rootfile full-path="Preview/PrvText.txt" media-type="text/plain"/><ocf:rootfile full-path="META-INF/container.rdf" media-type="application/rdf+xml"/></ocf:rootfiles></ocf:container>'},
+        {name:'META-INF/manifest.xml',data:XH+'<odf:manifest xmlns:odf="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"/>'}]); }
+    /* hwpx → {title, html}: 문단 글을 차례로, 표는 표로, 개요·제목 스타일이나 크고 굵은 글은 소제목으로 */
+    async function importDoc(file){ const files=await read(await file.arrayBuffer()), td=new TextDecoder();
+      const secs=[...files.keys()].filter(n=>/^Contents\/section\d+\.xml$/i.test(n)).sort((a,b)=>(+a.match(/\d+/)[0])-(+b.match(/\d+/)[0]));
+      if(!secs.length) throw new Error('hwpx 안에 본문(section)이 없어요');
+      const P=s=>new DOMParser().parseFromString(td.decode(s),'application/xml');
+      const hd=files.get('Contents/header.xml')?P(files.get('Contents/header.xml')):null, styleName={}, charBig={}, center={};
+      if(hd){ [...hd.getElementsByTagNameNS('*','style')].forEach(x=>styleName[x.getAttribute('id')]=x.getAttribute('name')||'');
+        [...hd.getElementsByTagNameNS('*','charPr')].forEach(x=>{ charBig[x.getAttribute('id')]=(+x.getAttribute('height')||1000)>=1200||!!x.getElementsByTagNameNS('*','bold').length; });
+        [...hd.getElementsByTagNameNS('*','paraPr')].forEach(x=>{ const a=x.getElementsByTagNameNS('*','align')[0]; center[x.getAttribute('id')]=!!a&&a.getAttribute('horizontal')==='CENTER'; }); }
+      const kids=(el,nm)=>[...el.children].filter(c=>c.localName===nm), out=[]; let title='', summary='', sumOk=true;
+      const txt=p=>{ let t=''; const walk=n=>{ for(const c of n.children){ if(c.localName==='tbl') continue; if(c.localName==='t') t+=c.textContent; else if(c.localName==='lineBreak') t+='\n'; else if(c.localName==='tab') t+=' '; else walk(c); } }; walk(p); return t; };
+      const esc2=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+      const doP=p=>{ p.querySelectorAll&&[...p.getElementsByTagNameNS('*','tbl')].filter(tb=>{ let a=tb.parentElement; while(a&&a!==p){ if(a.localName==='tbl') return false; a=a.parentElement; } return true; }).forEach(tb=>{
+          const rows=kids(tb,'tr').map(tr=>kids(tr,'tc').map(tc=>[...tc.getElementsByTagNameNS('*','p')].map(txt).join(' ').trim()));
+          if(rows.length) out.push(`<table><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${esc2(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`); });
+        const t=txt(p).replace(/\s+$/,''); if(!t.trim()) return;
+        const sn=styleName[p.getAttribute('styleIDRef')]||'', runs=kids(p,'run'), big=runs.length&&runs.every(r=>charBig[r.getAttribute('charPrIDRef')]);
+        if(!title&&!out.length&&(big||/제목/.test(sn))){ title=t.trim().slice(0,200); return; }
+        if(title&&sumOk&&!out.length&&!summary&&center[p.getAttribute('paraPrIDRef')]){ summary=t.trim().slice(0,500); return; }   /* 제목 바로 아래 가운데 줄 = 한 줄 요약 */
+        sumOk=false;
+        if(/^\s*\d{1,2}[.)]\s/.test(t)){ const li=`<li>${esc2(t.replace(/^\s*\d{1,2}[.)]\s*/,''))}</li>`; if(/<\/ol>$/.test(out[out.length-1]||'')) out[out.length-1]=out[out.length-1].replace(/<\/ol>$/,li+'</ol>'); else out.push(`<ol>${li}</ol>`); return; }
+        if(/^개요|제목|Heading/i.test(sn)||(big&&t.length<60)) out.push(`<h4>${esc2(t.trim())}</h4>`);
+        else if(/^\s*[•·○◦▪■□\-–]\s/.test(t)){ const li=`<li>${esc2(t.replace(/^\s*[•·○◦▪■□\-–]\s*/,''))}</li>`; if(/<\/ul>$/.test(out[out.length-1]||'')) out[out.length-1]=out[out.length-1].replace(/<\/ul>$/,li+'</ul>'); else out.push(`<ul>${li}</ul>`); }
+        else out.push(`<p>${esc2(t)}</p>`); };
+      for(const n of secs){ const d=P(files.get(n)); kids(d.documentElement,'p').forEach(doP); }
+      return {title, summary, html:labClean(out.join(''))}; }
+    return {exportDoc, importDoc};
+  })();
+  // ---------- 저장소 — 서버(15.18+, 교수 전용). 서버가 옛 버전이면 이 기기에 저장해 두고, 나중에 서버가 비어 있으면 그 내용으로 채움 ----------
+  const LABD={items:null, mode:''}, LAB_LS='sachil_lab_local_v1';
+  const labLocal=()=>{ try{ const v=JSON.parse(localStorage.getItem(LAB_LS)||'null'); if(Array.isArray(v)&&v.length) return v; }catch(_){ } return null; };
+  const labLocalSave=a=>{ try{ localStorage.setItem(LAB_LS,JSON.stringify(a)); }catch(_){ toast('이 기기 저장 공간이 부족해요'); } };
+  const labSrvOk=()=>SRV.on&&SRV.ver&&!verLt(SRV.ver,'15.18');
+  async function labCall(op,x){ const r=await api('/api/lab',{json:Object.assign({op},x||{}),tok:PROF.tok}); if(r.ok&&r.j&&Array.isArray(r.j.items)){ LABD.items=r.j.items; return r.j; } toast((r.j&&r.j.error)||'서버에 저장하지 못했어요'); return null; }
+  async function labLoad(){
+    if(labSrvOk()){ LABD.mode='server'; const j=await labCall('list'); if(!j) return false;
+      if(!LABD.items.length){ const src=labLocal()||LAB_SEED; await labCall('seed',{docs:src}); }
+      return true; }
+    LABD.mode='local'; LABD.items=labLocal()||LAB_SEED.map((d,i)=>Object.assign({id:'L'+(i+1), ord:i+1, ts:0},d)); return true; }
+  async function labSaveDoc(d){
+    if(LABD.mode==='server'){ const j=await labCall('save',{id:d.id||0,title:d.title,summary:d.summary,body:d.body}); return j?j.id:null; }
+    const a=LABD.items.slice(); let id=d.id; if(!id){ id='L'+Date.now().toString(36); a.push(Object.assign({},d,{id,ord:a.length+1,ts:Date.now()/1000})); } else { const i=a.findIndex(x=>x.id===id); if(i>=0) a[i]=Object.assign({},a[i],d,{ts:Date.now()/1000}); }
+    LABD.items=a; labLocalSave(a); return id; }
+  async function labDelDoc(id){ if(LABD.mode==='server') return !!(await labCall('del',{id})); LABD.items=LABD.items.filter(x=>x.id!==id); labLocalSave(LABD.items); return true; }
+  async function labOrder(ids){ if(LABD.mode==='server') return !!(await labCall('order',{ids})); const m=new Map(LABD.items.map(x=>[x.id,x])); LABD.items=ids.map(i=>m.get(i)).filter(Boolean); labLocalSave(LABD.items); return true; }
+  const labDl=(blob,name)=>{ const u=URL.createObjectURL(blob), a=document.createElement('a'); a.href=u; a.download=name; window.__lastDlName=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000); };
+  const labFname=t=>String(t||'연구').replace(/[\\/:*?"<>|]/g,'').slice(0,60)+'.hwpx';
+  const labFile=d=>{ const f=String(d.file||''); return f.includes('|')?f.split('|')[0]:''; };
   function renderLab(panel,s){
     if(!isProf()){ panel.innerHTML=secShell(s,`<div class="card lab">${secHead(s)}<p class="lab-lock">${pgIcon('lock')} 교수 모드로 로그인해야 볼 수 있어요.</p><a class="btn primary" href="#login">교수 로그인</a></div>`); return; }
-    const gen=SRV.gen, open=LAB.find(x=>x.k===state.labOpen);
-    if(!open){
-      panel.innerHTML=secShell(s,`<div class="card lab">${secHead(s,'교수 전용')}
-        <div class="lab-grid">${LAB.map(x=>`<button type="button" class="lab-b lab-b-${x.k}" data-lab="${x.k}"><span class="lab-no">${x.k==='qna'?pgIcon('edit'):x.no}</span><span class="lab-tx"><b>${esc(x.t)}</b><span>${esc(x.s)}</span></span><span class="arrow" aria-hidden="true">→</span></button>`).join('')}</div></div>`);
-      panel.querySelector('.lab-grid').addEventListener('click',e=>{ const b=e.target.closest('[data-lab]'); if(!b) return; state.labOpen=b.dataset.lab; renderLab(panel,s); rootScrollTo(0); });
-      return; }
-    const back=`<button type="button" class="btn ghost lab-back" data-lab-back>‹ 연구실</button>`;
-    panel.innerHTML=secShell(s,`<div class="card lab lab-d">${back}
+    if(state.labReload){ state.labReload=false; LABD.items=null; }   /* 메뉴에서 새로 열면 서버에서 다시 받음(다른 기기에서 고친 것) */
+    const gen=SRV.gen, go2=k=>{ state.labOpen=k; renderLab(panel,s); rootScrollTo(0); };
+    const modeNote=()=>LABD.mode==='local'?`<p class="srch-note srch-pend">${pgIcon('warn')} 서버가 아직 ${esc(SRV.ver||'옛 버전')}이라 <b>이 기기에만</b> 저장돼요 — 서버가 15.18 이상이 되면 처음 열 때 이 내용이 서버로 올라가요.</p>`:'';
+    if(state.labOpen==='qna'){ renderLabQna(panel,s,gen,()=>go2(null)); return; }
+    if(!LABD.items){ panel.innerHTML=secShell(s,`<div class="card lab">${secHead(s,'교수 전용')}<p class="srch-note srch-load">불러오는 중…</p></div>`);
+      labLoad().then(ok=>{ if(SRV.gen!==gen||state.route!=='lab') return; if(!ok){ LABD.items=null; panel.querySelector('.srch-load').textContent='연구실 자료를 불러오지 못했어요 — 서버 연결을 확인해 주세요'; return; } renderLab(panel,s); }); return; }
+    const open=state.labOpen, doc=open&&open!=='new'?LABD.items.find(x=>String(x.id)===String(open)):null;
+    if(open==='new'||(doc&&state.labEdit)){ renderLabEdit(panel,s,doc,gen,go2,modeNote); return; }
+    if(doc){ renderLabDoc(panel,s,doc,gen,go2,modeNote); return; }
+    // 목록 — 과제 카드(번호·제목·요약·고친 날·원본 파일) + 질문 모음 + 새 과제 · 순서 바꾸기
+    const L=LABD.items, ord=!!state.labOrder;
+    panel.innerHTML=secShell(s,`<div class="card lab">${secHead(s,'교수 전용')}${modeNote()}
+      <div class="lab-tools"><button type="button" class="btn primary" data-new>＋ 새 연구 과제</button><label class="btn ghost lab-imp">hwpx 불러와 새 과제<input type="file" accept=".hwpx" hidden></label>${L.length>1?`<button type="button" class="btn ghost" data-ord aria-pressed="${ord}">${ord?'순서 바꾸기 끝':'순서 바꾸기'}</button>`:''}</div>
+      <div class="lab-grid">${L.map((x,i)=>`<div class="lab-card"><button type="button" class="lab-b" data-lab="${esc(String(x.id))}"><span class="lab-no">${i+1}</span><span class="lab-tx"><b>${esc(x.title)}</b><span>${esc(x.summary||'')}</span><small>${x.ts?esc(fmtDate(x.ts))+' 저장':''}${labFile(x)?` · ${pgIcon('doc')} ${esc(labFile(x))}`:''}</small></span><span class="arrow" aria-hidden="true">→</span></button>${ord?`<span class="lab-ord"><button type="button" class="btn ghost sm" data-up="${i}" aria-label="위로"${i?'':' disabled'}>▲</button><button type="button" class="btn ghost sm" data-dn="${i}" aria-label="아래로"${i<L.length-1?'':' disabled'}>▼</button></span>`:''}</div>`).join('')}
+        <div class="lab-card"><button type="button" class="lab-b lab-b-qna" data-lab="qna"><span class="lab-no">${pgIcon('edit')}</span><span class="lab-tx"><b>질문 모음</b><span>연구 질문을 직접 올리고 과제별로 한눈에</span></span><span class="arrow" aria-hidden="true">→</span></button></div></div></div>`);
+    const root=panel.querySelector('.lab');
+    root.addEventListener('click',async e=>{ const b=e.target.closest('[data-lab]'); if(b){ state.labEdit=false; go2(b.dataset.lab); return; }
+      if(e.target.closest('[data-new]')){ state.labEdit=true; go2('new'); return; }
+      if(e.target.closest('[data-ord]')){ state.labOrder=!ord; renderLab(panel,s); return; }
+      const u=e.target.closest('[data-up],[data-dn]'); if(u){ const i=+(u.dataset.up??u.dataset.dn), j=u.dataset.up!==undefined?i-1:i+1, ids=L.map(x=>x.id); [ids[i],ids[j]]=[ids[j],ids[i]]; if(await labOrder(ids)&&SRV.gen===gen) renderLab(panel,s); } });
+    root.querySelector('.lab-imp input').addEventListener('change',async e=>{ const f=e.target.files[0]; e.target.value=''; if(!f) return;
+      try{ const r=await HWPX.importDoc(f); state.labDraft={title:r.title||f.name.replace(/\.hwpx$/i,''), summary:r.summary||'', body:r.html, srcFile:f}; state.labEdit=true; go2('new'); toast('hwpx를 불러왔어요 — 확인하고 저장해 주세요'); }
+      catch(err){ toast(String(err.message||'hwpx를 읽지 못했어요')); } });
+  }
+  function renderLabDoc(panel,s,d,gen,go2,modeNote){
+    const fn=labFile(d);
+    panel.innerHTML=secShell(s,`<div class="card lab lab-d"><button type="button" class="btn ghost lab-back" data-back>‹ 연구실</button>${modeNote()}
+      ${pgHead({img:s.icon, t:d.title, s:d.summary||'', meta:d.ts?fmtDate(d.ts)+' 저장'+(d.by?' · '+d.by:''):'', cls:'lab-head'})}
+      <div class="lab-acts"><button type="button" class="btn primary" data-edit>${pgIcon('edit')} 편집</button><button type="button" class="btn ghost" data-hwpx>${pgIcon('down')} hwpx로 저장</button>
+        ${LABD.mode==='server'?`<label class="btn ghost">${pgIcon('doc')} ${fn?'원본 파일 바꾸기':'원본 파일 올리기'}<input type="file" accept=".hwpx,.hwp,.pdf,.docx,.xlsx,.pptx,.jpg,.jpeg,.png,.zip,.txt" hidden data-up></label>`:''}
+        <button type="button" class="btn ghost lab-del" data-del>삭제</button></div>
+      ${fn?`<p class="lab-file">${pgIcon('doc')} 원본: <button type="button" class="linkish" data-get>${esc(fn)}</button> <small>(${Math.max(1,Math.round((d.fsize||0)/1024))}KB)</small> <button type="button" class="btn ghost sm" data-unfile>떼기</button></p>`:''}
+      <article class="lab-art">${labClean(d.body)||'<p class="lab-note">아직 본문이 없어요 — ‘편집’을 눌러 써 주세요.</p>'}</article></div>`);
+    const root=panel.querySelector('.lab');
+    root.addEventListener('click',async e=>{
+      if(e.target.closest('[data-back]')){ go2(null); return; }
+      if(e.target.closest('[data-edit]')){ state.labEdit=true; go2(d.id); return; }
+      if(e.target.closest('[data-hwpx]')){ try{ labDl(await HWPX.exportDoc(d),labFname(d.title)); toast('hwpx로 저장했어요 — 한글에서 열 수 있어요'); }catch(err){ toast('hwpx를 만들지 못했어요: '+String(err.message||'').slice(0,60)); } return; }
+      if(e.target.closest('[data-get]')){ const r=await fetch(SURL('/api/lab/file?id='+encodeURIComponent(d.id)),{headers:{'X-SACHIL':'1','Authorization':'Bearer '+PROF.tok},credentials:SRVBASE?'omit':'same-origin'}).catch(()=>null);
+        if(!r||!r.ok){ toast('원본 파일을 받지 못했어요'); return; } labDl(await r.blob(),fn); return; }
+      if(e.target.closest('[data-unfile]')){ if(await labCall('unfile',{id:d.id})&&SRV.gen===gen) renderLab(panel,s); return; }
+      const del=e.target.closest('[data-del]'); if(del){ if(!del.dataset.arm){ del.dataset.arm='1'; del.textContent='정말 삭제?'; setTimeout(()=>{ if(del.isConnected){ delete del.dataset.arm; del.textContent='삭제'; } },3000); return; }
+        if(await labDelDoc(d.id)){ toast('과제를 지웠어요'); go2(null); } } });
+    const up=root.querySelector('[data-up]'); if(up) up.addEventListener('change',async()=>{ const f=up.files[0]; up.value=''; if(!f) return; toast('올리는 중…');
+      const r=await apiUp('/api/lab/file?id='+encodeURIComponent(d.id), f, {'Content-Type':f.type||'application/octet-stream','X-Filename':encodeURIComponent(f.name)}, null, PROF.tok, 15*60*1000);
+      if(r.ok&&r.j&&Array.isArray(r.j.items)){ LABD.items=r.j.items; toast('원본 파일을 올렸어요'); if(SRV.gen===gen) renderLab(panel,s); } else toast((r.j&&r.j.error)||'올리지 못했어요'); });
+  }
+  function renderLabEdit(panel,s,d,gen,go2,modeNote){
+    const dk='sachil_lab_draft_'+(d?d.id:'new'); let dr=null; try{ dr=JSON.parse(localStorage.getItem(dk)||'null'); }catch(_){ }
+    const src=state.labDraft||(dr&&(!d||dr.t>(d.ts||0)*1000)?dr:null)||d||{title:'',summary:'',body:''}; const srcFile=state.labDraft&&state.labDraft.srcFile; state.labDraft=null;
+    panel.innerHTML=secShell(s,`<div class="card lab lab-d lab-e">${modeNote()}
+      <div class="lab-ebar"><button type="button" class="btn ghost" data-cancel>취소</button><span class="lab-st" aria-live="polite">${dr&&src===dr?'저장 안 된 고친 내용을 불러왔어요':''}</span><label class="btn ghost">${pgIcon('down')} hwpx 불러오기<input type="file" accept=".hwpx" hidden data-imp></label><button type="button" class="btn primary" data-save>저장</button></div>
+      <input class="lab-ti" maxlength="200" placeholder="연구 과제 제목" value="${esc(src.title||'')}" aria-label="제목">
+      <input class="lab-su" maxlength="500" placeholder="한 줄 요약(선택)" value="${esc(src.summary||'')}" aria-label="한 줄 요약">
+      <div class="lab-tb" role="toolbar" aria-label="본문 서식"><button type="button" data-c="h4">소제목</button><button type="button" data-c="p">본문</button><button type="button" data-c="bold"><b>굵게</b></button><button type="button" data-c="ul">• 글머리</button><button type="button" data-c="ol">1. 번호</button><button type="button" data-c="table">표</button><button type="button" data-c="undo" aria-label="되돌리기">↶</button></div>
+      <article class="lab-art lab-ed" contenteditable="true" aria-label="본문" data-ph="본문을 쓰세요 — 한글·워드에서 복사해 붙여넣어도 돼요">${labClean(src.body)}</article></div>`);
+    const root=panel.querySelector('.lab'), ed=root.querySelector('.lab-ed'), st=root.querySelector('.lab-st');
+    const cur=()=>({title:root.querySelector('.lab-ti').value.trim(), summary:root.querySelector('.lab-su').value.trim(), body:labClean(ed.innerHTML)});
+    let tmr=0; const keep=()=>{ clearTimeout(tmr); tmr=setTimeout(()=>{ try{ localStorage.setItem(dk,JSON.stringify(Object.assign(cur(),{t:Date.now()}))); st.textContent='임시 저장됨(이 기기)'; }catch(_){ } },600); };
+    root.addEventListener('input',keep);
+    ed.addEventListener('paste',e=>{ const h=e.clipboardData&&(e.clipboardData.getData('text/html')||''), t=e.clipboardData&&e.clipboardData.getData('text/plain'); e.preventDefault();
+      const ins=h?labClean(h):String(t||'').split(/\n{2,}/).map(x=>`<p>${esc(x).replace(/\n/g,'<br>')}</p>`).join(''); document.execCommand('insertHTML',false,ins); keep(); });
+    root.querySelector('.lab-tb').addEventListener('mousedown',e=>e.preventDefault());
+    root.querySelector('.lab-tb').addEventListener('click',e=>{ const b=e.target.closest('[data-c]'); if(!b) return; ed.focus(); const c=b.dataset.c;
+      if(c==='h4'||c==='p') document.execCommand('formatBlock',false,c); else if(c==='bold') document.execCommand('bold'); else if(c==='ul') document.execCommand('insertUnorderedList'); else if(c==='ol') document.execCommand('insertOrderedList'); else if(c==='undo') document.execCommand('undo');
+      else if(c==='table'){   /* 표는 커서가 있는 문단·목록 '다음'에 따로 넣는다(목록 안에 들어가면 hwpx에서 표가 풀림) */
+        const sel=getSelection(); let n=sel&&sel.rangeCount?sel.getRangeAt(0).startContainer:null; while(n&&n.parentNode!==ed) n=n.parentNode;
+        const t=document.createElement('template'); t.innerHTML='<table><tbody><tr><th>항목</th><th>내용</th></tr><tr><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td></tr></tbody></table><p><br></p>';
+        const tb=t.content.firstChild, after=t.content.lastChild; if(n) n.after(tb,after); else ed.append(tb,after);
+        const td=tb.querySelector('td'); if(td){ const r=document.createRange(); r.selectNodeContents(td); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); } }
+      keep(); });
+    root.querySelector('[data-imp]').addEventListener('change',async e=>{ const f=e.target.files[0]; e.target.value=''; if(!f) return;
+      try{ const r=await HWPX.importDoc(f); if(r.title&&!root.querySelector('.lab-ti').value.trim()) root.querySelector('.lab-ti').value=r.title; if(r.summary&&!root.querySelector('.lab-su').value.trim()) root.querySelector('.lab-su').value=r.summary; ed.innerHTML=r.html||ed.innerHTML; keep(); toast('hwpx 본문을 불러왔어요'); }catch(err){ toast(String(err.message||'hwpx를 읽지 못했어요')); } });
+    root.querySelector('[data-cancel]').addEventListener('click',()=>{ try{ localStorage.removeItem(dk); }catch(_){ } state.labEdit=false; go2(d?d.id:null); });
+    root.querySelector('[data-save]').addEventListener('click',async e=>{ const v=cur(); if(!v.title){ root.querySelector('.lab-ti').focus(); toast('제목을 적어 주세요'); return; }
+      e.target.disabled=true; const id=await labSaveDoc(Object.assign({id:d?d.id:0},v)); e.target.disabled=false; if(!id) return;
+      try{ localStorage.removeItem(dk); }catch(_){ }
+      if(srcFile&&LABD.mode==='server'){ const r=await apiUp('/api/lab/file?id='+encodeURIComponent(id), srcFile, {'Content-Type':'application/hwp+zip','X-Filename':encodeURIComponent(srcFile.name)}, null, PROF.tok, 15*60*1000); if(r.ok&&r.j&&Array.isArray(r.j.items)) LABD.items=r.j.items; }
+      toast(LABD.mode==='server'?'서버에 저장했어요':'이 기기에 저장했어요'); state.labEdit=false; if(SRV.gen===gen) go2(id); });
+  }
+  function renderLabQna(panel,s,gen,back){
+    const open={t:'질문 모음', s:'연구 질문을 직접 올리고 과제별로 한눈에'};
+    panel.innerHTML=secShell(s,`<div class="card lab lab-d"><button type="button" class="btn ghost lab-back" data-lab-back>‹ 연구실</button>
       ${pgHead({img:s.icon, t:open.t, s:open.s, cls:'lab-head'})}
-      <div class="lab-body">${open.body?open.body():'<p class="srch-note srch-load">질문을 불러오는 중…</p>'}</div></div>`);
-    panel.querySelector('[data-lab-back]').addEventListener('click',()=>{ state.labOpen=null; renderLab(panel,s); rootScrollTo(0); });
-    if(open.k!=='qna') return;
+      <div class="lab-body"><p class="srch-note srch-load">질문을 불러오는 중…</p></div></div>`);
+    panel.querySelector('[data-lab-back]').addEventListener('click',back);
     // V240: 질문 모음 — 교수가 직접 올리고(과제·질문·메모) 고치고 지우기. 서버 chat.db에 교수 전용으로(서버 15.17+)
     const box=panel.querySelector('.lab-body'); let items=null, f='all', edit=null;
     const call=async(op,x)=>{ const r=await api('/api/admin/ai',{json:Object.assign({action:'labq',op},x||{}),tok:PROF.tok}); if(r.ok&&r.j&&Array.isArray(r.j.items)){ items=r.j.items; return true; } toast((r.j&&r.j.error)||'서버에 저장하지 못했어요'); return false; };
