@@ -2683,6 +2683,25 @@ html:root body .convo .convo-note:has(.convo-empty){background:transparent}
 .lab-q td:nth-child(3){white-space:nowrap;font-size:13px}
 @media (max-width:599px){ .lab-q thead{display:none} .lab-q tr{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;padding:10px 0;border-bottom:1px solid #E4E7EC} .lab-q td{border:0;padding:0} .lab-q td:nth-child(2){grid-column:2} .lab-q td:nth-child(3),.lab-q td:nth-child(4){grid-column:2;font-size:12px;color:#475467} .lab-q td:first-child{grid-row:span 3} }
 @media (pointer:coarse){ .lab-qf .hb{min-height:44px} }
+
+/* V240: 질문 모음 올리기 */
+.lab-qadd{display:grid;gap:8px;margin:8px 0 14px;padding:12px;border:1px solid var(--c-line,#E4E7EC);border-radius:12px;background:#F9FAFB}
+.lab-qadd textarea{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--c-line-2,#D0D5DD);border-radius:10px;font:inherit;font-size:15px;resize:vertical;background:#fff}
+.lab-qt{display:flex;flex-wrap:wrap;gap:6px}
+.lab-qt label{position:relative}
+.lab-qt input{position:absolute;opacity:0;inset:0}
+.lab-qt span{display:inline-flex;align-items:center;min-height:36px;padding:0 12px;border:1px solid var(--c-line-2,#D0D5DD);border-radius:99px;background:#fff;font-size:14px;font-weight:600;cursor:pointer}
+.lab-qt input:checked+span{border-color:#244EA2;background:#EEF4FF;color:#244EA2;font-weight:700}
+.lab-qt input:focus-visible+span{outline:3px solid #244EA2;outline-offset:2px}
+.lab-qbtn{display:flex;gap:8px}
+.lab-tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:700;background:#EEF2F8;color:#0B1B3F}
+.lab-tag.t-water{background:#E0F2FE;color:#075985}.lab-tag.t-hydrant{background:#FEE4E2;color:#912018}.lab-tag.t-coupling{background:#FEF0C7;color:#93370D}
+.lab-q td.act{white-space:nowrap;text-align:right}
+.lab-q td.act .btn{min-height:36px;margin-left:4px}
+.lab-q .lab-del{color:#B42318}
+.lab-q tr.ed td{background:#FFFAEB}
+@media (pointer:coarse){ .lab-qt span,.lab-q td.act .btn{min-height:44px} }
+@media (max-width:599px){ .lab-q td.act{grid-column:2;text-align:left} .lab-q td.act .btn{margin:4px 6px 0 0} }
 </style>
 </head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
@@ -3663,7 +3682,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v239</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v240</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4683,8 +4702,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V239', SRV_VER='15.16';
+  const APP_VER='V240', SRV_VER='15.17';
   const UPDATES=[
+    {v:'V240', d:'2026-11-04', t:['연구실 ‘질문 모음’: 교수가 직접 질문을 올리고(관련 과제 · 질문 · 메모) 고치고 지울 수 있게 — 과제별로 거르기, 서버에 교수 전용으로 저장(서버 15.17)']},
     {v:'V239', d:'2026-11-04', t:['메뉴 SACHIL에 ‘지휘역량강화센터 연구실’ 추가(방재실 다음 칸, 교수 로그인 때만 보임)','연구 과제 3가지(상수도 흐름 구조 · 소화전 급수량/방수 거리/방수량 실증 · 소방차량 100mm 보수구 구조 변경)와 질문 모음(주요 질의응답 전체를 표로, 답변 대기만 거르기)']},
     {v:'V238', d:'2026-10-28', t:['검색: 새로 올린 자료를 서버가 아직 읽는 중이면 검색 결과 맨 위에 ‘어떤 파일 · 몇 쪽째(예: 212/640쪽)’를 표시 — 다 읽으면 그 내용도 찾아요(큰 파일은 몇 분)']},
     {v:'V237', d:'2026-10-28', t:['메뉴 자료 올리기 크기 제한(60MB) 없앰 — 큰 파일은 48MB씩 나눠 올리고 서버가 이어 붙여요(인터넷이 잠깐 끊기면 그 조각만 다시)','서버 15.14 이상에서 동작 — 서버가 옛 버전이면 60MB 넘는 파일은 올리기 전에 알려 줌','서버 PC 저장 공간이 500MB 아래로 남으면 받지 않음(서버 멈춤 방지)']},
@@ -5646,7 +5666,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         <ol class="lab-steps">${['화재경계지구','산업단지','대응2단계 발생 지역','인천 전지역'].map((x,i)=>`<li><span class="n">${i+1}단계</span><b>${x}</b></li>`).join('')}</ol>`},
     {k:'coupling', no:3, t:'소방차량 100mm 보수구 구조 변경에 관한 연구', s:'소방차량 100mm 보수구의 구조 변경',
       body:()=>`<p class="lab-lead">소방차량 100mm 보수구의 구조를 바꿔 급수·연결 효율을 높이는 방안을 연구합니다.</p><p class="lab-note">세부 내용은 준비 중이에요.</p>`},
-    {k:'qna', no:4, t:'질문 모음', s:'주요 질의응답에 올라온 질문을 한눈에', body:null}];
+    {k:'qna', no:4, t:'질문 모음', s:'연구 질문을 직접 올리고 과제별로 한눈에', body:null}];
+  const LABT={water:'상수도 흐름',hydrant:'소화전 실증',coupling:'100mm 보수구',etc:'기타'};   /* V240: 질문 모음 과제 꼬리표 */
   function renderLab(panel,s){
     if(!isProf()){ panel.innerHTML=secShell(s,`<div class="card lab">${secHead(s)}<p class="lab-lock">${pgIcon('lock')} 교수 모드로 로그인해야 볼 수 있어요.</p><a class="btn primary" href="#login">교수 로그인</a></div>`); return; }
     const gen=SRV.gen, open=LAB.find(x=>x.k===state.labOpen);
@@ -5661,15 +5682,33 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       <div class="lab-body">${open.body?open.body():'<p class="srch-note srch-load">질문을 불러오는 중…</p>'}</div></div>`);
     panel.querySelector('[data-lab-back]').addEventListener('click',()=>{ state.labOpen=null; renderLab(panel,s); rootScrollTo(0); });
     if(open.k!=='qna') return;
-    (async()=>{ const box=panel.querySelector('.lab-body'); if(!SRV.on){ box.innerHTML='<p class="srch-note">서버(47망)에 연결되면 질문을 볼 수 있어요.</p>'; return; }
-      const r=await api('/api/qna'); if(SRV.gen!==gen||!box.isConnected) return;
-      const it=(r.ok&&r.j&&r.j.items)||[]; if(!it.length){ box.innerHTML='<p class="srch-note">아직 올라온 질문이 없어요.</p>'; return; }
-      const wait=it.filter(x=>!x.a).length;
-      const draw=f=>{ const L=f==='wait'?it.filter(x=>!x.a):it;
-        box.innerHTML=`<div class="lab-qf" role="group" aria-label="질문 거르기"><button type="button" class="hb${f!=='wait'?' on':''}" data-f="all">전체 ${it.length}</button><button type="button" class="hb${f==='wait'?' on':''}" data-f="wait">답변 대기 ${wait}</button><a class="btn ghost sm" href="#faq">주요 질의응답에서 답하기 →</a></div>
-          <table class="lab-q"><thead><tr><th>#</th><th>질문</th><th>올린 사람 · 날짜</th><th>답변</th></tr></thead><tbody>${L.map((x,i)=>`<tr class="${x.a?'':'wait'}"><td>${i+1}</td><td>${esc(x.q)}${x.a?`<p class="a">${esc(x.a)}</p>`:''}</td><td>${esc(x.name||'익명')}<br><small>${esc(fmtDate(x.ts))}</small></td><td>${x.a?'완료':'<b>대기</b>'}</td></tr>`).join('')}</tbody></table>`;
-        box.querySelector('.lab-qf').addEventListener('click',e=>{ const b=e.target.closest('[data-f]'); if(b) draw(b.dataset.f); }); };
-      draw('all'); })();
+    // V240: 질문 모음 — 교수가 직접 올리고(과제·질문·메모) 고치고 지우기. 서버 chat.db에 교수 전용으로(서버 15.17+)
+    const box=panel.querySelector('.lab-body'); let items=null, f='all', edit=null;
+    const call=async(op,x)=>{ const r=await api('/api/admin/ai',{json:Object.assign({action:'labq',op},x||{}),tok:PROF.tok}); if(r.ok&&r.j&&Array.isArray(r.j.items)){ items=r.j.items; return true; } toast((r.j&&r.j.error)||'서버에 저장하지 못했어요'); return false; };
+    const draw=()=>{ if(!box.isConnected) return;
+      const cnt=k=>items.filter(x=>k==='all'||x.topic===k).length, L=items.filter(x=>f==='all'||x.topic===f), e=edit&&items.find(x=>x.id===edit);
+      box.innerHTML=`<form class="lab-qadd" autocomplete="off">
+          <div class="lab-qt" role="radiogroup" aria-label="관련 과제">${Object.entries(LABT).map(([k,v])=>`<label><input type="radio" name="tp" value="${k}"${(e?e.topic:(f!=='all'?f:'etc'))===k?' checked':''}><span>${v}</span></label>`).join('')}</div>
+          <textarea name="q" rows="2" maxlength="2000" placeholder="질문을 적어 주세요" required>${e?esc(e.q):''}</textarea>
+          <textarea name="note" rows="2" maxlength="4000" placeholder="메모·답(선택)">${e?esc(e.note||''):''}</textarea>
+          <div class="lab-qbtn"><button type="submit" class="btn primary">${e?'수정 저장':'질문 추가'}</button>${e?'<button type="button" class="btn ghost" data-cancel>취소</button>':''}</div></form>
+        <div class="lab-qf" role="group" aria-label="과제별로 보기"><button type="button" class="hb${f==='all'?' on':''}" data-f="all">전체 ${cnt('all')}</button>${Object.entries(LABT).map(([k,v])=>`<button type="button" class="hb${f===k?' on':''}" data-f="${k}">${v} ${cnt(k)}</button>`).join('')}</div>
+        ${L.length?`<table class="lab-q"><thead><tr><th>#</th><th>질문</th><th>과제 · 날짜</th><th></th></tr></thead><tbody>${L.map((x,i)=>`<tr data-id="${x.id}"${x.id===edit?' class="ed"':''}><td>${L.length-i}</td><td>${esc(x.q)}${x.note?`<p class="a">${esc(x.note)}</p>`:''}</td><td><span class="lab-tag t-${esc(x.topic)}">${esc(LABT[x.topic]||'기타')}</span><br><small>${esc(fmtDate(x.ts))}${x.by?' · '+esc(x.by):''}</small></td><td class="act"><button type="button" class="btn ghost sm" data-ed>수정</button><button type="button" class="btn ghost sm lab-del" data-del>삭제</button></td></tr>`).join('')}</tbody></table>`:`<p class="srch-note">${f==='all'?'아직 올린 질문이 없어요 — 위에서 첫 질문을 추가해 보세요':'이 과제에 올린 질문이 없어요'}</p>`}`;
+    };
+    box.addEventListener('submit',async e=>{ e.preventDefault(); const fm=e.target.closest('form'); if(!fm) return; const b=fm.querySelector('[type=submit]'); const tp=(fm.querySelector('[name=tp]:checked')||{}).value||'etc';
+      const qv=fm.q.value.trim(); if(!qv){ fm.q.focus(); return; } b.disabled=true;
+      const ok=await call(edit?'edit':'add',{id:edit||0, topic:tp, q:qv, note:fm.note.value.trim()}); if(!box.isConnected) return; b.disabled=false;
+      if(ok){ toast(edit?'질문을 고쳤어요':'질문을 추가했어요'); edit=null; draw(); } });
+    box.addEventListener('click',async e=>{ const fb=e.target.closest('[data-f]'); if(fb){ f=fb.dataset.f; draw(); return; }
+      if(e.target.closest('[data-cancel]')){ edit=null; draw(); return; }
+      const tr=e.target.closest('tr[data-id]'); if(!tr) return; const id=+tr.dataset.id;
+      if(e.target.closest('[data-ed]')){ edit=id; draw(); const t=box.querySelector('textarea[name=q]'); if(t){ t.focus(); try{ t.scrollIntoView({block:'center'}); }catch(_){ } } return; }
+      const d=e.target.closest('[data-del]'); if(!d) return;
+      if(!d.dataset.arm){ d.dataset.arm='1'; d.textContent='정말 삭제?'; setTimeout(()=>{ if(d.isConnected){ delete d.dataset.arm; d.textContent='삭제'; } },3000); return; }
+      if(await call('del',{id})){ if(edit===id) edit=null; toast('질문을 지웠어요'); draw(); } });
+    (async()=>{ if(!SRV.on){ box.innerHTML='<p class="srch-note">서버(47망)에 연결되면 질문을 올리고 볼 수 있어요.</p>'; return; }
+      if(SRV.ver&&verLt(SRV.ver,'15.17')){ box.innerHTML=`<p class="srch-note">질문 올리기는 서버 15.17부터 돼요(지금 서버 ${esc(SRV.ver)}) — 서버가 업데이트되면 바로 쓸 수 있어요.</p>`; return; }
+      const ok=await call('list'); if(SRV.gen!==gen||!box.isConnected) return; if(!ok){ box.innerHTML='<p class="srch-note">질문을 불러오지 못했어요 — 교수 로그인·서버 연결을 확인해 주세요.</p>'; return; } draw(); })();
   }
   function secShell(s,inner){ return `<div class="sx" data-sx="${esc(s.slug)}"><div class="sx-in">${secNavHtml(s.slug)}<div class="sx-main">${inner}${secPager(s.slug)}</div></div></div>`; }
   function secNavSync(panel){ const nav=panel.querySelector('.sx-nav'), a=nav&&nav.querySelector('a[aria-current]'); if(!a||nav.scrollHeight<=nav.clientHeight) return; const t=a.offsetTop-nav.clientHeight/2+a.offsetHeight/2; nav.scrollTop=Math.max(0,t); }
@@ -5704,7 +5743,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   const isProf=()=>PROF.ok;
   { const lb=document.getElementById('profLogout'); if(lb) lb.addEventListener('click',()=>profLogout()); }
   function syncProfUI(){ const on=isProf(); document.body.classList.toggle('prof',on); const b=document.getElementById('profBar'); if(b) b.hidden=!on;
-    document.querySelectorAll('#sheetGrid a.profonly').forEach(a=>{ a.hidden=!on; }); const l=document.getElementById('profLink'); if(l) l.hidden=on; if(window.__repProf) window.__repProf(); if(window.__rnRedraw) window.__rnRedraw(); }   // 교수로 로그인돼 있으면 메뉴의 '교수 로그인' 링크는 숨김(V88)
+    document.querySelectorAll('#sheetGrid a.profonly').forEach(a=>{ a.hidden=!on; }); const l=document.getElementById('profLink'); if(l) l.hidden=on; if(window.__repProf) window.__repProf(); if(window.__rnRedraw) window.__rnRedraw();
+    if(state.route==='lab'&&!!document.querySelector('#panel .lab-lock')===on) render(); }   /* V240: 연구실을 연 채로 교수 확인이 끝나면(또는 로그아웃) 다시 그림 */   // 교수로 로그인돼 있으면 메뉴의 '교수 로그인' 링크는 숨김(V88)
   async function profLogout(){ try{ await api('/api/logout',{json:{},tok:PROF.tok}); }catch(_){ } setProf(''); syncProfUI(); toast('교수 모드에서 로그아웃했어요'); render(); }
   async function checkProf(){
     if(!PROF.tok||!SRV.on){ PROF.ok=false; PROF.checked=!PROF.tok; return false; }   // V143: 서버 연결 전이면 '확인함'으로 두지 않는다(연결되면 다시 확인)
