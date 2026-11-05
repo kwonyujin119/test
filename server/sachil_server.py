@@ -46,7 +46,7 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False), '.csv': ('text/csv; charset=utf-8', False),   # 15.12: CSV(엑셀에서 저장한 표)
 }
-VERSION = '15.20'
+VERSION = '15.21'
 APP_VERSION = 'V243'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
@@ -829,12 +829,15 @@ class H(BaseHTTPRequestHandler):
         if not self.cors_origin():
             return self.send(403, b'', 'text/plain', log=False)
         return self.send(204, b'', 'text/plain', {'Access-Control-Allow-Methods': 'GET, POST, DELETE, HEAD',
-                                                  'Access-Control-Allow-Headers': 'X-SACHIL, Content-Type, X-Filename, X-Part-Size, X-Total-Size, Authorization, Range',
+                                                  'Access-Control-Allow-Headers': 'X-SACHIL, X-ALBUM, Content-Type, X-Filename, X-Part-Size, X-Total-Size, Authorization, Range',
                                                   'Access-Control-Max-Age': '600'}, log=False)
 
     def guard(self):
-        """쓰기 요청은 앱이 붙이는 헤더가 있어야 한다(다른 사이트에서 오는 요청 차단)."""
-        return self.headers.get('X-SACHIL') == '1'
+        """쓰기 요청은 앱이 붙이는 헤더가 있어야 한다(다른 사이트에서 오는 요청 차단).
+        15.21: 사진 앨범 화면(test3)은 X-ALBUM: 1을 붙인다 — /api/album/ 에서만 같은 효력(PC에서 임시로 고친 것을 저장소에 반영)."""
+        if self.headers.get('X-SACHIL') == '1':
+            return True
+        return self.path.startswith('/api/album/') and self.headers.get('X-ALBUM') == '1'
 
     # --- 라우팅
     def do_HEAD(self):
