@@ -46,8 +46,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False), '.csv': ('text/csv; charset=utf-8', False),   # 15.12: CSV(엑셀에서 저장한 표)
 }
-VERSION = '15.19'
-APP_VERSION = 'V242'
+VERSION = '15.20'
+APP_VERSION = 'V243'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 500 * 1024 * 1024         # 15.19: 47망·디브리핑룸 파일 1개 500MB(config chat_max_mb) — 48MB 조각으로 받아 디스크에 바로 씀(예전 10MB, 통째로 메모리)
@@ -243,6 +243,8 @@ CREATE TABLE IF NOT EXISTS maps(room INTEGER PRIMARY KEY, data TEXT, ts REAL);
 CREATE TABLE IF NOT EXISTS album(id TEXT PRIMARY KEY, who TEXT, name TEXT, mime TEXT, size INTEGER, w INTEGER, h INTEGER, memo TEXT, taken REAL, ts REAL, thumb INTEGER DEFAULT 0);
 CREATE INDEX IF NOT EXISTS ix_album_taken ON album(taken);
 CREATE TABLE IF NOT EXISTS album_sessions(token TEXT PRIMARY KEY, who TEXT, admin INTEGER, created REAL, seen REAL, ip TEXT);
+CREATE TABLE IF NOT EXISTS lab_fd(id INTEGER PRIMARY KEY AUTOINCREMENT, parent INTEGER, name TEXT, by TEXT, ts REAL);
+CREATE TABLE IF NOT EXISTS lab_it(id INTEGER PRIMARY KEY AUTOINCREMENT, folder INTEGER, name TEXT, fn TEXT, size INTEGER, note TEXT, by TEXT, ts REAL);
 CREATE TABLE IF NOT EXISTS lab_doc(id INTEGER PRIMARY KEY AUTOINCREMENT, ord INTEGER, title TEXT, summary TEXT, body TEXT, file TEXT, fsize INTEGER, by TEXT, ts REAL);
 CREATE TABLE IF NOT EXISTS lab_q(id INTEGER PRIMARY KEY AUTOINCREMENT, topic TEXT, q TEXT, note TEXT, by TEXT, ts REAL, ets REAL);
 INSERT OR IGNORE INTO members SELECT room, user, seen FROM reads;
@@ -941,6 +943,8 @@ class H(BaseHTTPRequestHandler):
             if m:
                 return self.lib_get(m.group(1), urllib.parse.unquote(m.group(2)))
             self.user = self.get_user()
+            if path == '/api/lab/lib/file':   # 15.20: 연구실 자료실 파일 받기 — 교수만
+                return self.lablib_get(urllib.parse.parse_qs(qs))
             if path == '/api/lab/file':   # 15.18: 연구실 원본 파일(hwpx 등) 내려받기 — 교수만
                 return self.lab_file_get(urllib.parse.parse_qs(qs))
             if path == '/api/report/tpl':   # V125: 교수가 정한 보고서 규칙 초안 양식(모든 기기 공통). 비어 있으면 앱 기본 양식
@@ -1035,6 +1039,10 @@ class H(BaseHTTPRequestHandler):
                 return self.lab_api()
             if path == '/api/lab/file':
                 return self.lab_file_put(urllib.parse.parse_qs(qs))
+            if path == '/api/lab/lib':   # 15.20: 연구실 자료실(폴더·파일) — 교수만
+                return self.lablib_api()
+            if path == '/api/lab/lib/up':
+                return self.lablib_up(urllib.parse.parse_qs(qs))
             if path == '/api/admin/ai':
                 return self.admin_ai()
             m = re.fullmatch(r'/api/lib/([a-z\-]{2,20})/upload', path)
@@ -1901,6 +1909,213 @@ class H(BaseHTTPRequestHandler):
             if os.path.exists(tmp):
                 os.remove(tmp)
         return self.send(200, {'ok': True, 'items': self.lab_rows()}, log=False)
+
+    # --- 15.20: 지휘역량강화센터 연구실 '자료실' — 폴더(lab_fd, 여러 단계) + 파일(lab_it, data\lab\lib\<id>). 교수만 보고 고친다
+    LABLIB_BAD = ('.exe', '.bat', '.cmd', '.com', '.msi', '.ps1', '.vbs', '.js', '.jse', '.wsf', '.scr', '.lnk', '.html', '.htm', '.svg', '.hta', '.jar', '.dll')
+    LABLIB_DIR = os.path.join(DATA, 'lab', 'lib')
+
+    def lablib_admin(self):
+        return bool(self.user) and self.user['role'] == 'admin'
+
+    def lablib_state(self, folder):
+        f = to_int(str(folder or 0), 0)
+        if f and not q('SELECT id FROM lab_fd WHERE id=?', (f,), one=True):
+            f = 0
+        path, cur = [], f
+        while cur:
+            r = q('SELECT id, parent, name FROM lab_fd WHERE id=?', (cur,), one=True)
+            if not r:
+                break
+            path.insert(0, {'id': r['id'], 'name': r['name']})
+            cur = r['parent'] or 0
+            if len(path) > 30:
+                break
+        dirs = [dict(r) for r in q('SELECT id, name, ts, by, (SELECT COUNT(*) FROM lab_fd c WHERE c.parent=lab_fd.id) + (SELECT COUNT(*) FROM lab_it i WHERE i.folder=lab_fd.id) n FROM lab_fd WHERE parent=? ORDER BY name', (f,))]
+        files = [dict(r) for r in q('SELECT id, name, size, note, by, ts FROM lab_it WHERE folder=? ORDER BY name', (f,))]
+        tot = q('SELECT COUNT(*) n, COALESCE(SUM(size),0) s FROM lab_it', one=True)
+        return {'ok': True, 'folder': f, 'path': path, 'dirs': dirs, 'files': files, 'total': {'n': tot['n'], 'size': tot['s']}}
+
+    def lablib_sub(self, fid):
+        """폴더와 그 아래 모든 폴더 id(자기 포함)"""
+        out, todo = [], [fid]
+        while todo and len(out) < 5000:
+            x = todo.pop()
+            out.append(x)
+            todo += [r['id'] for r in q('SELECT id FROM lab_fd WHERE parent=?', (x,))]
+        return out
+
+    def lablib_api(self):
+        if not self.lablib_admin():
+            return self.err(403, '교수(관리자)만 쓸 수 있습니다')
+        j = self.body_json(20000)
+        op = str(j.get('op') or 'list')
+        folder = to_int(str(j.get('folder') or 0), 0)
+        clean = lambda v: re.sub(r'[\x00-\x1f\x7f<>:"/\\|?*]', '', str(v or '')).strip().strip('.')[:120]
+        if op == 'search':
+            k = str(j.get('q') or '').strip()[:60]
+            if not k:
+                return self.send(200, {'ok': True, 'dirs': [], 'files': []}, log=False)
+            like = '%' + k.replace('%', '').replace('_', '') + '%'
+            dirs = [dict(r) for r in q('SELECT id, name, parent, ts FROM lab_fd WHERE name LIKE ? ORDER BY name LIMIT 100', (like,))]
+            files = [dict(r) for r in q('SELECT id, name, size, note, folder, ts, by FROM lab_it WHERE name LIKE ? OR note LIKE ? ORDER BY name LIMIT 300', (like, like))]
+            names = {r['id']: r['name'] for r in q('SELECT id, name FROM lab_fd')}
+            for x in files:
+                x['where'] = names.get(x['folder'], '자료실')
+            for x in dirs:
+                x['where'] = names.get(x['parent'], '자료실')
+            return self.send(200, {'ok': True, 'dirs': dirs, 'files': files}, log=False)
+        if op == 'tree':
+            return self.send(200, {'ok': True, 'dirs': [dict(r) for r in q('SELECT id, parent, name FROM lab_fd ORDER BY name')]}, log=False)
+        if op == 'mkdir':
+            name = clean(j.get('name'))
+            if not name:
+                return self.err(400, '폴더 이름을 적어 주세요')
+            if q('SELECT id FROM lab_fd WHERE parent=? AND name=?', (folder, name), one=True):
+                return self.err(400, '같은 이름의 폴더가 있습니다')
+            if (q('SELECT COUNT(*) c FROM lab_fd', one=True) or {'c': 0})['c'] >= 2000:
+                return self.err(400, '폴더는 2000개까지입니다')
+            q('INSERT INTO lab_fd(parent,name,by,ts) VALUES(?,?,?,?)', (folder, name, self.user['name'], time.time()), commit=True)
+        elif op in ('rename', 'note'):
+            tid, kind = to_int(str(j.get('id') or 0), 0), str(j.get('kind') or 'file')
+            if op == 'note':
+                q('UPDATE lab_it SET note=? WHERE id=?', (str(j.get('note') or '').strip()[:500], tid), commit=True)
+            else:
+                name = clean(j.get('name'))
+                if not name:
+                    return self.err(400, '이름을 적어 주세요')
+                if kind == 'dir':
+                    cur = q('SELECT parent FROM lab_fd WHERE id=?', (tid,), one=True)
+                    if cur and q('SELECT id FROM lab_fd WHERE parent=? AND name=? AND id<>?', (cur['parent'], name, tid), one=True):
+                        return self.err(400, '같은 이름의 폴더가 있습니다')
+                    q('UPDATE lab_fd SET name=? WHERE id=?', (name, tid), commit=True)
+                else:
+                    old = q('SELECT name FROM lab_it WHERE id=?', (tid,), one=True)
+                    if old and not os.path.splitext(name)[1] and os.path.splitext(old['name'])[1]:
+                        name += os.path.splitext(old['name'])[1]   # 확장자를 지우고 바꾸면 원래 확장자를 붙여 둔다
+                    if os.path.splitext(name)[1].lower() in self.LABLIB_BAD:
+                        return self.err(400, '그 확장자로는 바꿀 수 없습니다')
+                    q('UPDATE lab_it SET name=? WHERE id=?', (name, tid), commit=True)
+        elif op == 'move':
+            to = to_int(str(j.get('to') or 0), 0)
+            if to and not q('SELECT id FROM lab_fd WHERE id=?', (to,), one=True):
+                return self.err(404, '옮길 폴더가 없습니다')
+            for x in (j.get('items') or [])[:500]:
+                tid, kind = to_int(str((x or {}).get('id') or 0), 0), str((x or {}).get('kind') or 'file')
+                if kind == 'dir':
+                    if to in self.lablib_sub(tid):
+                        return self.err(400, '폴더를 자기 안(또는 그 아래)으로 옮길 수 없습니다')
+                    q('UPDATE lab_fd SET parent=? WHERE id=?', (to, tid), commit=True)
+                else:
+                    q('UPDATE lab_it SET folder=? WHERE id=?', (to, tid), commit=True)
+        elif op == 'del':
+            for x in (j.get('items') or [])[:500]:
+                tid, kind = to_int(str((x or {}).get('id') or 0), 0), str((x or {}).get('kind') or 'file')
+                fids = self.lablib_sub(tid) if kind == 'dir' else []
+                rows = q('SELECT id, fn FROM lab_it WHERE folder IN (%s)' % ','.join('?' * len(fids)), tuple(fids)) if fids else q('SELECT id, fn FROM lab_it WHERE id=?', (tid,))
+                for r in rows:
+                    try:
+                        os.remove(os.path.join(self.LABLIB_DIR, r['fn']))
+                    except OSError:
+                        pass
+                    q('DELETE FROM lab_it WHERE id=?', (r['id'],), commit=True)
+                for fd in fids:
+                    q('DELETE FROM lab_fd WHERE id=?', (fd,), commit=True)
+        return self.send(200, self.lablib_state(folder), log=False)
+
+    def lablib_up(self, args):
+        """자료실 파일 올리기 — 48MB 조각(?uid&part&parts)으로 받아 디스크에 이어 씀. 마지막 조각에서 목록에 넣는다."""
+        if not self.lablib_admin():
+            return self.err(403, '교수(관리자)만 올릴 수 있습니다')
+        folder = to_int((args.get('folder') or ['0'])[0], 0)
+        if folder and not q('SELECT id FROM lab_fd WHERE id=?', (folder,), one=True):
+            return self.err(404, '폴더가 없습니다(다른 기기에서 지웠을 수 있어요)')
+        n = self.clen()
+        if n <= 0 or n > LIB_PART_MAX:
+            self.close_connection = True
+            return self.err(413, '한 번에 보내는 조각이 너무 큽니다(앱을 새로고침해 다시 올려 주세요)')
+        name = re.sub(r'[\x00-\x1f\x7f<>:"/\\|?*]', '', urllib.parse.unquote(self.headers.get('X-Filename') or '')).strip().strip('.')[:120]
+        if not name or os.path.splitext(name)[1].lower() in self.LABLIB_BAD:
+            self.close_connection = True
+            return self.err(415, '실행 파일·웹 문서(exe·bat·js·html 등)는 올릴 수 없습니다')
+        uid = re.sub(r'[^0-9a-f]', '', (args.get('uid') or [''])[0])[:32]
+        part, parts = to_int((args.get('part') or ['0'])[0], 0), to_int((args.get('parts') or ['1'])[0], 1)
+        if uid and (len(uid) < 12 or not 0 <= part < parts <= 100000):
+            self.close_connection = True
+            return self.err(400, '조각 번호가 맞지 않습니다')
+        os.makedirs(self.LABLIB_DIR, exist_ok=True)
+        if part == 0:
+            total = to_int(self.headers.get('X-Total-Size') or str(n), n)
+            try:
+                free = shutil.disk_usage(self.LABLIB_DIR).free
+            except OSError:
+                free = 0
+            if free and free < total + 512 * 1048576:
+                self.close_connection = True
+                return self.err(507, '서버 PC 저장 공간이 부족합니다(500MB 이상 남겨 주세요)')
+        tmp = os.path.join(self.LABLIB_DIR, '.up-' + (uid if uid else secrets.token_hex(8)))
+        have = 0
+        if uid and part:
+            have = os.path.getsize(tmp) if os.path.exists(tmp) else 0
+            hint = to_int(self.headers.get('X-Part-Size') or '0', 0)
+            if not hint or have < part * hint:
+                self.close_connection = True
+                return self.err(409, '조각 순서가 어긋났습니다 — 처음부터 다시 올려 주세요')
+            have = part * hint
+        last = (not uid) or part == parts - 1
+        left, done = n, False
+        try:
+            with open(tmp, 'r+b' if uid and part else 'wb') as f:
+                if uid and part:
+                    f.seek(have)
+                    f.truncate()
+                while left > 0:
+                    b = self.rfile.read(min(262144, left))
+                    if not b:
+                        raise ConnectionError('업로드가 끊겼습니다')
+                    f.write(b)
+                    left -= len(b)
+            self._body_read = True
+            if not last:
+                done = True
+                return self.send(200, {'ok': True, 'part': part})
+            size = os.path.getsize(tmp)
+            fn = secrets.token_hex(12)
+            os.replace(tmp, os.path.join(self.LABLIB_DIR, fn))
+            done = True
+            base, ext = os.path.splitext(name)
+            nm, k = name, 2
+            while q('SELECT id FROM lab_it WHERE folder=? AND name=?', (folder, nm), one=True) and k < 1000:
+                nm, k = f'{base} ({k}){ext}', k + 1   # 같은 이름이 있으면 '이름 (2).pdf'
+            q('INSERT INTO lab_it(folder,name,fn,size,note,by,ts) VALUES(?,?,?,?,?,?,?)', (folder, nm, fn, size, '', self.user['name'], time.time()), commit=True)
+            return self.send(200, self.lablib_state(folder), log=False)
+        except ConnectionError:
+            self.close_connection = True
+            if uid and not last and os.path.exists(tmp):
+                try:
+                    with open(tmp, 'r+b') as f:
+                        f.truncate(have)
+                except OSError:
+                    pass
+                done = True
+            return self.err(400, '전송이 중간에 끊겼습니다. 다시 올려 주세요')
+        finally:
+            if not done and os.path.exists(tmp):
+                try:
+                    os.remove(tmp)
+                except OSError:
+                    pass
+
+    def lablib_get(self, args):
+        if not self.lablib_admin():
+            return self.err(403, '교수(관리자)만 받을 수 있습니다')
+        r = q('SELECT name, fn FROM lab_it WHERE id=?', (to_int((args.get('id') or ['0'])[0], 0),), one=True)
+        if not r:
+            return self.err(404, '파일이 없습니다')
+        ext = os.path.splitext(r['name'])[1].lower()
+        mime = LIB_TYPES.get(ext, ('application/octet-stream', False))[0]
+        view = (args.get('view') or [''])[0] == '1' and ext in ('.pdf', '.jpg', '.jpeg', '.png', '.webp', '.gif', '.mp4')
+        return self.send_file(os.path.join(self.LABLIB_DIR, r['fn']), mime if view else 'application/octet-stream',
+                              ('inline' if view else 'attachment') + "; filename*=UTF-8''" + urllib.parse.quote(r['name']), 'no-store')
 
     def lab_file_get(self, args):
         if not self.user or self.user['role'] != 'admin':

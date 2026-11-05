@@ -2745,6 +2745,60 @@ html:root body .convo .convo-note:has(.convo-empty){background:transparent}
 /* V242: 대화방 문서·파일 카드 */
 .att-file .ico{min-width:44px;padding:0 6px;background:#244EA2;color:#fff;font-size:11px;letter-spacing:0}
 .pchip .sz{font-size:11px;color:#667085;margin-left:4px}
+
+/* V243: 연구실 탭 · 자료실(구글 드라이브·탐색기처럼) */
+.lab-tabs{display:flex;gap:4px;margin:12px 0 4px;border-bottom:2px solid var(--c-line,#E4E7EC)}
+.lab-tab{min-height:44px;padding:0 16px;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;background:none;font:inherit;font-size:15px;font-weight:600;color:#475467;cursor:pointer}
+.lab-tab.on{border-bottom-color:#FDD000;color:#0B1B3F;font-weight:700}
+.lb-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 8px}
+.lb-bar label.btn{display:inline-flex;align-items:center;gap:6px}
+.lb-bar .pg-ic{width:16px;height:16px;transform:rotate(180deg)}
+.lb-q{flex:1;min-width:180px}
+.lb-q input{width:100%;box-sizing:border-box;min-height:40px;padding:0 12px;border:1px solid var(--c-line-2,#D0D5DD);border-radius:10px;font:inherit;font-size:14px}
+.lb-sort{min-height:40px;border:1px solid var(--c-line-2,#D0D5DD);border-radius:10px;padding:0 8px;font:inherit;font-size:14px;background:#fff}
+.lb-crumb{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:6px 0 8px;font-size:14px;color:#475467}
+.lb-cr{border:0;background:none;padding:4px 6px;border-radius:6px;font:inherit;color:#244EA2;font-weight:600;cursor:pointer}
+.lb-cr:hover{background:#EEF4FF}
+.lb-selbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 12px;margin-bottom:8px;border-radius:10px;background:#EEF4FF;font-size:14px}
+.lb-drop{border-radius:12px;transition:background .15s}
+.lb-drop.drop{background:#EEF4FF;outline:2px dashed #244EA2;outline-offset:2px}
+.lb-list{list-style:none;margin:0;padding:0;border:1px solid var(--c-line,#E4E7EC);border-radius:12px;overflow:visible}
+.lb-row{position:relative;display:flex;align-items:center;gap:6px;padding:4px 8px 4px 4px;border-bottom:1px solid var(--c-line,#E4E7EC)}
+.lb-row:last-child{border-bottom:0}
+.lb-row.on{background:#F5F8FF}
+.lb-chk{display:grid;place-items:center;width:40px;height:44px;flex:none}
+.lb-chk input{width:18px;height:18px}
+.lb-main{flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:52px;padding:4px;border:0;background:none;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.lb-nm{min-width:0;display:grid;gap:2px}
+.lb-nm b{font-size:15px;font-weight:600;color:#0B1B3F;overflow-wrap:anywhere}
+.lb-nm small{font-size:12px;color:#667085}
+.lb-nm em{font-style:normal;color:#244EA2}
+.lb-fd{flex:none;width:34px;height:28px;border-radius:4px 6px 6px 6px;background:#FDD000;position:relative;box-shadow:inset 0 -9px 0 #F5C400}
+.lb-fd::before{content:'';position:absolute;left:0;top:-5px;width:14px;height:7px;border-radius:3px 3px 0 0;background:#F5C400}
+.lb-fd.up{background:#E4E7EC;box-shadow:inset 0 -9px 0 #D0D5DD}.lb-fd.up::before{background:#D0D5DD}
+.lb-ext{flex:none;display:grid;place-items:center;min-width:40px;height:34px;padding:0 4px;border-radius:6px;background:#244EA2;color:#fff;font-size:10px;font-weight:700;letter-spacing:0}
+.lb-ext.e-pdf{background:#D92D20}.lb-ext.e-hwp,.lb-ext.e-hwpx{background:#0B7FAB}.lb-ext.e-xlsx,.lb-ext.e-xls,.lb-ext.e-csv{background:#067647}.lb-ext.e-pptx,.lb-ext.e-ppt{background:#C4320A}.lb-ext.e-jpg,.lb-ext.e-jpeg,.lb-ext.e-png{background:#6941C6}
+.lb-acts{display:flex;gap:4px;flex:none}
+.lb-acts .btn{min-height:36px;display:inline-flex;align-items:center;gap:4px}
+.lb-acts .pg-ic{width:14px;height:14px}
+.lb-menu{position:absolute;right:8px;top:calc(100% - 6px);z-index:20;display:grid;min-width:200px;padding:6px;border:1px solid var(--c-line,#E4E7EC);border-radius:12px;background:#fff;box-shadow:0 8px 24px rgba(11,27,63,.18)}
+.lb-menu button{min-height:44px;padding:0 12px;border:0;background:none;text-align:left;font:inherit;font-size:14px;border-radius:8px;cursor:pointer}
+.lb-menu button:hover{background:#F2F4F7}
+.lb-ups{list-style:none;margin:0 0 10px;padding:10px 12px;border:1px solid #244EA2;border-radius:12px;display:grid;gap:8px}
+.lb-ups .st-ok small{color:#067647;font-weight:700}.lb-ups .st-bad small{color:#B42318;font-weight:700}
+.lb-ups .pu-bar{display:block;margin-top:4px}
+.lb-ups li.st-bad{display:flex;align-items:center;gap:8px}.lb-ups li.st-bad .lb-nm{flex:1;min-width:0}
+.lb-empty{margin:0;padding:28px 12px;text-align:center;color:#667085;font-size:14px}
+.lb-foot{margin:10px 2px 0;font-size:12px;color:#667085}
+.lb-pick{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:rgba(11,27,63,.45);padding:16px}
+.lb-pk{width:min(440px,100%);max-height:80vh;overflow:auto;padding:16px;border-radius:16px;background:#fff;display:grid;gap:10px}
+.lb-pk ul{list-style:none;margin:0;padding:0}
+.lb-pk ul ul{margin:0}
+.lb-pk button[data-to]{width:100%;display:flex;align-items:center;gap:10px;min-height:44px;border:0;background:none;text-align:left;font:inherit;font-size:15px;border-radius:8px;cursor:pointer}
+.lb-pk button[data-to]:hover{background:#EEF4FF}
+.lb-pk .lb-fd{width:26px;height:21px}
+@media (max-width:599px){ .lb-acts .btn span{display:none} .lb-sort{flex:1} }
+@media (pointer:coarse){ .lb-acts .btn{min-height:44px;min-width:44px} }
 </style>
 </head><body>
 <!-- V114~V117: 첫 화면 인트로 — 빨간 빛(펜 끝)이 12시에서 출발해 첫 화면의 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
@@ -3725,7 +3779,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v242</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v243</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4706,7 +4760,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     {slug:'fobj',          ab:'특정', title:'특정소방대상물', desc:'특정소방대상물 분류와 소방시설 설치 기준', kw:'특정소방대상물 소방대상물 용도 분류 소방시설 설치 기준 근린생활 판매 업무 숙박 노유자 의료 공동주택 복합건축물'},
     {slug:'signature',     ab:'SIG',  title:'SACHIL 시그니처', desc:'SACHIL 심벌·로고·시그니처 컬러', kw:'시그니처 심벌 로고 브랜드 컬러 색상 SACHIL 47 아이콘 디자인', local:true},
     {slug:'bangjae',       ab:'방재', title:'SACHIL방재실', desc:'교수 전용 · 메뉴 자료·AI 키·지도 키·서버 관리', kw:'', local:true, prof:true},
-    {slug:'lab',           ab:'연구', title:'지휘역량강화센터 연구실', desc:'교수 전용 · 연구 과제 문서(hwpx)와 질문 모음', kw:'', local:true, prof:true},   /* V239: 교수 로그인 때만 */
+    {slug:'lab',           ab:'연구', title:'지휘역량강화센터 연구실', desc:'교수 전용 · 연구 과제 문서(hwpx)·자료실·질문 모음', kw:'', local:true, prof:true},   /* V239: 교수 로그인 때만 */
     {slug:'updates',       ab:'내역', title:'업데이트 내역', desc:'버전별 개선·업데이트 기록', kw:'업데이트 버전 내역 변경 개선 보강 패치 기록 새 기능', local:true}
   ];
   // 예시 인덱스: 본문 연결 전, 문서 '제목' 수준. 조문 제목은 원문 확인 전 예시로 표시한다.
@@ -4745,8 +4799,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V242', SRV_VER='15.19';
+  const APP_VER='V243', SRV_VER='15.20';
   const UPDATES=[
+    {v:'V243', d:'2026-11-05', t:['연구실에 ‘자료실’ 탭 추가(서버 15.20, 교수 전용): 중요한 자료를 폴더별로 모으고 정리 — 새 폴더(폴더 안에 폴더도), 파일 여러 개 한꺼번에 올리기(끌어다 놓기도 됨, 큰 파일도 나눠 올림), 보기·받기','정리: 이름 바꾸기·메모 달기·다른 폴더로 옮기기·삭제(여러 개 골라 한 번에), 이름·최근·크기순 정렬, 자료실 전체에서 이름·메모 찾기','연구실 위쪽을 ‘연구 과제 · 자료실 · 질문 모음’ 탭으로 정리','안전: 실행 파일·웹 문서(exe·bat·js·html 등)는 올릴 수 없고, 같은 이름은 ‘이름 (2)’로 따로 저장']},
     {v:'V242', d:'2026-11-05', t:['47망·디브리핑룸 파일 보내기 보강(서버 15.19): 파일 1개 10MB → 500MB, 큰 파일은 48MB씩 나눠 보내고 연결이 끊기면 그 조각만 자동으로 다시(최대 3번)','사진·PDF 말고도 한글(hwp·hwpx)·워드·엑셀·파워포인트·압축(zip)·동영상(mp4·mov)·글(txt·csv) 보내기 — 대화에는 파일 카드 + [받기]','서버가 옛 버전이면 10MB 넘는 파일·문서 파일은 보내기 전에 바로 알려 줌']},
     {v:'V241', d:'2026-11-04', t:['연구실: 연구 과제를 직접 쓰고 저장 — 새 과제 추가·편집(제목·요약·본문: 소제목·굵게·글머리·번호·표)·순서 바꾸기·삭제, 쓰는 중 이 기기에 자동 임시 저장','한글(hwpx) 방식: ‘hwpx로 저장’하면 한글에서 바로 열리고, 한글에서 만든 hwpx를 불러와 새 과제로(원본 파일도 함께 보관·내려받기)','서버에 교수 전용으로 저장(서버 15.18) — 서버가 옛 버전이면 이 기기에 저장해 두었다가 서버가 업데이트되면 올라감']},
     {v:'V240', d:'2026-11-04', t:['연구실 ‘질문 모음’: 교수가 직접 질문을 올리고(관련 과제 · 질문 · 메모) 고치고 지울 수 있게 — 과제별로 거르기, 서버에 교수 전용으로 저장(서버 15.17)']},
@@ -5841,6 +5896,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const gen=SRV.gen, go2=k=>{ state.labOpen=k; renderLab(panel,s); rootScrollTo(0); };
     const modeNote=()=>LABD.mode==='local'?`<p class="srch-note srch-pend">${pgIcon('warn')} 서버가 아직 ${esc(SRV.ver||'옛 버전')}이라 <b>이 기기에만</b> 저장돼요 — 서버가 15.18 이상이 되면 처음 열 때 이 내용이 서버로 올라가요.</p>`:'';
     if(state.labOpen==='qna'){ renderLabQna(panel,s,gen,()=>go2(null)); return; }
+    if(state.labTab==='lib'&&!state.labOpen){ renderLabLib(panel,s,gen); return; }   /* V243: 자료실 탭 */
     if(!LABD.items){ panel.innerHTML=secShell(s,`<div class="card lab">${secHead(s,'교수 전용')}<p class="srch-note srch-load">불러오는 중…</p></div>`);
       labLoad().then(ok=>{ if(SRV.gen!==gen||state.route!=='lab') return; if(!ok){ LABD.items=null; panel.querySelector('.srch-load').textContent='연구실 자료를 불러오지 못했어요 — 서버 연결을 확인해 주세요'; return; } renderLab(panel,s); }); return; }
     const open=state.labOpen, doc=open&&open!=='new'?LABD.items.find(x=>String(x.id)===String(open)):null;
@@ -5848,11 +5904,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(doc){ renderLabDoc(panel,s,doc,gen,go2,modeNote); return; }
     // 목록 — 과제 카드(번호·제목·요약·고친 날·원본 파일) + 질문 모음 + 새 과제 · 순서 바꾸기
     const L=LABD.items, ord=!!state.labOrder;
-    panel.innerHTML=secShell(s,`<div class="card lab">${secHead(s,'교수 전용')}${modeNote()}
+    panel.innerHTML=secShell(s,`<div class="card lab">${secHead(s,'교수 전용')}${labTabs('docs')}${modeNote()}
       <div class="lab-tools"><button type="button" class="btn primary" data-new>＋ 새 연구 과제</button><label class="btn ghost lab-imp">hwpx 불러와 새 과제<input type="file" accept=".hwpx" hidden></label>${L.length>1?`<button type="button" class="btn ghost" data-ord aria-pressed="${ord}">${ord?'순서 바꾸기 끝':'순서 바꾸기'}</button>`:''}</div>
       <div class="lab-grid">${L.map((x,i)=>`<div class="lab-card"><button type="button" class="lab-b" data-lab="${esc(String(x.id))}"><span class="lab-no">${i+1}</span><span class="lab-tx"><b>${esc(x.title)}</b><span>${esc(x.summary||'')}</span><small>${x.ts?esc(fmtDate(x.ts))+' 저장':''}${labFile(x)?` · ${pgIcon('doc')} ${esc(labFile(x))}`:''}</small></span><span class="arrow" aria-hidden="true">→</span></button>${ord?`<span class="lab-ord"><button type="button" class="btn ghost sm" data-up="${i}" aria-label="위로"${i?'':' disabled'}>▲</button><button type="button" class="btn ghost sm" data-dn="${i}" aria-label="아래로"${i<L.length-1?'':' disabled'}>▼</button></span>`:''}</div>`).join('')}
-        <div class="lab-card"><button type="button" class="lab-b lab-b-qna" data-lab="qna"><span class="lab-no">${pgIcon('edit')}</span><span class="lab-tx"><b>질문 모음</b><span>연구 질문을 직접 올리고 과제별로 한눈에</span></span><span class="arrow" aria-hidden="true">→</span></button></div></div></div>`);
-    const root=panel.querySelector('.lab');
+        </div></div>`);
+    const root=panel.querySelector('.lab'); labTabsBind(panel,s);
     root.addEventListener('click',async e=>{ const b=e.target.closest('[data-lab]'); if(b){ state.labEdit=false; go2(b.dataset.lab); return; }
       if(e.target.closest('[data-new]')){ state.labEdit=true; go2('new'); return; }
       if(e.target.closest('[data-ord]')){ state.labOrder=!ord; renderLab(panel,s); return; }
@@ -5917,12 +5973,101 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       if(srcFile&&LABD.mode==='server'){ const r=await apiUp('/api/lab/file?id='+encodeURIComponent(id), srcFile, {'Content-Type':'application/hwp+zip','X-Filename':encodeURIComponent(srcFile.name)}, null, PROF.tok, 15*60*1000); if(r.ok&&r.j&&Array.isArray(r.j.items)) LABD.items=r.j.items; }
       toast(LABD.mode==='server'?'서버에 저장했어요':'이 기기에 저장했어요'); state.labEdit=false; if(SRV.gen===gen) go2(id); });
   }
+  // V243: 연구실 탭 — 연구 과제 · 자료실 · 질문 모음
+  const labTabs=cur=>`<div class="lab-tabs" role="tablist" aria-label="연구실">${[['docs','연구 과제'],['lib','자료실'],['qna','질문 모음']].map(([k,t])=>`<button type="button" role="tab" aria-selected="${cur===k}" class="lab-tab${cur===k?' on':''}" data-tab="${k}">${t}</button>`).join('')}</div>`;
+  function labTabsBind(panel,s){ const t=panel.querySelector('.lab-tabs'); if(!t) return; t.addEventListener('click',e=>{ const b=e.target.closest('[data-tab]'); if(!b) return; const k=b.dataset.tab;
+    state.labEdit=false; if(k==='qna'){ state.labOpen='qna'; } else { state.labOpen=null; state.labTab=k; } renderLab(panel,s); rootScrollTo(0); }); }
+  // V243: 자료실 — 폴더(여러 단계)·파일 모으고 정리(새 폴더·올리기·이름 바꾸기·옮기기·메모·지우기·정렬·검색). 서버에 교수 전용(15.20+)
+  const labExt=n=>(String(n||'').match(/\.([a-z0-9]{1,5})$/i)||['',''])[1].toUpperCase()||'파일', labSz=n=>!n?'0KB':n>=1073741824?(n/1073741824).toFixed(1)+'GB':n>=1048576?(n/1048576).toFixed(1)+'MB':Math.max(1,Math.round(n/1024))+'KB';
+  const LIBV={folder:0, data:null, sort:'name', sel:new Set(), q:'', found:null, up:[]};
+  const libIcon=n=>{ const e=labExt(n); return `<span class="lb-ext e-${esc(e.toLowerCase())}">${esc(e)}</span>`; };
+  const libCall=async(op,x)=>{ const r=await api('/api/lab/lib',{json:Object.assign({op,folder:LIBV.folder},x||{}),tok:PROF.tok}); if(r.ok&&r.j&&r.j.ok!==false) return r.j; toast((r.j&&r.j.error)||'서버에 연결하지 못했어요'); return null; };
+  async function libFetch(id,view){ const r=await fetch(SURL('/api/lab/lib/file?id='+encodeURIComponent(id)+(view?'&view=1':'')),{headers:{'X-SACHIL':'1','Authorization':'Bearer '+PROF.tok},credentials:SRVBASE?'omit':'same-origin'}).catch(()=>null); if(!r||!r.ok){ toast('파일을 받지 못했어요'); return null; } return r.blob(); }
+  function renderLabLib(panel,s,gen){
+    const old=!SRV.on||!SRV.ver||verLt(SRV.ver,'15.20');
+    const shell=inner=>{ panel.innerHTML=secShell(s,`<div class="card lab lab-lib">${secHead(s,'교수 전용')}${labTabs('lib')}${inner}</div>`); labTabsBind(panel,s); };
+    if(old){ shell(`<p class="srch-note srch-pend">${pgIcon('warn')} 자료실은 서버 15.20부터 써요(지금 서버 ${esc(SRV.ver||'연결 안 됨')}) — 서버가 업데이트되면 바로 쓸 수 있어요.</p>`); return; }
+    const draw=()=>{ if(state.route!=='lab'||SRV.gen!==gen) return; const d=LIBV.data; if(!d){ shell('<p class="srch-note srch-load">자료실을 불러오는 중…</p>'); return; }
+      const CMP={name:(a,b)=>a.name.localeCompare(b.name,'ko',{numeric:true}), date:(a,b)=>(b.ts||0)-(a.ts||0), size:(a,b)=>(b.size||0)-(a.size||0)}, cmp=CMP[LIBV.sort]||CMP.name;
+      const dirs=d.dirs.slice().sort(LIBV.sort==='size'?CMP.name:cmp), files=d.files.slice().sort(cmp), sel=LIBV.sel;
+      const crumbs=[{id:0,name:'자료실'},...d.path].map((p,i,a)=>i<a.length-1?`<button type="button" class="lb-cr" data-go="${p.id}">${esc(p.name)}</button><span aria-hidden="true">›</span>`:`<b>${esc(p.name)}</b>`).join('');
+      const row=(x,k)=>{ const key=k+':'+x.id, on=sel.has(key);
+        return `<li class="lb-row${on?' on':''}" data-k="${k}" data-id="${x.id}"><label class="lb-chk"><input type="checkbox" data-sel="${key}"${on?' checked':''} aria-label="${esc(x.name)} 고르기"></label>
+          ${k==='dir'?`<button type="button" class="lb-main" data-open="${x.id}"><span class="lb-fd" aria-hidden="true"></span><span class="lb-nm"><b>${esc(x.name)}</b><small>${x.n?x.n+'개':'비어 있음'} · ${esc(fmtDate(x.ts))}</small></span></button>`
+            :`<button type="button" class="lb-main" data-file="${x.id}">${libIcon(x.name)}<span class="lb-nm"><b>${esc(x.name)}</b><small>${labSz(x.size||0)} · ${esc(fmtDate(x.ts))}${x.by?' · '+esc(x.by):''}${x.note?`<em> · ${esc(x.note)}</em>`:''}</small></span></button>`}
+          <span class="lb-acts">${k==='file'&&/\.(pdf|jpe?g|png|webp|gif|mp4)$/i.test(x.name)?`<button type="button" class="btn ghost sm" data-view="${x.id}">보기</button>`:''}${k==='file'?`<button type="button" class="btn ghost sm" data-dl="${x.id}">${pgIcon('down')}<span>받기</span></button>`:''}<button type="button" class="btn ghost sm lb-more" data-more="${key}" aria-label="${esc(x.name)} 더보기">⋯</button></span></li>`; };
+      const ups=LIBV.up.length?`<ul class="lb-ups">${LIBV.up.map(u=>`<li class="st-${u.st}"><span class="lb-nm"><b>${esc(u.name)}</b><small>${u.st==='ok'?'올림 완료':u.st==='bad'?'실패 — '+esc(u.why||''):u.st==='up'?`올리는 중 ${u.pct|0}% · ${labSz(u.size*(u.pct||0)/100)} / ${labSz(u.size)}`:'기다리는 중'}</small></span>${u.st==='up'||u.st==='wait'?`<span class="pu-bar"><i style="width:${u.pct|0}%"></i></span>`:''}${u.st==='bad'?`<button type="button" class="btn ghost sm" data-upx="${LIBV.up.indexOf(u)}" aria-label="${esc(u.name)} 실패 표시 닫기">닫기</button>`:''}</li>`).join('')}</ul>`:'';
+      const found=LIBV.found;
+      shell(`<div class="lb-bar"><button type="button" class="btn primary" data-mk>＋ 새 폴더</button><label class="btn ghost">${pgIcon('down')} 파일 올리기<input type="file" multiple hidden data-upf></label>
+          <form class="lb-q" role="search"><input type="search" placeholder="자료실 전체에서 이름·메모 찾기" value="${esc(LIBV.q)}" aria-label="자료실 검색"></form>
+          <select class="lb-sort" aria-label="정렬">${[['name','이름순'],['date','최근순'],['size','크기순']].map(([v,t])=>`<option value="${v}"${LIBV.sort===v?' selected':''}>${t}</option>`).join('')}</select></div>
+        ${found?`<div class="lb-crumb"><button type="button" class="lb-cr" data-unq>‹ 폴더로</button><b>‘${esc(LIBV.q)}’ 찾은 결과 ${found.dirs.length+found.files.length}개</b></div>
+          <ul class="lb-list">${found.dirs.map(x=>`<li class="lb-row"><button type="button" class="lb-main" data-open="${x.id}"><span class="lb-fd" aria-hidden="true"></span><span class="lb-nm"><b>${esc(x.name)}</b><small>위치: ${esc(x.where)}</small></span></button></li>`).join('')}${found.files.map(x=>`<li class="lb-row"><button type="button" class="lb-main" data-open="${x.folder}">${libIcon(x.name)}<span class="lb-nm"><b>${esc(x.name)}</b><small>${labSz(x.size||0)} · 위치: ${esc(x.where)}${x.note?' · '+esc(x.note):''}</small></span></button><span class="lb-acts"><button type="button" class="btn ghost sm" data-dl="${x.id}">${pgIcon('down')}<span>받기</span></button></span></li>`).join('')||'<li class="srch-note">찾은 자료가 없어요</li>'}</ul>`
+        :`<nav class="lb-crumb" aria-label="폴더 위치">${crumbs}</nav>
+          ${sel.size?`<div class="lb-selbar"><b>${sel.size}개 골랐어요</b><button type="button" class="btn ghost sm" data-mv>옮기기</button><button type="button" class="btn ghost sm lab-del" data-delsel>삭제</button><button type="button" class="btn ghost sm" data-unsel>고르기 해제</button></div>`:''}
+          ${ups}
+          <div class="lb-drop"><ul class="lb-list">${d.folder?`<li class="lb-row lb-upr"><button type="button" class="lb-main" data-go="${d.path.length>1?d.path[d.path.length-2].id:0}"><span class="lb-fd up" aria-hidden="true"></span><span class="lb-nm"><b>위 폴더로</b></span></button></li>`:''}${dirs.map(x=>row(x,'dir')).join('')}${files.map(x=>row(x,'file')).join('')}</ul>
+          ${!dirs.length&&!files.length?'<p class="lb-empty">비어 있어요 — ‘＋ 새 폴더’나 ‘파일 올리기’, 또는 파일을 여기로 끌어다 놓으세요</p>':''}</div>
+          <p class="lb-foot">자료실 전체 파일 ${d.total.n}개 · ${labSz(d.total.size||0)} · 교수 로그인에서만 보여요</p>`}`);
+      bind(); };
+    const load=async f=>{ LIBV.folder=f; LIBV.sel.clear(); const j=await libCall('list',{folder:f}); if(!j) { if(!LIBV.data) shell('<p class="srch-note">자료실을 불러오지 못했어요 — 교수 로그인·서버 연결을 확인해 주세요.</p>'); return; } LIBV.data=j; LIBV.folder=j.folder; draw(); };
+    const setData=j=>{ if(j&&j.dirs&&j.path){ LIBV.data=j; LIBV.sel=new Set([...LIBV.sel].filter(k=>{ const [t,id]=k.split(':'); return (t==='dir'?j.dirs:j.files).some(x=>String(x.id)===id); })); } draw(); };
+    const CH=48*1024*1024;
+    async function upload(files){ const items=[...files].map(f=>({f,name:f.name,size:f.size,st:'wait',pct:0})); LIBV.up=items.concat(LIBV.up.filter(u=>u.st==='up'||u.st==='wait')); draw();
+      for(const u of items){ u.st='up'; draw(); const folder=LIBV.folder; let r=null, last=0;
+        const parts=Math.max(1,Math.ceil(u.size/CH)), uid=[...crypto.getRandomValues(new Uint8Array(12))].map(x=>x.toString(16).padStart(2,'0')).join('');
+        for(let i=0;i<parts;i++){ const b=u.f.slice(i*CH,Math.min(u.size,(i+1)*CH));
+          for(let k=0;k<4;k++){ r=await apiUp(`/api/lab/lib/up?folder=${folder}${parts>1?`&uid=${uid}&part=${i}&parts=${parts}`:''}`, b, {'Content-Type':u.f.type||'application/octet-stream','X-Filename':encodeURIComponent(u.name),'X-Part-Size':String(CH),'X-Total-Size':String(u.size)},
+              (l)=>{ u.pct=Math.min(99,(i*CH+l)/Math.max(1,u.size)*100); const t=Date.now(); if(t-last>300){ last=t; draw(); } }, PROF.tok, 20*60*1000);
+            if(r.ok||!(r.status===0||r.status===408||(r.status>=500&&r.status!==507))) break; await sleep(1500*(k+1)); }
+          if(!r.ok) break; }
+        if(r&&r.ok){ u.st='ok'; u.pct=100; if(folder===LIBV.folder) setData(r.j); } else { u.st='bad'; u.why=(r&&r.j&&r.j.error)||'서버에 연결하지 못했어요'; draw(); } }
+      const ok=items.filter(u=>u.st==='ok').length; toast(ok===items.length?`${ok}개 올렸어요`:`${ok}개 올림 · ${items.length-ok}개 실패`); setTimeout(()=>{ LIBV.up=LIBV.up.filter(u=>u.st!=='ok'); draw(); },4000); }
+    function pickFolder(title,cb){ libCall('tree').then(j=>{ if(!j) return; const kids=p=>j.dirs.filter(x=>(x.parent||0)===p);
+      const tree=(p,dep)=>kids(p).map(x=>`<li><button type="button" data-to="${x.id}" style="padding-left:${12+dep*18}px"><span class="lb-fd" aria-hidden="true"></span>${esc(x.name)}</button>${tree(x.id,dep+1)}</li>`).join('');
+      const ov=document.createElement('div'); ov.className='lb-pick'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+      ov.innerHTML=`<div class="lb-pk"><b>${esc(title)}</b><ul><li><button type="button" data-to="0"><span class="lb-fd" aria-hidden="true"></span>자료실(맨 위)</button></li>${tree(0,1)}</ul><button type="button" class="btn ghost" data-x>취소</button></div>`;
+      document.body.appendChild(ov); const close=()=>ov.remove();
+      ov.addEventListener('click',e=>{ if(e.target===ov||e.target.closest('[data-x]')){ close(); return; } const b=e.target.closest('[data-to]'); if(b){ close(); cb(+b.dataset.to); } }); }); }
+    const items=keys=>[...keys].map(k=>{ const [t,id]=k.split(':'); return {kind:t,id:+id}; });
+    function more(key,btn){ document.querySelectorAll('.lb-menu').forEach(m=>m.remove()); const [k,id]=key.split(':'), d=LIBV.data, x=(k==='dir'?d.dirs:d.files).find(z=>String(z.id)===id); if(!x) return;
+      const m=document.createElement('div'); m.className='lb-menu'; m.setAttribute('role','menu');
+      m.innerHTML=`<button type="button" data-a="ren" role="menuitem">이름 바꾸기</button><button type="button" data-a="mv" role="menuitem">다른 폴더로 옮기기</button>${k==='file'?'<button type="button" data-a="note" role="menuitem">메모</button>':''}<button type="button" data-a="del" role="menuitem" class="lab-del">${k==='dir'?'폴더 삭제(안의 자료 포함)':'삭제'}</button>`;
+      btn.closest('.lb-row').appendChild(m);
+      m.addEventListener('click',async e=>{ const a=(e.target.closest('[data-a]')||{}).dataset; if(!a||!a.a) return; m.remove();
+        if(a.a==='ren'){ const v=prompt('새 이름',x.name); if(v&&v.trim()&&v.trim()!==x.name) setData(await libCall('rename',{id:x.id,kind:k,name:v.trim()})); }
+        else if(a.a==='note'){ const v=prompt('메모(검색에도 쓰여요)',x.note||''); if(v!==null) setData(await libCall('note',{id:x.id,note:v})); }
+        else if(a.a==='mv') pickFolder(`‘${x.name}’ 옮길 곳`,async to=>setData(await libCall('move',{to,items:[{kind:k,id:x.id}]})));
+        else if(a.a==='del'){ if(confirm(k==='dir'?`‘${x.name}’ 폴더와 그 안의 모든 자료(${x.n||0}개 항목)를 지울까요? 되돌릴 수 없어요`:`‘${x.name}’을(를) 지울까요? 되돌릴 수 없어요`)) setData(await libCall('del',{items:[{kind:k,id:x.id}]})); } });
+      setTimeout(()=>document.addEventListener('click',function h(ev){ if(!m.contains(ev.target)){ m.remove(); document.removeEventListener('click',h); } }),0); }
+    function bind(){ const root=panel.querySelector('.lab-lib'); if(!root) return;
+      root.addEventListener('click',async e=>{ const t=e.target;
+        const go=t.closest('[data-go]'); if(go){ load(+go.dataset.go); return; }
+        const op=t.closest('[data-open]'); if(op){ LIBV.found=null; LIBV.q=''; load(+op.dataset.open); return; }
+        if(t.closest('[data-unq]')){ LIBV.found=null; LIBV.q=''; draw(); return; }
+        if(t.closest('[data-mk]')){ const v=prompt('새 폴더 이름'); if(v&&v.trim()) setData(await libCall('mkdir',{name:v.trim()})); return; }
+        const dl=t.closest('[data-dl]'); if(dl){ const x=(LIBV.found?LIBV.found.files:LIBV.data.files).find(z=>String(z.id)===dl.dataset.dl); const b=await libFetch(dl.dataset.dl,false); if(b) labDl(b,x?x.name:'자료'); return; }
+        const vw=t.closest('[data-view]'); if(vw){ const w=window.open('','_blank'); const b=await libFetch(vw.dataset.view,true); if(!b){ if(w) w.close(); return; } const u=URL.createObjectURL(b); if(w) w.location.href=u; else window.open(u,'_blank'); setTimeout(()=>URL.revokeObjectURL(u),120000); return; }
+        const fl=t.closest('[data-file]'); if(fl){ const cb=fl.closest('.lb-row').querySelector('[data-sel]'); if(cb){ cb.checked=!cb.checked; cb.dispatchEvent(new Event('change',{bubbles:true})); } return; }
+        const mo=t.closest('[data-more]'); if(mo){ e.stopPropagation(); more(mo.dataset.more,mo); return; }
+        if(t.closest('[data-unsel]')){ LIBV.sel.clear(); draw(); return; }
+        const ux=t.closest('[data-upx]'); if(ux){ LIBV.up.splice(+ux.dataset.upx,1); draw(); return; }
+        if(t.closest('[data-mv]')){ const its=items(LIBV.sel); pickFolder(`${its.length}개 옮길 곳`,async to=>{ setData(await libCall('move',{to,items:its})); }); return; }
+        if(t.closest('[data-delsel]')){ const its=items(LIBV.sel), nd=its.filter(x=>x.kind==='dir').length; if(confirm(`${its.length}개를 지울까요?${nd?` 폴더 ${nd}개는 안의 자료도 함께 지워져요.`:''} 되돌릴 수 없어요`)) setData(await libCall('del',{items:its})); return; } });
+      root.addEventListener('change',e=>{ const c=e.target.closest('[data-sel]'); if(c){ if(c.checked) LIBV.sel.add(c.dataset.sel); else LIBV.sel.delete(c.dataset.sel); draw(); return; }
+        if(e.target.closest('.lb-sort')){ LIBV.sort=e.target.value; draw(); return; }
+        const u=e.target.closest('[data-upf]'); if(u){ const fs=[...u.files]; u.value=''; if(fs.length) upload(fs); } });
+      const qf=root.querySelector('.lb-q'); if(qf) qf.addEventListener('submit',async e=>{ e.preventDefault(); const v=qf.querySelector('input').value.trim(); LIBV.q=v; if(!v){ LIBV.found=null; draw(); return; } const j=await libCall('search',{q:v}); if(j){ LIBV.found=j; draw(); } });
+      const dz=root.querySelector('.lb-drop'); if(dz){ const has=e=>e.dataTransfer&&[...(e.dataTransfer.types||[])].includes('Files');
+        dz.addEventListener('dragover',e=>{ if(has(e)){ e.preventDefault(); dz.classList.add('drop'); } }); dz.addEventListener('dragleave',()=>dz.classList.remove('drop'));
+        dz.addEventListener('drop',e=>{ if(!has(e)) return; e.preventDefault(); dz.classList.remove('drop'); const fs=[...(e.dataTransfer.files||[])]; if(fs.length) upload(fs); }); } }
+    if(LIBV.data&&!LIBV.up.length) draw(); load(LIBV.folder);
+  }
   function renderLabQna(panel,s,gen,back){
     const open={t:'질문 모음', s:'연구 질문을 직접 올리고 과제별로 한눈에'};
-    panel.innerHTML=secShell(s,`<div class="card lab lab-d"><button type="button" class="btn ghost lab-back" data-lab-back>‹ 연구실</button>
-      ${pgHead({img:s.icon, t:open.t, s:open.s, cls:'lab-head'})}
+    panel.innerHTML=secShell(s,`<div class="card lab lab-d">${secHead(s,'교수 전용')}${labTabs('qna')}
       <div class="lab-body"><p class="srch-note srch-load">질문을 불러오는 중…</p></div></div>`);
-    panel.querySelector('[data-lab-back]').addEventListener('click',back);
+    labTabsBind(panel,s);
     // V240: 질문 모음 — 교수가 직접 올리고(과제·질문·메모) 고치고 지우기. 서버 chat.db에 교수 전용으로(서버 15.17+)
     const box=panel.querySelector('.lab-body'); let items=null, f='all', edit=null;
     const call=async(op,x)=>{ const r=await api('/api/admin/ai',{json:Object.assign({action:'labq',op},x||{}),tok:PROF.tok}); if(r.ok&&r.j&&Array.isArray(r.j.items)){ items=r.j.items; return true; } toast((r.j&&r.j.error)||'서버에 저장하지 못했어요'); return false; };
