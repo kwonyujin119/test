@@ -46,13 +46,13 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False), '.csv': ('text/csv; charset=utf-8', False),   # 15.12: CSV(엑셀에서 저장한 표)
 }
-VERSION = '15.18'
-APP_VERSION = 'V241'
+VERSION = '15.19'
+APP_VERSION = 'V242'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
-MAX_UPLOAD = 10 * 1024 * 1024          # 파일 1개 10MB
-MAX_STORE = 3 * 1024 * 1024 * 1024     # 첨부 총량 3GB
-UPLOAD_DAY_MAX = 200 * 1024 * 1024     # V111: 한 사람 하루 첨부 200MB(교수 제외)
+MAX_UPLOAD = 500 * 1024 * 1024         # 15.19: 47망·디브리핑룸 파일 1개 500MB(config chat_max_mb) — 48MB 조각으로 받아 디스크에 바로 씀(예전 10MB, 통째로 메모리)
+MAX_STORE = 20 * 1024 * 1024 * 1024    # 첨부 총량 20GB(config chat_store_gb, 예전 3GB) — 디스크 남은 공간도 따로 확인
+UPLOAD_DAY_MAX = 2 * 1024 * 1024 * 1024  # V111·15.19: 한 사람 하루 첨부 2GB(교수 제외, 예전 200MB)
 LIB_MAX = 0                            # 15.14: 교수 메뉴 자료 파일 크기 제한 없음(0) — config lib_max_mb로 다시 둘 수 있음
 LIB_PART_MAX = 95 * 1024 * 1024       # 15.14: 한 번에 받는 조각 최대(Cloudflare 무료 100MB 한도 아래) — 큰 파일은 앱이 나눠 보내고 서버가 이어 붙임
 QNA_HITS, QNA_LOCK = {}, threading.Lock()   # 질의응답 질문 IP별 횟수
@@ -402,6 +402,13 @@ def th(token):
 
 
 # ---------------------------------------------------------------- 정리 작업(보관 기간)
+def chat_max():
+    try:
+        return int(float(CONF.get('chat_max_mb') or 0) * 1048576) or MAX_UPLOAD
+    except (TypeError, ValueError):
+        return MAX_UPLOAD
+
+
 def store_size():
     total = 0
     for n in os.listdir(FILES):
@@ -820,7 +827,7 @@ class H(BaseHTTPRequestHandler):
         if not self.cors_origin():
             return self.send(403, b'', 'text/plain', log=False)
         return self.send(204, b'', 'text/plain', {'Access-Control-Allow-Methods': 'GET, POST, DELETE, HEAD',
-                                                  'Access-Control-Allow-Headers': 'X-SACHIL, Content-Type, X-Filename, X-Part-Size, Authorization, Range',
+                                                  'Access-Control-Allow-Headers': 'X-SACHIL, Content-Type, X-Filename, X-Part-Size, X-Total-Size, Authorization, Range',
                                                   'Access-Control-Max-Age': '600'}, log=False)
 
     def guard(self):
@@ -951,7 +958,7 @@ class H(BaseHTTPRequestHandler):
                                        'ot_yt': str(CONF.get('ot_yt') or ''),   # V219: 초과근무 알리미 알림음 YouTube 영상(교수가 방재실에서 정함)
                                        'trim_ratio': CONF.get('weekly_trim_ratio'),
                                        'require_code': bool(CONF.get('require_code')),
-                                       'retention_days': CONF.get('retention_days'), 'max_files': 10,
+                                       'retention_days': CONF.get('retention_days'), 'max_files': 10, 'max_upload_mb': chat_max() // 1048576, 'file_kinds': 1,
                                        'ai': ai_ready(), 'ai_name': AI_NAMES.get(ai_provider(), ''), 'index': DOCS_IDX.status(),
                                        'kakao': str(CONF.get('kakao_js_key') or ''), 'tmap': str(CONF.get('tmap_app_key') or ''),
                                        'bld': bool(CONF.get('bld_key')),
@@ -1015,9 +1022,9 @@ class H(BaseHTTPRequestHandler):
             m = re.fullmatch(r'/api/rooms/(\d{1,12})/messages', path)
             if m:
                 return self.message_post(int(m.group(1)))
-            m = re.fullmatch(r'/api/rooms/(\d{1,12})/upload', path)
+            m = re.fullmatch(r'/api/rooms/(\d{1,12})/upload', path)   # 15.19: ?uid&part&parts 조각 올리기
             if m:
-                return self.upload(int(m.group(1)))
+                return self.upload(int(m.group(1)), urllib.parse.parse_qs(qs))
             m = re.fullmatch(r'/api/rooms/(\d{1,12})/map', path)
             if m:
                 return self.map_set(int(m.group(1)))
@@ -2537,39 +2544,138 @@ class H(BaseHTTPRequestHandler):
         return self.send(200, {'ok': True})
 
     # --- 파일
-    def upload(self, rid):
+    # 15.19: 대화방 첨부 — 사진·PDF + 한글·워드·엑셀·파워포인트·압축·동영상·글(내려받기 전용 'file')
+    CHAT_EXT = {'.hwp': 'application/x-hwp', '.hwpx': 'application/hwp+zip', '.doc': 'application/msword', '.xls': 'application/vnd.ms-excel',
+                '.ppt': 'application/vnd.ms-powerpoint', '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                '.zip': 'application/zip', '.mp4': 'video/mp4', '.mov': 'video/quicktime', '.txt': 'text/plain; charset=utf-8', '.csv': 'text/csv; charset=utf-8'}
+
+    def chat_kind(self, head, name):
+        """앞 바이트로 종류를 확인. 사진·PDF는 바로 보기, 나머지는 확장자와 내용이 맞을 때만 'file'(내려받기 전용)."""
+        k = sniff(head[:16])
+        if k:
+            return k
+        ext = os.path.splitext(name)[1].lower()
+        mime = self.CHAT_EXT.get(ext)
+        if not mime:
+            return None
+        if ext in ('.hwpx', '.docx', '.xlsx', '.pptx', '.zip') and head[:2] == b'PK':
+            return 'file', mime, ext
+        if ext in ('.hwp', '.doc', '.xls', '.ppt') and head[:8] == b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1':
+            return 'file', mime, ext
+        if ext in ('.mp4', '.mov') and head[4:8] == b'ftyp':
+            return 'file', mime, ext
+        if ext in ('.txt', '.csv') and b'\x00' not in head[:4096]:
+            return 'file', mime, ext
+        return None
+
+    def upload(self, rid, args=None):
         if not q('SELECT id FROM rooms WHERE id=?', (rid,), one=True):
             return self.err(404, '없는 디브리핑룸입니다')
+        args = args or {}
         n = self.clen()
         if n <= 0:
             return self.err(400, '빈 파일입니다')
-        if n > MAX_UPLOAD:
+        mx = chat_max()
+        uid = re.sub(r'[^0-9a-f]', '', (args.get('uid') or [''])[0])[:32]
+        part, parts = to_int((args.get('part') or ['0'])[0], 0), to_int((args.get('parts') or ['1'])[0], 1)
+        if uid and (len(uid) < 12 or not 0 <= part < parts <= 20000):
+            self.close_connection = True
+            return self.err(400, '조각 번호가 맞지 않습니다')
+        total = to_int(self.headers.get('X-Total-Size') or str(n), n) if uid else n
+        if n > LIB_PART_MAX or total > mx:
             self.close_connection = True   # 큰 본문은 읽지 않고 연결을 닫는다(drain도 1MB 초과는 닫음)
-            return self.err(413, '파일은 10MB 이하만 올릴 수 있습니다')
-        if store_size() + n > MAX_STORE:
-            self.close_connection = True
-            return self.err(507, '서버 저장 공간이 찼습니다. 관리자에게 알려 주세요')
-        # V111: 한 접속(대화명)이 하루 200MB 넘게 올려 저장 공간을 다 채우지 못하게
-        used = q('SELECT COALESCE(SUM(size),0) s FROM files WHERE owner=? AND ts>?', (self.user['id'], time.time() - 86400), one=True)['s']
-        if used + n > UPLOAD_DAY_MAX and self.user.get('role') != 'admin':
-            self.close_connection = True
-            return self.err(429, '오늘 올릴 수 있는 양(200MB)을 넘었습니다. 내일 다시 올려 주세요')
-        data = self.rfile.read(n)
-        self._body_read = True
-        if len(data) != n:   # V190: 올리는 중 연결이 끊기면 반쪽 파일이 남아 사진이 깨져 보였다 — 저장하지 않고 다시 올리게
-            self.close_connection = True
-            return self.err(400, '전송이 중간에 끊겼습니다. 다시 보내 주세요')
-        kind = sniff(data[:16])
-        if not kind:
-            return self.err(415, '사진(JPG·PNG·WEBP·GIF)과 PDF만 올릴 수 있습니다')
+            return self.err(413, f'파일은 {mx // 1048576}MB 이하만 올릴 수 있습니다')
+        if part == 0:
+            if store_size() + total > int(float(CONF.get('chat_store_gb') or 0) * 1073741824 or MAX_STORE):
+                self.close_connection = True
+                return self.err(507, '서버 저장 공간이 찼습니다. 관리자에게 알려 주세요')
+            try:
+                free = shutil.disk_usage(FILES).free
+            except OSError:
+                free = 0
+            if free and free < total + 512 * 1048576:
+                self.close_connection = True
+                return self.err(507, '서버 PC 저장 공간이 부족합니다. 관리자에게 알려 주세요')
+            # V111: 한 접속(대화명)이 하루에 너무 많이 올려 저장 공간을 다 채우지 못하게
+            used = q('SELECT COALESCE(SUM(size),0) s FROM files WHERE owner=? AND ts>?', (self.user['id'], time.time() - 86400), one=True)['s']
+            if used + total > UPLOAD_DAY_MAX and self.user.get('role') != 'admin':
+                self.close_connection = True
+                return self.err(429, f'오늘 올릴 수 있는 양({UPLOAD_DAY_MAX // 1073741824}GB)을 넘었습니다. 내일 다시 올려 주세요')
         name = urllib.parse.unquote(self.headers.get('X-Filename') or '')
-        name = re.sub(r'[\x00-\x1f\x7f<>:"/\\|?*]', '', name).strip()[:80] or ('파일' + kind[2])
-        fid = secrets.token_hex(12)
-        with open(os.path.join(FILES, fid), 'wb') as f:
-            f.write(data)
-        q('INSERT INTO files(id,room,owner,name,kind,mime,size,used,ts) VALUES(?,?,?,?,?,?,?,0,?)',
-          (fid, rid, self.user['id'], name, kind[0], kind[1], n, time.time()), commit=True)
-        return self.send(200, {'ok': True, 'file': {'id': fid, 'name': name, 'kind': kind[0], 'size': n}})
+        name = re.sub(r'[\x00-\x1f\x7f<>:"/\\|?*]', '', name).strip()[:80]
+        tmp = os.path.join(FILES, '.up-' + ((uid + '-' + str(self.user['id'])) if uid else secrets.token_hex(8)))
+        have = 0
+        if uid:
+            have = os.path.getsize(tmp) if os.path.exists(tmp) else 0
+            if part == 0:
+                have = 0
+                for x in os.listdir(FILES):   # 하루 넘게 버려진 조각 정리
+                    if x.startswith('.up-'):
+                        try:
+                            if time.time() - os.path.getmtime(os.path.join(FILES, x)) > 86400:
+                                os.remove(os.path.join(FILES, x))
+                        except OSError:
+                            pass
+            elif not os.path.exists(tmp):
+                self.close_connection = True
+                return self.err(409, '앞 조각이 없습니다 — 처음부터 다시 보내 주세요')
+            hint = to_int(self.headers.get('X-Part-Size') or '0', 0)
+            if part and (not hint or have < part * hint):   # 앞 조각이 덜 왔으면 처음부터
+                self.close_connection = True
+                return self.err(409, '조각 순서가 어긋났습니다 — 처음부터 다시 보내 주세요')
+            if part:
+                have = part * hint   # 같은 조각을 다시 보내면(응답만 끊긴 경우) 그 조각 자리부터 다시 씀
+        last = (not uid) or part == parts - 1
+        left, done = n, False
+        try:
+            with open(tmp, 'r+b' if uid and part else 'wb') as f:
+                if uid and part:
+                    f.seek(have)
+                    f.truncate()
+                while left > 0:
+                    b = self.rfile.read(min(262144, left))
+                    if not b:
+                        raise ConnectionError('업로드가 끊겼습니다')
+                    f.write(b)
+                    left -= len(b)
+            self._body_read = True
+            if not last:
+                done = True
+                return self.send(200, {'ok': True, 'part': part, 'parts': parts})
+            size = os.path.getsize(tmp)
+            if size > mx:
+                return self.err(413, f'파일은 {mx // 1048576}MB 이하만 올릴 수 있습니다')
+            with open(tmp, 'rb') as f:
+                head = f.read(4096)
+            kind = self.chat_kind(head, name)
+            if not kind:
+                return self.err(415, '사진·PDF·한글·워드·엑셀·파워포인트·압축(zip)·동영상(mp4)·글(txt·csv)만 보낼 수 있습니다')
+            name = name or ('파일' + kind[2])
+            fid = secrets.token_hex(12)
+            os.replace(tmp, os.path.join(FILES, fid))
+            done = True
+            q('INSERT INTO files(id,room,owner,name,kind,mime,size,used,ts) VALUES(?,?,?,?,?,?,?,0,?)',
+              (fid, rid, self.user['id'], name, kind[0], kind[1], size, time.time()), commit=True)
+            if size > 10 * 1048576:
+                print(f'[파일] {self.user["name"]} → 방 {rid}: {name} ({size // 1048576}MB)', flush=True)
+            return self.send(200, {'ok': True, 'file': {'id': fid, 'name': name, 'kind': kind[0], 'size': size}})
+        except ConnectionError:
+            self.close_connection = True
+            if uid and not last and os.path.exists(tmp):
+                try:
+                    with open(tmp, 'r+b') as f:
+                        f.truncate(have)
+                except OSError:
+                    pass
+                done = True
+            return self.err(400, '전송이 중간에 끊겼습니다. 다시 보내 주세요')
+        finally:
+            if not done and os.path.exists(tmp):
+                try:
+                    os.remove(tmp)
+                except OSError:
+                    pass
 
     def file_get(self, fid):
         f = q('SELECT * FROM files WHERE id=? AND used=1', (fid,), one=True)
@@ -2578,7 +2684,8 @@ class H(BaseHTTPRequestHandler):
         p = os.path.join(FILES, fid)
         if not os.path.exists(p):
             return self.err(404, '파일이 없습니다')
-        return self.send_file(p, f['mime'], "inline; filename*=UTF-8''" + urllib.parse.quote(f['name']), 'private, max-age=3600')
+        disp = 'inline' if f['kind'] in ('image', 'pdf') else 'attachment'   # 15.19: 한글·엑셀 등은 내려받기로(브라우저가 열어 실행하지 않게)
+        return self.send_file(p, f['mime'], disp + "; filename*=UTF-8''" + urllib.parse.quote(f['name']), 'private, max-age=3600')
 
     # --- 사진 앨범(15.8): 앨범 화면(저장소 kwonyujin119/test3 → github.io/test3/) 전용. 47망 대화명·교수 로그인과 별개의 암호(album_code_hash 또는 관리자 코드)와 토큰을 쓴다.
     #     사진은 data\album\<id>(원본)·<id>.t.jpg(화면이 만든 미리보기)에, 목록은 album 표에. 47망 첨부 용량(MAX_STORE)과는 따로 센다(album_max_mb).
