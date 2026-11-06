@@ -46,8 +46,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False), '.csv': ('text/csv; charset=utf-8', False),   # 15.12: CSV(엑셀에서 저장한 표)
 }
-VERSION = '15.22'
-APP_VERSION = 'V244'
+VERSION = '15.23'
+APP_VERSION = 'V245'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 500 * 1024 * 1024         # 15.19: 47망·디브리핑룸 파일 1개 500MB(config chat_max_mb) — 48MB 조각으로 받아 디스크에 바로 씀(예전 10MB, 통째로 메모리)
