@@ -8,6 +8,24 @@ self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch', e => {
   const req = e.request;
+  // V246: 다른 앱에서 '공유 → SACHIL:47'(manifest share_target) — 받은 파일·글을 캐시에 잠깐 두고 47망 화면으로(화면이 꺼내 입력창 첨부로)
+  if (req.method === 'POST' && new URL(req.url).searchParams.has('share-target')) {
+    e.respondWith((async () => {
+      try {
+        const fd = await req.formData(), c = await caches.open('sachil-share-v1');
+        for (const k of await c.keys()) await c.delete(k);
+        const text = ['title', 'text', 'url'].map(k => String(fd.get(k) || '').trim()).filter((v, i, a) => v && a.indexOf(v) === i).join(' ');
+        if (text) await c.put(new URL('./__share/text', self.location).href, new Response(text));
+        let i = 0;
+        for (const f of fd.getAll('files')) {
+          if (!f || typeof f === 'string' || !f.size) continue;
+          await c.put(new URL('./__share/f' + (i++), self.location).href, new Response(f, { headers: { 'Content-Type': f.type || 'application/octet-stream', 'X-Name': encodeURIComponent(f.name || ('공유파일' + i)) } }));
+        }
+      } catch (_) { }
+      return Response.redirect(new URL('./?share=1#chat', self.location).href, 303);
+    })());
+    return;
+  }
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
   if (req.mode === 'navigate') {
     e.respondWith(
