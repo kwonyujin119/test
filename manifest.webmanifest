@@ -33,5 +33,37 @@
       "url": "https://kwonyujin119.github.io/test/manifest.webmanifest"
     }
   ],
-  "description": "소방 현장지휘관 교육용 — 검색·AI 도우미·체크리스트·사고보고서·47망"
+  "description": "소방 현장지휘관 교육용 — 검색·AI 도우미·체크리스트·사고보고서·47망",
+  "share_target": {
+    "action": "./?share-target=1",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "files",
+          "accept": [
+            "image/*",
+            "video/*",
+            "application/pdf",
+            ".pdf",
+            ".hwp",
+            ".hwpx",
+            ".doc",
+            ".docx",
+            ".xls",
+            ".xlsx",
+            ".ppt",
+            ".pptx",
+            ".zip",
+            ".txt",
+            ".csv"
+          ]
+        }
+      ]
+    }
+  }
 }

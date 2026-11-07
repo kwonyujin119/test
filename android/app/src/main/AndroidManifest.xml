@@ -29,6 +29,22 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- 다른 앱(카카오톡·갤러리 등)에서 '공유' → SACHIL:47 → 47망 입력창 첨부로 -->
+            <intent-filter android:label="47망으로 보내기">
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+                <data android:mimeType="application/*" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter android:label="47망으로 보내기">
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+                <data android:mimeType="application/*" />
+            </intent-filter>
         </activity>
 
         <activity

@@ -34,6 +34,33 @@ class MainActivity : Activity() {
     companion object { const val APP_URL = "https://kwonyujin119.github.io/test/" }
 
     private lateinit var web: WebView
+    /** 다른 앱에서 공유받은 파일(이름·형식·주소)과 글 — 웹이 shareInfo/shareFile로 꺼내 가면 shareDone으로 비운다 */
+    private data class Shared(val uri: Uri, val name: String, val type: String, val size: Long)
+    private var shared: List<Shared> = emptyList()
+    private var sharedText = ""
+    private val SHARE_MAX = 40L * 1024 * 1024
+
+    @Suppress("DEPRECATION")
+    private fun takeShareIntent(i: Intent?): Boolean {
+        if (i == null || (i.action != Intent.ACTION_SEND && i.action != Intent.ACTION_SEND_MULTIPLE)) return false
+        val uris = ArrayList<Uri>()
+        if (i.action == Intent.ACTION_SEND) (i.getParcelableExtra<Uri>(Intent.EXTRA_STREAM))?.let { uris.add(it) }
+        else i.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)?.let { uris.addAll(it) }
+        i.clipData?.let { cd -> for (k in 0 until cd.itemCount) cd.getItemAt(k).uri?.let { if (!uris.contains(it)) uris.add(it) } }
+        shared = uris.take(10).map { u ->
+            var name = "공유파일"; var size = -1L
+            try { contentResolver.query(u, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME, android.provider.OpenableColumns.SIZE), null, null, null)?.use { c ->
+                if (c.moveToFirst()) { c.getString(0)?.let { name = it }; if (!c.isNull(1)) size = c.getLong(1) } } } catch (_: Exception) { }
+            Shared(u, name, contentResolver.getType(u) ?: (i.type ?: ""), size)
+        }
+        sharedText = listOfNotNull(i.getStringExtra(Intent.EXTRA_SUBJECT), i.getStringExtra(Intent.EXTRA_TEXT)).distinct().joinToString(" ").trim()
+        return shared.isNotEmpty() || sharedText.isNotEmpty()
+    }
+
+    override fun onNewIntent(i: Intent) {
+        super.onNewIntent(i); setIntent(i)
+        if (takeShareIntent(i)) web.evaluateJavascript("window.__sachilNativeShare&&window.__sachilNativeShare()", null)
+    }
     private var fileCb: ValueCallback<Array<Uri>>? = null
     private var geoCb: GeolocationPermissions.Callback? = null
     private var geoOrigin: String? = null
@@ -96,7 +123,8 @@ class MainActivity : Activity() {
         if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 43)
         Ot.ensureChannel(this)
-        if (b == null) web.loadUrl(APP_URL) else web.restoreState(b)
+        val fromShare = takeShareIntent(intent)
+        if (b == null || fromShare) web.loadUrl(APP_URL) else web.restoreState(b)
     }
 
     private fun openOut(i: Intent): Boolean {
@@ -137,6 +165,18 @@ class MainActivity : Activity() {
     /** 웹앱에서 부르는 기능: window.SachilNative */
     inner class Bridge {
         @JavascriptInterface fun isNative(): Boolean = true
+        @JavascriptInterface fun shareInfo(): String {
+            val a = org.json.JSONArray(); shared.forEach { a.put(org.json.JSONObject().put("name", it.name).put("type", it.type).put("size", it.size)) }
+            return org.json.JSONObject().put("files", a).put("text", sharedText).toString()
+        }
+        /** i번째 공유 파일 내용(base64). 40MB가 넘으면 빈 글 */
+        @JavascriptInterface fun shareFile(i: Int): String {
+            val s = shared.getOrNull(i) ?: return ""
+            if (s.size > SHARE_MAX) return ""
+            return try { contentResolver.openInputStream(s.uri)?.use { inp ->
+                val bytes = inp.readBytes(); if (bytes.size > SHARE_MAX) "" else Base64.encodeToString(bytes, Base64.NO_WRAP) } ?: "" } catch (_: Exception) { "" }
+        }
+        @JavascriptInterface fun shareDone() { shared = emptyList(); sharedText = "" }
         @JavascriptInterface fun schedule(due: String, iv: Int) { due.toLongOrNull()?.let { Ot.schedule(this@MainActivity, it, iv) } }
         @JavascriptInterface fun cancel() { Ot.cancel(this@MainActivity) }
         @JavascriptInterface fun takeEvents(): String = Ot.takeEvents(this@MainActivity)
