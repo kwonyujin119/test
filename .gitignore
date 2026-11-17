@@ -1,0 +1,4 @@
+# 실행할 때 생기는 파일 — 저장소에 올리지 않음(서버 데이터·설정·대화 기록은 각 PC의 server/data에만)
+__pycache__/
+*.pyc
+server/data/

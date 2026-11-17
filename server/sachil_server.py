@@ -46,8 +46,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False), '.csv': ('text/csv; charset=utf-8', False),   # 15.12: CSV(엑셀에서 저장한 표)
 }
-VERSION = '15.24'
-APP_VERSION = 'V246'
+VERSION = '15.25'
+APP_VERSION = 'V248'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 500 * 1024 * 1024         # 15.19: 47망·디브리핑룸 파일 1개 500MB(config chat_max_mb) — 48MB 조각으로 받아 디스크에 바로 씀(예전 10MB, 통째로 메모리)
@@ -116,7 +116,7 @@ def load_conf():
         'public_url': '',
         'ai_api_key': '',               # Claude API 키(sk-ant-…). 비우면 AI 도우미는 자료 발췌형으로 답함
         'gemini_api_key': '',           # Google AI Studio API 키(AIza…) — V96. gemini-key-setup.bat으로 넣음
-        'gemini_model': 'gemini-flash-latest',   # Gemini 모델 이름(AI Studio에 나온 이름으로 바꿀 수 있음)
+        'gemini_model': 'gemini-flash-lite-latest',   # Gemini 모델 이름(AI Studio에 나온 이름으로 바꿀 수 있음). 15.25: Flash → Flash-Lite(무료 하루 약 500회, 분당 15회)
         'ai_provider': 'auto',          # auto(키 있는 쪽: gemini → groq → claude) | gemini | groq | claude
         'groq_api_key': '',             # V103: Groq API 키(gsk_…) — Gemini 한도가 차면 예비로. groq-key-setup.bat으로 넣음
         'groq_model': 'openai/gpt-oss-120b',     # Groq 모델 이름(console.groq.com의 Models에 나온 이름). 안 되면 예비 모델을 차례로 시도
@@ -131,7 +131,7 @@ def load_conf():
         'update_url': 'https://raw.githubusercontent.com/kwonyujin119/test/main/server/sachil_server.py',
         'app_update_url': 'https://raw.githubusercontent.com/kwonyujin119/test/main/index.html',   # V126: 서버가 내보내는 앱 화면도 함께 최신으로
         'ai_model': 'claude-sonnet-5-5',
-        'ai_daily_limit': 50,           # 하루 AI 답변 최대 횟수(비용 상한, 교수 로그인은 제외). 0이면 무제한
+        'ai_daily_limit': 600,          # 하루 AI 답변 최대 횟수(교수 로그인은 제외). 0이면 무제한. 15.25: 50 → 600(Gemini Flash-Lite 약 500 + Groq 하루 토큰 한도만큼)
         'ai_assist_model': 'claude-haiku-5-5',   # AI 도우미 전용 모델(가장 저렴). 보고서는 ai_model
         'ai_code': '',                  # AI 도우미 입장코드. 비우면 코드 없이 누구나 사용(V124부터 기본 공개)
         'allowed_origins': ['https://kwonyujin119.github.io'],   # 이 서버에 접속을 허용할 외부 앱 주소(github.io)
@@ -149,6 +149,13 @@ def load_conf():
         changed = True
     if conf.get('ai_daily_limit') == 300:   # V93: 예전 기본값 300 → 50(교수 사용은 셈에서 제외)
         conf['ai_daily_limit'] = 50
+        changed = True
+    if not conf.get('ai_lite_v1525'):   # 15.25: 예전 기본값(Gemini Flash · 하루 50번)이면 Flash-Lite · 하루 600번으로(직접 바꾼 값은 그대로)
+        if conf.get('gemini_model') in (None, '', 'gemini-flash-latest'):
+            conf['gemini_model'] = 'gemini-flash-lite-latest'
+        if conf.get('ai_daily_limit') in (None, 50):
+            conf['ai_daily_limit'] = 600
+        conf['ai_lite_v1525'] = True
         changed = True
     # V88: 관리자 코드 교체 — 예전 평문 admin_code는 지우고 새 코드(해시)로 바꾼다(한 번만)
     if 'admin_code_hash' not in conf:
@@ -243,10 +250,6 @@ CREATE TABLE IF NOT EXISTS maps(room INTEGER PRIMARY KEY, data TEXT, ts REAL);
 CREATE TABLE IF NOT EXISTS album(id TEXT PRIMARY KEY, who TEXT, name TEXT, mime TEXT, size INTEGER, w INTEGER, h INTEGER, memo TEXT, taken REAL, ts REAL, thumb INTEGER DEFAULT 0);
 CREATE INDEX IF NOT EXISTS ix_album_taken ON album(taken);
 CREATE TABLE IF NOT EXISTS album_sessions(token TEXT PRIMARY KEY, who TEXT, admin INTEGER, created REAL, seen REAL, ip TEXT);
-CREATE TABLE IF NOT EXISTS lab_fd(id INTEGER PRIMARY KEY AUTOINCREMENT, parent INTEGER, name TEXT, by TEXT, ts REAL);
-CREATE TABLE IF NOT EXISTS lab_it(id INTEGER PRIMARY KEY AUTOINCREMENT, folder INTEGER, name TEXT, fn TEXT, size INTEGER, note TEXT, by TEXT, ts REAL);
-CREATE TABLE IF NOT EXISTS lab_doc(id INTEGER PRIMARY KEY AUTOINCREMENT, ord INTEGER, title TEXT, summary TEXT, body TEXT, file TEXT, fsize INTEGER, by TEXT, ts REAL);
-CREATE TABLE IF NOT EXISTS lab_q(id INTEGER PRIMARY KEY AUTOINCREMENT, topic TEXT, q TEXT, note TEXT, by TEXT, ts REAL, ets REAL);
 INSERT OR IGNORE INTO members SELECT room, user, seen FROM reads;
 ''')
 try:   # 예전 DB에 답장 칸 추가
@@ -272,6 +275,11 @@ def q(sql, args=(), one=False, commit=False):
 
 
 NEW_MSG = threading.Condition()
+ROOM_TICK = {}   # 15.25: 방마다 '바뀜' 번호(0 = 모든 방). 기다리는 요청은 이 번호가 바뀐 방만 DB를 다시 본다 — 글 하나에 모든 방 대기자가 DB를 두 번씩 읽던 것을 없앰
+
+
+def room_tick(rid=0):
+    ROOM_TICK[rid] = ROOM_TICK.get(rid, 0) + 1
 
 
 def ensure_room(cat, title):
@@ -395,6 +403,7 @@ if not _EP.get('start'):   # 처음 한 번 기록
     epoch_save()
 POSTS = {}
 POSTS_LOCK = threading.Lock()
+SENT_CID = {}   # 15.25: (사용자, 방, 전송 번호) → (글 번호, 시각) — 10분 동안 같은 전송을 다시 받으면 저장된 글을 돌려줌
 POST_MAX, POST_WINDOW = 24, 30          # 한 사람이 30초에 24번 넘게 보내면 잠시 막음(사진 10장 따로 보내기 + 글 여유)
 JOIN_MAX = 300                          # 한 접속 주소에서 10분에 대화명 입장 300번까지(교실 와이파이는 모두 같은 주소라 넉넉히)
 JOINS = {}
@@ -411,13 +420,20 @@ def chat_max():
         return MAX_UPLOAD
 
 
+STORE_SZ = [0.0, 0]   # 15.25: (계산한 시각, 합계) — 업로드 첫 조각마다 폴더 전체를 훑지 않게 1분 동안 다시 씀
+
+
 def store_size():
+    now = time.time()
+    if now - STORE_SZ[0] < 60:
+        return STORE_SZ[1]
     total = 0
     for n in os.listdir(FILES):
         try:
             total += os.path.getsize(os.path.join(FILES, n))
         except OSError:
             pass
+    STORE_SZ[0], STORE_SZ[1] = now, total
     return total
 
 
@@ -485,6 +501,7 @@ def _weekly_trim(force):
             epoch_save()
             removed += drop
         if removed:
+            room_tick()
             with NEW_MSG:
                 NEW_MSG.notify_all()
     st['last_trim'] = time.time()
@@ -934,8 +951,6 @@ class H(BaseHTTPRequestHandler):
                 return self.send(200, {'ok': True, 'rows': rows}, log=False)
             if path == '/api/contacts':   # V154: 긴급구조대응계획 — 응원협정 대상·긴급구조 관련기관 전화(교수가 고친 목록 > PDF에서 뽑은 목록)
                 return self.send(200, {'ok': True, 'manual': bool(str(CONF.get('contacts') or '').strip()), 'groups': contacts_groups()}, log=False)
-            if path == '/api/index':
-                return self.send(200, {'ok': True, 'status': DOCS_IDX.status()}, log=False)
             m = re.fullmatch(r'/lib-thumb/([0-9a-f]{24})\.jpg', path)
             if m:
                 fp = os.path.join(THUMBS, m.group(1) + '.jpg')
@@ -946,10 +961,6 @@ class H(BaseHTTPRequestHandler):
             if m:
                 return self.lib_get(m.group(1), urllib.parse.unquote(m.group(2)))
             self.user = self.get_user()
-            if path == '/api/lab/lib/file':   # 15.20: 연구실 자료실 파일 받기 — 교수만
-                return self.lablib_get(urllib.parse.parse_qs(qs))
-            if path == '/api/lab/file':   # 15.18: 연구실 원본 파일(hwpx 등) 내려받기 — 교수만
-                return self.lab_file_get(urllib.parse.parse_qs(qs))
             if path == '/api/report/tpl':   # V125: 교수가 정한 보고서 규칙 초안 양식(모든 기기 공통). 비어 있으면 앱 기본 양식
                 return self.send(200, {'ok': True, 'tpl': str(CONF.get('report_tpl') or ''), 'inst': str(CONF.get('report_inst') or ''), 'ts': CONF.get('report_tpl_ts') or 0}, log=False)   # V136: inst = 관리자 지시사항
             if path == '/api/ilform':   # V174: IL 화재등 상황 보고서 입력 서식(교수가 방재실에서 고침). 비어 있으면 앱 기본 서식
@@ -1038,14 +1049,6 @@ class H(BaseHTTPRequestHandler):
             m = re.fullmatch(r'/api/rooms/(\d{1,12})/read', path)
             if m:
                 return self.read_mark(int(m.group(1)))
-            if path == '/api/lab':   # 15.18: 지휘역량강화센터 연구실 문서(교수 전용)
-                return self.lab_api()
-            if path == '/api/lab/file':
-                return self.lab_file_put(urllib.parse.parse_qs(qs))
-            if path == '/api/lab/lib':   # 15.20: 연구실 자료실(폴더·파일) — 교수만
-                return self.lablib_api()
-            if path == '/api/lab/lib/up':
-                return self.lablib_up(urllib.parse.parse_qs(qs))
             if path == '/api/admin/ai':
                 return self.admin_ai()
             m = re.fullmatch(r'/api/lib/([a-z\-]{2,20})/upload', path)
@@ -1335,17 +1338,20 @@ class H(BaseHTTPRequestHandler):
         finally:
             with AI_BUSY_LOCK:
                 AI_BUSY[0] -= 1
+        partial = bool(text and code)
         if not text or code:   # 스트림 실패 → 보통 호출(재시도·다른 회사)로
-            if not text and ai_has()[1:]:
+            if not text and ai_has()[1:] and (code == 'rate_limited' or '시간 초과' in str(why)):
                 ai_mark_down('gemini', why or code or '스트림 글자 없음')   # V230: Gemini를 다시 기다리지 않고 바로 예비 AI로
             ev({'wait': 1})   # V191: 앱에 '아직 살아 있음'(다른 AI로 넘기는 중)
             t2, why2, _c = call_llm(sysmsg, msgs, max_tokens, 'low', CONF.get('ai_assist_model') or 'claude-haiku-5-5')
             if t2:
-                text, why = t2, ''
+                text, why, partial = t2, '', False
             else:
                 why = why2 or why
         ans = order_answer(text) if text else ''
         note = '' if ans else why
+        if partial:   # 15.25: 중간에 끊긴 답 — 보여 주되 저장(캐시)하지 않고 끊겼다고 알림
+            ck, note = '', 'AI 연결이 중간에 끊겨 답이 다 오지 않았어요 — 다시 물어보세요'
         if ans and ck:
             ans_cache_put(ck, mode, ans, sources)
         if not ans:
@@ -1396,7 +1402,7 @@ class H(BaseHTTPRequestHandler):
             with AI_BUSY_LOCK:
                 AI_BUSY[0] -= 1
         if not text or code:
-            if not text and ai_has()[1:]:
+            if not text and ai_has()[1:] and code == 'rate_limited':
                 ai_mark_down('gemini', why or code or '스트림 글자 없음')   # V230: 보고서도 Gemini를 다시(최대 180초) 기다리지 않고 예비 AI로
             ev({'wait': 1})
             t2, why2, code2 = call_llm(sysmsg, msgs, 8000, 'medium')
@@ -1407,7 +1413,8 @@ class H(BaseHTTPRequestHandler):
         if text and not code:
             if len(REPORT_CACHE) > 200:
                 REPORT_CACHE.clear()
-            REPORT_CACHE[key] = (now, text)
+            if TRUNC_NOTE not in text:
+                REPORT_CACHE[key] = (now, text)
             ev({'done': 1, 'ok': True, 'text': text})
         else:
             ev({'done': 1, 'ok': False, 'code': code or 'upstream_error', 'error': why})
@@ -1448,7 +1455,8 @@ class H(BaseHTTPRequestHandler):
             return self.send(200, {'ok': False, 'code': code or 'upstream_error', 'error': why}, log=False)
         if len(REPORT_CACHE) > 200:
             REPORT_CACHE.clear()
-        REPORT_CACHE[key] = (now, text)
+        if TRUNC_NOTE not in text:
+            REPORT_CACHE[key] = (now, text)
         return self.send(200, {'ok': True, 'text': text}, log=False)
 
     # --- 현장 지도(V106): 방마다 화재대상·현장지휘소·방면·차량대기소 하나씩. 방 참여자 모두가 같은 지도를 본다
@@ -1538,6 +1546,7 @@ class H(BaseHTTPRequestHandler):
                     'models': {'gemini': CONF.get('gemini_model'), 'groq': CONF.get('groq_model'), 'claude': CONF.get('ai_assist_model')},
                     'today': AI_DAY.get('n', 0) if AI_DAY.get('d') == time.strftime('%Y-%m-%d') else 0,
                     'limit': int(CONF.get('ai_daily_limit') or 0), 'version': VERSION,
+                    'groq_today': dict(GROQ_DAY), 'ai_down': {k: [int(v[0]), v[1]] for k, v in AI_DOWN.items() if v[0] > time.time()},
                     'auto_update': bool(CONF.get('auto_update')) and os.environ.get('SACHIL_LOOP') == '1',
                     'bat_old': bool(CONF.get('auto_update')) and os.environ.get('SACHIL_LOOP') != '1',   # V138: 옛 bat로 켜 서버 자동 업데이트가 쉬는 중
                     'bat_manual': bat_needs_manual(),   # V138: 자동 업데이트는 되지만 bat 자체는 한 번 손으로 바꿔야 함
@@ -1721,26 +1730,6 @@ class H(BaseHTTPRequestHandler):
             BLD_CACHE.clear()
             ffus_clear()
             return self.send(200, dict(status(), msg='연결 완료 — ' + txt), log=False)
-        if act == 'labq':   # 15.17: 지휘역량강화센터 연구실 '질문 모음' — 교수만 읽고 쓴다(서버 chat.db, 공개 저장소·일반 사용자에겐 없음)
-            op = str(j.get('op') or 'list')
-            topic = str(j.get('topic') or '')[:10] if str(j.get('topic') or '') in ('water', 'hydrant', 'coupling', 'etc') else 'etc'
-            qtext = str(j.get('q') or '').strip()[:2000]
-            note = str(j.get('note') or '').strip()[:4000]
-            qid = to_int(str(j.get('id') or '0'), 0)
-            if op == 'add':
-                if not qtext:
-                    return self.err(400, '질문을 적어 주세요')
-                if (q('SELECT COUNT(*) c FROM lab_q', one=True) or {'c': 0})['c'] >= 2000:
-                    return self.err(400, '질문이 너무 많습니다(2000개)')
-                q('INSERT INTO lab_q(topic,q,note,by,ts,ets) VALUES(?,?,?,?,?,?)', (topic, qtext, note, self.user['name'], time.time(), time.time()), commit=True)
-            elif op == 'edit':
-                if not qtext or not q('SELECT id FROM lab_q WHERE id=?', (qid,), one=True):
-                    return self.err(404, '없는 질문입니다')
-                q('UPDATE lab_q SET topic=?, q=?, note=?, ets=? WHERE id=?', (topic, qtext, note, time.time(), qid), commit=True)
-            elif op == 'del':
-                q('DELETE FROM lab_q WHERE id=?', (qid,), commit=True)
-            rows = q('SELECT id, topic, q, note, by, ts, ets FROM lab_q ORDER BY id DESC LIMIT 2000')
-            return self.send(200, {'ok': True, 'items': [dict(r) for r in rows]}, log=False)
         if act == 'contacts':   # V154: 교수 — 전화 목록 고치기('구분|기관명|번호' 한 줄씩). 빈 값이면 PDF 자동 목록으로
             t = str(j.get('text') or '')[:20000]
             if j.get('auto'):
@@ -1811,327 +1800,6 @@ class H(BaseHTTPRequestHandler):
         return self.send(200, dict(status(), msg=f'{AI_NAMES[prov]} 키 저장·시험 성공 — 바로 적용됩니다'), log=False)
 
     # --- 교수(관리자) 메뉴 자료 올리기·지우기 (V79)
-    # --- 15.18: 지휘역량강화센터 연구실 — 연구 과제 문서(제목·요약·본문 HTML) + 원본 파일(hwpx 등). 교수만 읽고 쓴다
-    LAB_TAGS = ('p', 'h3', 'h4', 'b', 'strong', 'i', 'em', 'u', 'ul', 'ol', 'li', 'br', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'blockquote')
-    LAB_EXT = ('.hwpx', '.hwp', '.pdf', '.docx', '.xlsx', '.pptx', '.jpg', '.jpeg', '.png', '.zip', '.txt')
-
-    def lab_clean(self, html):
-        """본문 HTML은 허용한 태그만(속성 모두 버림) — 교수만 쓰지만 화면에 그대로 넣으므로 스크립트·이벤트 속성을 막는다."""
-        html = re.sub(r'(?is)<(script|style|iframe|object|embed)[^>]*>.*?</\1>', '', str(html or ''))[:400000]
-        def tag(m):
-            close, name = m.group(1), m.group(2).lower()
-            if name not in self.LAB_TAGS:
-                return ''
-            return f'<{close}{name}>' if name != 'br' else '<br>'
-        return re.sub(r'<\s*(/?)\s*([a-zA-Z0-9]+)[^>]*>', tag, html)
-
-    def lab_rows(self):
-        return [dict(r) for r in q('SELECT id, ord, title, summary, body, file, fsize, by, ts FROM lab_doc ORDER BY ord, id')]
-
-    def lab_api(self):
-        if not self.user or self.user['role'] != 'admin':
-            return self.err(403, '교수(관리자)만 쓸 수 있습니다')
-        j = self.body_json(1_500_000)
-        op = str(j.get('op') or 'list')
-        did = to_int(str(j.get('id') or '0'), 0)
-        if op == 'seed' and not q('SELECT id FROM lab_doc LIMIT 1', one=True):   # 처음 한 번 — 앱의 기본 과제 3개
-            for i, d in enumerate((j.get('docs') or [])[:20]):
-                q('INSERT INTO lab_doc(ord,title,summary,body,file,fsize,by,ts) VALUES(?,?,?,?,?,?,?,?)',
-                  (i + 1, str(d.get('title') or '')[:200], str(d.get('summary') or '')[:500], self.lab_clean(d.get('body')), '', 0, self.user['name'], time.time()), commit=True)
-        elif op == 'save':
-            title = str(j.get('title') or '').strip()[:200]
-            if not title:
-                return self.err(400, '제목을 적어 주세요')
-            vals = (title, str(j.get('summary') or '').strip()[:500], self.lab_clean(j.get('body')), self.user['name'], time.time())
-            if did and q('SELECT id FROM lab_doc WHERE id=?', (did,), one=True):
-                q('UPDATE lab_doc SET title=?, summary=?, body=?, by=?, ts=? WHERE id=?', vals + (did,), commit=True)
-            else:
-                if (q('SELECT COUNT(*) c FROM lab_doc', one=True) or {'c': 0})['c'] >= 50:
-                    return self.err(400, '과제는 50개까지입니다')
-                mx = (q('SELECT MAX(ord) m FROM lab_doc', one=True) or {'m': 0})['m'] or 0
-                did = q('INSERT INTO lab_doc(ord,title,summary,body,file,fsize,by,ts) VALUES(?,?,?,?,?,?,?,?)', (mx + 1,) + vals[:3] + ('', 0) + vals[3:], commit=True)
-        elif op == 'del':
-            r = q('SELECT file FROM lab_doc WHERE id=?', (did,), one=True)
-            if r and r['file']:
-                try:
-                    os.remove(os.path.join(DATA, 'lab', r['file']))
-                except OSError:
-                    pass
-            q('DELETE FROM lab_doc WHERE id=?', (did,), commit=True)
-        elif op == 'order':
-            for i, x in enumerate((j.get('ids') or [])[:50]):
-                q('UPDATE lab_doc SET ord=? WHERE id=?', (i + 1, to_int(str(x), 0)), commit=True)
-        elif op == 'unfile':
-            r = q('SELECT file FROM lab_doc WHERE id=?', (did,), one=True)
-            if r and r['file']:
-                try:
-                    os.remove(os.path.join(DATA, 'lab', r['file']))
-                except OSError:
-                    pass
-            q("UPDATE lab_doc SET file='', fsize=0 WHERE id=?", (did,), commit=True)
-        return self.send(200, {'ok': True, 'id': did, 'items': self.lab_rows()}, log=False)
-
-    def lab_file_put(self, args):
-        if not self.user or self.user['role'] != 'admin':
-            return self.err(403, '교수(관리자)만 올릴 수 있습니다')
-        did = to_int((args.get('id') or ['0'])[0], 0)
-        if not q('SELECT id FROM lab_doc WHERE id=?', (did,), one=True):
-            return self.err(404, '없는 과제입니다')
-        n = self.clen()
-        if n <= 0 or n > LIB_PART_MAX:
-            self.close_connection = True
-            return self.err(413, '파일은 95MB 이하만 올릴 수 있습니다')
-        name = re.sub(r'[\x00-\x1f\x7f<>:"/\\|?*]', '', urllib.parse.unquote(self.headers.get('X-Filename') or '')).strip().strip('.')[:120]
-        ext = os.path.splitext(name)[1].lower()
-        if not name or ext not in self.LAB_EXT:
-            self.close_connection = True
-            return self.err(415, '올릴 수 없는 파일 형식입니다(hwpx·hwp·pdf·docx·xlsx·pptx·그림)')
-        d = os.path.join(DATA, 'lab')
-        os.makedirs(d, exist_ok=True)
-        fn = f'{did}-{secrets.token_hex(4)}{ext}'
-        tmp = os.path.join(d, '.up-' + fn)
-        left = n
-        try:
-            with open(tmp, 'wb') as f:
-                while left > 0:
-                    b = self.rfile.read(min(262144, left))
-                    if not b:
-                        raise ConnectionError('업로드가 끊겼습니다')
-                    f.write(b)
-                    left -= len(b)
-            self._body_read = True
-            old = q('SELECT file FROM lab_doc WHERE id=?', (did,), one=True)
-            os.replace(tmp, os.path.join(d, fn))
-            if old and old['file']:
-                try:
-                    os.remove(os.path.join(d, old['file']))
-                except OSError:
-                    pass
-            q('UPDATE lab_doc SET file=?, fsize=?, ts=? WHERE id=?', (name + '|' + fn, n, time.time(), did), commit=True)
-        finally:
-            if os.path.exists(tmp):
-                os.remove(tmp)
-        return self.send(200, {'ok': True, 'items': self.lab_rows()}, log=False)
-
-    # --- 15.20: 지휘역량강화센터 연구실 '자료실' — 폴더(lab_fd, 여러 단계) + 파일(lab_it, data\lab\lib\<id>). 교수만 보고 고친다
-    LABLIB_BAD = ('.exe', '.bat', '.cmd', '.com', '.msi', '.ps1', '.vbs', '.js', '.jse', '.wsf', '.scr', '.lnk', '.html', '.htm', '.svg', '.hta', '.jar', '.dll')
-    LABLIB_DIR = os.path.join(DATA, 'lab', 'lib')
-
-    def lablib_admin(self):
-        return bool(self.user) and self.user['role'] == 'admin'
-
-    def lablib_state(self, folder):
-        f = to_int(str(folder or 0), 0)
-        if f and not q('SELECT id FROM lab_fd WHERE id=?', (f,), one=True):
-            f = 0
-        path, cur = [], f
-        while cur:
-            r = q('SELECT id, parent, name FROM lab_fd WHERE id=?', (cur,), one=True)
-            if not r:
-                break
-            path.insert(0, {'id': r['id'], 'name': r['name']})
-            cur = r['parent'] or 0
-            if len(path) > 30:
-                break
-        dirs = [dict(r) for r in q('SELECT id, name, ts, by, (SELECT COUNT(*) FROM lab_fd c WHERE c.parent=lab_fd.id) + (SELECT COUNT(*) FROM lab_it i WHERE i.folder=lab_fd.id) n FROM lab_fd WHERE parent=? ORDER BY name', (f,))]
-        files = [dict(r) for r in q('SELECT id, name, size, note, by, ts FROM lab_it WHERE folder=? ORDER BY name', (f,))]
-        tot = q('SELECT COUNT(*) n, COALESCE(SUM(size),0) s FROM lab_it', one=True)
-        return {'ok': True, 'folder': f, 'path': path, 'dirs': dirs, 'files': files, 'total': {'n': tot['n'], 'size': tot['s']}}
-
-    def lablib_sub(self, fid):
-        """폴더와 그 아래 모든 폴더 id(자기 포함)"""
-        out, todo = [], [fid]
-        while todo and len(out) < 5000:
-            x = todo.pop()
-            out.append(x)
-            todo += [r['id'] for r in q('SELECT id FROM lab_fd WHERE parent=?', (x,))]
-        return out
-
-    def lablib_api(self):
-        if not self.lablib_admin():
-            return self.err(403, '교수(관리자)만 쓸 수 있습니다')
-        j = self.body_json(20000)
-        op = str(j.get('op') or 'list')
-        folder = to_int(str(j.get('folder') or 0), 0)
-        clean = lambda v: re.sub(r'[\x00-\x1f\x7f<>:"/\\|?*]', '', str(v or '')).strip().strip('.')[:120]
-        if op == 'search':
-            k = str(j.get('q') or '').strip()[:60]
-            if not k:
-                return self.send(200, {'ok': True, 'dirs': [], 'files': []}, log=False)
-            like = '%' + k.replace('%', '').replace('_', '') + '%'
-            dirs = [dict(r) for r in q('SELECT id, name, parent, ts FROM lab_fd WHERE name LIKE ? ORDER BY name LIMIT 100', (like,))]
-            files = [dict(r) for r in q('SELECT id, name, size, note, folder, ts, by FROM lab_it WHERE name LIKE ? OR note LIKE ? ORDER BY name LIMIT 300', (like, like))]
-            names = {r['id']: r['name'] for r in q('SELECT id, name FROM lab_fd')}
-            for x in files:
-                x['where'] = names.get(x['folder'], '자료실')
-            for x in dirs:
-                x['where'] = names.get(x['parent'], '자료실')
-            return self.send(200, {'ok': True, 'dirs': dirs, 'files': files}, log=False)
-        if op == 'tree':
-            return self.send(200, {'ok': True, 'dirs': [dict(r) for r in q('SELECT id, parent, name FROM lab_fd ORDER BY name')]}, log=False)
-        if op == 'mkdir':
-            name = clean(j.get('name'))
-            if not name:
-                return self.err(400, '폴더 이름을 적어 주세요')
-            if q('SELECT id FROM lab_fd WHERE parent=? AND name=?', (folder, name), one=True):
-                return self.err(400, '같은 이름의 폴더가 있습니다')
-            if (q('SELECT COUNT(*) c FROM lab_fd', one=True) or {'c': 0})['c'] >= 2000:
-                return self.err(400, '폴더는 2000개까지입니다')
-            q('INSERT INTO lab_fd(parent,name,by,ts) VALUES(?,?,?,?)', (folder, name, self.user['name'], time.time()), commit=True)
-        elif op in ('rename', 'note'):
-            tid, kind = to_int(str(j.get('id') or 0), 0), str(j.get('kind') or 'file')
-            if op == 'note':
-                q('UPDATE lab_it SET note=? WHERE id=?', (str(j.get('note') or '').strip()[:500], tid), commit=True)
-            else:
-                name = clean(j.get('name'))
-                if not name:
-                    return self.err(400, '이름을 적어 주세요')
-                if kind == 'dir':
-                    cur = q('SELECT parent FROM lab_fd WHERE id=?', (tid,), one=True)
-                    if cur and q('SELECT id FROM lab_fd WHERE parent=? AND name=? AND id<>?', (cur['parent'], name, tid), one=True):
-                        return self.err(400, '같은 이름의 폴더가 있습니다')
-                    q('UPDATE lab_fd SET name=? WHERE id=?', (name, tid), commit=True)
-                else:
-                    old = q('SELECT name FROM lab_it WHERE id=?', (tid,), one=True)
-                    if old and not os.path.splitext(name)[1] and os.path.splitext(old['name'])[1]:
-                        name += os.path.splitext(old['name'])[1]   # 확장자를 지우고 바꾸면 원래 확장자를 붙여 둔다
-                    if os.path.splitext(name)[1].lower() in self.LABLIB_BAD:
-                        return self.err(400, '그 확장자로는 바꿀 수 없습니다')
-                    q('UPDATE lab_it SET name=? WHERE id=?', (name, tid), commit=True)
-        elif op == 'move':
-            to = to_int(str(j.get('to') or 0), 0)
-            if to and not q('SELECT id FROM lab_fd WHERE id=?', (to,), one=True):
-                return self.err(404, '옮길 폴더가 없습니다')
-            for x in (j.get('items') or [])[:500]:
-                tid, kind = to_int(str((x or {}).get('id') or 0), 0), str((x or {}).get('kind') or 'file')
-                if kind == 'dir':
-                    if to in self.lablib_sub(tid):
-                        return self.err(400, '폴더를 자기 안(또는 그 아래)으로 옮길 수 없습니다')
-                    q('UPDATE lab_fd SET parent=? WHERE id=?', (to, tid), commit=True)
-                else:
-                    q('UPDATE lab_it SET folder=? WHERE id=?', (to, tid), commit=True)
-        elif op == 'del':
-            for x in (j.get('items') or [])[:500]:
-                tid, kind = to_int(str((x or {}).get('id') or 0), 0), str((x or {}).get('kind') or 'file')
-                fids = self.lablib_sub(tid) if kind == 'dir' else []
-                rows = q('SELECT id, fn FROM lab_it WHERE folder IN (%s)' % ','.join('?' * len(fids)), tuple(fids)) if fids else q('SELECT id, fn FROM lab_it WHERE id=?', (tid,))
-                for r in rows:
-                    try:
-                        os.remove(os.path.join(self.LABLIB_DIR, r['fn']))
-                    except OSError:
-                        pass
-                    q('DELETE FROM lab_it WHERE id=?', (r['id'],), commit=True)
-                for fd in fids:
-                    q('DELETE FROM lab_fd WHERE id=?', (fd,), commit=True)
-        return self.send(200, self.lablib_state(folder), log=False)
-
-    def lablib_up(self, args):
-        """자료실 파일 올리기 — 48MB 조각(?uid&part&parts)으로 받아 디스크에 이어 씀. 마지막 조각에서 목록에 넣는다."""
-        if not self.lablib_admin():
-            return self.err(403, '교수(관리자)만 올릴 수 있습니다')
-        folder = to_int((args.get('folder') or ['0'])[0], 0)
-        if folder and not q('SELECT id FROM lab_fd WHERE id=?', (folder,), one=True):
-            return self.err(404, '폴더가 없습니다(다른 기기에서 지웠을 수 있어요)')
-        n = self.clen()
-        if n <= 0 or n > LIB_PART_MAX:
-            self.close_connection = True
-            return self.err(413, '한 번에 보내는 조각이 너무 큽니다(앱을 새로고침해 다시 올려 주세요)')
-        name = re.sub(r'[\x00-\x1f\x7f<>:"/\\|?*]', '', urllib.parse.unquote(self.headers.get('X-Filename') or '')).strip().strip('.')[:120]
-        if not name or os.path.splitext(name)[1].lower() in self.LABLIB_BAD:
-            self.close_connection = True
-            return self.err(415, '실행 파일·웹 문서(exe·bat·js·html 등)는 올릴 수 없습니다')
-        uid = re.sub(r'[^0-9a-f]', '', (args.get('uid') or [''])[0])[:32]
-        part, parts = to_int((args.get('part') or ['0'])[0], 0), to_int((args.get('parts') or ['1'])[0], 1)
-        if uid and (len(uid) < 12 or not 0 <= part < parts <= 100000):
-            self.close_connection = True
-            return self.err(400, '조각 번호가 맞지 않습니다')
-        os.makedirs(self.LABLIB_DIR, exist_ok=True)
-        if part == 0:
-            total = to_int(self.headers.get('X-Total-Size') or str(n), n)
-            try:
-                free = shutil.disk_usage(self.LABLIB_DIR).free
-            except OSError:
-                free = 0
-            if free and free < total + 512 * 1048576:
-                self.close_connection = True
-                return self.err(507, '서버 PC 저장 공간이 부족합니다(500MB 이상 남겨 주세요)')
-        tmp = os.path.join(self.LABLIB_DIR, '.up-' + (uid if uid else secrets.token_hex(8)))
-        have = 0
-        if uid and part:
-            have = os.path.getsize(tmp) if os.path.exists(tmp) else 0
-            hint = to_int(self.headers.get('X-Part-Size') or '0', 0)
-            if not hint or have < part * hint:
-                self.close_connection = True
-                return self.err(409, '조각 순서가 어긋났습니다 — 처음부터 다시 올려 주세요')
-            have = part * hint
-        last = (not uid) or part == parts - 1
-        left, done = n, False
-        try:
-            with open(tmp, 'r+b' if uid and part else 'wb') as f:
-                if uid and part:
-                    f.seek(have)
-                    f.truncate()
-                while left > 0:
-                    b = self.rfile.read(min(262144, left))
-                    if not b:
-                        raise ConnectionError('업로드가 끊겼습니다')
-                    f.write(b)
-                    left -= len(b)
-            self._body_read = True
-            if not last:
-                done = True
-                return self.send(200, {'ok': True, 'part': part})
-            size = os.path.getsize(tmp)
-            fn = secrets.token_hex(12)
-            os.replace(tmp, os.path.join(self.LABLIB_DIR, fn))
-            done = True
-            base, ext = os.path.splitext(name)
-            nm, k = name, 2
-            while q('SELECT id FROM lab_it WHERE folder=? AND name=?', (folder, nm), one=True) and k < 1000:
-                nm, k = f'{base} ({k}){ext}', k + 1   # 같은 이름이 있으면 '이름 (2).pdf'
-            q('INSERT INTO lab_it(folder,name,fn,size,note,by,ts) VALUES(?,?,?,?,?,?,?)', (folder, nm, fn, size, '', self.user['name'], time.time()), commit=True)
-            return self.send(200, self.lablib_state(folder), log=False)
-        except ConnectionError:
-            self.close_connection = True
-            if uid and not last and os.path.exists(tmp):
-                try:
-                    with open(tmp, 'r+b') as f:
-                        f.truncate(have)
-                except OSError:
-                    pass
-                done = True
-            return self.err(400, '전송이 중간에 끊겼습니다. 다시 올려 주세요')
-        finally:
-            if not done and os.path.exists(tmp):
-                try:
-                    os.remove(tmp)
-                except OSError:
-                    pass
-
-    def lablib_get(self, args):
-        if not self.lablib_admin():
-            return self.err(403, '교수(관리자)만 받을 수 있습니다')
-        r = q('SELECT name, fn FROM lab_it WHERE id=?', (to_int((args.get('id') or ['0'])[0], 0),), one=True)
-        if not r:
-            return self.err(404, '파일이 없습니다')
-        ext = os.path.splitext(r['name'])[1].lower()
-        mime = LIB_TYPES.get(ext, ('application/octet-stream', False))[0]
-        view = (args.get('view') or [''])[0] == '1' and ext in ('.pdf', '.jpg', '.jpeg', '.png', '.webp', '.gif', '.mp4')
-        return self.send_file(os.path.join(self.LABLIB_DIR, r['fn']), mime if view else 'application/octet-stream',
-                              ('inline' if view else 'attachment') + "; filename*=UTF-8''" + urllib.parse.quote(r['name']), 'no-store')
-
-    def lab_file_get(self, args):
-        if not self.user or self.user['role'] != 'admin':
-            return self.err(403, '교수(관리자)만 받을 수 있습니다')
-        r = q('SELECT file FROM lab_doc WHERE id=?', (to_int((args.get('id') or ['0'])[0], 0),), one=True)
-        if not r or '|' not in (r['file'] or ''):
-            return self.err(404, '파일이 없습니다')
-        name, fn = r['file'].split('|', 1)
-        mime = LIB_TYPES.get(os.path.splitext(name)[1].lower(), ('application/octet-stream', False))[0]
-        if name.lower().endswith('.hwpx'):
-            mime = 'application/hwp+zip'
-        return self.send_file(os.path.join(DATA, 'lab', fn), mime, "attachment; filename*=UTF-8''" + urllib.parse.quote(name), 'no-store')
-
     def lib_upload(self, slug, args=None):
         """교수 메뉴 자료 올리기. 15.14: 크기 제한 없음 — 큰 파일은 ?uid=…&part=i&parts=n 조각으로 와서 차례로 이어 붙이고, 마지막 조각에서 검사·교체."""
         if self.user['role'] != 'admin':
@@ -2515,6 +2183,7 @@ class H(BaseHTTPRequestHandler):
         q('DELETE FROM files WHERE room=?', (rid,), commit=True)
         q('DELETE FROM messages WHERE room=?', (rid,), commit=True)
         q('DELETE FROM rooms WHERE id=?', (rid,), commit=True)
+        room_tick(rid)
         with NEW_MSG:
             NEW_MSG.notify_all()
         return self.send(200, {'ok': True})
@@ -2535,6 +2204,7 @@ class H(BaseHTTPRequestHandler):
         epoch_save()
         with ROOM_CACHE_LOCK:
             ROOM_CACHE.pop(('al', rid), None)
+        room_tick(rid)
         with NEW_MSG:
             NEW_MSG.notify_all()
         self.alog(200, 'room-clear')
@@ -2568,21 +2238,23 @@ class H(BaseHTTPRequestHandler):
         with ROOM_CACHE_LOCK:   # V193: 2초 동안은 모두에게 같은 값(참여자 수·읽음 위치) — 1000명이 동시에 깨어나도 한 번만 계산
             c = ROOM_CACHE.get(('st', rid))
             busy = ROOM_CACHE.get(('stb', rid))
-            if c and (now - c[0] < 2.0 or (busy and now - busy < 5)):   # 누가 계산 중이면 잠깐 옛 값
-                return dict(c[1], rv=READ_VER.get(rid, 0))
+            rvn = READ_VER.get(rid, 0)
+            if c and ((now - c[0] < 2.0 and c[2] == rvn) or (busy and now - busy < 5)):   # 누가 계산 중이면 잠깐 옛 값
+                return dict(c[1], rv=c[2])   # 15.25: 읽음 위치를 계산한 때의 rv를 붙인다(새 rv + 옛 위치를 주면 앱이 25초 동안 틀린 '안 읽은 수'를 보임)
             ROOM_CACHE[('stb', rid)] = now
         with PRESENCE_LOCK:
             for k in [k for k, t in PRESENCE.items() if now - t > ONLINE_SEC * 3]:
                 PRESENCE.pop(k, None)
             online = sum(1 for (r, _u), t in PRESENCE.items() if r == rid and now - t <= ONLINE_SEC)
+        rv_at = READ_VER.get(rid, 0)
         rows = q('SELECT r.last_id FROM reads r JOIN sessions s ON s.id=r.user WHERE r.room=? AND r.seen>?',
                  (rid, now - MEMBER_DAYS * 86400))
         mem = q('SELECT COUNT(*) n FROM members m JOIN sessions s ON s.id=m.user WHERE m.room=?', (rid,), one=True)['n']
         st = {'online': max(1, online), 'members': max(1, mem), 'rp': sorted(x['last_id'] for x in rows)}
         with ROOM_CACHE_LOCK:
-            ROOM_CACHE[('st', rid)] = (now, st)
+            ROOM_CACHE[('st', rid)] = (now, st, rv_at)
             ROOM_CACHE.pop(('stb', rid), None)
-        return dict(st, rv=READ_VER.get(rid, 0))
+        return dict(st, rv=rv_at)
 
     def set_read(self, rid, last):
         # V193: 읽음은 메모리에 모았다가 1.5초마다 한 번에 저장(1000명이 동시에 읽어도 저장은 1번)
@@ -2627,14 +2299,20 @@ class H(BaseHTTPRequestHandler):
                 p0 = READ_PEND.get((rid, self.user['id']))
             r0 = q('SELECT last_id FROM reads WHERE room=? AND user=?', (rid, self.user['id']), one=True)
             my_read = max(r0['last_id'] if r0 else 0, p0[0] if p0 else 0)
+        seen_tick = None
         while True:
-            if after <= 0:
-                rows = q('SELECT * FROM (SELECT * FROM messages WHERE room=? ORDER BY id DESC LIMIT 200) ORDER BY id', (rid,))
+            tick = (ROOM_TICK.get(rid, 0), ROOM_TICK.get(0, 0))   # 15.25: 이 방이 바뀌었을 때만 DB를 다시 본다(먼저 번호를 읽고 조회 — 그 뒤의 글은 번호가 바뀌어 다음에 잡힘)
+            if tick != seen_tick:
+                seen_tick = tick
+                if after <= 0:
+                    rows = q('SELECT * FROM (SELECT * FROM messages WHERE room=? ORDER BY id DESC LIMIT 200) ORDER BY id', (rid,))
+                else:
+                    rows = q('SELECT * FROM messages WHERE room=? AND id>? ORDER BY id LIMIT 200', (rid, after))
+                alive = q('SELECT id FROM rooms WHERE id=?', (rid,), one=True)
+                if not alive:   # 기다리는 동안 방이 삭제됨 — 오류가 아니라 정상 응답으로 알린다
+                    return self.send(200, {'ok': True, 'gone': True, 'messages': []}, log=False)
             else:
-                rows = q('SELECT * FROM messages WHERE room=? AND id>? ORDER BY id LIMIT 200', (rid, after))
-            alive = q('SELECT id FROM rooms WHERE id=?', (rid,), one=True)
-            if not alive:   # 기다리는 동안 방이 삭제됨 — 오류가 아니라 정상 응답으로 알린다
-                return self.send(200, {'ok': True, 'gone': True, 'messages': []}, log=False)
+                rows = []
             if rows or not wait or time.time() >= deadline or (ep0 and ep0 != epoch(rid)) or (rv0 >= 0 and rv0 != READ_VER.get(rid, 0)) or (dv0 >= 0 and dv0 != DEL_VER.get(rid, 0)):
                 break
             with NEW_MSG:
@@ -2669,6 +2347,16 @@ class H(BaseHTTPRequestHandler):
             ps.append(now)
             POSTS[self.user['id']] = ps
         b = self.body_json()
+        cid = str(b.get('cid') or '')[:40]   # 15.25: 앱이 붙인 전송 번호 — 응답이 끊겨 다시 보내도 같은 글을 두 번 저장하지 않는다
+        if cid:
+            with POSTS_LOCK:
+                for k in [k for k, v in SENT_CID.items() if now - v[1] > 600]:
+                    SENT_CID.pop(k, None)
+                hit = SENT_CID.get((self.user['id'], rid, cid))
+            if hit:
+                r = q('SELECT * FROM messages WHERE id=? AND room=?', (hit[0], rid), one=True)
+                if r:
+                    return self.send(200, dict({'ok': True, 'message': self.msg_out(r, self.aliases(rid, {r['author']})), 'dup': 1}, **self.room_state(rid)))
         raw = b.get('text')
         text = re.sub(r'[\x00-\x08\x0b-\x1f\x7f]', '', raw if isinstance(raw, str) else '').strip()[:1000]   # 글이 아닌 값은 받지 않음
         if text == DELETED_TXT:   # 지운 글 표시와 헷갈리지 않게
@@ -2721,9 +2409,14 @@ class H(BaseHTTPRequestHandler):
         mid = q('INSERT INTO messages(room,author,name,text,files,ts,reply) VALUES(?,?,?,?,?,?,?)',
                 (rid, self.user['id'], self.user['name'], text, json.dumps(files, ensure_ascii=False), now, reply), commit=True)
         self._posted = True   # 여기부터는 파일이 글에 붙었다
+        cid = str(b.get('cid') or '')[:40]
+        if cid:
+            with POSTS_LOCK:
+                SENT_CID[(self.user['id'], rid, cid)] = (mid, now)
         q('UPDATE rooms SET last=? WHERE id=?', (now, rid), commit=True)
         self.touch(rid)
         self.set_read(rid, mid)   # 내 글은 내가 읽은 것(안에서 NEW_MSG도 깨움)
+        room_tick(rid)
         with NEW_MSG:
             NEW_MSG.notify_all()
         r = q('SELECT * FROM messages WHERE id=?', (mid,), one=True)
@@ -2757,6 +2450,7 @@ class H(BaseHTTPRequestHandler):
         DEL_VER[rid] = DEL_VER.get(rid, 0) + 1
         DELETED.setdefault(rid, []).append((DEL_VER[rid], mid))
         del DELETED[rid][:-300]
+        room_tick(rid)
         with NEW_MSG:
             NEW_MSG.notify_all()
         return self.send(200, {'ok': True})
@@ -4610,8 +4304,11 @@ def ans_cache_get(key):
     return None
 
 
+TRUNC_NOTE = '\n\n(답이 길이 한도에서 잘렸어요 — 더 좁혀 물어보면 끝까지 받을 수 있어요)'   # 15.25: 잘린 답은 표시하고 저장(캐시)하지 않는다
+
+
 def ans_cache_put(key, mode, answer, sources):
-    if not key or float(CONF.get('ai_cache_days') or 0) <= 0:
+    if not key or float(CONF.get('ai_cache_days') or 0) <= 0 or TRUNC_NOTE.strip() in str(answer or ''):
         return
     now = time.time()
     with ANS_CACHE_LOCK:
@@ -4659,13 +4356,37 @@ def ai_ready():
     return bool(ai_provider())
 
 
+AI_DOWN_LOG = []   # 15.25: 최근 '쉬기' 기록(교수 화면 상태에 보임)
 AI_DOWN = {}   # V230: 회사별 '잠시 쉬기' — {회사: (이때까지, 이유)}. 스트림이 글자 없이 끊기거나 일시 오류가 나면 그동안 건너뛰고 예비 AI로 바로
+
+
+def quota_day(txt):
+    """15.25: 오류 글이 '하루 한도 소진'(Gemini PerDay·RPD, Groq TPD·RPD)이면 True — 분당 한도와 달리 몇 분 뒤 다시 해도 안 된다."""
+    t = str(txt or '')
+    return bool(re.search(r'PerDay|per day|\bRPD\b|\bTPD\b|하루 한도', t, re.I))
+
+
+def day_reset_sec(p):
+    """하루 한도가 다시 풀리기까지 남은 초. Gemini = 미국 태평양 자정(대략 UTC 08:00), Groq = 한 시간마다 다시 확인(구간 한도)."""
+    if p != 'gemini':
+        return 3600
+    now = time.time()
+    nxt = (now // 86400) * 86400 + 8 * 3600
+    if nxt <= now:
+        nxt += 86400
+    return int(nxt - now) + 60
 
 
 def ai_mark_down(p, why):
     sec = int(CONF.get('ai_down_sec') or 600)
+    if quota_day(why):
+        sec = max(sec, day_reset_sec(p))
+    elif '한도 초과' in str(why or ''):
+        sec = 60   # 15.25: 분당 한도는 1분이면 풀린다(예전엔 10분 내내 예비 AI만)
     AI_DOWN[p] = (time.time() + sec, str(why or '')[:160])
     msg = f'{AI_NAMES.get(p, p)} {sec // 60}분 쉬고 예비 AI로: {str(why or "")[:120]}'
+    AI_DOWN_LOG.append((time.time(), p, sec, str(why or '')[:120]))
+    del AI_DOWN_LOG[:-20]
     print('[AI]', msg, flush=True)
     try:
         upd_log('AI ' + msg)
@@ -4717,7 +4438,7 @@ def _call_llm(system, msgs, max_tokens, effort='', model=''):
             return call_groq(system, msgs, max_tokens)
         return call_claude(system, msgs, max_tokens, effort, model)
     text, why, code = call(prov)
-    if not text and code in ('rate_limited', 'upstream_error') and '키' not in why and '모델' not in why and 'model' not in why and '한도' not in why:
+    if not text and code == 'rate_limited' and '바쁩니다' in why:   # 15.25: 서버 바쁨만 한 번 더(시간 초과·한도는 다시 해도 같음 — 바로 예비 AI로)
         time.sleep(2)
         text, why2, code = call(prov)
         why = why2 or why
@@ -4740,6 +4461,17 @@ def _call_llm(system, msgs, max_tokens, effort='', model=''):
 
 
 GROQ_FALLBACK_MODELS = ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'qwen/qwen3-32b', 'openai/gpt-oss-20b']
+GROQ_DAY = {'d': '', 'tok': 0, 'n': 0}   # 15.25: 오늘 Groq에 쓴 토큰·횟수(무료 하루 20만 토큰 · 1,000번) — 교수 화면 상태에 보임
+
+
+def groq_day_add(tok):
+    d = time.strftime('%Y-%m-%d', time.gmtime())
+    if GROQ_DAY['d'] != d:
+        GROQ_DAY.update(d=d, tok=0, n=0)
+    GROQ_DAY['tok'] += max(0, tok)
+    GROQ_DAY['n'] += 1
+
+
 GROQ_OK_MODEL = [None]   # 이번 실행에서 실제로 된 모델(이름이 바뀌어 404가 나면 예비 모델로)
 
 
@@ -4749,28 +4481,39 @@ def call_groq(system, msgs, max_tokens):
     url = (CONF.get('groq_api_url') or 'https://api.groq.com/openai/v1').rstrip('/') + '/chat/completions'
     want = re.sub(r'[^A-Za-z0-9./\-_:]', '', str(CONF.get('groq_model') or '')) or GROQ_FALLBACK_MODELS[0]
     models = [m for m in ([GROQ_OK_MODEL[0]] if GROQ_OK_MODEL[0] else []) + [want] + GROQ_FALLBACK_MODELS if m]
-    seen, code, why = set(), 'upstream_error', ''
+    seen, code, why, gone = set(), 'upstream_error', '', set()
     # V146: 무료 계정은 '보낸 글 + 답 최대 길이'가 분당 한도(모델마다 6천~1만2천 토큰)를 넘으면 413 — 답 길이는 3천으로, 413이면 글을 줄여 다시
     out_tok = min(max(int(max_tokens), 1024), 3000)
+    # 15.25: 분당 한도(무료 8천 토큰) 안에 들도록 미리 맞춘다 — 넘겨서 413을 받고 다시 보내는 헛걸음(요청 한 번·몇 초)을 없앰
+    tpm = int(CONF.get('groq_tpm') or 8000)
+    est = (len(system) + sum(len(str(m.get('content') or '')) for m in msgs)) * 2 // 3 + 200   # 한글 섞인 글 ≈ 글자 1.5개당 1토큰
+    if est + out_tok > tpm - 300:
+        out_tok = max(1200, tpm - 300 - est)
+    start = 1.0 if est + out_tok <= tpm - 300 else (0.55 if est * 0.55 + out_tok <= tpm - 300 else 0.3)
     def shrink(ms, frac):
         if frac >= 1:
             return ms
         big = max(range(len(ms)), key=lambda i: len(ms[i]['content'])) if ms else -1
         out = [dict(m) for m in ms]
-        if big >= 0:
-            c = out[big]['content']; keep = max(800, int(len(c) * frac))
-            out[big]['content'] = c[:keep] + '\n…(자료 일부 생략)'
+        if big >= 0:   # 15.25: <자료> 안만 줄인다(질문·답 순서·보고서 양식은 그대로 — 예전엔 끝을 잘라 질문이 빠졌다)
+            c = out[big]['content']; a, b = c.find('<자료>'), c.find('</자료>')
+            if 0 <= a < b:
+                mat = c[a + 5:b]; keep = max(600, int(len(mat) * frac))
+                out[big]['content'] = c[:a + 5] + mat[:keep] + '\n…(자료 일부 생략)\n' + c[b:]
+            else:
+                keep = max(800, int(len(c) * frac)); tail = min(1500, keep // 2)
+                out[big]['content'] = c[:keep - tail] + '\n…(일부 생략)…\n' + c[-tail:]
         return out
     tries = []
     for model in models:
         if model not in seen:
             seen.add(model)
-            tries += [(model, 1.0), (model, 0.55), (model, 0.3)]
+            tries += [(model, f) for f in (1.0, 0.55, 0.3) if f <= start]
     skip = set()
     for model, frac in tries:
         if model in skip:
             continue
-        sysc = system if frac >= 1 else system[:max(1500, int(len(system) * max(frac, 0.6)))]
+        sysc = system   # 15.25: 지시문(끝에 붙는 보고서 양식·관리자 지시 포함)은 자르지 않는다
         body = {'model': model, 'max_tokens': out_tok if frac >= 1 else min(out_tok, 2000), 'temperature': 0.3,
                 'messages': [{'role': 'system', 'content': sysc}] + [{'role': m['role'], 'content': m['content']} for m in shrink(msgs, frac)]}
         if model.startswith('openai/gpt-oss'):
@@ -4779,13 +4522,17 @@ def call_groq(system, msgs, max_tokens):
                                      headers={'Authorization': 'Bearer ' + CONF.get('groq_api_key', ''), 'content-type': 'application/json',
                                               'User-Agent': 'SACHIL47-server'})
         try:
-            with urllib.request.urlopen(req, timeout=120) as r:
+            with urllib.request.urlopen(req, timeout=int(CONF.get('groq_timeout') or 45)) as r:   # 15.25: 120 → 45초(앱은 45초면 기다림을 멈춘다)
                 j = json.loads(r.read().decode('utf-8'))
             ch = (j.get('choices') or [{}])[0]
             text = re.sub(r'<think>.*?</think>', '', str((ch.get('message') or {}).get('content') or ''), flags=re.S).strip()
             if not text:
                 return '', ('AI 답변이 길이 한도에서 끊겼습니다' if ch.get('finish_reason') == 'length' else 'AI가 내용을 내지 않았습니다'), 'empty_completion'
-            GROQ_OK_MODEL[0] = model
+            if ch.get('finish_reason') == 'length':
+                text += TRUNC_NOTE
+            if model == want or want in gone:
+                GROQ_OK_MODEL[0] = model   # 15.25: 정한 모델이 없어졌을 때(404)만 예비 모델을 기억 — 잠깐 한도로 약한 모델에 붙지 않게
+            groq_day_add(int(((j.get('usage') or {}).get('total_tokens')) or 0))
             return text, '', ''
         except urllib.error.HTTPError as e:
             try:
@@ -4796,8 +4543,9 @@ def call_groq(system, msgs, max_tokens):
             if e.code == 404 or 'model_not_found' in msg or 'decommissioned' in msg:
                 why = f'groq_model 이름({model})을 확인하세요'
                 skip.add(model)
+                gone.add(model)
                 continue   # 다음 예비 모델로
-            if e.code == 413 or 'too large' in msg.lower() or ('tokens per minute' in msg.lower() and e.code == 429 and 'Requested' in msg):
+            if e.code == 413 or 'too large' in msg.lower():
                 why = f'Groq 무료 계정 한 번 요청 한도를 넘음({model})'
                 if frac <= 0.3:
                     skip.add(model)   # 더 줄여도 안 되면 한도가 큰 다음 모델로
@@ -4806,6 +4554,10 @@ def call_groq(system, msgs, max_tokens):
                 why = 'Groq API 키가 틀렸습니다'
             elif e.code == 403:
                 why = 'Groq API 키 권한이 없습니다(망에서 막혔을 수도)'
+            elif e.code == 429 and quota_day(msg):
+                why, code = 'Groq 하루 한도 소진(한 시간 뒤 다시 확인)', 'rate_limited'
+                skip.add(model)
+                continue   # 15.25: 하루 한도는 모델마다 따로 — 다음 예비 모델로
             elif e.code == 429:
                 why, code = 'Groq 무료 사용 한도 초과(잠시 뒤 다시)', 'rate_limited'
             elif e.code in (500, 502, 503):
@@ -4851,7 +4603,7 @@ def gemini_stream(system, msgs, max_tokens, on_text, effort='low', how=''):
     """V177: Gemini를 글자가 나오는 대로 받기(streamGenerateContent, SSE). on_text(조각)를 부른다. (본문, 실패 사유, 오류 코드).
     실패하면 본문 없이 돌아오고, 부른 쪽이 보통 호출(다른 회사 대체 포함)로 다시 한다."""
     import urllib.request, urllib.error
-    model = re.sub(r'[^A-Za-z0-9.\-_]', '', str(CONF.get('gemini_model') or 'gemini-flash-latest')) or 'gemini-flash-latest'
+    model = re.sub(r'[^A-Za-z0-9.\-_]', '', str(CONF.get('gemini_model') or 'gemini-flash-lite-latest')) or 'gemini-flash-lite-latest'
     base = (CONF.get('gemini_api_url') or 'https://generativelanguage.googleapis.com/v1beta').rstrip('/')
     body = {'systemInstruction': {'parts': [{'text': system}]},
             'contents': [{'role': 'model' if m['role'] == 'assistant' else 'user', 'parts': [{'text': m['content']}]} for m in msgs],
@@ -4862,6 +4614,7 @@ def gemini_stream(system, msgs, max_tokens, on_text, effort='low', how=''):
     req = urllib.request.Request(f'{base}/models/{model}:streamGenerateContent?alt=sse', data=json.dumps(body).encode('utf-8'), method='POST',
                                  headers={'x-goog-api-key': CONF.get('gemini_api_key', ''), 'content-type': 'application/json'})
     out = []
+    fin = ['']
     try:
         with urllib.request.urlopen(req, timeout=int(CONF.get('ai_stream_timeout') or 15)) as r:   # V191·V230: 15초 동안 한 글자도 안 오면 끊고 다른 AI로(예전 120초 → 25초 → 15초)
             for raw in r:
@@ -4874,10 +4627,15 @@ def gemini_stream(system, msgs, max_tokens, on_text, effort='low', how=''):
                     continue
                 for c in (j.get('candidates') or [])[:1]:
                     t = ''.join(p.get('text', '') for p in ((c.get('content') or {}).get('parts') or []) if not p.get('thought'))
+                    if c.get('finishReason'):
+                        fin[0] = c.get('finishReason')
                     if t:
                         out.append(t)
                         on_text(t)
         text = ''.join(out).strip()
+        if text and fin[0] == 'MAX_TOKENS':
+            text += TRUNC_NOTE
+            on_text(TRUNC_NOTE)
         if text and tc:
             GEMINI_THINK_OK[model] = how
         return (text, '', '') if text else ('', 'AI가 내용을 내지 않았습니다', 'empty_completion')
@@ -4895,7 +4653,8 @@ def gemini_stream(system, msgs, max_tokens, on_text, effort='low', how=''):
         except Exception:
             em = body[:120]
         print(f'[AI] Gemini 스트림 오류 {e.code} ({model}): {em}', flush=True)   # V230: 왜 안 되는지 서버 창에
-        return ''.join(out).strip(), f'Gemini 스트림 오류 {e.code}' + (' 한도 초과' if e.code == 429 else ''), 'rate_limited' if e.code in (429, 500, 503) else 'upstream_error'
+        lim = (' 하루 한도 소진(내일 다시)' if quota_day(body) else ' 한도 초과') if e.code == 429 else ''
+        return ''.join(out).strip(), f'Gemini 스트림 오류 {e.code}{lim}', 'rate_limited' if e.code in (429, 500, 503) else 'upstream_error'
     except Exception as e:
         print(f'[AI] Gemini 스트림 끊김({model}, 받은 조각 {len(out)}개):', str(e)[:120], flush=True)
         return ''.join(out).strip(), ('Gemini 응답 없음(시간 초과)' if not out else 'AI 연결이 끊겼습니다'), 'upstream_error'
@@ -4904,7 +4663,7 @@ def gemini_stream(system, msgs, max_tokens, on_text, effort='low', how=''):
 def call_gemini(system, msgs, max_tokens, effort='', how=''):
     """Google Gemini API(generateContent) 한 번 호출. 키는 머리글(x-goog-api-key)로만 보낸다(주소에 넣지 않음)."""
     import urllib.request, urllib.error, ssl
-    model = re.sub(r'[^A-Za-z0-9.\-_]', '', str(CONF.get('gemini_model') or 'gemini-flash-latest')) or 'gemini-flash-latest'
+    model = re.sub(r'[^A-Za-z0-9.\-_]', '', str(CONF.get('gemini_model') or 'gemini-flash-lite-latest')) or 'gemini-flash-lite-latest'
     base = (CONF.get('gemini_api_url') or 'https://generativelanguage.googleapis.com/v1beta').rstrip('/')
     body = {'systemInstruction': {'parts': [{'text': system}]},
             'contents': [{'role': 'model' if m['role'] == 'assistant' else 'user', 'parts': [{'text': m['content']}]} for m in msgs],
@@ -4926,6 +4685,8 @@ def call_gemini(system, msgs, max_tokens, effort='', how=''):
         text = ''.join(p.get('text', '') for p in ((c.get('content') or {}).get('parts') or []) if not p.get('thought')).strip()
         if text and tc:
             GEMINI_THINK_OK[model] = how
+        if text and c.get('finishReason') == 'MAX_TOKENS':
+            text += TRUNC_NOTE
         if not text:
             fr = c.get('finishReason')
             return '', ('AI 답변이 길이 한도에서 끊겼습니다' if fr == 'MAX_TOKENS' else
@@ -4949,7 +4710,7 @@ def call_gemini(system, msgs, max_tokens, effort='', how=''):
         elif e.code == 404:
             why = f'gemini_model 이름({model})을 확인하세요'
         elif e.code == 429:
-            why, code = 'Gemini 무료 사용 한도 초과(잠시 뒤 또는 내일 다시)', 'rate_limited'
+            why, code = ('Gemini 하루 한도 소진(내일 다시)' if quota_day(msg) else 'Gemini 무료 사용 한도 초과(잠시 뒤 다시)'), 'rate_limited'
         elif e.code in (500, 503):
             why, code = 'Gemini 서버가 바쁩니다', 'rate_limited'
         else:
@@ -5004,7 +4765,7 @@ def call_claude(system, msgs, max_tokens, effort='', model=''):
             why = '인증서 오류(망의 HTTPS 검사 장비가 막음)'
         except Exception as e:
             why = 'AI 서버에 연결하지 못했어요(인터넷·방화벽 확인)'
-        print('[AI] 연결 오류:', str(e)[:120], flush=True)
+            print('[AI] 연결 오류:', str(e)[:120], flush=True)   # 15.25: except 밖에서 e를 쓰면(파이썬은 except가 끝나면 e를 지움) NameError로 요청이 죽었다
         break
     print('[AI]', why, flush=True)
     return '', why, code
