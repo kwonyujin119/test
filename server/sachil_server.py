@@ -116,7 +116,7 @@ def load_conf():
         'public_url': '',
         'ai_api_key': '',               # Claude API 키(sk-ant-…). 비우면 AI 도우미는 자료 발췌형으로 답함
         'gemini_api_key': '',           # Google AI Studio API 키(AIza…) — V96. gemini-key-setup.bat으로 넣음
-        'gemini_model': 'gemini-flash-latest',   # Gemini 모델 이름(AI Studio에 나온 이름으로 바꿀 수 있음)
+        'gemini_model': 'gemini-flash-lite-latest',   # Gemini 모델 이름(AI Studio에 나온 이름으로 바꿀 수 있음). 15.25: Flash → Flash-Lite(무료 하루 약 500회, 분당 15회)
         'ai_provider': 'auto',          # auto(키 있는 쪽: gemini → groq → claude) | gemini | groq | claude
         'groq_api_key': '',             # V103: Groq API 키(gsk_…) — Gemini 한도가 차면 예비로. groq-key-setup.bat으로 넣음
         'groq_model': 'openai/gpt-oss-120b',     # Groq 모델 이름(console.groq.com의 Models에 나온 이름). 안 되면 예비 모델을 차례로 시도
@@ -131,7 +131,7 @@ def load_conf():
         'update_url': 'https://raw.githubusercontent.com/kwonyujin119/test/main/server/sachil_server.py',
         'app_update_url': 'https://raw.githubusercontent.com/kwonyujin119/test/main/index.html',   # V126: 서버가 내보내는 앱 화면도 함께 최신으로
         'ai_model': 'claude-sonnet-5-5',
-        'ai_daily_limit': 50,           # 하루 AI 답변 최대 횟수(비용 상한, 교수 로그인은 제외). 0이면 무제한
+        'ai_daily_limit': 600,          # 하루 AI 답변 최대 횟수(교수 로그인은 제외). 0이면 무제한. 15.25: 50 → 600(Gemini Flash-Lite 약 500 + Groq 하루 토큰 한도만큼)
         'ai_assist_model': 'claude-haiku-5-5',   # AI 도우미 전용 모델(가장 저렴). 보고서는 ai_model
         'ai_code': '',                  # AI 도우미 입장코드. 비우면 코드 없이 누구나 사용(V124부터 기본 공개)
         'allowed_origins': ['https://kwonyujin119.github.io'],   # 이 서버에 접속을 허용할 외부 앱 주소(github.io)
@@ -149,6 +149,13 @@ def load_conf():
         changed = True
     if conf.get('ai_daily_limit') == 300:   # V93: 예전 기본값 300 → 50(교수 사용은 셈에서 제외)
         conf['ai_daily_limit'] = 50
+        changed = True
+    if not conf.get('ai_lite_v1525'):   # 15.25: 예전 기본값(Gemini Flash · 하루 50번)이면 Flash-Lite · 하루 600번으로(직접 바꾼 값은 그대로)
+        if conf.get('gemini_model') in (None, '', 'gemini-flash-latest'):
+            conf['gemini_model'] = 'gemini-flash-lite-latest'
+        if conf.get('ai_daily_limit') in (None, 50):
+            conf['ai_daily_limit'] = 600
+        conf['ai_lite_v1525'] = True
         changed = True
     # V88: 관리자 코드 교체 — 예전 평문 admin_code는 지우고 새 코드(해시)로 바꾼다(한 번만)
     if 'admin_code_hash' not in conf:
@@ -1538,6 +1545,7 @@ class H(BaseHTTPRequestHandler):
                     'models': {'gemini': CONF.get('gemini_model'), 'groq': CONF.get('groq_model'), 'claude': CONF.get('ai_assist_model')},
                     'today': AI_DAY.get('n', 0) if AI_DAY.get('d') == time.strftime('%Y-%m-%d') else 0,
                     'limit': int(CONF.get('ai_daily_limit') or 0), 'version': VERSION,
+                    'groq_today': dict(GROQ_DAY), 'ai_down': {k: [int(v[0]), v[1]] for k, v in AI_DOWN.items() if v[0] > time.time()},
                     'auto_update': bool(CONF.get('auto_update')) and os.environ.get('SACHIL_LOOP') == '1',
                     'bat_old': bool(CONF.get('auto_update')) and os.environ.get('SACHIL_LOOP') != '1',   # V138: 옛 bat로 켜 서버 자동 업데이트가 쉬는 중
                     'bat_manual': bat_needs_manual(),   # V138: 자동 업데이트는 되지만 bat 자체는 한 번 손으로 바꿔야 함
@@ -4659,13 +4667,35 @@ def ai_ready():
     return bool(ai_provider())
 
 
+AI_DOWN_LOG = []   # 15.25: 최근 '쉬기' 기록(교수 화면 상태에 보임)
 AI_DOWN = {}   # V230: 회사별 '잠시 쉬기' — {회사: (이때까지, 이유)}. 스트림이 글자 없이 끊기거나 일시 오류가 나면 그동안 건너뛰고 예비 AI로 바로
+
+
+def quota_day(txt):
+    """15.25: 오류 글이 '하루 한도 소진'(Gemini PerDay·RPD, Groq TPD·RPD)이면 True — 분당 한도와 달리 몇 분 뒤 다시 해도 안 된다."""
+    t = str(txt or '')
+    return bool(re.search(r'PerDay|per day|\bRPD\b|\bTPD\b|하루 한도', t, re.I))
+
+
+def day_reset_sec(p):
+    """하루 한도가 다시 풀리기까지 남은 초. Gemini = 미국 태평양 자정(대략 UTC 08:00), Groq = 한 시간마다 다시 확인(구간 한도)."""
+    if p != 'gemini':
+        return 3600
+    now = time.time()
+    nxt = (now // 86400) * 86400 + 8 * 3600
+    if nxt <= now:
+        nxt += 86400
+    return int(nxt - now) + 60
 
 
 def ai_mark_down(p, why):
     sec = int(CONF.get('ai_down_sec') or 600)
+    if quota_day(why):
+        sec = max(sec, day_reset_sec(p))
     AI_DOWN[p] = (time.time() + sec, str(why or '')[:160])
     msg = f'{AI_NAMES.get(p, p)} {sec // 60}분 쉬고 예비 AI로: {str(why or "")[:120]}'
+    AI_DOWN_LOG.append((time.time(), p, sec, str(why or '')[:120]))
+    del AI_DOWN_LOG[:-20]
     print('[AI]', msg, flush=True)
     try:
         upd_log('AI ' + msg)
@@ -4740,6 +4770,17 @@ def _call_llm(system, msgs, max_tokens, effort='', model=''):
 
 
 GROQ_FALLBACK_MODELS = ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'qwen/qwen3-32b', 'openai/gpt-oss-20b']
+GROQ_DAY = {'d': '', 'tok': 0, 'n': 0}   # 15.25: 오늘 Groq에 쓴 토큰·횟수(무료 하루 20만 토큰 · 1,000번) — 교수 화면 상태에 보임
+
+
+def groq_day_add(tok):
+    d = time.strftime('%Y-%m-%d', time.gmtime())
+    if GROQ_DAY['d'] != d:
+        GROQ_DAY.update(d=d, tok=0, n=0)
+    GROQ_DAY['tok'] += max(0, tok)
+    GROQ_DAY['n'] += 1
+
+
 GROQ_OK_MODEL = [None]   # 이번 실행에서 실제로 된 모델(이름이 바뀌어 404가 나면 예비 모델로)
 
 
@@ -4752,6 +4793,12 @@ def call_groq(system, msgs, max_tokens):
     seen, code, why = set(), 'upstream_error', ''
     # V146: 무료 계정은 '보낸 글 + 답 최대 길이'가 분당 한도(모델마다 6천~1만2천 토큰)를 넘으면 413 — 답 길이는 3천으로, 413이면 글을 줄여 다시
     out_tok = min(max(int(max_tokens), 1024), 3000)
+    # 15.25: 분당 한도(무료 8천 토큰) 안에 들도록 미리 맞춘다 — 넘겨서 413을 받고 다시 보내는 헛걸음(요청 한 번·몇 초)을 없앰
+    tpm = int(CONF.get('groq_tpm') or 8000)
+    est = (len(system) + sum(len(str(m.get('content') or '')) for m in msgs)) * 2 // 3 + 200   # 한글 섞인 글 ≈ 글자 1.5개당 1토큰
+    if est + out_tok > tpm - 300:
+        out_tok = max(1200, tpm - 300 - est)
+    start = 1.0 if est + out_tok <= tpm - 300 else (0.55 if est * 0.55 + out_tok <= tpm - 300 else 0.3)
     def shrink(ms, frac):
         if frac >= 1:
             return ms
@@ -4765,7 +4812,7 @@ def call_groq(system, msgs, max_tokens):
     for model in models:
         if model not in seen:
             seen.add(model)
-            tries += [(model, 1.0), (model, 0.55), (model, 0.3)]
+            tries += [(model, f) for f in (1.0, 0.55, 0.3) if f <= start]
     skip = set()
     for model, frac in tries:
         if model in skip:
@@ -4786,6 +4833,7 @@ def call_groq(system, msgs, max_tokens):
             if not text:
                 return '', ('AI 답변이 길이 한도에서 끊겼습니다' if ch.get('finish_reason') == 'length' else 'AI가 내용을 내지 않았습니다'), 'empty_completion'
             GROQ_OK_MODEL[0] = model
+            groq_day_add(int(((j.get('usage') or {}).get('total_tokens')) or 0))
             return text, '', ''
         except urllib.error.HTTPError as e:
             try:
@@ -4807,7 +4855,7 @@ def call_groq(system, msgs, max_tokens):
             elif e.code == 403:
                 why = 'Groq API 키 권한이 없습니다(망에서 막혔을 수도)'
             elif e.code == 429:
-                why, code = 'Groq 무료 사용 한도 초과(잠시 뒤 다시)', 'rate_limited'
+                why, code = ('Groq 하루 한도 소진(한 시간 뒤 다시 확인)' if quota_day(msg) else 'Groq 무료 사용 한도 초과(잠시 뒤 다시)'), 'rate_limited'
             elif e.code in (500, 502, 503):
                 why, code = 'Groq 서버가 바쁩니다', 'rate_limited'
             else:
@@ -4895,7 +4943,8 @@ def gemini_stream(system, msgs, max_tokens, on_text, effort='low', how=''):
         except Exception:
             em = body[:120]
         print(f'[AI] Gemini 스트림 오류 {e.code} ({model}): {em}', flush=True)   # V230: 왜 안 되는지 서버 창에
-        return ''.join(out).strip(), f'Gemini 스트림 오류 {e.code}' + (' 한도 초과' if e.code == 429 else ''), 'rate_limited' if e.code in (429, 500, 503) else 'upstream_error'
+        lim = (' 하루 한도 소진(내일 다시)' if quota_day(body) else ' 한도 초과') if e.code == 429 else ''
+        return ''.join(out).strip(), f'Gemini 스트림 오류 {e.code}{lim}', 'rate_limited' if e.code in (429, 500, 503) else 'upstream_error'
     except Exception as e:
         print(f'[AI] Gemini 스트림 끊김({model}, 받은 조각 {len(out)}개):', str(e)[:120], flush=True)
         return ''.join(out).strip(), ('Gemini 응답 없음(시간 초과)' if not out else 'AI 연결이 끊겼습니다'), 'upstream_error'
@@ -4949,7 +4998,7 @@ def call_gemini(system, msgs, max_tokens, effort='', how=''):
         elif e.code == 404:
             why = f'gemini_model 이름({model})을 확인하세요'
         elif e.code == 429:
-            why, code = 'Gemini 무료 사용 한도 초과(잠시 뒤 또는 내일 다시)', 'rate_limited'
+            why, code = ('Gemini 하루 한도 소진(내일 다시)' if quota_day(msg) else 'Gemini 무료 사용 한도 초과(잠시 뒤 다시)'), 'rate_limited'
         elif e.code in (500, 503):
             why, code = 'Gemini 서버가 바쁩니다', 'rate_limited'
         else:
