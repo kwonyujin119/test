@@ -283,11 +283,11 @@ body[data-room="deb"] .srv-wait b{font-size:16px}
   #panel .ilbar .jump .reps .rl{display:none}
 }
 /* 보고서 종류 고르기 */
-.rtov .rtc{min-height:120px}
-.rtov .rtc:focus-visible{outline:3px solid #244EA2;outline-offset:2px}
-.rtov .rtc[aria-checked="true"]{position:relative}
-.rtov .rtc[aria-checked="true"]::after{content:"✓";position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:#0B1B3F;color:#FDD000;font-size:14px;font-weight:900;display:grid;place-items:center}
-@media (hover:none),(pointer:coarse){ .rtov .rtc:hover{transform:none} }
+
+
+
+
+
 /* 보고서 보기·편집 */
 #repDoc .rdoc{border-top:0}
 #report .rep-ph,#report .rep-busy{margin:0 12px 10px}
@@ -299,7 +299,7 @@ body[data-room="deb"] .srv-wait b{font-size:16px}
   #report .rep-sub{display:block;margin-top:2px;font-size:12.5px;color:#475467}
 }
 @media (max-width:599px){ #report .rep-ph,#report .rep-busy{margin:0 8px 8px} }
-@media (prefers-reduced-motion:reduce){ #panel .il-pvc{transition:none} .rtov .rtc:hover{transform:none} }
+@media (prefers-reduced-motion:reduce){ #panel .il-pvc{transition:none}  }
 </style>
 <style id="v198-ai">
 /* V198(ai): A · AI assistant 화면 — 현장 지휘 도구다운 답 카드. #panel .botchat 안에서만 */
@@ -1068,7 +1068,7 @@ html body .tour .tip .nav{flex-wrap:wrap;row-gap:6px}
 /* 디자인 모드 [간편 모드](폰 32px): 누르는 범위만 넓힘(모양·자리 그대로) */
 @media (pointer:coarse){ html body .hub.hz .hmode::after{content:"";position:absolute;inset:-6px -2px} }
 /* 초과근무 '설정'·'지난 기록' 펼치기, 보고서 종류 창 닫기(×): 터치 44px */
-@media (pointer:coarse){ html body .otmore summary{min-height:44px} html body .rtbox .close{width:44px;height:44px} }
+@media (pointer:coarse){ html body .otmore summary{min-height:44px}  }
 </style>
 <style id="v211-design">
 /* V211 첫 화면 [디자인 모드] 다듬기 — 현장(장갑·햇빛·한 손)에서 빨리 알아보고 정확히 누르게 */
@@ -1732,7 +1732,7 @@ html body .chat:not(.botchat) > .chat-foot:not(.on):not(:has(.warn)){display:non
 #panel .il-reps .reprow .roomrow .t{font-size:var(--fs-h3);font-weight:700;color:var(--c-ink)}
 #panel .il-reps .reprow .roomrow .d{font-size:var(--fs-cap);font-weight:500;color:var(--c-mute)}
 #panel .il-reps .reprow .tag{font-size:var(--fs-micro);font-weight:700;border-radius:var(--rad-pill)}
-#panel .il-reps .reprow .tag.rt-photo{background:var(--c-ember-soft);color:var(--c-ember-text)}
+
 #panel .il-reps .reprow .del{min-width:64px;color:var(--c-danger);font-size:var(--fs-sub);font-weight:600;border-left:1px solid var(--c-line)}
 #panel .il-reps .reprow .del.accent{background:var(--c-danger);color:#fff}
 #panel .il-reps .rep-empty img{width:min(220px,60vw);margin-bottom:var(--sp-3)}
@@ -1763,23 +1763,23 @@ html body .chat:not(.botchat) > .chat-foot:not(.on):not(:has(.warn)){display:non
 @media (pointer:coarse){ #report .rph-t input{min-height:44px;font-size:16px} #report .rph-t textarea{font-size:16px} }
 #report .rep-foot .note{font-size:var(--fs-cap);color:var(--c-mute)}
 /* 보고서 종류 고르기 창 */
-.rtov .rtbox{border-radius:var(--rad-l);box-shadow:var(--sh-3)}
-.rtov .rtbox>.pg-head{margin:0 0 var(--sp-4);justify-content:flex-start}
-.rtov .rtbox>.pg-head .pg-title{font-size:var(--fs-h2);color:var(--c-ink)}
-.rtov .rtbox .close{width:44px;height:44px;border-radius:50%;background:var(--c-surface-2);color:var(--c-ink);font-size:22px}
-.rtov .rtc{border:1px solid var(--c-line-2);border-radius:var(--rad-m);box-shadow:none}
-.rtov .rtc b{font-size:var(--fs-h3);font-weight:700;color:var(--c-ink)}
-.rtov .rtc span{font-size:var(--fs-sub);font-weight:500;color:var(--c-sub)}
-.rtov .rtc em{font-size:var(--fs-cap);font-weight:600;color:var(--c-ocean-2)}
-.rtov .rtc[aria-checked="true"]{border-color:var(--c-ocean);box-shadow:inset 0 0 0 1px var(--c-ocean);background:var(--c-ocean-soft)}
-.rtov .rtc[aria-checked="true"]::after{background:var(--c-ink);color:var(--c-ember);font-weight:700}
-.rtov .rtwarn{border-radius:var(--rad-s);background:var(--c-caution-soft);color:#93370D;font-size:var(--fs-sub);font-weight:600}
-.rtov .rtacts .btn{min-height:44px;border-radius:var(--rad-s);font-weight:700}
-.rtov .rtacts [data-rt="go"]{background:var(--c-ember);border-color:var(--c-ember);color:var(--c-ink)}
-.rtov .rtacts [data-rt="go"]:hover{background:var(--c-ember-2);border-color:var(--c-ember-2)}
-.rtov .rtacts [data-rt="go"]:disabled{background:var(--c-line);border-color:var(--c-line);color:var(--c-mute)}
-.rtov .rtacts [data-rt="x"]{color:var(--c-ink)}
-@media (hover:hover) and (pointer:fine){ .rtov .rtacts .btn{min-height:40px} .rtov .rtbox .close{width:40px;height:40px} }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </style>
 <style id="v226-ch">
 /* V226(ch): CH 현장지휘 체크리스트 — 화면 머리 pgHead 틀, 토큰(색·글자·둥글기), 타이머 Mono 28px, 칩 선택 = 오션 연한 바탕. 범위: #panel .board / .ch-head 만 */
@@ -3065,33 +3065,33 @@ body:not(.nosearch) #panel .card.empty.srch-none{padding:20px 16px;margin-bottom
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .bub.streaming{white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
 .bub.streaming::after{content:"▍";display:inline-block;margin-left:2px;color:var(--navy);animation:stcar .9s steps(1) infinite}@keyframes stcar{50%{opacity:0}}
-.rtov{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(11,27,63,.55)}
-.rtov[hidden]{display:none}
-.rtbox{width:min(720px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:var(--surface,#fff);border-radius:20px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
-.rtbox header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.rtbox header b{font-size:19px;font-weight:800;color:var(--navy)}
-.rtbox .close{width:40px;height:40px;border:0;border-radius:50%;background:var(--surface-2);font-size:22px;cursor:pointer}
-.rtcards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-@media (max-width:560px){ .rtcards{grid-template-columns:1fr} .rtc{display:grid!important;grid-template-columns:86px 1fr;column-gap:12px;text-align:left!important;align-items:center} .rtc .rtv{grid-row:1/4;margin:0!important} }
-.rtc{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:14px 10px;border:2px solid var(--line);border-radius:16px;background:var(--surface,#fff);font:inherit;cursor:pointer;color:var(--fg);transition:border-color .12s,box-shadow .12s,transform .12s}
-.rtc b{font-size:16px;font-weight:800;color:var(--navy)}.rtc span{font-size:13px;color:var(--muted);line-height:1.35}.rtc em{font-style:normal;font-size:12px;font-weight:700;color:#B54708}
-.rtc[aria-checked="true"]{border-color:var(--navy);box-shadow:0 0 0 3px rgba(36,78,162,.18);background:#F5F8FF}
-.rtc:hover{transform:translateY(-1px)}
-.rtv{position:relative;display:block;width:86px;height:110px;margin-bottom:6px;border-radius:6px;background:#fff;border:1px solid #D0D5DD;box-shadow:0 2px 6px rgba(16,24,40,.12);overflow:hidden}
-.rtv::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:linear-gradient(#0B1B3F 60%,#FDD000 60%)}
-.rtv s,.rtv u,.rtv q{position:absolute;display:block;border-radius:2px}
-.rtv-brief s:nth-child(1){left:8px;right:8px;top:14px;height:6px;background:#0B1B3F}
-.rtv-brief s:nth-child(2){left:8px;right:8px;top:28px;height:8px;background:#DCE3F1}.rtv-brief s:nth-child(3){left:8px;right:30px;top:42px;height:4px;background:#98A2B3;box-shadow:0 8px 0 #98A2B3,0 16px 0 #98A2B3}
-.rtv-brief u{left:8px;right:8px;top:70px;height:14px;border:1px solid #98A2B3;background:repeating-linear-gradient(90deg,#fff 0 12px,#98A2B3 12px 13px)}
-.rtv-brief s:nth-child(5){left:8px;right:8px;top:90px;height:8px;background:#DCE3F1}
-.rtv-info s{top:14px;width:15px;height:18px}.rtv-info s:nth-child(1){left:7px;background:#FDA29B}.rtv-info s:nth-child(2){left:26px;background:#A6F4C5}.rtv-info s:nth-child(3){left:45px;background:#FEDF89}.rtv-info s:nth-child(4){left:64px;background:#B2CCFF}
-.rtv-info u{left:8px;right:8px;top:40px;height:10px;background:linear-gradient(90deg,#D92D20 0 30%,#F2F4F7 30% 32%,#244EA2 32% 60%,#F2F4F7 60% 62%,#D0D5DD 62%)}
-.rtv-info q{left:8px;top:58px;width:40px;height:44px;background:linear-gradient(#244EA2,#244EA2) 0 6px/90% 6px no-repeat,linear-gradient(#244EA2,#244EA2) 0 18px/60% 6px no-repeat,linear-gradient(#244EA2,#244EA2) 0 30px/75% 6px no-repeat}
-.rtv-info q::after{content:"";position:absolute;left:46px;top:4px;width:30px;height:30px;border-radius:50%;border:6px solid #244EA2;border-right-color:#D0D5DD;box-sizing:border-box}
-.rtv-photo s{width:33px;height:30px;background:linear-gradient(135deg,#F79009,#7A271A)}.rtv-photo s:nth-child(1){left:7px;top:16px}.rtv-photo s:nth-child(2){left:45px;top:16px}.rtv-photo s:nth-child(3){left:7px;top:58px}.rtv-photo s:nth-child(4){left:45px;top:58px}
-.rtv-photo s::after{content:"";position:absolute;left:0;right:0;top:32px;height:4px;background:#98A2B3}
-.rtwarn{margin:12px 0 0;padding:8px 12px;border-radius:10px;background:#FFFAEB;color:#93370D;font-size:13px;font-weight:700}
-.rtacts{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.rtacts .btn{min-height:46px}
-.tag.rt-brief{background:#EEF2F8;color:#244EA2}.tag.rt-info{background:#ECFDF3;color:#067647}.tag.rt-photo{background:#FFFAEB;color:#B54708}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.tag.rt-brief{background:#EEF2F8;color:#244EA2}
 .rep-ph{margin:0 0 10px;padding:12px;border-radius:14px;background:var(--surface-2,#F2F4F7);border:1px solid var(--line)}
 .rph-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.rph-h b{font-size:15px;color:var(--navy)}.rph-h span{flex:1 1 200px;font-size:12.5px;color:var(--muted)}.rph-h label{cursor:pointer}
 .rph-l{display:flex;flex-direction:column;gap:8px;margin-top:10px}.rph-l:empty{display:none}
@@ -3679,7 +3679,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v249</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v250</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4699,8 +4699,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V249', SRV_VER='15.26';
+  const APP_VER='V250', SRV_VER='15.27';
   const UPDATES=[
+    {v:'V250', d:'2026-11-26', t:['보고서 만들기: ‘인포그래픽 요약형’·‘사진기록 리포트형’을 없애고 신속 브리핑형 한 가지로 — 종류 고르는 창 없이 누르면 바로 만들어져요','예전에 만든 인포그래픽·사진기록 보고서도 지우지 않고 신속 브리핑형으로 보여 줘요(첫 사진 1장은 ‘1. 발생개요’ 오른쪽)','쓰지 않게 된 그리기 코드를 지워 앱이 약 26KB 가벼워졌어요']},
     {v:'V249', d:'2026-11-26', t:['47망·디브리핑룸 배경: GPT 이미지(gpt-image-2)로 만든 은은한 해안 도시 지도·등고선·무전 전파 무늬 배경(휴대폰·PC 따로) — 글씨는 그대로 잘 보이게 밝은 톤','새 글이 들어오면 살짝 떠오르며 빛이 한 번 스치고, 내 글은 오른쪽에서 미끄러져 나타나요','입력칸: 쓰기 시작하면 노랑·남색 빛이 천천히 돌며 감싸고, 보내기 단추가 숨 쉬듯 빛나요 · 보내면 종이비행기가 날아갔다 돌아와요','접속자 수 옆 초록 점이 깜빡여 연결 중임을 보여 줘요 · 말풍선에 옅은 그림자, 날짜 칸은 반투명 유리 느낌','기기 설정에서 ‘동작 줄이기’를 켜면 움직임은 모두 꺼져요']},
     {v:'V248', d:'2026-11-17', t:['AI 도우미: Gemini를 Flash-Lite로 바꿔 무료로 하루 약 500번(예전 Flash는 하루 약 20번)까지, 한도가 차면 Groq가 자기 하루 한도만큼 이어 받아요 — 하루 질문 상한도 50 → 600번','AI 도우미 오류 고침: Groq로 넘어갈 때 질문이 잘려 엉뚱한 답이 나오던 것, 중간에 끊긴 답이 며칠 동안 그대로 다시 나오던 것, 길이 한도에서 잘린 답을 완성된 것처럼 보이던 것(이제 ‘잘렸어요’ 표시)','AI가 잠깐 바쁠 때 10분 동안 예비 AI만 쓰던 것을 1분으로, 하루 한도가 다 찬 AI는 다시 풀릴 때까지 건너뛰어 기다림이 줄었어요','47망: 내가 글을 보내는 순간 다른 사람이 쓴 글이 안 보이던 경우를 고쳤어요 · 전송 응답이 끊겨 다시 보내도 같은 글이 두 번 올라가지 않아요','47망: 앱을 1분 넘게 내려 두면 서버 연결을 쉬었다가 돌아오면 바로 이어 받아요(배터리·데이터 절약) · 서버가 꺼졌을 때 다시 연결 간격을 3초 → 최대 60초로 늘려 몰리지 않게','앱 정리: 쓰지 않는 그림·코드·스타일을 지워 앱 파일이 약 80KB 가벼워졌어요']},
     {v:'V246', d:'2026-11-07', t:['카카오톡·갤러리 등 다른 앱에서 사진·파일을 ‘공유’할 때 목록에 SACHIL:47이 나와요 → 고르면 47망 입력창에 바로 첨부(글·링크도 함께), 확인하고 보내기만 누르면 돼요','휴대폰에 설치한 앱(크롬 ‘홈 화면에 추가/앱 설치’)과 안드로이드 SACHIL47 앱(APK 1.1) 모두 — 아이폰은 브라우저가 이 기능을 지원하지 않아요','47망 대화명을 아직 안 정했으면 대화명을 정하는 즉시 첨부돼요. 한 번에 보낼 수 있는 개수(보통 5개)까지, 안드로이드 앱은 파일 1개 40MB까지']},
@@ -6679,35 +6680,14 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(cur&&cur.ai&&!repCtl&&!cur.aiPartial) b.hidden=true;   // V133: '다시 작성' 없앰 — 작성본이 있으면 버튼을 숨김(V138: 일부만 작성됐으면 다시 쓸 수 있게)
     if(!keepStatus && !$('#report').hidden && !repCtl) $('#repStatus').textContent=repStatusText();
   }
-  // V176: 보고서 종류 고르기 — 신속 브리핑형 / 인포그래픽 요약형 / 사진기록 리포트형
+  // V250: 보고서는 신속 브리핑형 한 가지(인포그래픽 요약형·사진기록 리포트형 없앰) — 종류 고르기 창 없이 바로 만든다
   { const h=document.querySelector('#report .rep>header'); if(h&&window.pgHead) h.outerHTML=pgHead({g:'IL', t:'화재등 상황 보고서', sHtml:'<span id="repSub"></span>', s1:true, id:'repTitle', cls:'is-compact rep-h', act:'<button type="button" class="btn primary sm" id="repEdit" hidden>편집</button><button type="button" class="close" id="repClose" aria-label="닫기">×</button>'}); }   /* V226(il): 보고서 창 머리도 공통 틀(pgHead) */
-  const REP_TN={brief:'신속 브리핑형', info:'인포그래픽 요약형', photo:'사진기록 리포트형'}, RT_KEY='sachil_rep_type';
-  const rtEl=document.createElement('div'); rtEl.className='rtov'; rtEl.hidden=true; rtEl.setAttribute('role','dialog'); rtEl.setAttribute('aria-modal','true'); rtEl.setAttribute('aria-labelledby','rtH');
-  rtEl.innerHTML=`<div class="rtbox">${pgHead({g:'IL', t:'어떤 보고서로 만들까요?', s:'종류를 고르면 칸에 채운 내용으로 바로 만들어요', id:'rtH', cls:'is-compact', act:'<button type="button" class="close" data-rt="x" aria-label="닫기">×</button>'})}
-    <div class="rtcards" role="radiogroup" aria-label="보고서 종류">
-      <button type="button" class="rtc" role="radio" data-rtt="brief"><i class="rtv rtv-brief" aria-hidden="true"><s></s><s></s><s></s><u></u><s></s></i><b>신속 브리핑형</b><span>A4 1쪽 요약 · 핵심만 · 표와 아이콘</span><em>상급자 보고·무전 브리핑</em></button>
-      <button type="button" class="rtc" role="radio" data-rtt="info"><i class="rtv rtv-info" aria-hidden="true"><s></s><s></s><s></s><s></s><u></u><q></q></i><b>인포그래픽 요약형</b><span>숫자 타일 · 차트 · 단계 도식 · 아이콘</span><em>한눈에 보는 현황판</em></button>
-      <button type="button" class="rtc" role="radio" data-rtt="photo"><i class="rtv rtv-photo" aria-hidden="true"><s></s><s></s><s></s><s></s></i><b>사진기록 리포트형</b><span>사진·캡션 중심 · 사진별 설명 · 나란히 비교</span><em>현장 사진 정리·전후 비교</em></button>
-    </div>
-    <p class="rtwarn" id="rtWarn" hidden></p>
-    <div class="rtacts"><button type="button" class="btn ghost" data-rt="x">취소</button><button type="button" class="btn primary" data-rt="go" disabled>보고서 만들기</button></div></div>`;
-  document.body.appendChild(rtEl);
-  let rtSel='', rtLast=null;
-  const rtPick=t=>{ rtSel=t; rtEl.querySelectorAll('[data-rtt]').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.rtt===t))); const go=rtEl.querySelector('[data-rt="go"]'); go.disabled=!t; go.textContent=t?`${REP_TN[t]}으로 만들기`:'보고서 만들기'; };
-  function openRepType(){ if(!$('#report').hidden) return; rtLast=document.activeElement; let t=''; try{ t=localStorage.getItem(RT_KEY)||''; }catch(_){ } rtPick(REP_TN[t]?t:'');
-    const miss=SITU.filter(x=>!situStatus(x).cls).length, full=reports.length>=MAX_REPORTS, w=rtEl.querySelector('#rtWarn');
-    w.hidden=!(miss||full); w.textContent=[miss?`아직 비어 있는 칸 ${miss}곳 — ‘파악 중’으로 들어가요`:'', full?`보고서가 ${MAX_REPORTS}건이라 가장 오래된 1건이 지워져요`:''].filter(Boolean).join(' · ');
-    rtEl.hidden=false; appEl.inert=true; tabbarEl.inert=true; setTimeout(()=>{ const b=rtEl.querySelector(rtSel?`[data-rtt="${rtSel}"]`:'[data-rtt]'); if(b) b.focus(); },30); }
-  const closeRepType=()=>{ if(rtEl.hidden) return; rtEl.hidden=true; appEl.inert=false; tabbarEl.inert=false; if(rtLast&&rtLast.focus) rtLast.focus(); };
-  rtEl.addEventListener('click',e=>{ if(e.target===rtEl) return closeRepType(); const c=e.target.closest('[data-rtt]'); if(c) return rtPick(c.dataset.rtt);
-    const b=e.target.closest('[data-rt]'); if(!b) return; if(b.dataset.rt==='x') return closeRepType();
-    if(b.dataset.rt==='go'&&rtSel){ try{ localStorage.setItem(RT_KEY,rtSel); }catch(_){ } const t=rtSel; rtEl.hidden=true; appEl.inert=false; tabbarEl.inert=false; newReport(t); } });
-  rtEl.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.stopPropagation(); closeRepType(); } if(e.key==='Enter'&&e.target.closest('[data-rtt]')){ e.preventDefault(); rtPick(e.target.closest('[data-rtt]').dataset.rtt); } });
+  const REP_TN={brief:'신속 브리핑형'};
   function newReport(type){
     if(!$('#report').hidden) return;   // 연타로 같은 보고서가 두 번 생기지 않게(V99)
     const facts=reportFacts(), ts=new Date().toISOString();
     const e={id:'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), ts, place:([state.situ.fields.place,state.situ.fields.burn].filter(Boolean).join(' · ')||'').slice(0,120), done:facts.done, total:facts.total, elapsed:facts.elapsed, facts,
-      draftAuto:'', draft:'', draftEdited:false, ai:'', aiAuto:'', aiEdited:false, at:'', type:['brief','info','photo'].includes(type)?type:'brief', photos:[]};
+      draftAuto:'', draft:'', draftEdited:false, ai:'', aiAuto:'', aiEdited:false, at:'', type:'brief', photos:[]};
     e.draftAuto=e.draft=reportDraft(facts, fmtTs(ts));
     const dropped=reports.length>=MAX_REPORTS; reports.unshift(e); const saved=rpsave(); openReport(e, saved?(dropped?'dropped':true):'nosave');
   }
@@ -6985,9 +6965,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // V174: 미리보기 = 실제 A4 출력 그림(PDF와 같은 모양). AI가 쓰는 중에는 가벼운 글 미리보기
   let repPvT=0, repPvN=0;
   // V176: 보고서 종류별 그리기 — brief(신속 브리핑, 글 양식) · info(인포그래픽) · photo(사진기록)
-  const repType=e=>(e&&['brief','info','photo'].includes(e.type))?e.type:'brief';
+  const repType=()=>'brief';   // V250: 예전에 만든 인포그래픽·사진기록 보고서도 신속 브리핑형으로 보여 줌(글 초안은 모두 같음)
   const repPhotos=e=>(e&&Array.isArray(e.photos)&&e.photos.length)?e.photos:(e&&e.img?[{img:e.img,cap:'',desc:''}]:[]);
-  function repRender(text,mode,e){ e=e||cur; const t=repType(e); if(t==='info') return repInfo(e,mode); if(t==='photo') return repPhoto(Object.assign({},e,{photos:repPhotos(e)}),mode); const p0=repPhotos(e)[0]; return repPdf(text,mode,p0&&p0.img); }
+  function repRender(text,mode,e){ e=e||cur; const p0=repPhotos(e)[0]; return repPdf(text,mode,p0&&p0.img); }
   function repDocSync(){ const d=$('#repDoc'), b=$('#repBody'); if(!d||!b) return; b.hidden=!repEditing; d.hidden=repEditing; if(repEditing) return;
     if(repCtl&&!repShowDraft){ repPvN++; clearTimeout(repPvT); d.innerHTML=`<article class="rdoc">${repDocHtml(b.value)}</article>`; return; }
     if(!d.querySelector('.rpages')) d.innerHTML=`<article class="rdoc">${repDocHtml(b.value)}</article>`;
@@ -7204,96 +7184,6 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     else { g.beginPath(); g.arc(cx,cy,r*0.35,0,7); g.fill(); }
     g.restore(); }
   const rIcoFor=t=>/개요/.test(t)?'pin':/화재|성상/.test(t)?'fire':/피해/.test(t)?'person':/조치/.test(t)?'check':/전망|계획/.test(t)?'arrow':/지휘/.test(t)?'list':/시간/.test(t)?'clock':/확인/.test(t)?'alert':/사진/.test(t)?'camera':'dot';
-  // 보고서 사실(facts)에서 칸 값 꺼내기
-  const fxv=(f,k)=>{ for(const b of (f.situ||[])) for(const x of (b.fields||[])) if(x.k===k) return x; return null; };
-  const fxs=(f,k)=>{ const x=fxv(f,k); return x&&x.value?String(x.value):''; };
-  const RFF='"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif';
-  function rWrap(g,t,lim){ const r=[]; let rest=String(t||''); while(rest.length){ let n=rest.length; if(g.measureText(rest).width>lim){ n=1; while(n<rest.length&&g.measureText(rest.slice(0,n+1)).width<=lim) n++; const sp=rest.lastIndexOf(' ',n); if(sp>n*0.55) n=sp+1; } r.push(rest.slice(0,n).trim()); rest=rest.slice(n).replace(/^\s+/,''); } return r; }
-  function rRound(g,x,y,w,h,r){ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
-  function rHead(g,W,M,title,sub,meta){ g.fillStyle='#fff'; g.fillRect(0,0,W,1754); g.fillStyle='#0B1B3F'; g.fillRect(0,0,W,14); g.fillStyle='#FDD000'; g.fillRect(0,14,W,5);
-    g.textBaseline='middle'; g.font=`800 46px ${RFF}`; g.fillStyle='#0B1B3F'; g.fillText(title,M,96); const tw=g.measureText(title).width;
-    g.font=`800 22px ${RFF}`; const sw=g.measureText(sub).width+32; g.fillStyle='#FDD000'; rRound(g,M+tw+18,78,sw,36,18); g.fill(); g.fillStyle='#0B1B3F'; g.fillText(sub,M+tw+34,97);
-    g.font=`500 21px ${RFF}`; g.fillStyle='#475467'; const mw=g.measureText(meta).width; g.fillText(meta,W-M-mw,140); g.fillStyle='#0B1B3F'; g.fillRect(M,160,W-2*M,3); }
-  function rFoot(g,W,M,p,n){ const d=new Date(), sd=`${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; g.fillStyle='#D0D5DD'; g.fillRect(M,1622,W-2*M,1);
-    g.font=`500 18px ${RFF}`; g.fillStyle='#667085'; g.textBaseline='middle'; g.fillText(`SACHIL:47 지휘역량강화 플랫폼 · 출력 ${sd}`,M,1648); const pn=`${p} / ${n}`; g.fillText(pn,W-M-g.measureText(pn).width,1648); }
-  async function rOut(cvs,mode){   // 쪽 캔버스들 → canvas·png·pdf
-    if(mode==='canvas') return cvs;
-    if(mode==='png'){ const W=1240,H=1754, sc=Math.min(1,Math.sqrt(15e6/(W*H*cvs.length))), out=document.createElement('canvas'); out.width=Math.round(W*sc); out.height=Math.round(H*sc*cvs.length); const o=out.getContext('2d'); o.fillStyle='#E9EDF3'; o.fillRect(0,0,out.width,out.height); cvs.forEach((c,i)=>o.drawImage(c,0,Math.round(i*H*sc),Math.round(W*sc),Math.round(H*sc))); return await new Promise(ok=>out.toBlob(ok,'image/png')); }
-    const pages=[]; for(const c of cvs){ const b=await new Promise(ok=>c.toBlob(ok,'image/jpeg',0.92)); pages.push({w:c.width,h:c.height,data:new Uint8Array(await b.arrayBuffer())}); } return pdfFromJpegs(pages); }
-  const rLoadImg=src=>new Promise(ok=>{ if(!src) return ok(null); const im=new Image(); im.onload=()=>ok(im); im.onerror=()=>ok(null); im.src=src; });
-  // ---------- 인포그래픽 요약형: 숫자 타일·단계 도식·막대 차트·도넛·시간 흐름 ----------
-  async function repInfo(e, mode){
-    try{ if(document.fonts&&document.fonts.ready) await Promise.race([document.fonts.ready, sleep(1500)]); }catch(_){ }
-    const f=e.facts||{situ:[],phases:[],log:[]}, W=1240, M=84, cv=document.createElement('canvas'); cv.width=W; cv.height=1754; const g=cv.getContext('2d'); g.textBaseline='middle';
-    const T=(t,x,y,sz,w,c,al)=>{ g.font=`${w||500} ${sz}px ${RFF}`; g.fillStyle=c||'#1A1A1A'; g.textAlign=al||'left'; g.fillText(t,x,y); g.textAlign='left'; };
-    const fit=(t,sz,w,lim)=>{ g.font=`${w} ${sz}px ${RFF}`; let s2=String(t||''); if(g.measureText(s2).width<=lim) return s2; while(s2.length>1&&g.measureText(s2+'…').width>lim) s2=s2.slice(0,-1); return s2+'…'; };
-    rHead(g,W,M,'화재등 상황 보고서','인포그래픽 요약',`보고일시 ${fmtTs(e.ts)} · 경과 ${f.elapsed||'-'}`);
-    // 기본 정보 줄
-    let y=186; const cw=(W-2*M-30)/4, info=[['cal','일시',fxs(f,'dt')||'파악 중'],['pin','장소',fxs(f,'place')||'파악 중'],['fire','처종 · 타는 것',[fxs(f,'kind'),fxs(f,'burn')].filter(Boolean).join(' · ')||'파악 중'],['alert','대응단계',fxs(f,'level')||'-']];
-    info.forEach(([ic,lb,v],i)=>{ const x=M+i*(cw+10); g.fillStyle='#F2F4F7'; rRound(g,x,y,cw,96,16); g.fill(); g.fillStyle='#244EA2'; g.beginPath(); g.arc(x+38,y+48,24,0,7); g.fill(); rIco(g,ic,x+38,y+48,13,'#fff');
-      T(lb,x+72,y+26,17,700,'#667085'); g.font=`800 20px ${RFF}`; const vl=rWrap(g,String(v).replace(/^\d{4}-/,''),cw-84); if(vl.length>1){ T(vl[0],x+72,y+52,20,800,'#0B1B3F'); T(fit(vl.slice(1).join(' '),20,800,cw-84),x+72,y+76,20,800,'#0B1B3F'); } else T(vl[0]||'',x+72,y+60,20,800,'#0B1B3F'); });
-    // 숫자 타일
-    y+=122; const life=fxv(f,'life'), raw=String(life&&life.raw||''), c={}; raw.split('|').forEach(x=>{ const m=x.match(/^(.+)=(\d+)$/); if(m) c[m[1]]=+m[2]; });
-    const kinds=(life&&life.opts)||['경상','중상','심정지'], sum=kinds.reduce((a,k)=>a+(c[k]||0),0), known=raw==='none'||sum>0;
-    const resc=fxs(f,'rescue'), propSt=fxs(f,'prop_st'), propRaw=(fxv(f,'prop_est')||{}).raw, pct=f.total?Math.round(f.done/f.total*100):0;
-    const tiles=[['person','인명피해',known?`${sum}명`:'파악 중',raw==='none'?(life&&life.none)||'해당없음':kinds.filter(k=>c[k]).map(k=>`${k} ${c[k]}`).join(' · '),'#D92D20','#FEF3F2'],
-      ['rescue','인명구조',resc||'-','구조 인원','#067647','#ECFDF3'],
-      ['won','재산피해',propRaw?wonTxt(+propRaw):(propSt||'파악 중'),fxs(f,'prop_note')||'추정 피해액','#B54708','#FFFAEB'],
-      ['list','지휘 절차 이행',`${pct}%`,`${f.done||0} / ${f.total||0} 항목`,'#244EA2','#EEF2F8']];
-    tiles.forEach(([ic,lb,big,small,col,bg],i)=>{ const x=M+i*(cw+10), h=190; g.fillStyle=bg; rRound(g,x,y,cw,h,20); g.fill(); g.fillStyle=col; rRound(g,x,y,8,h,4); g.fill();
-      g.fillStyle=col; g.beginPath(); g.arc(x+46,y+46,26,0,7); g.fill(); rIco(g,ic,x+46,y+46,14,'#fff'); T(lb,x+84,y+46,21,800,col);
-      if(i===3){ const cx=x+cw-62, cy=y+118, rr=44; g.lineWidth=14; g.strokeStyle='#D0D5DD'; g.beginPath(); g.arc(cx,cy,rr,0,7); g.stroke(); g.strokeStyle=col; g.lineCap='round'; g.beginPath(); g.arc(cx,cy,rr,-Math.PI/2,-Math.PI/2+Math.PI*2*pct/100); g.stroke(); g.lineCap='butt'; { let bs=46; g.font=`900 ${bs}px ${RFF}`; while(bs>30&&g.measureText(big).width>cw-150){ bs-=2; g.font=`900 ${bs}px ${RFF}`; } T(big,x+24,y+112,bs,900,'#0B1B3F'); } }   /* V181: 100%가 '10…'으로 잘리지 않게 글자를 줄임 */
-      else T(fit(big,46,900,cw-40),x+24,y+112,46,900,'#0B1B3F');
-      T(fit(small,18,600,cw-40),x+24,y+160,18,600,'#475467'); });
-    // 단계 도식: 화재 성상 · 화재 상황
-    y+=218; const chain=(lab,opts,cur,yy,col)=>{ T(lab,M,yy,22,800,'#0B1B3F'); const x0=M+170, w=(W-M-x0)/opts.length, idx=opts.indexOf(cur);
-      opts.forEach((o,i)=>{ const x=x0+i*w, on=i===idx, past=idx>=0&&i<idx; g.fillStyle=on?col:past?'#D0D5DD':'#F2F4F7'; g.beginPath(); g.moveTo(x,yy-30); g.lineTo(x+w-22,yy-30); g.lineTo(x+w-4,yy); g.lineTo(x+w-22,yy+30); g.lineTo(x,yy+30); g.lineTo(x+18,yy); g.closePath(); g.fill();
-        T(fit(o,o.length>8?17:20,800,w-48),x+w/2+2,yy+1,o.length>8?17:20,800,on?'#fff':past?'#344054':'#98A2B3','center'); }); if(idx<0&&cur) T(fit('· '+cur,18,600,400),x0,yy+48,18,600,'#475467'); };
-    chain('화재 성상',['초기','성장기','최성기','감쇠기'],fxs(f,'phase'),y+32,'#D92D20'); chain('화재 상황',['연소확대','연소확대 저지(방어선 구축)','초진','완진'],fxs(f,'fstat'),y+112,'#244EA2');
-    { const cs=[fxs(f,'cause_est'),fxs(f,'cause_txt')].filter(Boolean).join(' / ')||'파악 중'; y+=170; g.fillStyle='#FFFAEB'; rRound(g,M,y,W-2*M,58,14); g.fill(); g.fillStyle='#B54708'; g.beginPath(); g.arc(M+32,y+29,18,0,7); g.fill(); rIco(g,'fire',M+32,y+29,10,'#fff'); T('화재 원인',M+62,y+29,20,800,'#B54708'); T(fit(cs,21,600,W-2*M-200),M+180,y+29,21,600,'#1A1A1A'); }
-    // 차트: 인명피해 막대 · 단계별 이행
-    y+=86; const half=(W-2*M-30)/2; g.fillStyle='#fff'; g.strokeStyle='#E4E7EC'; g.lineWidth=2; rRound(g,M,y,half,380,18); g.stroke(); rRound(g,M+half+30,y,half,380,18); g.stroke();
-    T('인명피해 유형별',M+24,y+34,22,800,'#0B1B3F'); { const mx=Math.max(1,...kinds.map(k=>c[k]||0)), bw=half-200, gapY=Math.min(86,240/Math.max(1,kinds.length)); kinds.forEach((k,i)=>{ const yy=y+104+i*gapY, n=c[k]||0; T(k,M+24,yy,21,800,'#344054'); g.fillStyle='#F2F4F7'; rRound(g,M+110,yy-22,bw,44,10); g.fill(); if(n){ g.fillStyle=['#F79009','#D92D20','#7A271A'][i%3]; rRound(g,M+110,yy-22,Math.max(18,bw*n/mx),44,10); g.fill(); } T(known?`${n}명`:'-',M+122+bw,yy,21,800,'#0B1B3F'); });
-      if(known&&raw!=='none'){ g.fillStyle='#E4E7EC'; g.fillRect(M+24,y+316,half-48,1); T(`계 ${sum}명`,M+24,y+344,20,800,'#D92D20'); T(resc?`인명구조 ${resc}`:'',M+half-24,y+344,20,800,'#067647','right'); }
-      if(raw==='none') T(`※ ${(life&&life.none)||'해당없음'}`,M+24,y+344,18,600,'#067647'); else if(!known) T('※ 인명피해 파악 중',M+24,y+344,18,600,'#B54708'); }
-    { const x0=M+half+54; T('지휘 절차 단계별 이행',x0,y+34,22,800,'#0B1B3F'); const ph=f.phases||[], n=ph.length||1, rh=Math.min(24,300/n), bw=half-250;
-      ph.forEach((p,i)=>{ const yy=y+74+i*rh+rh/2, tot=p.done.length+p.undone.length, r2=tot?p.done.length/tot:0; T(fit(`${i+1} ${p.name}`,14,600,150),x0,yy,14,600,'#344054'); g.fillStyle='#F2F4F7'; g.fillRect(x0+160,yy-rh*0.32,bw,rh*0.64); if(r2){ g.fillStyle=r2===1?'#067647':'#244EA2'; g.fillRect(x0+160,yy-rh*0.32,bw*r2,rh*0.64); } T(`${p.done.length}/${tot}`,x0+170+bw,yy,13,700,'#475467'); }); }
-    // 조치 · 전망 칩
-    y+=404; const chips=(lab,ic,list,x,w,col)=>{ T(lab,x,y+20,22,800,'#0B1B3F'); let cx=x, cy=y+62; g.font=`700 18px ${RFF}`; (list.length?list:['파악 중']).slice(0,10).forEach(t=>{ const tw=g.measureText(t).width+58; if(cx+tw>x+w){ cx=x; cy+=50; } if(cy>y+190) return; g.fillStyle=list.length?col+'1A':'#F2F4F7'; rRound(g,cx,cy-20,tw,40,20); g.fill(); g.fillStyle=col; g.beginPath(); g.arc(cx+20,cy,11,0,7); g.fill(); rIco(g,ic,cx+20,cy,6,'#fff'); T(t,cx+38,cy,18,700,'#1A1A1A'); cx+=tw+8; }); };
-    chips('조치 사항','check',fxs(f,'acts').split(MULTI_SEP).filter(Boolean),M,half,'#067647'); chips('향후 전망','arrow',fxs(f,'outlook').split(MULTI_SEP).filter(Boolean),M+half+30,half,'#244EA2');
-    // 시간 흐름(현장 사건 8건)
-    y+=200; T('시간 흐름 (현장 사건)',M,y,22,800,'#0B1B3F'); { const IR=INPUT_LOG_F(), ev=(f.log||[]).filter(l=>!IR.test(String(l))).map(l=>String(l).match(/^(\d{1,2}:\d{2})(?::\d{2})?\s+\(\+[^)]*\)\s+(.*)$/)).filter(m=>m&&(/^\[/.test(m[2])||m[2]==='체크리스트 시작')).map(m=>[m[1],m[2]==='체크리스트 시작'?'지휘 개시':m[2].replace(/^\[[^\]]+\]\s*/,'').replace(/\s*✔$/,'')]).slice(0,8);   /* CH 체크 항목·칸에 적은 글은 빼고 */
-      const x0=M+20, x1=W-M-20, ly=y+92; g.fillStyle='#D0D5DD'; g.fillRect(x0,ly-2,x1-x0,4);
-      if(!ev.length) T('기록 없음',x0,ly+40,18,600,'#98A2B3');
-      ev.forEach(([tm,tx],i)=>{ const x=ev.length>1?x0+(x1-x0)*i/(ev.length-1):x0+(x1-x0)/2, up=i%2===0; g.fillStyle='#244EA2'; g.beginPath(); g.arc(x,ly,9,0,7); g.fill(); g.fillStyle='#fff'; g.beginPath(); g.arc(x,ly,4,0,7); g.fill();
-        const al=i===0?'left':i===ev.length-1&&ev.length>1?'right':'center', bx=al==='left'?x-8:al==='right'?x+8:x; T(tm,bx,up?ly-50:ly+38,17,800,'#244EA2',al); T(fit(tx,16,600,170),bx,up?ly-26:ly+62,16,600,'#344054',al); }); }
-    rFoot(g,W,M,1,1); return rOut([cv],mode); }
-  // ---------- 사진기록 리포트형: 사진·캡션·설명 중심, 같은 크기 칸으로 나란히(비교) ----------
-  async function repPhoto(e, mode){
-    try{ if(document.fonts&&document.fonts.ready) await Promise.race([document.fonts.ready, sleep(1500)]); }catch(_){ }
-    const f=e.facts||{situ:[],phases:[],log:[]}, W=1240, M=84, ph=(e.photos||[]).filter(x=>x&&x.img).slice(0,6), ims=await Promise.all(ph.map(x=>rLoadImg(x.img)));
-    const cv=document.createElement('canvas'); cv.width=W; cv.height=1754; const g=cv.getContext('2d'); g.textBaseline='middle';
-    const T=(t,x,y,sz,w,c,al)=>{ g.font=`${w||500} ${sz}px ${RFF}`; g.fillStyle=c||'#1A1A1A'; g.textAlign=al||'left'; g.fillText(t,x,y); g.textAlign='left'; };
-    rHead(g,W,M,'화재등 상황 보고서','사진기록 리포트',`보고일시 ${fmtTs(e.ts)} · 사진 ${ph.length}장`);
-    let y=184; { const parts=[['cal',fxs(f,'dt')||'일시 파악 중'],['pin',fxs(f,'place')||'장소 파악 중'],['fire',[fxs(f,'kind'),fxs(f,'burn')].filter(Boolean).join(' · ')||'처종 파악 중'],['alert',fxs(f,'level')||'대응단계 -']];
-      g.fillStyle='#F2F4F7'; rRound(g,M,y,W-2*M,64,16); g.fill(); let x=M+20; parts.forEach(([ic,t])=>{ g.font=`700 19px ${RFF}`; const w=Math.min(g.measureText(t).width,270); g.fillStyle='#244EA2'; g.beginPath(); g.arc(x+14,y+32,14,0,7); g.fill(); rIco(g,ic,x+14,y+32,8,'#fff'); g.save(); g.beginPath(); g.rect(x+34,y,w+4,64); g.clip(); T(t,x+36,y+32,19,700,'#0B1B3F'); g.restore(); x+=w+64; }); }
-    y+=88; const sumH=210, area=1600-y-sumH-20, n=ph.length;
-    if(!n){ g.strokeStyle='#98A2B3'; g.setLineDash([12,10]); g.lineWidth=3; rRound(g,M,y,W-2*M,area,24); g.stroke(); g.setLineDash([]); rIco(g,'camera',W/2,y+area/2-50,46,'#98A2B3'); T('사진이 아직 없습니다',W/2,y+area/2+30,30,800,'#475467','center'); T('보고서 창 ‘편집’ → ‘＋ 사진 추가’로 넣고 사진마다 캡션·설명을 적으세요',W/2,y+area/2+76,20,600,'#667085','center'); }
-    else { const cols=n===1?1:2, rows=Math.ceil(n/cols), gap=24, cw=(W-2*M-gap*(cols-1))/cols, chh=(area-gap*(rows-1))/rows, capH=Math.min(150,Math.max(104,chh*0.3)), imH=chh-capH;
-      ph.forEach((p,i)=>{ const col=i%cols, row=Math.floor(i/cols), x=M+col*(cw+gap), yy=y+row*(chh+gap), im=ims[i];
-        g.fillStyle='#fff'; g.strokeStyle='#D0D5DD'; g.lineWidth=2; rRound(g,x,yy,cw,chh,18); g.fill(); g.stroke();
-        g.save(); rRound(g,x,yy,cw,imH,18); g.clip(); g.fillStyle='#E9EDF3'; g.fillRect(x,yy,cw,imH); if(im){ const sc=Math.min(cw/im.naturalWidth,imH/im.naturalHeight), w=im.naturalWidth*sc, h=im.naturalHeight*sc; g.drawImage(im,x+(cw-w)/2,yy+(imH-h)/2,w,h); } g.restore();
-        g.fillStyle='#0B1B3F'; g.beginPath(); g.arc(x+34,yy+34,22,0,7); g.fill(); T(String(i+1),x+34,yy+35,22,900,'#FDD000','center');
-        const cap=p.cap||`사진 ${i+1}`; g.font=`800 24px ${RFF}`; let cp=cap; while(cp.length>1&&g.measureText(cp).width>cw-40) cp=cp.slice(0,-1); if(cp!==cap) cp+='…'; T(cp,x+20,yy+imH+30,24,800,'#0B1B3F');
-        g.font=`500 19px ${RFF}`; const dl=rWrap(g,p.desc||'',cw-40), maxL=Math.max(1,Math.floor((capH-58)/26)); dl.slice(0,maxL).forEach((t,k)=>T(k===maxL-1&&dl.length>maxL?t.slice(0,-1)+'…':t,x+20,yy+imH+62+k*26,19,500,'#344054'));
-        if(cols===2&&col===0&&ph[i+1]){ const ax=x+cw+gap/2, ay=yy+imH/2; g.fillStyle='#FDD000'; g.beginPath(); g.arc(ax,ay,18,0,7); g.fill(); rIco(g,'arrow',ax,ay,10,'#0B1B3F'); }   /* 같은 줄 두 장 = 비교(→) */
-      }); }
-    // 아래 요약 3칸
-    { const yy=1600-sumH, w3=(W-2*M-40)/3, life=fxv(f,'life'), raw=String(life&&life.raw||''), c={}; raw.split('|').forEach(x=>{ const m=x.match(/^(.+)=(\d+)$/); if(m) c[m[1]]=+m[2]; });
-      const boxes=[['fire','화재 개요',[fxs(f,'phase'),fxs(f,'fstat'),fxs(f,'cause_est')].filter(Boolean)],['person','피해 현황',[raw==='none'?((life&&life.none)||'인명피해 해당없음'):Object.keys(c).length?Object.keys(c).map(k=>`${k} ${c[k]}명`).join(' · '):'인명피해 파악 중', fxs(f,'rescue')?`인명구조 ${fxs(f,'rescue')}`:'', (fxv(f,'prop_est')||{}).raw?`재산 ${wonTxt(+(fxv(f,'prop_est')||{}).raw)}`:fxs(f,'prop_st')?`재산 ${fxs(f,'prop_st')}`:''].filter(Boolean)],['check','조치 사항',fxs(f,'acts').split(MULTI_SEP).filter(Boolean)]];
-      boxes.forEach(([ic,lb,ls],i)=>{ const x=M+i*(w3+20); g.fillStyle='#F8FAFC'; g.strokeStyle='#E4E7EC'; g.lineWidth=2; rRound(g,x,yy,w3,sumH-10,16); g.fill(); g.stroke(); g.fillStyle='#244EA2'; g.beginPath(); g.arc(x+30,yy+32,17,0,7); g.fill(); rIco(g,ic,x+30,yy+32,9,'#fff'); T(lb,x+56,yy+32,20,800,'#0B1B3F');
-        g.font=`500 18px ${RFF}`; const lines=(ls.length?ls:['파악 중']).flatMap(t=>rWrap(g,'· '+t,w3-36)).slice(0,5); lines.forEach((t,k)=>T(t,x+20,yy+72+k*26,18,500,'#344054')); }); }
-    rFoot(g,W,M,1,1); return rOut([cv],mode); }
   // V174·V175: 화재등 상황 보고서 A4 — 머리 띠·제목·보고일시, ■ 항목 띠, '- 이름: 값'은 이름 칸+값 칸, '|' 줄은 표, [[나란히]]는 좌우 두 단, 첫 항목 오른쪽에 사진(편집에서 넣음)
   //   한 쪽에 꽉 맞게: 넘치면 글자를 줄이고(68%까지) 남으면 간격을 넓힌다(1.45배까지)
   // V228: A4 세 띠 — 상단(1 발생개요 한 단, 오른쪽에 사진) · 중단(2 화재 개요 | 3 피해 현황) · 하단(4 진행 사항: 조치 사항 | 향후 전망). 제목으로 찾으므로 AI 작성본·옛 양식도 같은 모양
@@ -7528,7 +7418,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       </section>
       </div>`;
     panel.querySelectorAll('[data-rep]').forEach(b=>b.addEventListener('click',()=>{ const r=reports.find(x=>x.id===b.dataset.rep); if(r) openReport(r); }));
-    $('#mkReport').addEventListener('click',()=>openRepType());   // V176: 종류부터 고른 뒤 만들기
+    $('#mkReport').addEventListener('click',()=>newReport('brief'));   // V250: 신속 브리핑형으로 바로 만들기
     $('#ilPvT').addEventListener('click',()=>{ ILPV.open=!ILPV.open; const pv=$('#ilPv'); pv.classList.toggle('open',ILPV.open); $('#ilPvT').setAttribute('aria-expanded',String(ILPV.open)); ilPvPaint(); });
     $('#ilReset').addEventListener('click',()=>{ const b=$('#ilReset'); arm(b,'현장 기록 지움?',()=>{
       const old=JSON.parse(JSON.stringify(state.situ));
