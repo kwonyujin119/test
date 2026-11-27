@@ -2752,6 +2752,15 @@ a.hzl:hover,a.hzl:focus-visible{background:#FDD000;color:#0B1B3F;text-decoration
 #pdfv .pv-hl i.on{background:rgba(255,140,0,.5);outline:2px solid #E8590C;outline-offset:1px}
 @media (max-width:599px){ #pdfv .pv-find output{font-size:12px} }
 </style>
+<style id="v253-menu-bg">
+/* V253: 메뉴(전체 메뉴 창) 배경 — GPT 이미지 API(gpt-image-2)로 만든 밝은 선화(책·체크리스트·소화전·호스·헬멧·사다리·지도·무전기, 모서리에만).
+   카드는 살짝 비치는 흰색 + 흐림으로 글씨는 그대로 또렷하게. 배경은 창에 고정(목록만 넘어감) */
+#sheet{background:#FBFCFE url(img/menu-bg-m.webp) center top/cover no-repeat}
+@media (min-width:700px) and (orientation:landscape){ #sheet{background-image:url(img/menu-bg-pc.webp)} }   /* 세로 태블릿은 세로용 그림(가로용을 늘리면 선화가 커짐) */
+#sheet .sheet-grid a{background:rgba(255,255,255,.86);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);box-shadow:0 1px 2px rgba(11,27,63,.05),0 6px 18px -12px rgba(11,27,63,.35)}
+#sheet .sheet-grid a:hover{background:rgba(255,255,255,.96)}
+#sheet .sheet-grid a[aria-current="page"]{background:rgba(234,240,251,.94)}
+</style>
 </head><body>
 <!-- V114~V117·V252: 첫 화면 인트로 — 메뉴가 모두 보이는 첫 화면 위에서 빨간 빛(펜 끝)이 12시에서 출발해 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
@@ -3725,7 +3734,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v252</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v253</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4745,8 +4754,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V252', SRV_VER='15.29';
+  const APP_VER='V253', SRV_VER='15.30';
   const UPDATES=[
+    {v:'V253', d:'2026-11-27', t:['메뉴 창 배경: GPT 이미지(gpt-image-2)로 만든 밝은 선화 — 책·체크리스트·소화전·호스·헬멧·사다리·지도·무전기가 모서리에 은은하게(휴대폰·세로 태블릿·가로 화면 각각 맞춤)','메뉴 카드는 살짝 비치는 흰색으로 배경이 은은히 보이고, 글씨는 그대로 또렷해요']},
     {v:'V252', d:'2026-11-27', t:['첫 화면: 빨간 펜이 47을 그리는 동안에도 메뉴·상단·하단이 모두 보여요(예전엔 빈 화면에서 그려졌음) — 그리는 중에 메뉴를 누르면 바로 열려요','유해화학물질: 핵심 요약·AI 답 속 ‘ERG 지침번호 119’를 누르면 유해물질 비상대응 핸드북의 그 지침 쪽이, ‘UN번호 2199’를 누르면 사고대비물질 키인포가이드의 그 물질 쪽이 한 번에 열려요(키인포가이드에 없으면 핸드북 UN 목록 쪽)','문서 보기에서 찾기: 한글 Ctrl+F처럼 돋보기(또는 Ctrl+F)를 누르고 낱말을 넣으면 그 낱말이 있는 쪽으로 가서 노란색으로 표시 — Enter 다음, Shift+Enter 이전, 몇 번째/몇 곳인지 표시']},
     {v:'V251', d:'2026-11-27', t:['Search: 검색하면 맨 위에 ‘핵심 요약’ 상자가 따로 떠요 — 올려 둔 자료를 근거로 AI가 결론·설명·현장에서를 정리(예: 위험물), 근거 자료·쪽 결과는 그 아래 그대로','요약 속 [번호]를 누르면 그 자료의 원문 쪽이 바로 열리고, ‘AI assistant에서 이어 묻기’로 더 물을 수 있어요','같은 검색어는 30분 동안 다시 요약하지 않고 바로 보여 줘요(AI 한도 아끼기) · 주소 검색(건축물대장)에는 요약을 붙이지 않아요']},
     {v:'V250', d:'2026-11-26', t:['보고서 만들기: ‘인포그래픽 요약형’·‘사진기록 리포트형’을 없애고 신속 브리핑형 한 가지로 — 종류 고르는 창 없이 누르면 바로 만들어져요','예전에 만든 인포그래픽·사진기록 보고서도 지우지 않고 신속 브리핑형으로 보여 줘요(첫 사진 1장은 ‘1. 발생개요’ 오른쪽)','쓰지 않게 된 그리기 코드를 지워 앱이 약 26KB 가벼워졌어요']},
