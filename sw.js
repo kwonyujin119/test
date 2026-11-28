@@ -8,6 +8,7 @@ const isShell = u => { const p = new URL(u).pathname, k = new URL(SHELL_KEY).pat
 // 쓸 때는 네트워크 먼저(그림을 바꿔도 바로 새 그림), 끊겼을 때만 보관본.
 const IMG = 'sachil-img-v1', IMG_PRE = [
   'img/3d/47.webp',
+  'img/ai-agent-full.webp',
   'img/3d/ai-agent.webp',
   'img/3d/cases.webp',
   'img/3d/cp.webp',
