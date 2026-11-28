@@ -3914,7 +3914,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v262</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v263</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4934,8 +4934,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V262', SRV_VER='15.39';
+  const APP_VER='V263', SRV_VER='15.40';
   const UPDATES=[
+    {v:'V263', d:'2026-11-28', t:['관리자(교수) 모드로 로그인하면 47망·디브리핑룸 머리에 ‘대화 전체 지우기’ — 한 번 더 눌러 확인하면 그 방의 대화·사진·파일이 모든 사람 화면에서 지워져요(되돌릴 수 없음)','메뉴 오른쪽 화면 버전 단추 이름을 G1 · G2로']},
     {v:'V262', d:'2026-11-28', t:['입체 화면: 검색·체크리스트·상황 보고서 맨 위에 장면 띠 — 검색=SOP 바인더 서가, 체크리스트=현장지휘소 상황판, 보고서=지휘차 위 보고서 클립보드(남색 톤 실사)','장면은 머리 띠에만 두고 아래·왼쪽(제목 자리)은 바탕색으로 흐려져요 — 카드·글자 뒤에는 그림이 없어 그대로 또렷 · 현장 모드·기본 화면에서는 나오지 않아요']},
     {v:'V261', d:'2026-11-28', t:['입체 화면 2단계: 첫 화면·47망·디브리핑룸 배경을 한 그림체로 새로 — 남색 톤 실사, 국내 소방차·현장지휘소·브리핑실, 사람은 뒷모습, 위쪽은 비워 글자가 잘 보이게','아이콘 21개를 무광으로 다시: 국내형 헬멧(CP·안전관리), 노란 지상식 소화전 하나로 통일, 다수사상자=중증도 분류표, 위험물=국내 운반 표지, 익명=대화명 표찰','47망·디브리핑룸 빈 방 안내를 흰 바탕 짙은 글씨로 · 첫 화면 칸을 빠르게 두 번 눌러도 한 번만 넘어가요']},
     {v:'V260', d:'2026-11-28', t:['입체 화면 2차 심사 반영: AI 대화창의 로봇 그림·흐르는 신호선을 걷어내고 남색 상황판 바탕으로, 휴대폰 추천 질문은 2열로 다 보이게','첫 화면: 47 획의 푸른 빛·노란 칸의 사선 띠·지나가는 빛·갈색 그림자를 빼고 남색 그림자 한 가지 + 노란 칸 아래 반사띠 한 줄로 차분하게','칸을 누르면 0.2초 안에 화면이 열려요(전보다 2배 이상 빠름) · 메뉴는 그림 대신 깨끗한 바탕, 단추 이름 ‘기본/입체’','현장 모드 단추에 글자 표시(휴대폰은 메뉴 창 머리에) · 보고서 미리보기 형광펜은 바뀐 줄에만 잠깐 · 인터넷이 끊겨도 입체 글자·아이콘이 보여요']},
@@ -5359,7 +5360,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 
   const sheet=$('#sheet'), sheetBack=$('#sheetBack');
   /* V226(menu): 시트 머리 = pgHead 한 틀 — 노랑 메뉴 기호 칸 + MENU 손글씨 제목 + 요약(자료 섹션 수, 태블릿·PC) + 닫기. #sheetTitle·#sheetClose·#sheetFoot id 유지 */
-  { const hd=sheet.querySelector(':scope > header'), f=$('#sheetFoot'); if(hd&&window.pgHead){ const t=f?f.textContent:''; if(f) f.remove(); hd.outerHTML=pgHead({g:'MENU', tHtml:'<i class="sg sg-MENU" role="img" aria-label="메뉴"></i>', s:t, sid:'sheetFoot', s1:true, id:'sheetTitle', cls:'is-compact sheet-hd', act:'<div class="uigen" role="group" aria-label="화면 버전"><button type="button" data-ug="1" aria-pressed="false" title="기본 — 예전 모습(평면 아이콘, 배경 그림 없음)">기본</button><button type="button" data-ug="2" aria-pressed="false" title="입체 — 3D 글자·아이콘, 첫 화면 장면">입체</button></div><button type="button" class="close" id="sheetClose" aria-label="닫기">×</button>'}); } }
+  { const hd=sheet.querySelector(':scope > header'), f=$('#sheetFoot'); if(hd&&window.pgHead){ const t=f?f.textContent:''; if(f) f.remove(); hd.outerHTML=pgHead({g:'MENU', tHtml:'<i class="sg sg-MENU" role="img" aria-label="메뉴"></i>', s:t, sid:'sheetFoot', s1:true, id:'sheetTitle', cls:'is-compact sheet-hd', act:'<div class="uigen" role="group" aria-label="화면 버전"><button type="button" data-ug="1" aria-pressed="false" title="G1 — 기본 화면(평면 아이콘, 배경 그림 없음)">G1</button><button type="button" data-ug="2" aria-pressed="false" title="G2 — 입체 화면(3D 글자·아이콘, 장면)">G2</button></div><button type="button" class="close" id="sheetClose" aria-label="닫기">×</button>'}); } }
   /* V255: UI gen1 ↔ gen2 — 섹션·AI 프로필·상태 아이콘은 그림 주소를 바꿔 끼우고(gen1 원래 그림은 보관), 기호(디브리핑·CP·소화전)는 두 벌을 넣어 CSS로 보이기 */
   const G3=k=>'img/3d/'+k+'.webp';
   const G3_SEC=new Set(['ictc-schedule','ictc-eval','faq','law','sop','ersp','rit','water','safety','mci','drone','cases','hazmat','fobj','updates']);
@@ -5372,7 +5373,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     document.querySelectorAll('img[data-i47]').forEach(im=>{ im.src=I47(); });
     document.querySelectorAll('img.ico-img[data-sec]').forEach(im=>{ const s=SECTIONS.find(x=>x.slug===im.dataset.sec); if(s&&s.icon) im.src=s.icon; });
     document.querySelectorAll('.uigen [data-ug]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.ug===g)));
-    if(!quiet){ try{ render(); }catch(_){ } toast(two?'입체 화면으로 바꿨어요(3D 글자·아이콘)':'기본 화면으로 바꿨어요'); } }
+    if(!quiet){ try{ render(); }catch(_){ } toast(two?'G2 — 입체 화면으로 바꿨어요':'G1 — 기본 화면으로 바꿨어요'); } }
   uiGen(document.documentElement.classList.contains('ui-g2')?'2':'1',true);
   sheet.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('.uigen [data-ug]'); if(b){ e.preventDefault(); uiGen(b.dataset.ug); } });
   let lastFocus=null;
@@ -6020,7 +6021,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   { const lb=document.getElementById('profLogout'); if(lb) lb.addEventListener('click',()=>profLogout()); }
   function syncProfUI(){ const on=isProf(); document.body.classList.toggle('prof',on); const b=document.getElementById('profBar'); if(b) b.hidden=!on;
     document.querySelectorAll('#sheetGrid a.profonly').forEach(a=>{ a.hidden=!on; }); const l=document.getElementById('profLink'); if(l) l.hidden=on; if(window.__repProf) window.__repProf(); if(window.__rnRedraw) window.__rnRedraw();
-    if(state.route==='lab'&&!!document.querySelector('#panel .lab-lock')===on) render(); }   /* V240: 연구실을 연 채로 교수 확인이 끝나면(또는 로그아웃) 다시 그림 */   // 교수로 로그인돼 있으면 메뉴의 '교수 로그인' 링크는 숨김(V88)
+    if(state.route==='lab'&&!!document.querySelector('#panel .lab-lock')===on) render();
+    try{ if(ROOMS_R.includes(state.route)&&SRV.on&&!(SRV.me&&SRV.me.role==='admin')&&!!document.getElementById('dbClear')!==on) render(); }catch(_){ }   /* V263: 교수 로그인·로그아웃하면 47망·디브리핑룸 머리의 '대화 전체 지우기'를 바로 보이기·숨기기 */
+  }   /* V240: 연구실을 연 채로 교수 확인이 끝나면(또는 로그아웃) 다시 그림 */   // 교수로 로그인돼 있으면 메뉴의 '교수 로그인' 링크는 숨김(V88)
   async function profLogout(){ try{ await api('/api/logout',{json:{},tok:PROF.tok}); }catch(_){ } setProf(''); syncProfUI(); toast('교수 모드에서 로그아웃했어요'); render(); }
   async function checkProf(){
     if(!PROF.tok||!SRV.on){ PROF.ok=false; PROF.checked=!PROF.tok; return false; }   // V143: 서버 연결 전이면 '확인함'으로 두지 않는다(연결되면 다시 확인)
@@ -9419,7 +9422,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(!rid){ panel.innerHTML=`<p class="convo-note">${kind==='deb'?'디브리핑룸은 서버 PC를 새 버전(V57)으로 업데이트하면 열려요. 지금은 47망을 이용해 주세요.':'47망을 찾지 못했어요. 서버를 다시 시작해 주세요.'}</p>`; return; }
     pending=[]; SRV.animOk=false; SRV.last=0; SRV.seen=new Set(); SRV.unLo=null; SRV.epoch=''; SRV.msgs=new Map(); SRV.rp=[]; SRV.rv=-1; SRV.readSent=0; SRV.lastDay=''; SRV.replyTo=null; SRV.dv=-1;
     const admin=SRV.me&&SRV.me.role==='admin';
-    const NTOOLS='<div class="ctools" role="group" aria-label="현장 도구"><button type="button" class="ctool" id="mapBtn" title="CP — 현장 지휘(지도)" aria-label="CP 현장 지휘 지도 열기"><svg class="cpsym g1s" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 21.5C5 13.6 9.9 7.5 16.5 7.5S28 13.4 28 21.5z" fill="#229ED9" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M16.5 7.5c.9 0 1.6.7 1.6 1.6v12.4h-3.2V9.1c0-.9.7-1.6 1.6-1.6z" fill="#1A7FB0"/><path d="M2.2 21.2h27.3c.9 0 1.2 1.1.5 1.6-1.6 1-3.5 1.6-5.4 1.6H6.2c-2.2 0-4-1.4-4-3.2z" fill="#1A7FB0" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/><path d="M8.6 12.6h4.6v3.6c0 1.6-1.1 2.8-2.3 3.4-1.2-.6-2.3-1.8-2.3-3.4z" fill="#fff"/><path d="M10.9 14.1l.5 1.1 1.2.1-.9.8.3 1.2-1.1-.6-1.1.6.3-1.2-.9-.8 1.2-.1z" fill="#229ED9"/></svg><img class="cpsym g2i" src="img/3d/cp.webp" alt="" aria-hidden="true"><span>CP</span></button><button type="button" class="ctool" id="hydBtn" title="소화전" aria-label="소화전"><svg class="cpsym g1s" viewBox="0 0 32 32" aria-hidden="true"><path d="M11 6.6c0-2.3 2.2-4.1 5-4.1s5 1.8 5 4.1V8H11z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="8.6" y="7.8" width="14.8" height="3.4" rx="1.7" fill="#B42318" stroke="#fff" stroke-width="1.5"/><path d="M10.8 11.2h10.4v14.6H10.8z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="4.4" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="21" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="7.4" y="25.4" width="17.2" height="3.6" rx="1.8" fill="#B42318" stroke="#fff" stroke-width="1.5"/><circle cx="16" cy="17.4" r="2.6" fill="#fff"/><circle cx="16" cy="17.4" r="1.1" fill="#B42318"/></svg><img class="cpsym g2i" src="img/3d/hydrant.webp" alt="" aria-hidden="true"><span>소화전</span></button></div>', RTAIL=`<button type="button" class="btn ghost" id="dbRename">대화명<span class="rnx">바꾸기</span></button>${admin?'<button type="button" class="btn ghost" id="dbClear">대화 비우기</button>':''}`;   /* V226: 47망은 공통 화면 머리(pgHead) — 47 아이콘 · 47망 · N명 · (태블릿·PC) 요약, 오른쪽 📌·CP·소화전·대화명 */
+    const NTOOLS='<div class="ctools" role="group" aria-label="현장 도구"><button type="button" class="ctool" id="mapBtn" title="CP — 현장 지휘(지도)" aria-label="CP 현장 지휘 지도 열기"><svg class="cpsym g1s" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 21.5C5 13.6 9.9 7.5 16.5 7.5S28 13.4 28 21.5z" fill="#229ED9" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M16.5 7.5c.9 0 1.6.7 1.6 1.6v12.4h-3.2V9.1c0-.9.7-1.6 1.6-1.6z" fill="#1A7FB0"/><path d="M2.2 21.2h27.3c.9 0 1.2 1.1.5 1.6-1.6 1-3.5 1.6-5.4 1.6H6.2c-2.2 0-4-1.4-4-3.2z" fill="#1A7FB0" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/><path d="M8.6 12.6h4.6v3.6c0 1.6-1.1 2.8-2.3 3.4-1.2-.6-2.3-1.8-2.3-3.4z" fill="#fff"/><path d="M10.9 14.1l.5 1.1 1.2.1-.9.8.3 1.2-1.1-.6-1.1.6.3-1.2-.9-.8 1.2-.1z" fill="#229ED9"/></svg><img class="cpsym g2i" src="img/3d/cp.webp" alt="" aria-hidden="true"><span>CP</span></button><button type="button" class="ctool" id="hydBtn" title="소화전" aria-label="소화전"><svg class="cpsym g1s" viewBox="0 0 32 32" aria-hidden="true"><path d="M11 6.6c0-2.3 2.2-4.1 5-4.1s5 1.8 5 4.1V8H11z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="8.6" y="7.8" width="14.8" height="3.4" rx="1.7" fill="#B42318" stroke="#fff" stroke-width="1.5"/><path d="M10.8 11.2h10.4v14.6H10.8z" fill="#D92D20" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><rect x="4.4" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="21" y="13.6" width="6.6" height="5.2" rx="1.6" fill="#B42318" stroke="#fff" stroke-width="1.5"/><rect x="7.4" y="25.4" width="17.2" height="3.6" rx="1.8" fill="#B42318" stroke="#fff" stroke-width="1.5"/><circle cx="16" cy="17.4" r="2.6" fill="#fff"/><circle cx="16" cy="17.4" r="1.1" fill="#B42318"/></svg><img class="cpsym g2i" src="img/3d/hydrant.webp" alt="" aria-hidden="true"><span>소화전</span></button></div>', RTAIL=`<button type="button" class="btn ghost" id="dbRename">대화명<span class="rnx">바꾸기</span></button>${admin||isProf()?'<button type="button" class="btn ghost" id="dbClear" title="관리자: 이 방의 대화·사진·파일을 모든 사람에게서 지워요(되돌릴 수 없음)">대화 전체 지우기</button>':''}`;   /* V263: 교수(관리자) 모드로 로그인해도 보임 */   /* V226: 47망은 공통 화면 머리(pgHead) — 47 아이콘 · 47망 · N명 · (태블릿·PC) 요약, 오른쪽 📌·CP·소화전·대화명 */
     panel.innerHTML=(kind==='deb'?roomHead({id:'s'+rid,title,cnt:true},'',RTAIL):pgHead({g:'47', tHtml:esc(title)+'<span class="pg-n" id="onlineN"></span>', s:PG_NAME['47'].s, s1:true, back:'#hub', cls:'is-compact net-head', act:NTOOLS+RTAIL}))+`
       <div class="chat">
         <div class="card convo-card"><div class="convo" id="convo"><p class="convo-note" id="convoNote">불러오는 중…</p></div><button type="button" class="peek" id="peek" hidden></button></div>
@@ -9807,9 +9810,11 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     $('#dbRename').addEventListener('click',async()=>{ const rb=$('#dbRename'); if(rb.dataset.arm!=='1'){ rb.dataset.arm='1'; rb.textContent='한 번 더 누르면 바꿈'; rb.classList.add('accent'); stat('대화명을 바꾸면 지금까지 쓴 글은 다른 사람 글처럼 보이고 지울 수 없게 돼요'); setTimeout(()=>{ if(rb.isConnected){ rb.dataset.arm=''; rb.innerHTML='대화명<span class="rnx">바꾸기</span>'; rb.classList.remove('accent'); stat(''); } },3500); return; } if(SRV.ctl){ try{ SRV.ctl.abort(); }catch(_){ } SRV.ctl=null; } SRV.gen++; await api('/api/logout',{json:{}}); setTok(''); SRV.me=null; toChat(); });
     const clr=$('#dbClear');
     if(clr) clr.addEventListener('click',async()=>{
-      if(clr.dataset.arm!=='1'){ clr.dataset.arm='1'; clr.textContent='정말 비우기'; clr.classList.add('accent'); setTimeout(()=>{ if(clr.isConnected){ clr.dataset.arm=''; clr.textContent='대화 비우기'; clr.classList.remove('accent'); } },2500); return; }
-      const r=await api(`/api/rooms/${rid}/messages`,{method:'DELETE'});
-      if(r.ok){ SRV.epoch=''; resetConvo(); } else stat('비우기 실패: '+(r.j.error||'연결 오류'));
+      if(clr.dataset.arm!=='1'){ clr.dataset.arm='1'; clr.textContent='정말 전체 지우기'; clr.classList.add('accent'); stat('한 번 더 누르면 이 방의 대화·사진·파일이 모든 사람 화면에서 지워져요(되돌릴 수 없음)'); setTimeout(()=>{ if(clr.isConnected){ clr.dataset.arm=''; clr.textContent='대화 전체 지우기'; clr.classList.remove('accent'); } },4000); return; }
+      clr.disabled=true;
+      const r=await api(`/api/rooms/${rid}/messages`,admin?{method:'DELETE'}:{method:'DELETE',tok:PROF.tok});   /* V263: 방 계정이 관리자가 아니면 교수 로그인으로 */
+      clr.disabled=false;
+      if(r.ok){ SRV.epoch=''; resetConvo(); toast((kind==='deb'?'디브리핑룸':'47망')+' 대화를 모두 지웠어요'); } else stat('지우기 실패: '+((r.j&&r.j.error)||'연결 오류'));
     });
     // V129: 카카오톡처럼 — 마지막으로 본 대화를 이 기기에 남겨 두었다가 들어오자마자 보여 주고, 서버에서는 그 뒤 글만 받는다('불러오는 중' 없이)
     const MCK='sachil_mc:'+SRVBASE+RK+':'+rid+':'+((SRV.me&&SRV.me.id)||'');   // V138: 사용자별(공용 기기에서 남의 글이 '내 글'로 보이지 않게)
