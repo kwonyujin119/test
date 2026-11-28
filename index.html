@@ -1498,7 +1498,7 @@ html body .chat:not(.botchat) > .chat-foot:not(.on):not(:has(.warn)){display:non
     if(img) return '<span class="pg-glyph is-img" aria-hidden="true"><img src="'+E(img)+'" alt=""></span>';
     switch(g){
       case 'S': case 'A': case 'CH': case 'IL': return '<span class="pg-glyph" aria-hidden="true"><i class="sg sg-'+g+'"></i></span>';
-      case '47': return '<span class="pg-glyph is-full" aria-hidden="true"><img src="icons/icon-96.png" alt=""></span>';
+      case '47': return '<span class="pg-glyph is-full" aria-hidden="true"><img data-i47 src="'+I47()+'" alt=""></span>';
       case 'DB': return '<span class="pg-glyph is-ember" aria-hidden="true">'+DB_SVG+'</span>';
       case 'OT': return '<span class="pg-glyph is-ember" aria-hidden="true">'+SV(ICON.clock)+'</span>';
       case 'BJ': return '<span class="pg-glyph is-navy" aria-hidden="true">S:47</span>';
@@ -2797,6 +2797,9 @@ html.ui-g2 body.chatview .chat:not(.botchat) .convo-empty{display:none}   /* 3D 
 html.ui-g2 img.g2i.db-sym{width:100%;height:100%;max-width:100%;max-height:100%}
 html.ui-g2 img.g2i.cpsym{width:30px;height:30px}
 html.ui-g2 img.g2i.tsym{width:20px;height:20px;vertical-align:-4px}
+/* V256: 체크리스트(CH)·상황 보고서(IL) 글자 표시와 47망 아이콘도 3D(원래 모양을 그대로 입체로 — gpt-image-1.5 편집) */
+html.ui-g2 .sg-CH{--ar:1.981;background-image:url(img/3d/sg-CH.webp)}
+html.ui-g2 .sg-IL{--ar:1.481;background-image:url(img/3d/sg-IL.webp)}
 html.ui-g2 #sheet .sheet-grid a .ab img.ico-img,html.ui-g2 .sx-nav .ab img{filter:drop-shadow(0 2px 3px rgba(11,27,63,.18))}
 .uigen{display:inline-flex;align-items:center;gap:2px;padding:3px;border-radius:999px;background:#EEF2F8;border:1px solid #D5DEEA;margin-right:10px}
 .uigen button{min-height:32px;padding:0 12px;border:0;border-radius:999px;background:transparent;color:#475467;font:inherit;font-size:12.5px;font-weight:800;letter-spacing:.01em;cursor:pointer;white-space:nowrap}
@@ -2821,6 +2824,8 @@ html.intro-css .hz-47[data-s="0"]{animation:introDraw 1.6s cubic-bezier(.45,.05,
 <script>
 /* V255: UI 세대 — gen1(V253까지 모습) / gen2(3D 아이콘·AI 배경·47망·디브리핑룸 3D 배경). 메뉴 머리의 단추로 바꾸고 이 기기에 기억(기본 gen2) */
 (function(){ var g='2'; try{ g=localStorage.getItem('sachil_ui_gen')||'2'; }catch(e){} if(g!=='1') document.documentElement.classList.add('ui-g2'); })();
+/* V256: 47망 아이콘 — gen2는 3D */
+window.I47=function(){ return document.documentElement.classList.contains('ui-g2')?'img/3d/47.webp':'icons/icon-96.png'; };
 </script>
 <script>
 /* V168: 첫 화면이 그려지기 전 0.2초 동안 검색 창·바닥글·하단 탭이 잠깐 보이던 현상 — 주소를 먼저 보고 미리 숨김(화면을 그리면 해제) */
@@ -3744,7 +3749,7 @@ footer b{color:var(--muted);font-weight:600}
     <button type="button" class="help-btn" id="helpBtn" aria-label="사용법 안내 시작" aria-haspopup="dialog" title="사용법">?</button>
     </div>
     <div class="top-right">
-      <a class="ico" href="#chat" id="chatBtn" aria-label="47망" title="47망"><img src="icons/icon-96.png" alt="" width="30" height="30"></a>
+      <a class="ico" href="#chat" id="chatBtn" aria-label="47망" title="47망"><img data-i47 src="icons/icon-96.png" alt="" width="30" height="30"></a>
       <a class="ico" href="#debrief" id="dbBtn" aria-label="디브리핑룸" title="디브리핑룸"><span class="dbi"><svg class="db-sym g1s" viewBox="120 130 1010 1010" aria-hidden="true"><ellipse cx="820" cy="693" rx="290" ry="252" fill="#fff"/><path d="M1020 850C1036 900 1058 940 1080 968c8 14-4 26-20 22-50-14-102-40-155-68Z" fill="#fff"/><g fill="#FDD000" stroke="#FDD000" stroke-width="56" stroke-linejoin="round"><ellipse cx="495" cy="550" rx="352" ry="272"/><path d="M250 730C232 780 208 822 182 856c-10 14 3 28 18 22 50-18 100-46 152-72Z"/></g><g fill="#fff"><ellipse cx="495" cy="550" rx="352" ry="272"/><path d="M250 730C232 780 208 822 182 856c-10 14 3 28 18 22 50-18 100-46 152-72Z"/></g></svg><img class="db-sym g2i" src="img/3d/debrief.webp" alt="" aria-hidden="true"></span></a>
       <nav class="top-nav" aria-label="주요 기능">
         <a href="#search" data-route="search" id="navSearch"><b><i class="sg sg-S" role="img" aria-label="S"></i></b><span class="lbl">검색</span></a>
@@ -3781,7 +3786,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v255</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v256</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4801,8 +4806,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V255', SRV_VER='15.32';
+  const APP_VER='V256', SRV_VER='15.33';
   const UPDATES=[
+    {v:'V256', d:'2026-11-28', t:['UI gen2: 체크리스트(CH)·상황 보고서(IL) 글자 표시와 47망 아이콘도 3D로 — 원래 모양 그대로 입체감만 더했어요(UI gen1은 예전 그대로)']},
     {v:'V255', d:'2026-11-28', t:['UI gen2: 메뉴 맨 위 MENU 오른쪽 ‘UI gen1 / UI gen2’ 단추로 화면 버전을 골라요(이 기기에 기억) — gen1은 예전 모습(AI assistant 배경 그림 없음), gen2는 새 모습','gen2: 메뉴 15개 섹션·CP·소화전·디브리핑룸·상태 아이콘을 입체감 있는 3D 아이콘으로(GPT 이미지)','gen2: SACHIL AI 프로필을 AI 에이전트 모습으로 · AI assistant 배경(사람과 AI 교감 + 전기 신호)','gen2: 47망은 지휘·작전 무전망(지휘차·안테나·무전기가 신호로 연결된 도시), 디브리핑룸은 사후 검토 회의실(탁자·헬멧·타임라인 화이트보드) 3D 배경 — 글씨는 그대로 또렷']},
     {v:'V254', d:'2026-11-28', t:['AI assistant 대화창 배경: 교안 ‘AI로 나만의 PT 툴 만들기’ 11장 그림 — 사람과 AI 에이전트가 마주 보고 전기 신호로 교감하는 장면(휴대폰은 사람·신호·로봇이 함께 보이게 따로 자름)','그 위로 파란 전기 신호가 천천히 흐르며 깜빡여요(동작 줄이기 설정이면 멈춤)','말풍선은 흰색 그대로라 글씨는 또렷하고, 어두운 배경 위 이름·시간·추천 질문 제목은 밝게 · 첫 화면 소방관 캐릭터 그림은 배경 장면을 가리지 않게 숨김']},
     {v:'V253', d:'2026-11-27', t:['메뉴 창 배경: GPT 이미지(gpt-image-2)로 만든 밝은 선화 — 책·체크리스트·소화전·호스·헬멧·사다리·지도·무전기가 모서리에 은은하게(휴대폰·세로 태블릿·가로 화면 각각 맞춤)','메뉴 카드는 살짝 비치는 흰색으로 배경이 은은히 보이고, 글씨는 그대로 또렷해요']},
@@ -5223,12 +5229,13 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   /* V255: UI gen1 ↔ gen2 — 섹션·AI 프로필·상태 아이콘은 그림 주소를 바꿔 끼우고(gen1 원래 그림은 보관), 기호(디브리핑·CP·소화전)는 두 벌을 넣어 CSS로 보이기 */
   const G3=k=>'img/3d/'+k+'.webp';
   const G3_SEC=new Set(['ictc-schedule','ictc-eval','faq','law','sop','ersp','rit','water','safety','mci','drone','cases','hazmat','fobj','updates']);
-  SECTIONS.forEach(s=>{ s.icon1=s.icon; s.icon2=G3_SEC.has(s.slug)?G3(s.slug):s.icon; });
+  SECTIONS.forEach(s=>{ s.icon1=s.icon; s.icon2=G3_SEC.has(s.slug)?G3(s.slug):s.icon==='icons/icon-96.png'?G3('47'):s.icon; });
   const G3_AS={avatar:[AS.avatar,G3('ai-agent')], icAnon:[AS.icAnon,G3('icAnon')], icOffline:[AS.icOffline,G3('icOffline')], icBroken:[AS.icBroken,G3('icBroken')]};
   function uiGen(g,quiet){ g=g==='1'?'1':'2'; const two=g==='2';
     document.documentElement.classList.toggle('ui-g2',two); try{ localStorage.setItem('sachil_ui_gen',g); }catch(_){ }
     SECTIONS.forEach(s=>{ s.icon=two?s.icon2:s.icon1; });
     Object.entries(G3_AS).forEach(([k,v])=>{ AS[k]=two?v[1]:v[0]; });
+    document.querySelectorAll('img[data-i47]').forEach(im=>{ im.src=I47(); });
     document.querySelectorAll('img.ico-img[data-sec]').forEach(im=>{ const s=SECTIONS.find(x=>x.slug===im.dataset.sec); if(s&&s.icon) im.src=s.icon; });
     document.querySelectorAll('.uigen [data-ug]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.ug===g)));
     if(!quiet){ try{ render(); }catch(_){ } toast(two?'UI gen2 — 3D 아이콘·배경으로 바꿨어요':'UI gen1 — 예전 모습으로 바꿨어요'); } }
@@ -8207,7 +8214,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   // ---------- 첫 화면: 6개 박스(47망·디브리핑룸 / S·A / CH·IL) ----------
   window.__toast=(m,u)=>toast(m,u);   /* V208: 다른 스크립트(초과근무)에서 알림 띠 */
   const HUB=[
-    {go:'chat', k:'47', y:true, t:'47망', d:PG_NAME['47'].s, ic:'<img src="icons/icon-96.png" alt="" width="40" height="40">'},
+    {go:'chat', k:'47', y:true, t:'47망', d:PG_NAME['47'].s, get ic(){ return '<img data-i47 src="'+I47()+'" alt="" width="40" height="40">'; }},
     {go:'debrief', k:'DB', y:true, t:'디브리핑룸', d:PG_NAME.DB.s, ic:'<svg class="db-sym g1s" viewBox="120 130 1010 1010" aria-hidden="true"><ellipse cx="820" cy="693" rx="290" ry="252" fill="#fff"/><path d="M1020 850C1036 900 1058 940 1080 968c8 14-4 26-20 22-50-14-102-40-155-68Z" fill="#fff"/><g fill="#FDD000" stroke="#FDD000" stroke-width="56" stroke-linejoin="round"><ellipse cx="495" cy="550" rx="352" ry="272"/><path d="M250 730C232 780 208 822 182 856c-10 14 3 28 18 22 50-18 100-46 152-72Z"/></g><g fill="#fff"><ellipse cx="495" cy="550" rx="352" ry="272"/><path d="M250 730C232 780 208 822 182 856c-10 14 3 28 18 22 50-18 100-46 152-72Z"/></g></svg><img class="db-sym g2i" src="img/3d/debrief.webp" alt="" aria-hidden="true">'},
     {go:'search', k:'S', t:PG_NAME.S.en, d:PG_NAME.S.s},
     {go:'ai', k:'A', t:PG_NAME.A.en, d:PG_NAME.A.s},
