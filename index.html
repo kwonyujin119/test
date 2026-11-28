@@ -3129,6 +3129,64 @@ html.ui-g2:not(.field) #panel .board .done-card b{background:linear-gradient(100
 @media (prefers-reduced-motion:reduce){ html.ui-g2 #panel .board .item.next::after,html.ui-g2 #peek::after,html.ui-g2 #replyBar::after,html.ui-g2 #composer::after,html.ui-g2 .full-ask::after,html.ui-g2 .done-card b{animation:none!important} }
 </style>
 </head><body>
+<style id="v271-stage">
+/* V271: 첫 화면 — 캐릭터 무대(test0 첫 화면과 같은 모습). 캐릭터를 누르면 지금의 첫 화면(#hub)으로. 머리줄·탭은 덮어 숨김 */
+#st0{display:none}
+html.st0{overflow:hidden}
+html.st0 #st0{--h:min(48dvh,380px);display:flex;position:fixed;inset:0;z-index:2147483000;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,2.2vh,22px);background:#060a15;color:#e9eefb;overflow:hidden;opacity:1;transition:opacity .45s ease;-webkit-tap-highlight-color:transparent}
+#st0 .au{position:absolute;inset:-20%;pointer-events:none}
+#st0 .au i{position:absolute;width:60vmax;height:60vmax;border-radius:50%;opacity:.42;animation:st0drift 26s ease-in-out infinite alternate}
+#st0 .au .a1{left:5%;top:0;background:radial-gradient(closest-side,rgba(91,141,224,.55),transparent)}
+#st0 .au .a2{right:5%;top:5%;background:radial-gradient(closest-side,rgba(232,135,90,.4),transparent);animation-duration:31s;animation-delay:-8s}
+#st0 .au .a3{right:12%;bottom:0;background:radial-gradient(closest-side,rgba(154,131,232,.45),transparent);animation-duration:29s;animation-delay:-15s}
+#st0 .au .a4{left:12%;bottom:2%;background:radial-gradient(closest-side,rgba(63,181,154,.4),transparent);animation-duration:34s;animation-delay:-4s}
+@keyframes st0drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(6vmax,-4vmax) scale(1.12)}100%{transform:translate(-5vmax,5vmax) scale(.92)}}
+#st0 .vg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 30%,rgba(3,5,12,.82) 100%)}
+#st0 .fl{position:absolute;left:50%;bottom:-10vh;width:220vmax;height:60vh;transform:translateX(-50%) perspective(600px) rotateX(72deg);transform-origin:50% 100%;pointer-events:none;background-image:linear-gradient(rgba(140,170,255,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(140,170,255,.10) 1px,transparent 1px);background-size:64px 64px;-webkit-mask-image:radial-gradient(ellipse at 50% 0%,#000 10%,transparent 60%);mask-image:radial-gradient(ellipse at 50% 0%,#000 10%,transparent 60%)}
+#st0 .sig{position:relative;z-index:2;display:block;width:clamp(150px,22vw,232px);aspect-ratio:356/90;height:auto;pointer-events:none;user-select:none;-webkit-user-drag:none}
+#st0 .ch{position:relative;z-index:3;width:calc(var(--h) * 369 / 720);height:var(--h);padding:0;border:0;background:none;cursor:pointer;perspective:900px;-webkit-tap-highlight-color:transparent;border-radius:24px}
+#st0 .ch:focus{outline:none} #st0 .ch:focus-visible{outline:3px solid #FDD000;outline-offset:8px}
+#st0 .ch::before{content:'';position:absolute;left:-30%;right:-30%;top:8%;bottom:4%;border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(90,140,255,.22),transparent 70%)}
+#st0 .bd{position:absolute;inset:0;z-index:2;transform:rotateY(var(--ty,0deg)) rotateX(var(--tx,0deg));transition:transform .6s cubic-bezier(.2,.8,.2,1);animation:st0float 5s ease-in-out infinite}
+#st0 .bd img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
+@keyframes st0float{0%,100%{translate:0 0}50%{translate:0 -8px}}
+#st0 .pad{position:absolute;left:50%;bottom:calc(var(--h) * -.33);width:calc(var(--h) * .72);aspect-ratio:1;transform:translateX(-50%) rotateX(74deg);pointer-events:none;z-index:1}
+#st0 .pad i{position:absolute;inset:0;border-radius:50%}
+#st0 .pad .p1{background:conic-gradient(from 0deg,transparent 0 8%,#ffd23f 12%,transparent 22% 48%,rgba(120,170,255,.9) 54%,transparent 64%);-webkit-mask:radial-gradient(closest-side,transparent 88%,#000 90%,#000 97%,transparent 99%);mask:radial-gradient(closest-side,transparent 88%,#000 90%,#000 97%,transparent 99%);animation:st0spin 9s linear infinite}
+#st0 .pad .p2{inset:16%;border:1px solid rgba(140,175,255,.35);box-shadow:0 0 40px rgba(90,140,255,.35),inset 0 0 40px rgba(90,140,255,.25)}
+#st0 .pad .p3{inset:30%;background:radial-gradient(closest-side,rgba(255,210,63,.35),rgba(90,140,255,.15) 60%,transparent)}
+@keyframes st0spin{to{transform:rotate(360deg)}}
+#st0 .ver{position:relative;z-index:2;margin-top:max(16px,calc(var(--h) * .13));font:700 13px/1 Pretendard,system-ui,sans-serif;letter-spacing:.22em;color:#c3cde4;pointer-events:none}
+#st0 .rp{position:absolute;z-index:1;width:160px;height:160px;margin:-80px 0 0 -80px;border-radius:50%;pointer-events:none;border:1.5px solid rgba(253,208,0,.8);opacity:.6;transform:scale(.5);animation:st0rp .9s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes st0rp{to{transform:scale(3.4);opacity:0}}
+html.st0-out #st0{opacity:0;pointer-events:none}
+html.st0-out #st0 .ch{transform:scale(1.12);transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+@media (max-height:480px){ html.st0 #st0{--h:min(52dvh,300px)} #st0 .sig{width:130px} }
+@media (prefers-reduced-motion:reduce){ #st0 .au i,#st0 .pad .p1,#st0 .bd{animation:none!important} #st0 .bd{transition:none} #st0 .rp{display:none} }
+</style>
+<div id="st0" role="dialog" aria-modal="true" aria-label="SACHIL:47">
+  <div class="au" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="a3"></i><i class="a4"></i></div>
+  <div class="fl" aria-hidden="true"></div><div class="vg" aria-hidden="true"></div>
+  <img class="sig" id="st0Sig" alt="" width="356" height="90" draggable="false">
+  <button type="button" class="ch" id="st0Ch" aria-label="SACHIL:47 들어가기"><span class="pad" aria-hidden="true"><i class="p1"></i><i class="p2"></i><i class="p3"></i></span><span class="bd"><img src="img/ai-agent-full.webp" alt="" width="369" height="720" draggable="false" fetchpriority="high"></span></button>
+  <div class="ver">Ver. BETA</div>
+</div>
+<script>
+/* V271: 앱을 첫 화면(#hub)으로 열면 캐릭터 무대를 먼저 보임(다른 화면으로 바로 들어온 링크·알림은 생략). 47 그리기 인트로는 이때 건너뜀 */
+(function(){ var h=location.hash, root=document.documentElement;
+  if(h&&h!=='#'&&h!=='#hub') return;
+  root.classList.add('st0'); try{ sessionStorage.setItem('sachil_intro','1'); }catch(e){}
+  var st=document.getElementById('st0'), ch=document.getElementById('st0Ch'), done=false;
+  var fill=function(){ var m=document.querySelector('.brand .mark-img'), s=document.getElementById('st0Sig'); if(m&&s&&!s.src) s.src=m.src; };
+  fill(); document.addEventListener('DOMContentLoaded',fill);
+  var go=function(e){ if(done) return; done=true;
+    if(e&&e.clientX!=null&&!matchMedia('(prefers-reduced-motion: reduce)').matches){ var r=document.createElement('i'); r.className='rp'; r.style.left=e.clientX+'px'; r.style.top=e.clientY+'px'; st.appendChild(r); }
+    root.classList.add('st0-out'); setTimeout(function(){ root.classList.remove('st0','st0-out'); if(st.parentNode) st.parentNode.removeChild(st); document.removeEventListener('keydown',key,true); },460); };
+  var key=function(e){ if(e.key==='Enter'||e.key===' '||e.key==='Escape'){ if(e.target!==ch){ e.preventDefault(); e.stopPropagation(); go(); } } else if(e.key==='Tab'){ e.preventDefault(); ch.focus(); } };
+  ch.addEventListener('click',go); document.addEventListener('keydown',key,true);
+  if(matchMedia('(hover: hover) and (pointer: fine)').matches){ var raf=0; st.addEventListener('pointermove',function(e){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; var x=e.clientX/innerWidth-.5, y=e.clientY/innerHeight-.5; ch.style.setProperty('--ty',(x*18).toFixed(1)+'deg'); ch.style.setProperty('--tx',(-y*8).toFixed(1)+'deg'); }); }); }
+})();
+</script>
 <!-- V114~V117·V252: 첫 화면 인트로 — 메뉴가 모두 보이는 첫 화면 위에서 빨간 빛(펜 끝)이 12시에서 출발해 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
 <style>
@@ -4107,7 +4165,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v270</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v271</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -5127,8 +5185,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V270', SRV_VER='15.47';
+  const APP_VER='V271', SRV_VER='15.48';
   const UPDATES=[
+    {v:'V271', d:'2026-11-28', t:['첫 화면: 앱을 열면 SACHIL AI 캐릭터 무대가 먼저 나옵니다(위 SACHIL 시그니처, 아래 Ver. BETA)','캐릭터를 누르면 지금의 첫 화면(S·A·CH·IL·47망·디브리핑룸)으로 넘어갑니다','알림·링크로 다른 화면에 바로 들어올 때는 무대를 건너뜁니다']},
     {v:'V270', d:'2026-11-28', t:['AI 화면: 답이 나온 뒤 아래 추천 질문 줄이 천천히 옆으로 흐릅니다(G2). 손가락을 대거나 마우스를 올리면 멈춥니다','추천 질문이 더 이상 ’…’로 잘리지 않고 끝까지 보입니다','G1·현장 모드·움직임 줄이기 설정에서는 흐르지 않고 지금처럼 옆으로 밀어서 봅니다']},
     {v:'V269', d:'2026-11-28', t:['7개 화면 집중 점검 결과 반영(Search·AI·체크리스트·상황보고·47망·디브리핑룸·메뉴)','Search: 위험물 요약에 잘린 UN 번호(예: 염소 ‘35’)가 나오면 요약을 숨기고 원문 확인 안내, 본문 결과 0건이면 AI 요약을 부르지 않음, 같은 발췌문 중복 결과 하나로','AI: 320px·가로 화면에서 입력창이 화면 밖으로 밀리던 것, G2 ‘추천 질문’ 제목이 안 보이던 것, AI 답에서 Search로 넘어갈 때 AI 한도를 두 번 쓰던 것, 대화 비우기 때 쓰던 질문이 사라지던 것','체크리스트: 가로 휴대폰에서 타이머 바가 화면을 덮던 것, 50개를 다 체크하면 경과 시간이 멈춤, 늦게 푼 체크는 ‘해제’로 기록, 전략 결정은 하나만 선택','상황보고: 처음 열 때 미리보기 상태가 서로 다르던 것, 보고서 지우기 되돌리기, 대원에게 관리 용어가 보이던 AI 작성 안내 정리','47망·디브리핑룸: G1에서 CP·소화전 옆 빈 네모, 가로 화면 머리줄 밀림, 글 삭제는 두 번 눌러야, 관리자 삭제 확인, 디브리핑룸 PDF 파일 이름 숨김, 서버 없을 때 쓴 의견이 새로고침에 사라지던 것','메뉴: 마퀴를 누른 뒤 뒤로 가기 한 번에 돌아옴, 900~1099px에서 메뉴 단추가 화면 밖으로 밀리던 것(현장 단추를 메뉴 창으로), 방재실 그림, 번호 없는 전화 칸 숨김','효과(G2): 다음 할 체크 항목·새 글 띠·답장 띠·디브리핑 입력창에 보더빔, 기다리는 글(PDF 여는 중·찾는 중·만드는 중·다시 연결 중)에 쉬머, AI 소개 창 제목·체크 초기화 확인에 스크램블']},
     {v:'V268', d:'2026-11-28', t:['SACHIL AI가 대한민국 표준 방화복(황갈색 원단에 노랑 형광·은색 반사띠, 어깨 무전기)을 입었어요 — 얼굴은 그대로','AI 대화에서 SACHIL AI 얼굴이나 이름을 누르면 소개 창이 열려요(휴대폰은 화면 가득): 방화복 전신 모습, 답할 수 있는 것 6가지, 답하는 방식, 알아 둘 것, 바로 물어보기 — ×·뒤로 가기·Esc로 닫혀요']},
