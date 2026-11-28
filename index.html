@@ -3171,7 +3171,7 @@ html.st0 #st0{--h:min(48dvh,380px);display:flex;position:fixed;inset:0;z-index:2
 @keyframes st0drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(6vmax,-4vmax) scale(1.12)}100%{transform:translate(-5vmax,5vmax) scale(.92)}}
 #st0 .vg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 30%,rgba(3,5,12,.82) 100%)}
 #st0 .fl{position:absolute;left:50%;bottom:-10vh;width:220vmax;height:60vh;transform:translateX(-50%) perspective(600px) rotateX(72deg);transform-origin:50% 100%;pointer-events:none;background-image:linear-gradient(rgba(140,170,255,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(140,170,255,.10) 1px,transparent 1px);background-size:64px 64px;-webkit-mask-image:radial-gradient(ellipse at 50% 0%,#000 10%,transparent 60%);mask-image:radial-gradient(ellipse at 50% 0%,#000 10%,transparent 60%)}
-#st0 .sig{position:relative;z-index:2;display:block;width:clamp(150px,22vw,232px);aspect-ratio:356/90;height:auto;pointer-events:none;user-select:none;-webkit-user-drag:none}
+#st0 .sig{position:relative;z-index:2;display:block;width:clamp(150px,22vw,232px);aspect-ratio:356/90;height:auto;cursor:pointer;user-select:none;-webkit-user-drag:none}
 #st0 .ch{position:relative;z-index:3;width:calc(var(--h) * 369 / 720);height:var(--h);padding:0;border:0;background:none;cursor:pointer;perspective:900px;-webkit-tap-highlight-color:transparent;border-radius:24px}
 #st0 .ch:focus{outline:none} #st0 .ch:focus-visible{outline:3px solid #FDD000;outline-offset:8px}
 #st0 .ch::before{content:'';position:absolute;left:-30%;right:-30%;top:8%;bottom:4%;border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(90,140,255,.22),transparent 70%)}
@@ -3184,7 +3184,7 @@ html.st0 #st0{--h:min(48dvh,380px);display:flex;position:fixed;inset:0;z-index:2
 #st0 .pad .p2{inset:16%;border:1px solid rgba(140,175,255,.35);box-shadow:0 0 40px rgba(90,140,255,.35),inset 0 0 40px rgba(90,140,255,.25)}
 #st0 .pad .p3{inset:30%;background:radial-gradient(closest-side,rgba(255,210,63,.35),rgba(90,140,255,.15) 60%,transparent)}
 @keyframes st0spin{to{transform:rotate(360deg)}}
-#st0 .ver{position:relative;z-index:2;margin-top:max(16px,calc(var(--h) * .13));font:700 13px/1 Pretendard,system-ui,sans-serif;letter-spacing:.22em;color:#c3cde4;pointer-events:none}
+#st0 .ver{position:relative;z-index:2;margin-top:max(16px,calc(var(--h) * .13));font:700 13px/1 Pretendard,system-ui,sans-serif;letter-spacing:.22em;color:#c3cde4;cursor:pointer;padding:8px 10px}
 #st0 .rp{position:absolute;z-index:1;width:160px;height:160px;margin:-80px 0 0 -80px;border-radius:50%;pointer-events:none;border:1.5px solid rgba(253,208,0,.8);opacity:.6;transform:scale(.5);animation:st0rp .9s cubic-bezier(.2,.7,.3,1) forwards}
 @keyframes st0rp{to{transform:scale(3.4);opacity:0}}
 html.st0-out #st0{opacity:0;pointer-events:none}
@@ -3213,6 +3213,7 @@ html.st0-out #st0 .ch{transform:scale(1.12);transition:transform .45s cubic-bezi
     root.classList.add('st0-out'); setTimeout(function(){ root.classList.remove('st0','st0-out'); if(st.parentNode) st.parentNode.removeChild(st); document.removeEventListener('keydown',key,true); },460); };
   var key=function(e){ var gb=document.getElementById('st0Gb'); if(e.key==='Enter'||e.key===' '||e.key==='Escape'){ if(e.target!==ch&&e.target!==gb){ e.preventDefault(); e.stopPropagation(); go(); } } else if(e.key==='Tab'){ e.preventDefault(); (document.activeElement===ch?gb:ch).focus(); } };
   ch.addEventListener('click',go); document.addEventListener('keydown',key,true);
+  st.querySelectorAll('.sig,.ver').forEach(function(x){ x.addEventListener('click',go); });   /* V274: 시그니처·Ver. BETA를 눌러도 첫 화면으로 */
   document.getElementById('st0Gb').addEventListener('click',function(e){ location.hash='#guest'; go(e); });
   if(matchMedia('(hover: hover) and (pointer: fine)').matches){ var raf=0; st.addEventListener('pointermove',function(e){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; var x=e.clientX/innerWidth-.5, y=e.clientY/innerHeight-.5; ch.style.setProperty('--ty',(x*18).toFixed(1)+'deg'); ch.style.setProperty('--tx',(-y*8).toFixed(1)+'deg'); }); }); }
 })();
@@ -4195,7 +4196,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v273</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v274</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -5216,8 +5217,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V273', SRV_VER='15.50';
+  const APP_VER='V274', SRV_VER='15.51';
   const UPDATES=[
+    {v:'V274', d:'2026-11-28', t:['첫 화면 무대: SACHIL 시그니처나 Ver. BETA를 눌러도 첫 화면으로 넘어갑니다']},
     {v:'V273', d:'2026-11-28', t:['방명록: 내가 쓴 글은 ’수정’으로 고칠 수 있습니다(지우기는 없음)','방명록 글 지우기는 관리자(교수)만 할 수 있습니다','서버 15.50부터 적용(PC 서버 업데이트 필요)']},
     {v:'V272', d:'2026-11-28', t:['첫 화면: Ver. BETA를 SACHIL 시그니처 위로 옮기고, 캐릭터 아래에 ’방명록’ 배너를 넣었습니다','방명록(메뉴 맨 아래, 업데이트 내역 바로 위): 이름 없이 한마디(300자)를 남기고 모두가 읽습니다. 내가 쓴 글은 두 번 눌러 지울 수 있습니다','방명록은 서버 15.49부터 열립니다(PC 서버 업데이트 필요). 방명록 글은 매주 정리·보관 기한에서 빠져 계속 남습니다']},
     {v:'V271', d:'2026-11-28', t:['첫 화면: 앱을 열면 SACHIL AI 캐릭터 무대가 먼저 나옵니다(위 SACHIL 시그니처, 아래 Ver. BETA)','캐릭터를 누르면 지금의 첫 화면(S·A·CH·IL·47망·디브리핑룸)으로 넘어갑니다','알림·링크로 다른 화면에 바로 들어올 때는 무대를 건너뜁니다']},
