@@ -2762,21 +2762,21 @@ a.hzl:hover,a.hzl:focus-visible{background:#FDD000;color:#0B1B3F;text-decoration
 #sheet .sheet-grid a[aria-current="page"]{background:rgba(234,240,251,.94)}
 </style>
 <style id="v254-ai-bg">
-/* V254: AI assistant 대화창 배경 — 교안 301 11장 그림(사람과 AI 에이전트가 마주 보고 전기 신호로 교감) + 흐르는 전기 신호.
-   말풍선은 흰색 그대로(글씨 또렷), 어두운 배경 위 시간·이름·추천 질문 제목만 밝게. 움직임 줄이기면 신호는 멈춤 */
-html.ui-g2 #panel .botchat > .card{position:relative;isolation:isolate;background:#0B1220 url(img/ai-bg-m.webp) center 30%/cover no-repeat;overflow:hidden}
-@media (min-width:700px){ html.ui-g2 #panel .botchat > .card{background-image:url(img/ai-bg-pc.webp);background-position:right 35%} }
-html.ui-g2 #panel .botchat > .card::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(8,14,28,.42) 0%,rgba(8,14,28,.30) 45%,rgba(8,14,28,.62) 100%)}
-html.ui-g2 #panel .botchat > .card::after{content:'';position:absolute;left:-10%;right:-10%;top:34%;height:120px;z-index:0;pointer-events:none;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='120' viewBox='0 0 600 120'><defs><filter id='g'><feGaussianBlur stdDeviation='2.2'/></filter></defs><g fill='none' stroke-linecap='round'><path d='M0 60 C75 20 150 100 225 60 S375 20 450 60 S525 100 600 60' stroke='%2365C3FF' stroke-width='3' filter='url(%23g)' opacity='.9'/><path d='M0 60 C75 20 150 100 225 60 S375 20 450 60 S525 100 600 60' stroke='%23E8F6FF' stroke-width='1.2'/><path d='M0 70 C90 40 160 95 260 66 S420 30 600 72' stroke='%233D8BFF' stroke-width='1' opacity='.7'/><path d='M0 50 C80 78 170 30 280 56 S440 84 600 48' stroke='%2399D6FF' stroke-width='.8' opacity='.6'/></g></svg>") repeat-x 0 50%/600px 120px;mix-blend-mode:screen;opacity:.55;animation:v254Sig 4.5s linear infinite,v254Pulse 2.4s ease-in-out infinite;-webkit-mask:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent);mask:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent)}
-@keyframes v254Sig{to{background-position:-600px 50%}}
-@keyframes v254Pulse{0%,100%{opacity:.35}50%{opacity:.7}}
+/* V254→V260(UI gen2): AI assistant 대화창 — 사람·로봇 그림과 흐르는 신호선(AI티)을 걷어내고 남색 단색 + 옅은 24px 격자(지휘 상황판 느낌).
+   말풍선은 흰색 그대로, 어두운 바탕 위 시간·이름·추천 질문 제목만 밝게 */
+html.ui-g2 #panel .botchat > .card{position:relative;isolation:isolate;background-color:#0B1B3F;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:24px 24px;overflow:hidden}
 html.ui-g2 #panel .botchat > .card > *{position:relative;z-index:1}
 html.ui-g2 body #panel .botchat .msg .t{color:rgba(232,240,255,.8)}
 html.ui-g2 body #panel .botchat .msg.bot .who{color:#FDD000}
 html.ui-g2 #panel .botchat > .card .quick{border-top-color:rgba(255,255,255,.14)}
-html.ui-g2 #panel .botchat > .card .quick::before,#panel .botchat > .card:not(:has(.msg[data-mi])) .quick::before{color:#FDD000}
-html.ui-g2 body #panel .botchat .convo-empty.ai-hello{visibility:hidden}   /* 첫 화면: 소방관 캐릭터 대신 배경의 사람·AI 교감 장면이 보이게(자리는 그대로 두어 인사·추천 질문 위치 유지) */
-@media (prefers-reduced-motion:reduce){ html.ui-g2 #panel .botchat > .card::after{animation:none} }
+html.ui-g2 #panel .botchat > .card .quick::before{color:#FDD000}
+html.ui-g2 body #panel .botchat .convo-empty.ai-hello{display:none}
+/* 휴대폰 첫 화면: 추천 질문을 2열로(가로로 잘려 1개만 보이던 것) */
+@media (max-width:699px){
+  html.ui-g2 #panel .botchat > .card:not(:has(.msg[data-mi])) .quick{display:grid;grid-template-columns:1fr 1fr;overflow:visible}
+  html.ui-g2 #panel .botchat > .card:not(:has(.msg[data-mi])) .quick::before{grid-column:1 / -1}
+  html.ui-g2 #panel .botchat > .card:not(:has(.msg[data-mi])) .quick button{white-space:normal;min-height:44px;padding:8px 12px;line-height:1.35;border-radius:12px}
+}
 </style>
 <style id="v255-ui-gen">
 /* V255: UI gen2 — 47망(지휘·작전 무전망)·디브리핑룸(사후 검토 회의) 각각 3D 배경(GPT 이미지 gpt-image-2), 3D 아이콘(gpt-image-1.5, 투명 배경) */
@@ -2808,114 +2808,111 @@ html.ui-g2 #sheet .sheet-grid a .ab img.ico-img,html.ui-g2 .sx-nav .ab img{filte
 @media (max-width:420px){ .uigen button{padding:0 9px;font-size:12px} }
 </style>
 <style id="v257-hub3">
-/* V257(UI gen2): 첫 화면 '현장 장면 + 카드' · 진입 연출 · 타일 확장 전환 */
+/* V257→V260(UI gen2): 첫 화면 '현장 장면 + 카드' · 진입 연출 · 칸 확장 전환 · 현장 모드
+   V260(2차 심사 판정): 글로우·빛 지나감·사선 띠·갈색 그림자·배경 확대 애니(툭 튐) 삭제 → 그림자는 남색 3단계 토큰만, 노란 칸은 단색 + 수평 반사띠 */
+html.ui-g2{--e1:0 1px 2px rgba(11,27,63,.08);--e2:0 1px 2px rgba(11,27,63,.06),0 4px 12px -4px rgba(11,27,63,.16);--e3:0 2px 4px rgba(11,27,63,.08),0 12px 24px -8px rgba(11,27,63,.22)}
 html.ui-g2 .hub.hz{border-radius:22px;background:#E9EEF6 url(img/hub-scene-m.webp) center bottom/cover no-repeat;box-shadow:inset 0 0 0 1px rgba(11,27,63,.06)}
-@media (min-width:900px){ html.ui-g2 .hub.hz{background-image:url(img/hub-scene-pc.webp);background-position:center 78%} }
-/* 흰 카드: 반투명 유리 + 방화복 결(대각 미세 줄) + 깊은 그림자 */
-html.ui-g2 .hz-p:not(.y){fill:url(#v3Wh);stroke:rgba(255,255,255,.95);stroke-width:1.5;filter:drop-shadow(0 10px 18px rgba(11,27,63,.22)) drop-shadow(0 1px 0 rgba(255,255,255,.9))}
-html.ui-g2 .hz-p.y{fill:url(#v3Yel);stroke:#E5BC00;filter:drop-shadow(0 12px 20px rgba(150,110,0,.32))}
+@media (min-width:900px){ html.ui-g2 .hub.hz{background-image:url(img/hub-scene-pc.webp)} }
+/* 칸: 흰 칸 .94 한 값(아래로 갈수록 투명해져 글자가 흐려지던 것 고침), 노란 칸 단색 #FDD000, 그림자 남색 한 겹 */
+html.ui-g2 .hz-p:not(.y){fill:rgba(255,255,255,.94);stroke:#fff;stroke-width:1.5;filter:drop-shadow(0 8px 14px rgba(11,27,63,.16))}
+html.ui-g2 .hz-p.y{fill:#FDD000;stroke:#E5BC00;filter:drop-shadow(0 8px 14px rgba(11,27,63,.16))}
 html.ui-g2 .v3-weave{pointer-events:none;opacity:.5}
-html.ui-g2 .v3-strip{pointer-events:none}
-html.ui-g2 .v3-sheen{pointer-events:none;opacity:0}
-/* 글자 크게(심판: 1.3배) */
-html.ui-g2 .hub.hz .hz-l .sg{height:62px}
-html.ui-g2 .hub.hz .hz-l[data-l="search"] .sg{height:48px}
-html.ui-g2 .hub.hz .hz-l .sg-CH,html.ui-g2 .hub.hz .hz-l .sg-IL{height:54px}
-html.ui-g2 .hub.hz .hz-l b{font-size:17px;letter-spacing:-.01em}
-@media (min-width:600px) and (min-height:760px){ html.ui-g2 .hub.hz .hz-l .sg{height:88px} html.ui-g2 .hub.hz .hz-l[data-l="search"] .sg{height:70px} html.ui-g2 .hub.hz .hz-l .sg-CH,html.ui-g2 .hub.hz .hz-l .sg-IL{height:76px} html.ui-g2 .hub.hz .hz-l b{font-size:21px} }
-html.ui-g2 .hub.hz .hz-l .sg{filter:drop-shadow(0 6px 8px rgba(11,27,63,.18))}
-html.ui-g2 .hz-k .ic{filter:drop-shadow(0 8px 12px rgba(120,80,0,.28))}
-/* CP·소화전: 크게(최소 64px), 카드처럼 */
-html.ui-g2 .hz-tools .hzt{min-width:64px;min-height:64px;border-radius:18px;box-shadow:0 8px 16px rgba(120,80,0,.25),inset 0 1px 0 #fff}
-/* 47 획: 굵고 진하게 + 그림자 */
-html.ui-g2 .hz-47{stroke:#1B3D80;stroke-width:5.5;opacity:1;filter:drop-shadow(0 3px 3px rgba(11,27,63,.25))}
-html.ui-g2 .hz-47[data-s="1"]{stroke-width:4;opacity:.8}
+html.ui-g2 .hz-l b{letter-spacing:-.01em}
+html.ui-g2 .hub.hz .hz-l b{font-size:17px}
+@media (min-width:600px) and (min-height:760px){ html.ui-g2 .hub.hz .hz-l b{font-size:20px} }
+html.ui-g2 .hub.hz .hz-l .sg{filter:drop-shadow(0 2px 3px rgba(11,27,63,.16))}
+html.ui-g2 .hz-k .ic{filter:drop-shadow(0 2px 3px rgba(11,27,63,.16))}
+/* CP·소화전: 크게(최소 64px) */
+html.ui-g2 .hz-tools .hzt{min-width:64px;min-height:64px;border-radius:18px;box-shadow:var(--e2)}
 
-/* ---------- 진입 연출(첫 진입 1회, 총 900ms + 빛 1회) ---------- */
-html.ui-g2 .hub.v3in .hz-svg a,html.ui-g2 .hub.v3in .hz-l,html.ui-g2 .hub.v3in .hz-k,html.ui-g2 .hub.v3in .hz-tools{animation:v3Rise .42s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 70ms)}
+/* ---------- 진입 연출(창마다 1회, 900ms 안에 끝) ---------- */
+html.ui-g2 .hub.v3in .hz-svg a,html.ui-g2 .hub.v3in .hz-l,html.ui-g2 .hub.v3in .hz-k,html.ui-g2 .hub.v3in .hz-tools{animation:v3Rise .36s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 50ms)}
 html.ui-g2 .hub.v3in .hz-svg a{transform-box:fill-box;transform-origin:50% 100%}
-@keyframes v3Rise{from{opacity:0;translate:0 18px;scale:.96}to{opacity:1;translate:0 0;scale:1}}
-html.ui-g2 .hub.v3in .hz-47{stroke-dasharray:1 1;animation:v3Draw .7s cubic-bezier(.2,.8,.2,1) .2s both}
-html.ui-g2 .hub.v3in .hz-47[data-s="1"]{animation-delay:.45s}
+@keyframes v3Rise{from{opacity:0;translate:0 14px}to{opacity:1;translate:0 0}}
 @keyframes v3Draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
-html.ui-g2 .hub.v3in .v3-sheen{animation:v3Sheen .7s cubic-bezier(.3,.1,.3,1) .6s both}
-@keyframes v3Sheen{0%{opacity:.0;transform:translateX(-120%)}15%{opacity:.85}85%{opacity:.85}100%{opacity:0;transform:translateX(120%)}}
-html.ui-g2 .hub.v3in{animation:v3Bg .9s ease-out both}
-@keyframes v3Bg{from{background-size:112%;filter:saturate(.6)}to{background-size:cover;filter:none}}
 
-/* ---------- 타일 확장 전환 ---------- */
+/* ---------- 칸 확장 전환(240ms) ---------- */
 .v3-zoom{position:fixed;inset:0;z-index:9999;pointer-events:none;display:flex;align-items:center;justify-content:center;will-change:clip-path}
 .v3-zoom.w{background:#fff}
 .v3-zoom.y{background:#FDD000}
-.v3-zoom .z-g{transition:transform .34s cubic-bezier(.2,.8,.2,1),opacity .34s;display:flex;flex-direction:column;align-items:center;gap:8px}
+.v3-zoom .z-g{transition:transform .2s cubic-bezier(.2,.8,.2,1),opacity .2s;display:flex;flex-direction:column;align-items:center;gap:8px}
 .v3-zoom .z-g .sg{height:64px}
-.v3-zoom .z-g b{font:800 20px/1.2 inherit;color:#0B1B3F}
-.v3-zoom.out{transition:opacity .2s ease;opacity:0}
-html.ui-g2 .pg-head.v3up{animation:v3Up .26s cubic-bezier(.2,.8,.2,1) .12s both}
-html.ui-g2 #panel>*.v3up2{animation:v3Up2 .32s cubic-bezier(.2,.8,.2,1) .08s both}
-@keyframes v3Up{from{opacity:0;translate:0 16px}to{opacity:1;translate:0 0}}
-@keyframes v3Up2{from{opacity:.0;translate:0 10px}to{opacity:1;translate:0 0}}
+.v3-zoom .z-g b{font-size:20px;font-weight:800;line-height:1.2;color:#0B1B3F}
+.v3-zoom.out{transition:opacity .12s ease;opacity:0}
+html.ui-g2 .pg-head.v3up{animation:v3Up .2s cubic-bezier(.2,.8,.2,1) both}
+@keyframes v3Up{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
 
-/* 탭 안: CH 체크 튐 */
-html.ui-g2 .v3ck{animation:v3Ck .28s cubic-bezier(.2,1.5,.4,1)}
-@keyframes v3Ck{0%{transform:scale(.7)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
-/* IL: 방금 바뀐 줄 형광펜 */
-html.ui-g2 .v3hl{background:linear-gradient(90deg,rgba(253,208,0,.55),rgba(253,208,0,.55)) no-repeat 0 85%/100% 45%;animation:v3Hl .9s ease-out both}
-@keyframes v3Hl{0%{background-size:0% 45%}35%{background-size:100% 45%}100%{background-size:100% 45%;background-color:transparent}}
+/* 탭 안: CH 체크(1.06배까지만) */
+html.ui-g2 .v3ck{animation:v3Ck .2s cubic-bezier(.2,.8,.2,1)}
+@keyframes v3Ck{0%{transform:scale(.94)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+/* IL: 방금 바뀐 줄 형광펜 — 0.9초 뒤 사라짐(클래스도 지움) */
+html.ui-g2 .v3hl{animation:v3Hl .9s ease-out}
+@keyframes v3Hl{0%{background:rgba(253,208,0,0)}25%{background:rgba(253,208,0,.45)}100%{background:rgba(253,208,0,0)}}
 
-/* ---------- 현장 모드: 효과·배경 끔 ---------- */
+/* ---------- 현장 모드: 장식 효과·배경 끔(타이머 같은 기능 움직임은 그대로) ---------- */
 html.field .hub.hz{background:#F1F4F9}
-html.field *{animation:none!important;transition:none!important}
+html.field .hub,html.field .hub *,html.field .v3hl,html.field .v3ck,html.field .pg-head{animation:none!important;transition:none!important}
 html.field .hz-p:not(.y){fill:#fff}
-.v3field{display:inline-flex;align-items:center;gap:5px;min-height:40px;padding:0 10px;margin-right:4px;border-radius:999px;border:1.5px solid #C9D2E0;background:#fff;color:#0B1B3F;font:800 12.5px/1 inherit;cursor:pointer}
-.v3field i{width:9px;height:9px;border-radius:50%;background:#C9D2E0}
+html.field.ui-g2 .hz-p.y{fill:#FDD000}
+html.field .hz-svg .v3d{display:none}
+.v3field{display:inline-flex;align-items:center;gap:5px;min-height:40px;min-width:56px;justify-content:center;padding:0 10px;margin-right:4px;border-radius:999px;border:1.5px solid #C9D2E0;background:#fff;color:#0B1B3F;font-size:12.5px;font-weight:800;line-height:1;cursor:pointer;white-space:nowrap}
+.v3field i{width:9px;height:9px;border-radius:50%;background:#C9D2E0;flex:none}
 html.field .v3field{background:#0B1B3F;color:#FDD000;border-color:#0B1B3F}
 html.field .v3field i{background:#FDD000;box-shadow:0 0 0 3px rgba(253,208,0,.3)}
+@media (max-width:520px){ .v3field{padding:0 8px;gap:4px;margin-right:0;font-size:12px} }
+@media (max-width:520px){ .top-right .v3field{display:none} }   /* 휴대폰: 머리 줄이 넘쳐 메뉴 단추가 밀려나므로 메뉴 창 머리(기본/입체 옆)에만 */
+#sheet .v3field{margin:0 8px 0 0}
+@media (min-width:521px){ #sheet .v3field{display:none} }
 @media (prefers-reduced-motion:reduce){ html.ui-g2 .hub.v3in *,html.ui-g2 .hub.v3in{animation:none!important} .v3-zoom{display:none} }
-
-@media (max-width:520px){ .v3field{width:40px;padding:0;justify-content:center;font-size:0;gap:0;margin-right:0} .v3field i{width:12px;height:12px} }
-
 html:not(.ui-g2) .hz-svg .v3d{display:none}
-html.field .hz-svg .v3d{display:none}
-html.field.ui-g2 .hz-p.y{fill:#FDD000}
+/* 47망 안내(옆으로 밀기) 말풍선: 머리(제목·대화명)를 가리지 않게 입력창 위로 */
+html:root body .toast.lowtip{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 96px)}
 </style>
 <style id="v259-47">
-/* V259(UI gen2): 47 획 — 4·7 따로, 같은 굵기, 입체(그림자 두께·몸통 그라데이션·윗빛) + 은은한 빛(증강) · S·A도 3D 글자, CH 기준으로 크기 균형 */
+/* V259→V260(UI gen2): 47 획 — 4·7 따로, 같은 굵기, 입체(그림자 두께·몸통·윗빛). V260: 푸른 글로우·빛 펄스(AI티) 삭제 · S·A도 3D 글자, CH 기준 크기 균형 */
 .hz47g{display:none;pointer-events:none}
 html.ui-g2 .hz47g{display:inline}
-html.ui-g2:not(.intro):not(.intro-css) .hub.hz .hz-47{opacity:0!important}
+html.ui-g2:not(.intro):not(.intro-css) .hub.hz .hz-47{opacity:0!important;animation:none!important}
 html.ui-g2 .hz47g path{fill:none;stroke-linecap:round;stroke-linejoin:round}
-html.ui-g2 .hz47g .x{stroke:#0B1B3F;stroke-opacity:.38;stroke-width:7}
-html.ui-g2 .hz47g .b{stroke:url(#g47b);stroke-width:6.5;filter:drop-shadow(0 0 5px rgba(60,130,255,.35))}
-html.ui-g2 .hz47g .h{stroke:#fff;stroke-opacity:.55;stroke-width:1.6}
-html.ui-g2 .hz47g .p{stroke:#BFE3FF;stroke-width:4;stroke-dasharray:.1 1.2;stroke-dashoffset:.1;opacity:0}
-@media (min-width:600px){ html.ui-g2 .hz47g .x{stroke-width:9} html.ui-g2 .hz47g .b{stroke-width:8.5} html.ui-g2 .hz47g .h{stroke-width:2} html.ui-g2 .hz47g .p{stroke-width:5} }
-html.ui-g2 .hub.v3in .hz47g .x,html.ui-g2 .hub.v3in .hz47g .b,html.ui-g2 .hub.v3in .hz47g .h{stroke-dasharray:1 1;animation:v3Draw .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.2s + var(--i) * .16s)}
-html.ui-g2 .hub.v3in .hz47g .p{animation:g47Pulse .9s ease-in-out both;animation-delay:calc(1.05s + var(--i) * .12s)}
-html.ui-g2 .hub.hz:hover .hz47g .p{animation:g47Pulse 1.1s ease-in-out both}
-@keyframes g47Pulse{0%{opacity:0;stroke-dashoffset:.1}12%{opacity:.95}88%{opacity:.95}100%{opacity:0;stroke-dashoffset:-1.1}}
-html.field .hz47g .p{display:none}
-html.field .hz47g .b{filter:none}
+html.ui-g2 .hz47g .x{stroke:#0B1B3F;stroke-opacity:.32;stroke-width:7}
+html.ui-g2 .hz47g .b{stroke:url(#g47b);stroke-width:6.5}
+html.ui-g2 .hz47g .h{stroke:#fff;stroke-opacity:.35;stroke-width:1.4}
+html.ui-g2 .hz47g .p{display:none}
+@media (min-width:600px){ html.ui-g2 .hz47g .x{stroke-width:9} html.ui-g2 .hz47g .b{stroke-width:8.5} html.ui-g2 .hz47g .h{stroke-width:1.8} }
+html.ui-g2 .hub.v3in .hz47g .x,html.ui-g2 .hub.v3in .hz47g .b,html.ui-g2 .hub.v3in .hz47g .h{stroke-dasharray:1 1;animation:v3Draw .34s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.16s + var(--i) * .1s)}
 html.ui-g2 .sg-S{--ar:1.181;background-image:url(img/3d/sg-S.webp)}
 html.ui-g2 .sg-A{--ar:1.269;background-image:url(img/3d/sg-A.webp)}
-/* 크기 균형: CH 높이를 기준으로 글자 폭(비율)에 맞춰 — 넓을수록 낮게, 좁을수록 높게(눈에 보이는 크기를 맞춤) */
+/* 크기 균형: CH 높이를 기준으로 글자 폭(비율)에 맞춰 — 넓을수록 낮게, 좁을수록 높게 */
 html.ui-g2 .hub.hz .hz-l[data-l="search"] .sg-S{height:55px}
 html.ui-g2 .hub.hz .hz-l .sg-A{height:53px}
 html.ui-g2 .hub.hz .hz-l .sg-CH{height:45px}
 html.ui-g2 .hub.hz .hz-l .sg-IL{height:50px}
 @media (min-width:600px) and (min-height:760px){ html.ui-g2 .hub.hz .hz-l[data-l="search"] .sg-S{height:80px} html.ui-g2 .hub.hz .hz-l .sg-A{height:78px} html.ui-g2 .hub.hz .hz-l .sg-CH{height:66px} html.ui-g2 .hub.hz .hz-l .sg-IL{height:72px} }
 @media (max-height:680px){ html.ui-g2 .hub.hz .hz-l[data-l="search"] .sg-S{height:50px} html.ui-g2 .hub.hz .hz-l .sg-A{height:48px} html.ui-g2 .hub.hz .hz-l .sg-CH{height:40px} html.ui-g2 .hub.hz .hz-l .sg-IL{height:45px} }
-/* 자리가 좁아 한 단계 작게(.sm)일 때도 같은 비율로(옛 34px 일괄 대신) */
-html.ui-g2 .hub.hz .hz-l.sm[data-l="search"] .sg-S{height:46px!important}
-html.ui-g2 .hub.hz .hz-l.sm .sg-A{height:45px!important}
-html.ui-g2 .hub.hz .hz-l.sm .sg-CH{height:38px!important}
-html.ui-g2 .hub.hz .hz-l.sm .sg-IL{height:42px!important}
-/* 한 글자라도 작아지면 넷 모두 같은 단계로(크기 균형) */
+/* 한 글자라도 자리가 좁아 작아지면(.sm) 넷 모두 같은 단계로 */
 html.ui-g2 .hub.hz:has(.hz-l.sm) .hz-l[data-l="search"] .sg-S{height:46px!important}
 html.ui-g2 .hub.hz:has(.hz-l.sm) .hz-l .sg-A{height:45px!important}
 html.ui-g2 .hub.hz:has(.hz-l.sm) .hz-l .sg-CH{height:38px!important}
 html.ui-g2 .hub.hz:has(.hz-l.sm) .hz-l .sg-IL{height:42px!important}
 @media (prefers-reduced-motion:reduce){ html.ui-g2 .hz47g *{animation:none!important} }
+
+/* ---------- V260: 각 탭 안(gen2) — 읽고 입력하는 화면은 배경 그림 없이 깔끔하게 ---------- */
+/* 메뉴: 선화 배경·흐림 유리 대신 단색 + 흰 카드(남색 그림자 e2) · 아이콘 118% 확대 없앰 · 카드 제목 위 정렬 */
+html.ui-g2 #sheet{background:#F6F8FB}
+html.ui-g2 #sheet .sheet-grid a{background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:var(--e2)}
+html.ui-g2 #sheet .sheet-grid a:hover{background:#fff;box-shadow:var(--e3)}
+html.ui-g2 #sheet .sheet-grid a[aria-current="page"]{background:#EEF3FC}
+html.ui-g2 #sheet .sheet-grid a .ab img.ico-img{width:100%;height:100%;margin:0}
+html.ui-g2 #sheet .sheet-grid a{align-items:flex-start}
+/* 검색: 다른 그림체(웹툰) 그림은 gen2에서 숨김 */
+html.ui-g2 .hero-art{display:none}
+/* CH: 진행 중 단계만 왼쪽 노란 막대, 카드 그림자 e1 · 항목 누를 자리 넓게(장갑) */
+html.ui-g2 #panel .board .phase{box-shadow:var(--e1)}
+html.ui-g2 #panel .board .phase.cur{box-shadow:inset 4px 0 0 #FDD000,var(--e1)}
+html.ui-g2 #panel .board .done-card img{display:none}
+@media (max-width:520px){ html.ui-g2 #panel .board .phase .items>.item{min-height:52px} html.ui-g2 #panel .board .phase .items>.item input[type=checkbox]{width:28px;height:28px} }
+/* IL: 카드 그림자 e1 */
+html.ui-g2 #panel .il2 .phase,html.ui-g2 #panel .il-pv{box-shadow:var(--e1)}
 </style>
 </head><body>
 <!-- V114~V117·V252: 첫 화면 인트로 — 메뉴가 모두 보이는 첫 화면 위에서 빨간 빛(펜 끝)이 12시에서 출발해 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
@@ -3896,7 +3893,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v259</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v260</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4916,8 +4913,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V259', SRV_VER='15.36';
+  const APP_VER='V260', SRV_VER='15.37';
   const UPDATES=[
+    {v:'V260', d:'2026-11-28', t:['입체 화면 2차 심사 반영: AI 대화창의 로봇 그림·흐르는 신호선을 걷어내고 남색 상황판 바탕으로, 휴대폰 추천 질문은 2열로 다 보이게','첫 화면: 47 획의 푸른 빛·노란 칸의 사선 띠·지나가는 빛·갈색 그림자를 빼고 남색 그림자 한 가지 + 노란 칸 아래 반사띠 한 줄로 차분하게','칸을 누르면 0.2초 안에 화면이 열려요(전보다 2배 이상 빠름) · 메뉴는 그림 대신 깨끗한 바탕, 단추 이름 ‘기본/입체’','현장 모드 단추에 글자 표시(휴대폰은 메뉴 창 머리에) · 보고서 미리보기 형광펜은 바뀐 줄에만 잠깐 · 인터넷이 끊겨도 입체 글자·아이콘이 보여요']},
     {v:'V259', d:'2026-11-28', t:['UI gen2 첫 화면: S·A도 CH·IL처럼 3D 글자로 — 네 글자 크기를 CH 기준으로 균형 있게','가운데 남색 47 획: 4와 7을 떼어 한눈에 ‘4’ ‘7’로 읽히게, 굵기를 고르게(4의 세로획도 같게), 그림자 두께·윗빛으로 입체 + 처음 들어올 때 4→7 순서로 그려지고 빛이 한 번 흘러요']},
     {v:'V258', d:'2026-11-28', t:['UI gen2: SACHIL AI 프로필 — 얼굴은 그대로, 소방 방화복(반사띠·무전기 마이크)을 입었어요']},
     {v:'V257', d:'2026-11-28', t:['UI gen2 첫 화면: 새벽 화재 현장 장면(GPT 그림) 위에 유리 카드 — 노란 칸엔 반사띠, 47 획은 더 굵고 입체로','첫 진입에 한 번만: 장면 → 카드가 차례로 솟고 → 47 획이 그려지고 → 노란 칸에 빛 한 번(약 1.3초)','칸을 누르면 그 칸이 화면 전체로 펼쳐지며 넘어가요(0.4초) · 체크하면 살짝 튀고, 보고서 미리보기는 바뀐 줄에 형광펜','머리의 ●현장 단추 = 현장 모드: 효과·배경을 모두 끈 빠른 화면(이 기기에 기억)']},
@@ -5338,7 +5336,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 
   const sheet=$('#sheet'), sheetBack=$('#sheetBack');
   /* V226(menu): 시트 머리 = pgHead 한 틀 — 노랑 메뉴 기호 칸 + MENU 손글씨 제목 + 요약(자료 섹션 수, 태블릿·PC) + 닫기. #sheetTitle·#sheetClose·#sheetFoot id 유지 */
-  { const hd=sheet.querySelector(':scope > header'), f=$('#sheetFoot'); if(hd&&window.pgHead){ const t=f?f.textContent:''; if(f) f.remove(); hd.outerHTML=pgHead({g:'MENU', tHtml:'<i class="sg sg-MENU" role="img" aria-label="메뉴"></i>', s:t, sid:'sheetFoot', s1:true, id:'sheetTitle', cls:'is-compact sheet-hd', act:'<div class="uigen" role="group" aria-label="화면 버전"><button type="button" data-ug="1" aria-pressed="false" title="UI gen1 — 예전 모습(평면 아이콘)">UI gen1</button><button type="button" data-ug="2" aria-pressed="false" title="UI gen2 — 3D 아이콘·배경">UI gen2</button></div><button type="button" class="close" id="sheetClose" aria-label="닫기">×</button>'}); } }
+  { const hd=sheet.querySelector(':scope > header'), f=$('#sheetFoot'); if(hd&&window.pgHead){ const t=f?f.textContent:''; if(f) f.remove(); hd.outerHTML=pgHead({g:'MENU', tHtml:'<i class="sg sg-MENU" role="img" aria-label="메뉴"></i>', s:t, sid:'sheetFoot', s1:true, id:'sheetTitle', cls:'is-compact sheet-hd', act:'<div class="uigen" role="group" aria-label="화면 버전"><button type="button" data-ug="1" aria-pressed="false" title="기본 — 예전 모습(평면 아이콘, 배경 그림 없음)">기본</button><button type="button" data-ug="2" aria-pressed="false" title="입체 — 3D 글자·아이콘, 첫 화면 장면">입체</button></div><button type="button" class="close" id="sheetClose" aria-label="닫기">×</button>'}); } }
   /* V255: UI gen1 ↔ gen2 — 섹션·AI 프로필·상태 아이콘은 그림 주소를 바꿔 끼우고(gen1 원래 그림은 보관), 기호(디브리핑·CP·소화전)는 두 벌을 넣어 CSS로 보이기 */
   const G3=k=>'img/3d/'+k+'.webp';
   const G3_SEC=new Set(['ictc-schedule','ictc-eval','faq','law','sop','ersp','rit','water','safety','mci','drone','cases','hazmat','fobj','updates']);
@@ -5351,7 +5349,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     document.querySelectorAll('img[data-i47]').forEach(im=>{ im.src=I47(); });
     document.querySelectorAll('img.ico-img[data-sec]').forEach(im=>{ const s=SECTIONS.find(x=>x.slug===im.dataset.sec); if(s&&s.icon) im.src=s.icon; });
     document.querySelectorAll('.uigen [data-ug]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.ug===g)));
-    if(!quiet){ try{ render(); }catch(_){ } toast(two?'UI gen2 — 3D 아이콘·배경으로 바꿨어요':'UI gen1 — 예전 모습으로 바꿨어요'); } }
+    if(!quiet){ try{ render(); }catch(_){ } toast(two?'입체 화면으로 바꿨어요(3D 글자·아이콘)':'기본 화면으로 바꿨어요'); } }
   uiGen(document.documentElement.classList.contains('ui-g2')?'2':'1',true);
   sheet.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('.uigen [data-ug]'); if(b){ e.preventDefault(); uiGen(b.dataset.ug); } });
   let lastFocus=null;
@@ -5507,7 +5505,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
   function swipeTip(){
     try{ const n=Number(localStorage.getItem('sachil_swipe_tip_v27')||0); if(n>=2) return; localStorage.setItem('sachil_swipe_tip_v27',String(n+1)); }catch(_){ return; }
     const touch=matchMedia('(pointer:coarse)').matches;
-    setTimeout(()=>toast(touch?'왼쪽으로 밀면 S → A → CH → IL → 메뉴 순서로 넘어갑니다':'빈 곳을 마우스로 왼쪽으로 끌면 S → A → CH → IL → 메뉴 순서로 넘어갑니다'),700);
+    setTimeout(()=>{ toast(touch?'왼쪽으로 밀면 S → A → CH → IL → 메뉴 순서로 넘어갑니다':'빈 곳을 마우스로 왼쪽으로 끌면 S → A → CH → IL → 메뉴 순서로 넘어갑니다'); const t=document.getElementById('toast'); if(t){ t.classList.add('lowtip'); setTimeout(()=>t.classList.remove('lowtip'),4200); } },700);   /* V260: 머리를 가리지 않게 입력창 위로 */
   }
 
   // ---------- 라우팅 ----------
@@ -5832,7 +5830,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
         </a>`).join('')+'</div>';
     }
     // 2) 본문 — PDF 속 내용(쪽 단위). 누르면 그 쪽으로 열린다
-    html+=`<div class="pg-sec" id="srchBodyG" data-jg>본문 · 자료 속 내용</div><div id="srchBody">${SRV.on?'<p class="srch-note srch-load">자료 본문을 찾는 중…</p>':'<p class="srch-note">본문 검색은 서버(sachil_server.py)로 열었을 때 메뉴에 첨부된 PDF를 대상으로 동작해요.</p>'}</div>`;
+    html+=`<div class="pg-sec" id="srchBodyG" data-jg>본문 · 자료 속 내용</div><div id="srchBody">${SRV.on?'<p class="srch-note srch-load">자료 본문을 찾는 중…</p>':'<p class="srch-note">본문 검색은 서버에 연결되면 메뉴에 첨부된 PDF를 대상으로 동작해요.</p>'}</div>`;
     // 3) AI 도우미 — 검색은 찾기, AI는 답하기
     html+=`<div class="pg-sec" id="srchAiG" data-jg>AI assistant</div><div class="card ask-ai"><p id="askAiP">이 검색 결과(같은 자료·같은 쪽)를 근거로 <b>AI가 답을 정리</b>해요. 답의 [번호]를 누르면 원문 쪽이 열려요.</p><a class="btn primary" href="#ai" data-ask-ai>이 결과로 AI에게 묻기</a></div>`;
     // 4) 메뉴 바로가기 — 12개 메뉴 중 관련된 곳
@@ -6715,7 +6713,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       ${pgHead({g:'CH', t:PG_NAME.CH.t, s:`${phases[0].name}부터 ${phases[phases.length-1].name}까지 ${phases.length}단계 · 체크하면 시각이 자동으로 남아요`, id:'chTitle', cls:'ch-head'})}
       <div class="board">
         <div class="card timer ${state.timer.running?'live':''}" id="timerBar">
-          <div class="chrow"><div class="chclk${state.timer.running?' live':''}" title="첫 체크 때 경과 시간이 흘러요"><span class="lb">${state.timer.running?'경과':(state.timer.acc?'멈춤':'대기')} · <span id="tm">${clock(new Date())}</span></span><b id="tmEl" role="timer" aria-label="경과 시간">${hhmmss(elapsed())}</b></div><button type="button" class="btn ghost" id="tmReset" title="체크·시각 기록·타이머를 비워요(IL 현장 기록은 그대로예요)">체크 초기화</button><button type="button" class="jall" id="jumpAll" aria-expanded="${jumpOpen}" aria-controls="jgrid">${jumpOpen?'닫기 ▴':'전체 ▾'}</button><span class="prog" aria-label="진행">${done}/${total}</span><span class="pct" aria-hidden="true">${pct}%</span></div>
+          <div class="chrow"><div class="chclk${state.timer.running?' live':''}" title="첫 체크 때 경과 시간이 흘러요"><span class="lb">${state.timer.running?'경과':(state.timer.acc?'멈춤':'대기')} · 현재 <span id="tm">${clock(new Date())}</span></span><b id="tmEl" role="timer" aria-label="경과 시간">${hhmmss(elapsed())}</b></div><button type="button" class="btn ghost" id="tmReset" title="체크·시각 기록·타이머를 비워요(IL 현장 기록은 그대로예요)">체크 초기화</button><button type="button" class="jall" id="jumpAll" aria-expanded="${jumpOpen}" aria-controls="jgrid">${jumpOpen?'닫기 ▴':'전체 ▾'}</button><span class="prog" aria-label="진행">${done}/${total}</span><span class="pct" aria-hidden="true">${pct}%</span></div>
           <div class="chseg" aria-hidden="true">${phases.map((p,pi)=>{const d=dn(pi); return `<i class="${d===clNeed(p)?'full':''}" style="--p:${Math.round(d/clNeed(p)*100)}%"></i>`;}).join('')}</div>
           <nav class="jump" id="jump" aria-label="항목 바로가기">
             <div class="jl">${phases.slice(0,half).map((p,k)=>chip(k)).join('')}</div>
@@ -10456,7 +10454,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
 })();
 </script>
 <script>
-/* V257: 첫 화면 '현장 장면 + 카드'(gen2) · 첫 진입 연출 1회 · 칸 → 화면 확장 전환 · 현장 모드(효과·배경 끔) · CH 체크 튐 · IL 미리보기 형광펜 */
+/* V257·V260: 첫 화면 '현장 장면 + 카드'(gen2) · 첫 진입 연출 1회 · 칸 → 화면 확장 전환 · 현장 모드(효과·배경 끔) · CH 체크 튐 · IL 미리보기 형광펜 */
 (function(){
   const H=document.documentElement, NS='http://www.w3.org/2000/svg';
   try{ if(localStorage.getItem('sachil_field_v1')==='1') H.classList.add('field'); }catch(_){}
@@ -10470,11 +10468,8 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     const svg=hub.querySelector('.hz-svg'); if(!svg) return;
     svg.querySelectorAll('.v3d').forEach(x=>x.remove());
     const defs=el('defs',{class:'v3d'});
-    defs.innerHTML='<linearGradient id="v3Wh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".55" stop-color="#fff" stop-opacity=".88"/><stop offset="1" stop-color="#fff" stop-opacity=".70"/></linearGradient>'
-      +'<linearGradient id="v3Yel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE15A"/><stop offset=".55" stop-color="#FDD000"/><stop offset="1" stop-color="#F2BE00"/></linearGradient>'
-      +'<pattern id="v3Str" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="14" height="14" fill="#FDD000"/><rect width="7" height="14" fill="#D9DEE6"/></pattern>'
-      +'<pattern id="v3Wv" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0H6" stroke="#0B1B3F" stroke-opacity=".05" stroke-width="1"/></pattern>'
-      +'<linearGradient id="v3Sh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>';
+    defs.innerHTML='<pattern id="v3Wv" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0H6" stroke="#0B1B3F" stroke-opacity=".05" stroke-width="1"/></pattern>'
+      +'<linearGradient id="v3Rf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EEF1F5"/><stop offset="1" stop-color="#B9BFC8"/></linearGradient>';   /* V260: 반사띠(은색 위→아래) */
     svg.insertBefore(defs,svg.firstChild);
     svg.querySelectorAll('a[data-hub]').forEach(a=>{
       const k=a.dataset.hub, p=a.querySelector('.hz-p'); if(!p||!p.getAttribute('d')) return;
@@ -10482,17 +10477,15 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
       const cid='v3c-'+k, cp=el('clipPath',{id:cid}); cp.appendChild(el('path',{d:p.getAttribute('d')})); defs.appendChild(cp);
       let bb; try{ bb=p.getBBox(); }catch(_){ return; }
       const g=el('g',{'clip-path':`url(#${cid})`,class:'v3d','pointer-events':'none'});
-      if(p.classList.contains('y')){
-        g.appendChild(el('rect',{x:bb.x,y:bb.y+bb.height-12,width:bb.width,height:12,fill:'url(#v3Str)'}));
-        const sh=el('rect',{class:'v3-sheen',x:bb.x,y:bb.y,width:bb.width*.55,height:bb.height,fill:'url(#v3Sh)',transform:'skewX(-20)'}); sh.style.transformBox='fill-box'; g.appendChild(sh);
-      } else g.appendChild(el('rect',{class:'v3-weave',x:bb.x,y:bb.y,width:bb.width,height:bb.height,fill:'url(#v3Wv)'}));
+      if(p.classList.contains('y')) g.appendChild(el('rect',{x:bb.x,y:bb.y+bb.height-17,width:bb.width,height:5,fill:'url(#v3Rf)'}));   /* V260: 사선 공사장 띠 대신 수평 반사띠 한 줄 */
+      else g.appendChild(el('rect',{class:'v3-weave',x:bb.x,y:bb.y,width:bb.width,height:bb.height,fill:'url(#v3Wv)'}));
       p.after(g);
     });
   }
   function enter(hub){
     let seen=false; try{ seen=sessionStorage.getItem('sachil_hub3_seen')==='1'; sessionStorage.setItem('sachil_hub3_seen','1'); }catch(_){}
     if(seen||calm()||!g2()) return;
-    const go=()=>requestAnimationFrame(()=>{ hub.classList.add('v3in'); setTimeout(()=>hub.classList.remove('v3in'),1700); });
+    const go=()=>requestAnimationFrame(()=>{ hub.classList.add('v3in'); setTimeout(()=>hub.classList.remove('v3in'),1000); });
     document.readyState==='complete'?go():addEventListener('load',go,{once:true});   /* 그림이 다 뜬 뒤 시작(로딩 중에 연출이 지나가 버리지 않게) */
   }
   /* 칸(사다리꼴) → 화면 전체 사각형: 칸 둘레 점 N개를 화면 둘레 점 N개로(같은 방향·같은 시작 모서리) 보간 */
@@ -10509,28 +10502,35 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     z.innerHTML='<div class="z-g">'+(lab?lab.outerHTML:'')+'<b></b></div>'; z.querySelector('b').textContent=nm?nm.textContent:'';
     z.style.clipPath=poly(pts); document.body.appendChild(z);
     const g=z.querySelector('.z-g'); g.style.transform=`translate(${cx-innerWidth/2}px,${cy-innerHeight/2}px)`;
-    return z.animate([{clipPath:poly(pts)},{clipPath:poly(to)}],{duration:420,easing:'cubic-bezier(.45,0,.2,1)',fill:'forwards'}).finished.then(()=>{ g.style.transform='translate(0,-8vh) scale(1.15)'; g.style.opacity='0'; return z; });
+    return z.animate([{clipPath:poly(pts)},{clipPath:poly(to)}],{duration:180,easing:'cubic-bezier(.3,0,.2,1)',fill:'forwards'}).finished.then(()=>{ g.style.transform='translate(0,-8vh) scale(1.15)'; g.style.opacity='0'; return z; });
   }
   document.addEventListener('click',e=>{
     const a=e.target.closest&&e.target.closest('.hz-svg a[data-hub]'); if(!a||a.__v3||!g2()||calm()||lowEnd()) return;
     e.preventDefault(); e.stopImmediatePropagation();
     const nav=()=>{ a.__v3=1; a.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true})); a.__v3=0; };   // 원래 칸 동작(검색은 goSearch 등) 그대로
     let z; try{ z=zoomFrom(a); }catch(_){ nav(); return; }
-    z.then(zz=>{ nav(); setTimeout(()=>{ const pn=document.getElementById('panel'); if(pn){ const h=pn.querySelector('.pg-head'); if(h) h.classList.add('v3up'); } zz.classList.add('out'); setTimeout(()=>zz.remove(),260); },60); }, ()=>nav());
+    z.then(zz=>{ nav(); requestAnimationFrame(()=>{ const pn=document.getElementById('panel'); if(pn){ const h=pn.querySelector('.pg-head'); if(h) h.classList.add('v3up'); } zz.classList.add('out'); setTimeout(()=>zz.remove(),140); }); }, ()=>{ document.querySelectorAll('.v3-zoom').forEach(x=>x.remove()); nav(); });   /* V260: 취소·거부돼도 덮개가 남지 않게 */
   },true);
   /* 현장 모드 단추(머리, 초과근무 단추 왼쪽) */
-  function fieldBtn(){ if(document.querySelector('.v3field')) return; const b=document.createElement('button'); b.type='button'; b.className='v3field';
-    const lab=()=>{ const on=H.classList.contains('field'); b.innerHTML='<i aria-hidden="true"></i>현장'; b.title=on?'현장 모드 켜짐 — 효과·배경을 끈 빠른 화면':'현장 모드 — 누르면 효과·배경을 끄고 빠르게'; b.setAttribute('aria-label',b.title); b.setAttribute('aria-pressed',String(on)); }; lab();
-    b.addEventListener('click',()=>{ H.classList.toggle('field'); const on=H.classList.contains('field'); try{ localStorage.setItem('sachil_field_v1',on?'1':'0'); }catch(_){ } lab(); if(window.__toast) __toast(on?'현장 모드 — 효과·배경을 껐어요':'현장 모드를 껐어요'); });
-    const ot=document.getElementById('otBtn'); ot?ot.before(b):document.body.appendChild(b); }
+  function fieldBtn(){   /* V260: 머리(PC·태블릿) + 메뉴 창 머리(휴대폰) 두 곳 — 상태는 하나 */
+    const lab=b=>{ const on=H.classList.contains('field'); b.innerHTML='<i aria-hidden="true"></i>현장'; b.title=on?'현장 모드 켜짐 — 효과·배경을 끈 빠른 화면':'현장 모드 — 누르면 효과·배경을 끄고 빠르게'; b.setAttribute('aria-label',b.title); b.setAttribute('aria-pressed',String(on)); };
+    const mk=()=>{ const b=document.createElement('button'); b.type='button'; b.className='v3field'; lab(b);
+      b.addEventListener('click',()=>{ H.classList.toggle('field'); const on=H.classList.contains('field'); try{ localStorage.setItem('sachil_field_v1',on?'1':'0'); }catch(_){ } document.querySelectorAll('.v3field').forEach(lab); if(window.__toast) __toast(on?'현장 모드 — 효과·배경을 껐어요':'현장 모드를 껐어요'); }); return b; };
+    if(!document.querySelector('.top-right .v3field')){ const ot=document.getElementById('otBtn'); if(ot) ot.before(mk()); }
+    const sh=document.getElementById('sheet'); if(!sh) return;
+    const put=()=>{ const ug=sh.querySelector('.uigen'); if(ug&&!sh.querySelector('.v3field')) ug.before(mk()); };
+    put(); new MutationObserver(put).observe(sh,{childList:true,subtree:true}); }
   document.addEventListener('change',e=>{ const c=e.target; if(c&&c.type==='checkbox'&&c.closest('#panel')){ const box=c.closest('label')||c; box.classList.remove('v3ck'); void box.offsetWidth; box.classList.add('v3ck'); } },true);
-  let prevTxt=new Map();
-  function logPrev(pn){ const pv=pn.querySelectorAll('.il-pv li, .il-pv td'), nx=new Map();
-    pv.forEach((x,i)=>{ const t=x.textContent; nx.set(i,t); if(prevTxt.size&&prevTxt.has(i)&&prevTxt.get(i)!==t){ x.classList.remove('v3hl'); void x.offsetWidth; x.classList.add('v3hl'); } }); prevTxt=nx; }
-  function scan(){ const pn=document.getElementById('panel'); if(!pn) return;
-    const hub=pn.querySelector('.hub.hz'); if(hub&&!hub.dataset.v3){ hub.dataset.v3='1'; requestAnimationFrame(()=>{ decorate(hub); enter(hub); const p0=hub.querySelector('.hz-p'); if(p0) new MutationObserver(()=>decorate(hub)).observe(p0,{attributes:true,attributeFilter:['d']}); }); }
-    if(location.hash==='#log') logPrev(pn); else prevTxt=new Map(); }
-  function boot(){ const pn=document.getElementById('panel'); if(pn) new MutationObserver(scan).observe(pn,{childList:true,subtree:true,characterData:true}); fieldBtn(); scan(); }
+  let prevTxt=null;   /* V260: 줄 번호 비교(줄 하나 끼면 아래가 모두 칠해짐) 대신 '전에 없던 글'만 */
+  function logPrev(pn){ const pv=[...pn.querySelectorAll('.il-pv li, .il-pv td')], nx=new Set(pv.map(x=>x.textContent));
+    if(prevTxt) pv.forEach(x=>{ if(!prevTxt.has(x.textContent)&&!x.classList.contains('v3hl')){ x.classList.add('v3hl'); x.addEventListener('animationend',()=>x.classList.remove('v3hl'),{once:true}); setTimeout(()=>x.classList.remove('v3hl'),1200); } });
+    prevTxt=nx; }
+  let scanQ=0;   /* V260: 화면이 바뀔 때마다(타이머 1초 갱신 포함) 바로 훑지 않고 한 프레임에 한 번만 */
+  function scan(){ if(scanQ) return; scanQ=requestAnimationFrame(()=>{ scanQ=0; scanNow(); }); }
+  function scanNow(){ const pn=document.getElementById('panel'); if(!pn) return;
+    const hub=pn.querySelector('.hub.hz'); if(hub&&!hub.dataset.v3){ hub.dataset.v3='1'; decorate(hub); enter(hub); const p0=hub.querySelector('.hz-p'); if(p0) new MutationObserver(()=>decorate(hub)).observe(p0,{attributes:true,attributeFilter:['d']}); }
+    if(location.hash.startsWith('#log')) logPrev(pn); else prevTxt=null; }
+  function boot(){ const pn=document.getElementById('panel'); if(pn) new MutationObserver(scan).observe(pn,{childList:true,subtree:true,characterData:true}); fieldBtn(); scanNow(); }
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot):boot();
 })();
 </script>
