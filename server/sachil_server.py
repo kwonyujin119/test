@@ -46,8 +46,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False), '.csv': ('text/csv; charset=utf-8', False),   # 15.12: CSV(엑셀에서 저장한 표)
 }
-VERSION = '15.45'
-APP_VERSION = 'V268'
+VERSION = '15.46'
+APP_VERSION = 'V269'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 500 * 1024 * 1024         # 15.19: 47망·디브리핑룸 파일 1개 500MB(config chat_max_mb) — 48MB 조각으로 받아 디스크에 바로 씀(예전 10MB, 통째로 메모리)
@@ -4304,16 +4304,23 @@ def ans_cache_get(key):
         return None
     with ANS_CACHE_LOCK:
         e = ANS_CACHE.get(key)
-    if e and time.time() - e.get('t', 0) < days * 86400 and e.get('sig') == ans_cache_sig():
+    if e and time.time() - e.get('t', 0) < days * 86400 and e.get('sig') == ans_cache_sig() and not ans_bad_num(e.get('answer')):
         return e
     return None
+
+
+BAD_UN_RE = re.compile(r'UN\s*(?:번호)?\s*(?:는|은|:|：)?\s*(?<!\d)(\d{1,3}|\d{5,})(?!\d)', re.I)   # 15.46: UN 번호는 4자리 — 잘린 번호(예: '35')가 든 답은 저장·재사용하지 않음
+
+
+def ans_bad_num(answer):
+    return bool(BAD_UN_RE.search(str(answer or '')))
 
 
 TRUNC_NOTE = '\n\n(답이 길이 한도에서 잘렸어요 — 더 좁혀 물어보면 끝까지 받을 수 있어요)'   # 15.25: 잘린 답은 표시하고 저장(캐시)하지 않는다
 
 
 def ans_cache_put(key, mode, answer, sources):
-    if not key or float(CONF.get('ai_cache_days') or 0) <= 0 or TRUNC_NOTE.strip() in str(answer or ''):
+    if not key or float(CONF.get('ai_cache_days') or 0) <= 0 or TRUNC_NOTE.strip() in str(answer or '') or ans_bad_num(answer):
         return
     now = time.time()
     with ANS_CACHE_LOCK:
