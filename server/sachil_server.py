@@ -46,8 +46,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False), '.csv': ('text/csv; charset=utf-8', False),   # 15.12: CSV(엑셀에서 저장한 표)
 }
-VERSION = '15.41'
-APP_VERSION = 'V264'
+VERSION = '15.42'
+APP_VERSION = 'V265'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 500 * 1024 * 1024         # 15.19: 47망·디브리핑룸 파일 1개 500MB(config chat_max_mb) — 48MB 조각으로 받아 디스크에 바로 씀(예전 10MB, 통째로 메모리)
@@ -557,6 +557,9 @@ MANIFEST = json.dumps({   # V84: 새 시그니처 아이콘(github.io)·노랑 �
 }, ensure_ascii=False)
 
 
+GH_ASSET = 'https://kwonyujin119.github.io/test/'   # 앱 그림(img/·icons/)이 있는 곳
+
+
 def app_html():
     with open(APP_PATH, encoding='utf-8') as f:
         body = f.read()
@@ -569,6 +572,8 @@ def app_html():
             '<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">'
             '<meta name="apple-mobile-web-app-title" content="SACHIL:47">'
             '<style>[hidden]{display:none!important}</style></head><body>')
+    # 15.42: 서버 주소(app.sachil47.com)로 앱을 열면 서버에는 img/·icons/ 폴더가 없어 그림이 모두 404였다 → GitHub Pages 주소로 바꿔 내보냄
+    body = re.sub(r'(?<=["\'(])(img|icons)/', GH_ASSET + r'\1/', body)
     return (head + body + '</body></html>').encode('utf-8')
 
 
@@ -588,7 +593,7 @@ def packed(key, mtime, make):
     return val
 
 
-CSP = ("default-src 'self'; img-src 'self' data: blob: https://*.daumcdn.net https://*.kakao.com https://*.tmap.co.kr https://*.sk.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tmap.co.kr; "
+CSP = ("default-src 'self'; img-src 'self' data: blob: https://kwonyujin119.github.io https://*.daumcdn.net https://*.kakao.com https://*.tmap.co.kr https://*.sk.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tmap.co.kr; "
        "font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline' https://dapi.kakao.com https://*.daumcdn.net https://apis.openapi.sk.com https://*.tmap.co.kr https://www.youtube.com; "
        "connect-src 'self' data: blob: https://dapi.kakao.com https://*.daumcdn.net https://apis.openapi.sk.com https://*.tmap.co.kr; "
        "frame-src 'self' blob: https://www.youtube-nocookie.com https://www.youtube.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
