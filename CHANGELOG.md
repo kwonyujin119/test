@@ -1,7 +1,7 @@
 # SACHIL:47 버전 기록 (V1 ~ V55)
 
 인천소방학교 지휘역량강화센터 교육 플랫폼 「SACHIL:47」의 버전별 수정 내용입니다.
-정리일: 2026-10-24 · 현재 배포본: **앱 V269 · 서버 15.46** (github.io + `server/SACHIL47-server-update.zip`)
+정리일: 2026-10-24 · 현재 배포본: **앱 V270 · 서버 15.47** (github.io + `server/SACHIL47-server-update.zip`)
 
 **근거 표기**
 - **패치**: 버전마다 남은 수정 스크립트·작업 기록 기준 (가장 정확)
@@ -225,6 +225,7 @@
 | V252 | ① 첫 화면 인트로: html.intro의 '다른 것 숨기기' 규칙과 intro-float 떠오르기 애니메이션 제거 → 메뉴가 보이는 첫 화면 위에서 빨간 펜이 47 획을 그림, 그리는 중 클릭은 막지 않고 그리기만 끝냄 ② 유해화학물질: HZM(지침 111~174 → 핸드북 쪽 64개, 키인포가이드 UN 101개, 핸드북 UN 목록 1,321개 — 2026-11 서버 PDF에서 추출) + hzLinkify(TreeWalker로 텍스트만, 'ERG 대응 지침번호 NNN'·'지침 NNN'·'UN번호 NNNN')가 핵심 요약·AI 답에 a.hzl(data-pdfv·data-page) 링크, 표에 없으면 /api/search로 찾아 openPdf ③ PDF 보기 찾기(#pvFind): 돋보기·Ctrl+F·F3, pdf.js getTextContent로 쪽 글자(띄어쓰기 무시) 캐시, 지금 쪽부터 찾아 첫 결과로 이동, 쪽 크기 % 기준 노란 표시(지금 자리 주황), Enter·Shift+Enter, Esc는 찾기만 닫음, 찾기 칸 입력 중엔 화살표·+/- 단축키 무시 · 서버 15.29(버전 번호만) | PR #244 |
 | V253 | 메뉴 창(#sheet) 배경(style#v253-menu-bg): img/menu-bg-m.webp(1024×1536)·menu-bg-pc.webp(1536×1024, 700px 이상 가로 화면) — OpenAI 이미지 API gpt-image-2(medium, webp)로 생성한 밝은 선화(모서리에만), 카드 rgba(255,255,255,.86)+blur 3px·옅은 그림자 · 서버 15.30(버전 번호만) | PR #245 |
 | V254 | AI assistant 대화창 배경(style#v254-ai-bg): test0 교안 301 11장 그림(assets/pt37-sech-3.jpg) → img/ai-bg-pc.webp(1600×900)·ai-bg-m.webp(740×1080, 사람·신호·로봇 부분을 세로로) — .botchat > .card 배경 + 어둡게 덮는 그라데이션(::before) + 흐르는 전기 신호(::after, SVG 물결 repeat-x 이동·깜빡임, mix-blend screen, 양끝 흐림), 어두운 배경 위 .t·.who·추천 질문 제목 밝게, 첫 화면 ai-hello 캐릭터는 visibility:hidden(자리 유지), prefers-reduced-motion이면 신호 멈춤 · 서버 15.31(버전 번호만) | PR #246 |
+| V270 | AI 추천 질문 줄 마퀴(G2·누르면 멈춤·이음매 없는 반복) · 서버 15.47(버전 번호만) | PR #263 |
 | V269 | 7개 화면 에이전트 집중 점검 반영(위험물 UN 번호 검증, 낮은 화면 입력창·타이머 바, 삭제 2단계, 디브리핑 익명·로컬 저장, 머리 넘침, 효과 자리) · 서버 15.46(UN 번호가 잘린 AI 답은 저장·재사용 안 함) | PR #261 |
 | V268 | SACHIL AI: img/3d/ai-agent.webp 방화복 색을 국내 표준(황갈색·노랑 형광/은색 반사띠)으로(gpt-image-1.5 edits, 얼굴 유지), 전신 img/ai-agent-full.webp(369×720, 66KB, 같은 얼굴) · 소개 창 #aiProf(style#v268-aiprof): 아바타 role=button·이름 누르면 열림, 휴대폰 화면 가득/PC 760px 가운데, 전신 그림은 열 때 받음, 답할 수 있는 것 6(SOP·법령·사례·위험물·안전/RIT/다수사상자·소방용수/건축물대장), 답하는 방식 3, 알아 둘 것 3, 바로 물어보기 3(닫힌 뒤 질문 전송), 닫기 ×·Esc·배경·뒤로 가기(pushState/popstate), 포커스 가두기·되돌리기, 스크롤 잠금 · 시험 32건(휴대폰·PC·G1·320px) 통과 · 서버 15.45(버전 번호만) | PR #260 |
 | V267 | AI assistant 점검(실제 서버 15.43, github.io 앱): 정상 흐름 7종(추천 질문·이어 묻기·근거와 함께 다시 묻기·출처(법제처 새 창)·Search에서 근거 찾기·복사·대화 비우기/새로고침)과 실패 4종(요청 실패·500·429 한도·70초 지연 → 46초 뒤 안내) 모두 정상, 다시 묻기 단추·입력창 유지 · 고침: 휴대폰(≤699px) 대화 시작 뒤 추천 질문 줄 — 칩 최대 64vw·말줄임·오른쪽 32px 흐림·스크롤 스냅(G1·G2 공통) · 서버 15.44(버전 번호만) | PR #259 |
