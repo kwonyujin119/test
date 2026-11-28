@@ -46,8 +46,8 @@ LIB_TYPES = {  # 확장자: (MIME, 브라우저에서 바로 열기)
     '.xls': ('application/vnd.ms-excel', False), '.xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', False),
     '.zip': ('application/zip', False), '.csv': ('text/csv; charset=utf-8', False),   # 15.12: CSV(엑셀에서 저장한 표)
 }
-VERSION = '15.48'
-APP_VERSION = 'V271'
+VERSION = '15.49'
+APP_VERSION = 'V272'
 
 CATS = ['디브리핑']   # 구분은 V17에서 없앰(내부 호환용 값 하나만 유지)
 MAX_UPLOAD = 500 * 1024 * 1024         # 15.19: 47망·디브리핑룸 파일 1개 500MB(config chat_max_mb) — 48MB 조각으로 받아 디스크에 바로 씀(예전 10MB, 통째로 메모리)
@@ -293,6 +293,7 @@ def ensure_room(cat, title):
 
 ROOM47 = ensure_room('47', '47망')            # 기존 대화는 47망에 그대로
 ROOM_DB = ensure_room('DB', '디브리핑룸')      # V57: 47망과 디브리핑룸을 두 방으로 분리
+ROOM_GB = ensure_room('GB', '방명록')         # 15.49(V272): 첫 화면 방명록 — 익명 · 주간 정리/보관 기한에서 빠짐
 EPOCH = {}                               # 대화 비우기 표시(비우면 바뀜 → 모든 화면이 새로 그림)
 PRESENCE = {}                            # (방, 사용자) → 마지막으로 대화를 받아 간 시각 — '지금 접속' 수
 MEMBER_SEEN = set()                      # members 표에 이미 넣은 (방, 사용자) — 매 요청마다 DB에 쓰지 않게
@@ -481,7 +482,7 @@ def _weekly_trim(force):
     keep_min = int(CONF.get('weekly_trim_keep_min') or 0)
     removed = 0
     if ratio > 0:
-        for r in q('SELECT id FROM rooms'):
+        for r in q('SELECT id FROM rooms WHERE id != ?', (ROOM_GB,)):   # 15.49: 방명록은 주간 정리에서 뺌
             rid = r['id']
             n = q('SELECT COUNT(*) n FROM messages WHERE room=?', (rid,), one=True)['n']
             keep = max(keep_min, n - int(n * ratio))
@@ -522,14 +523,14 @@ def cleanup():
             now = time.time()
             if days > 0:
                 cut = now - days * 86400
-                old = q('SELECT id FROM files WHERE ts < ?', (cut,))
+                old = q('SELECT id FROM files WHERE ts < ? AND room != ?', (cut, ROOM_GB))
                 for r in old:
                     try:
                         os.remove(os.path.join(FILES, r['id']))
                     except OSError:
                         pass
-                q('DELETE FROM files WHERE ts < ?', (cut,), commit=True)
-                q('DELETE FROM messages WHERE ts < ?', (cut,), commit=True)
+                q('DELETE FROM files WHERE ts < ? AND room != ?', (cut, ROOM_GB), commit=True)
+                q('DELETE FROM messages WHERE ts < ? AND room != ?', (cut, ROOM_GB), commit=True)   # 15.49: 방명록은 보관 기한 없이 남김
             # 메시지에 붙지 않은 업로드는 하루 뒤 삭제
             orphan = q('SELECT id FROM files WHERE used=0 AND ts < ?', (now - 86400,))
             for r in orphan:
@@ -974,10 +975,13 @@ class H(BaseHTTPRequestHandler):
             if path == '/api/checklist':   # V173: CH 현장지휘 체크리스트(교수가 방재실에서 고침). 비어 있으면 앱 기본 목록
                 cl = CONF.get('checklist')
                 return self.send(200, {'ok': True, 'list': cl if isinstance(cl, list) and cl else None, 'cols': CONF.get('checklist_cols') or 0, 'ts': CONF.get('checklist_ts') or 0}, log=False)
+            if path == '/api/guestbook':   # 15.49: 방명록 글(이름 없이 글·시각만) — 로그인 없이 읽기. test0 999번 교안이 열 때 받아 슬라이드로 채움
+                rows = q('SELECT id, text, ts FROM messages WHERE room=? AND text != ? AND text != ? ORDER BY id LIMIT 3000', (ROOM_GB, '', DELETED_TXT))
+                return self.send(200, {'ok': True, 'items': [{'id': r['id'], 'text': r['text'], 'ts': r['ts']} for r in rows]}, log=False)
             if path == '/api/roominfo':   # V133: 47망·디브리핑룸 위 📌 핀 문구(교수가 고침). 비어 있으면 앱 기본 문구
                 return self.send(200, {'ok': True, 'info': CONF.get('room_info') or {}, 'ts': CONF.get('room_info_ts') or 0}, log=False)
             if path == '/api/me':
-                return self.send(200, {'server': 'sachil', 'version': VERSION, 'user': self.user, 'room': ROOM47, 'room_debrief': ROOM_DB,
+                return self.send(200, {'server': 'sachil', 'version': VERSION, 'user': self.user, 'room': ROOM47, 'room_debrief': ROOM_DB, 'room_guest': ROOM_GB,
                                        'ot_yt': str(CONF.get('ot_yt') or ''),   # V219: 초과근무 알리미 알림음 YouTube 영상(교수가 방재실에서 정함)
                                        'trim_ratio': CONF.get('weekly_trim_ratio'),
                                        'require_code': bool(CONF.get('require_code')),
@@ -2176,8 +2180,8 @@ class H(BaseHTTPRequestHandler):
         r = q('SELECT * FROM rooms WHERE id=?', (rid,), one=True)
         if not r:
             return self.err(404, '없는 디브리핑룸입니다')
-        if rid in (ROOM47, ROOM_DB):
-            return self.err(403, '47망·디브리핑룸은 지울 수 없습니다. 대화 비우기를 쓰세요')
+        if rid in (ROOM47, ROOM_DB, ROOM_GB):
+            return self.err(403, '47망·디브리핑룸·방명록은 지울 수 없습니다. 대화 비우기를 쓰세요')
         if r['owner'] != self.user['id'] and self.user['role'] != 'admin':
             return self.err(403, '디브리핑룸을 만든 사람이나 관리자만 지울 수 있습니다')
         for f in q('SELECT id FROM files WHERE room=?', (rid,)):
@@ -2368,6 +2372,9 @@ class H(BaseHTTPRequestHandler):
             text += ' '
         fl = b.get('files')
         ids = [i for i in (fl if isinstance(fl, list) else []) if isinstance(i, str) and re.fullmatch(r'[a-f0-9]{24}', i)][:10]
+        if rid == ROOM_GB:   # 15.49: 방명록은 글만(300자) · 첨부·답장 없음
+            text, ids = text[:300], []
+            b.pop('reply', None)
         files = []
         for i in ids:
             with DB_LOCK:   # V111: 고르고 표시하는 걸 한 번에 — 같은 파일이 두 글에 붙지 않게
@@ -2412,7 +2419,7 @@ class H(BaseHTTPRequestHandler):
                 reply = json.dumps({'id': o['id'], 'author': o['author'], 'text': snip}, ensure_ascii=False)
         now = time.time()
         mid = q('INSERT INTO messages(room,author,name,text,files,ts,reply) VALUES(?,?,?,?,?,?,?)',
-                (rid, self.user['id'], self.user['name'], text, json.dumps(files, ensure_ascii=False), now, reply), commit=True)
+                (rid, self.user['id'], '익명' if rid == ROOM_GB else self.user['name'], text, json.dumps(files, ensure_ascii=False), now, reply), commit=True)   # 15.49: 방명록은 대화명을 저장하지 않음
         self._posted = True   # 여기부터는 파일이 글에 붙었다
         cid = str(b.get('cid') or '')[:40]
         if cid:
