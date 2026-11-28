@@ -4,7 +4,41 @@
 // 화면(HTML)은 브라우저 캐시(github.io 10분)를 건너뛰고 매번 새 버전을 확인한다 — 바뀐 게 없으면 304로 가볍게 끝남.
 const SHELL = 'sachil-shell-v1', SHELL_KEY = new URL('./', self.location).href;
 const isShell = u => { const p = new URL(u).pathname, k = new URL(SHELL_KEY).pathname; return p === k || p === k + 'index.html'; };
-self.addEventListener('install', () => self.skipWaiting());
+// V260: UI gen2(입체) 그림 — 오프라인(지하·터널)에서도 첫 화면 S·A·CH·IL 3D 글자·아이콘이 빈칸이 되지 않게 미리 받아 둔다.
+// 쓸 때는 네트워크 먼저(그림을 바꿔도 바로 새 그림), 끊겼을 때만 보관본.
+const IMG = 'sachil-img-v1', IMG_PRE = [
+  'img/3d/47.webp',
+  'img/3d/ai-agent.webp',
+  'img/3d/cases.webp',
+  'img/3d/cp.webp',
+  'img/3d/debrief.webp',
+  'img/3d/drone.webp',
+  'img/3d/ersp.webp',
+  'img/3d/faq.webp',
+  'img/3d/fobj.webp',
+  'img/3d/hazmat.webp',
+  'img/3d/hydrant.webp',
+  'img/3d/icAnon.webp',
+  'img/3d/icBroken.webp',
+  'img/3d/icOffline.webp',
+  'img/3d/ictc-eval.webp',
+  'img/3d/ictc-schedule.webp',
+  'img/3d/law.webp',
+  'img/3d/mci.webp',
+  'img/3d/rit.webp',
+  'img/3d/safety.webp',
+  'img/3d/sg-A.webp',
+  'img/3d/sg-CH.webp',
+  'img/3d/sg-IL.webp',
+  'img/3d/sg-S.webp',
+  'img/3d/sop.webp',
+  'img/3d/updates.webp',
+  'img/3d/water.webp',
+  'img/hub-scene-m.webp',
+  'img/hub-scene-pc.webp',
+  'icons/icon-96.png'
+];
+self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(IMG).then(c => Promise.all(IMG_PRE.map(u => c.add(u).catch(() => {})))).catch(() => {})); });
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch', e => {
   const req = e.request;
@@ -38,6 +72,11 @@ self.addEventListener('fetch', e => {
         })
         .catch(() => fetch(req).catch(() => (isShell(req.url) ? caches.match(SHELL_KEY, { cacheName: SHELL }) : Promise.resolve(null)).then(m => m || Response.error())))
     );
+    return;
+  }
+  if (/\/(img|icons)\//.test(new URL(req.url).pathname)) {   // V260: 그림은 네트워크 먼저 → 받은 것은 보관 → 끊기면 보관본
+    e.respondWith(fetch(req).then(r => { if (r.ok) { const c = r.clone(); caches.open(IMG).then(x => x.put(req, c)).catch(() => {}); } return r; })
+      .catch(() => caches.match(req, { cacheName: IMG }).then(m => m || Response.error())));
     return;
   }
   e.respondWith(fetch(req));
