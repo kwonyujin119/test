@@ -3024,6 +3024,12 @@ html.ui-g2:not(.field) .top-nav a b,html.ui-g2:not(.field) .top-right > .ico{tra
   html body .hub.hs .hs-tools .hzt{min-height:40px;padding:0 10px}
 }
 @media (max-width:340px){ html:root body .hub.hz .hz-l[data-l="log"] b{font-size:12.5px;letter-spacing:-.02em} }
+
+/* V267: 휴대폰 AI — 대화를 시작한 뒤 추천 질문 줄에 칩이 하나만 보이고 오른쪽이 뚝 잘려 오류처럼 보이던 것: 칩 길이를 줄이고(…), 끝을 흐리게 해 옆으로 넘길 수 있음을 보여 줌 */
+@media (max-width:699px){
+  html body #panel .botchat > .card:has(.msg[data-mi]) .quick{-webkit-mask:linear-gradient(90deg,#000 calc(100% - 32px),transparent);mask:linear-gradient(90deg,#000 calc(100% - 32px),transparent);padding-right:32px;scroll-snap-type:x proximity}
+  html body #panel .botchat > .card:has(.msg[data-mi]) .quick button{max-width:64vw;overflow:hidden;text-overflow:ellipsis;scroll-snap-align:start}
+}
 </style>
 </head><body>
 <!-- V114~V117·V252: 첫 화면 인트로 — 메뉴가 모두 보이는 첫 화면 위에서 빨간 빛(펜 끝)이 12시에서 출발해 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
@@ -4004,7 +4010,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v266</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v267</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -5024,8 +5030,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V266', SRV_VER='15.43';
+  const APP_VER='V267', SRV_VER='15.44';
   const UPDATES=[
+    {v:'V267', d:'2026-11-28', t:['AI assistant 점검: 실제 서버에서 추천 질문·이어 묻기·근거와 함께 다시 묻기·출처 열기·Search로 이동·복사·대화 비우기, 서버 끊김·오류·한도·시간 초과까지 시험 — 모두 정상','휴대폰에서 대화를 시작한 뒤 추천 질문이 하나만 보이고 오른쪽이 잘려 오류처럼 보이던 것: 칩을 줄이고 끝을 흐리게 해 옆으로 넘길 수 있게']},
     {v:'V266', d:'2026-11-28', t:['작은 폰(320px, 구형 아이폰 SE 등): 머리 줄이 넘쳐 메뉴 단추가 화면 밖으로 밀리던 것, 첫 화면 글자가 칸 밖으로 잘리던 것 고침','폰을 가로로 눕히면 첫 화면이 잘리던 것 → 가로에서는 간편 모드(한 줄 칸, 47망 칸 오른쪽에 CP·소화전)로 한눈에, 다시 세우면 원래 첫 화면']},
     {v:'V265', d:'2026-11-28', t:['G2 새 효과: 메뉴 위쪽에 최근 업데이트가 흐르는 띠(마퀴, 누르면 업데이트 내역) · 검색창·보고서 만들기 테두리에 빛이 돎(보더빔, AI 입력창은 입력할 때)','AI ‘답을 찾는 중’·검색 중 글자에 빛이 흐름(쉬머) · 탭을 옮기면 화면 제목이 섞였다가 제자리로(텍스트 스크램블) · PC 위쪽 메뉴 아이콘이 마우스 가까이 갈수록 커짐(독 확대)','고침: 서버 주소(app.sachil47.com)로 앱을 열면 그림이 모두 빠지던 것 · 빨라짐: 열지 않은 메뉴의 그림·G1에서 쓰지 않는 그림을 처음에 받지 않아요']},
     {v:'V264', d:'2026-11-28', t:['G2 효과 강화: 탭을 옮기면 S→A→CH→IL 순서대로 앞으로는 오른쪽에서, 뒤로는 왼쪽에서 화면이 살짝 3D로 돌며 들어와요(0.3초)','탭을 열 때마다 카드가 아래에서 젖혀지며 차례로 솟고, 메뉴를 열면 카드가 접혔다 펴지듯 들어와요 · 첫 화면으로 돌아오면 칸이 다시 솟아요','PC: 첫 화면이 마우스를 따라 살짝 기울고, 메뉴 카드는 올리면 떠오르고 누르면 눌려 들어가요 · 체크하면 노란 고리가 퍼지고 한 단계를 다 채우면 카드가 한 번 튀어 올라요','현장 모드·움직임 줄이기·G1에서는 효과가 모두 꺼져요']},
