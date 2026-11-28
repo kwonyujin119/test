@@ -1,7 +1,7 @@
 # SACHIL:47 버전 기록 (V1 ~ V55)
 
 인천소방학교 지휘역량강화센터 교육 플랫폼 「SACHIL:47」의 버전별 수정 내용입니다.
-정리일: 2026-10-24 · 현재 배포본: **앱 V255 · 서버 15.32** (github.io + `server/SACHIL47-server-update.zip`)
+정리일: 2026-10-24 · 현재 배포본: **앱 V256 · 서버 15.33** (github.io + `server/SACHIL47-server-update.zip`)
 
 **근거 표기**
 - **패치**: 버전마다 남은 수정 스크립트·작업 기록 기준 (가장 정확)
@@ -225,6 +225,7 @@
 | V252 | ① 첫 화면 인트로: html.intro의 '다른 것 숨기기' 규칙과 intro-float 떠오르기 애니메이션 제거 → 메뉴가 보이는 첫 화면 위에서 빨간 펜이 47 획을 그림, 그리는 중 클릭은 막지 않고 그리기만 끝냄 ② 유해화학물질: HZM(지침 111~174 → 핸드북 쪽 64개, 키인포가이드 UN 101개, 핸드북 UN 목록 1,321개 — 2026-11 서버 PDF에서 추출) + hzLinkify(TreeWalker로 텍스트만, 'ERG 대응 지침번호 NNN'·'지침 NNN'·'UN번호 NNNN')가 핵심 요약·AI 답에 a.hzl(data-pdfv·data-page) 링크, 표에 없으면 /api/search로 찾아 openPdf ③ PDF 보기 찾기(#pvFind): 돋보기·Ctrl+F·F3, pdf.js getTextContent로 쪽 글자(띄어쓰기 무시) 캐시, 지금 쪽부터 찾아 첫 결과로 이동, 쪽 크기 % 기준 노란 표시(지금 자리 주황), Enter·Shift+Enter, Esc는 찾기만 닫음, 찾기 칸 입력 중엔 화살표·+/- 단축키 무시 · 서버 15.29(버전 번호만) | PR #244 |
 | V253 | 메뉴 창(#sheet) 배경(style#v253-menu-bg): img/menu-bg-m.webp(1024×1536)·menu-bg-pc.webp(1536×1024, 700px 이상 가로 화면) — OpenAI 이미지 API gpt-image-2(medium, webp)로 생성한 밝은 선화(모서리에만), 카드 rgba(255,255,255,.86)+blur 3px·옅은 그림자 · 서버 15.30(버전 번호만) | PR #245 |
 | V254 | AI assistant 대화창 배경(style#v254-ai-bg): test0 교안 301 11장 그림(assets/pt37-sech-3.jpg) → img/ai-bg-pc.webp(1600×900)·ai-bg-m.webp(740×1080, 사람·신호·로봇 부분을 세로로) — .botchat > .card 배경 + 어둡게 덮는 그라데이션(::before) + 흐르는 전기 신호(::after, SVG 물결 repeat-x 이동·깜빡임, mix-blend screen, 양끝 흐림), 어두운 배경 위 .t·.who·추천 질문 제목 밝게, 첫 화면 ai-hello 캐릭터는 visibility:hidden(자리 유지), prefers-reduced-motion이면 신호 멈춤 · 서버 15.31(버전 번호만) | PR #246 |
+| V256 | UI gen2 3D 확장: .sg-CH/.sg-IL을 html.ui-g2에서 img/3d/sg-CH·sg-IL.webp로(원본 글자 그림을 gpt-image-1.5 edits로 입체화, --ar 1.981/1.481) · 47망 아이콘 img/3d/47.webp — window.I47()(부팅), img[data-i47](상단 바·화면 머리·첫 화면 타일 getter)·서명 섹션 icon2, uiGen이 바꿔 끼움 · 서버 15.33(버전 번호만) | PR #248 |
 | V255 | UI 세대 전환: html.ui-g2(부팅 스크립트, localStorage sachil_ui_gen, 기본 gen2) · 메뉴 머리 .uigen 단추(UI gen1/gen2, aria-pressed) → uiGen()이 SECTIONS icon1/icon2·AS.avatar·AS.ic*·메뉴 그림 src를 바꾸고 render() · gen1 = V253 모습(V254 AI 배경 CSS를 html.ui-g2 아래로) · gen2: img/3d/*.webp 22개(gpt-image-1.5 투명 배경 3D — 섹션 15·ai-agent·cp·hydrant·debrief·icAnon·icOffline·icBroken, 160~256px), 디브리핑·CP·소화전 SVG는 .g1s/.g2i 두 벌(CSS로 보이기), 47망 img/chat3d-net-*.webp·디브리핑룸 chat3d-deb-*.webp(gpt-image-2, body.r-debrief로 구분), gen2 메뉴 아이콘 크게·디브리핑 빈 방 2D 그림 숨김 · 서버 15.32(버전 번호만) | PR #247 |
 | V147 | 법령 질문 보강: law_links(질문 속 법령명·제N조 → API 없이 법제처 원문 링크, 근거 목록 끝에), 법령 질문은 답 저장 키에 law1: 접두(연결 전 옛 답 재사용 방지), 조문 지정 시 법령 원문 우선·PDF 2개까지, _law_name_ok로 ‘방법’ 등 오인 방지, 법제처 조회 실패를 서버 창에 출력 · 서버 7.3 | PR #133 |
 | V146 | call_groq: 413(무료 계정 요청 한도)·TPM 초과 시 같은 모델로 자료 55%·30%까지 줄여 재시도 후 다음 모델(llama-3.3-70b 등), 답 최대 토큰 4096 이상 강제 → 1024~3000, gpt-oss는 reasoning_effort low · 서버 7.2 | PR #132 |
