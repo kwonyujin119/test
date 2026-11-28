@@ -2807,6 +2807,78 @@ html.ui-g2 #sheet .sheet-grid a .ab img.ico-img,html.ui-g2 .sx-nav .ab img{filte
 .uigen button:focus-visible{outline:2px solid #244EA2;outline-offset:1px}
 @media (max-width:420px){ .uigen button{padding:0 9px;font-size:12px} }
 </style>
+<style id="v257-hub3">
+/* V257(UI gen2): 첫 화면 '현장 장면 + 카드' · 진입 연출 · 타일 확장 전환 */
+html.ui-g2 .hub.hz{border-radius:22px;background:#E9EEF6 url(img/hub-scene-m.webp) center bottom/cover no-repeat;box-shadow:inset 0 0 0 1px rgba(11,27,63,.06)}
+@media (min-width:900px){ html.ui-g2 .hub.hz{background-image:url(img/hub-scene-pc.webp);background-position:center 78%} }
+/* 흰 카드: 반투명 유리 + 방화복 결(대각 미세 줄) + 깊은 그림자 */
+html.ui-g2 .hz-p:not(.y){fill:url(#v3Wh);stroke:rgba(255,255,255,.95);stroke-width:1.5;filter:drop-shadow(0 10px 18px rgba(11,27,63,.22)) drop-shadow(0 1px 0 rgba(255,255,255,.9))}
+html.ui-g2 .hz-p.y{fill:url(#v3Yel);stroke:#E5BC00;filter:drop-shadow(0 12px 20px rgba(150,110,0,.32))}
+html.ui-g2 .v3-weave{pointer-events:none;opacity:.5}
+html.ui-g2 .v3-strip{pointer-events:none}
+html.ui-g2 .v3-sheen{pointer-events:none;opacity:0}
+/* 글자 크게(심판: 1.3배) */
+html.ui-g2 .hub.hz .hz-l .sg{height:62px}
+html.ui-g2 .hub.hz .hz-l[data-l="search"] .sg{height:48px}
+html.ui-g2 .hub.hz .hz-l .sg-CH,html.ui-g2 .hub.hz .hz-l .sg-IL{height:54px}
+html.ui-g2 .hub.hz .hz-l b{font-size:17px;letter-spacing:-.01em}
+@media (min-width:600px) and (min-height:760px){ html.ui-g2 .hub.hz .hz-l .sg{height:88px} html.ui-g2 .hub.hz .hz-l[data-l="search"] .sg{height:70px} html.ui-g2 .hub.hz .hz-l .sg-CH,html.ui-g2 .hub.hz .hz-l .sg-IL{height:76px} html.ui-g2 .hub.hz .hz-l b{font-size:21px} }
+html.ui-g2 .hub.hz .hz-l .sg{filter:drop-shadow(0 6px 8px rgba(11,27,63,.18))}
+html.ui-g2 .hz-k .ic{filter:drop-shadow(0 8px 12px rgba(120,80,0,.28))}
+/* CP·소화전: 크게(최소 64px), 카드처럼 */
+html.ui-g2 .hz-tools .hzt{min-width:64px;min-height:64px;border-radius:18px;box-shadow:0 8px 16px rgba(120,80,0,.25),inset 0 1px 0 #fff}
+/* 47 획: 굵고 진하게 + 그림자 */
+html.ui-g2 .hz-47{stroke:#1B3D80;stroke-width:5.5;opacity:1;filter:drop-shadow(0 3px 3px rgba(11,27,63,.25))}
+html.ui-g2 .hz-47[data-s="1"]{stroke-width:4;opacity:.8}
+
+/* ---------- 진입 연출(첫 진입 1회, 총 900ms + 빛 1회) ---------- */
+html.ui-g2 .hub.v3in .hz-svg a,html.ui-g2 .hub.v3in .hz-l,html.ui-g2 .hub.v3in .hz-k,html.ui-g2 .hub.v3in .hz-tools{animation:v3Rise .42s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 70ms)}
+html.ui-g2 .hub.v3in .hz-svg a{transform-box:fill-box;transform-origin:50% 100%}
+@keyframes v3Rise{from{opacity:0;translate:0 18px;scale:.96}to{opacity:1;translate:0 0;scale:1}}
+html.ui-g2 .hub.v3in .hz-47{stroke-dasharray:1 1;animation:v3Draw .7s cubic-bezier(.2,.8,.2,1) .2s both}
+html.ui-g2 .hub.v3in .hz-47[data-s="1"]{animation-delay:.45s}
+@keyframes v3Draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+html.ui-g2 .hub.v3in .v3-sheen{animation:v3Sheen .7s cubic-bezier(.3,.1,.3,1) .6s both}
+@keyframes v3Sheen{0%{opacity:.0;transform:translateX(-120%)}15%{opacity:.85}85%{opacity:.85}100%{opacity:0;transform:translateX(120%)}}
+html.ui-g2 .hub.v3in{animation:v3Bg .9s ease-out both}
+@keyframes v3Bg{from{background-size:112%;filter:saturate(.6)}to{background-size:cover;filter:none}}
+
+/* ---------- 타일 확장 전환 ---------- */
+.v3-zoom{position:fixed;inset:0;z-index:9999;pointer-events:none;display:flex;align-items:center;justify-content:center;will-change:clip-path}
+.v3-zoom.w{background:#fff}
+.v3-zoom.y{background:#FDD000}
+.v3-zoom .z-g{transition:transform .34s cubic-bezier(.2,.8,.2,1),opacity .34s;display:flex;flex-direction:column;align-items:center;gap:8px}
+.v3-zoom .z-g .sg{height:64px}
+.v3-zoom .z-g b{font:800 20px/1.2 inherit;color:#0B1B3F}
+.v3-zoom.out{transition:opacity .2s ease;opacity:0}
+html.ui-g2 .pg-head.v3up{animation:v3Up .26s cubic-bezier(.2,.8,.2,1) .12s both}
+html.ui-g2 #panel>*.v3up2{animation:v3Up2 .32s cubic-bezier(.2,.8,.2,1) .08s both}
+@keyframes v3Up{from{opacity:0;translate:0 16px}to{opacity:1;translate:0 0}}
+@keyframes v3Up2{from{opacity:.0;translate:0 10px}to{opacity:1;translate:0 0}}
+
+/* 탭 안: CH 체크 튐 */
+html.ui-g2 .v3ck{animation:v3Ck .28s cubic-bezier(.2,1.5,.4,1)}
+@keyframes v3Ck{0%{transform:scale(.7)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+/* IL: 방금 바뀐 줄 형광펜 */
+html.ui-g2 .v3hl{background:linear-gradient(90deg,rgba(253,208,0,.55),rgba(253,208,0,.55)) no-repeat 0 85%/100% 45%;animation:v3Hl .9s ease-out both}
+@keyframes v3Hl{0%{background-size:0% 45%}35%{background-size:100% 45%}100%{background-size:100% 45%;background-color:transparent}}
+
+/* ---------- 현장 모드: 효과·배경 끔 ---------- */
+html.field .hub.hz{background:#F1F4F9}
+html.field *{animation:none!important;transition:none!important}
+html.field .hz-p:not(.y){fill:#fff}
+.v3field{display:inline-flex;align-items:center;gap:5px;min-height:40px;padding:0 10px;margin-right:4px;border-radius:999px;border:1.5px solid #C9D2E0;background:#fff;color:#0B1B3F;font:800 12.5px/1 inherit;cursor:pointer}
+.v3field i{width:9px;height:9px;border-radius:50%;background:#C9D2E0}
+html.field .v3field{background:#0B1B3F;color:#FDD000;border-color:#0B1B3F}
+html.field .v3field i{background:#FDD000;box-shadow:0 0 0 3px rgba(253,208,0,.3)}
+@media (prefers-reduced-motion:reduce){ html.ui-g2 .hub.v3in *,html.ui-g2 .hub.v3in{animation:none!important} .v3-zoom{display:none} }
+
+@media (max-width:520px){ .v3field{width:40px;padding:0;justify-content:center;font-size:0;gap:0;margin-right:0} .v3field i{width:12px;height:12px} }
+
+html:not(.ui-g2) .hz-svg .v3d{display:none}
+html.field .hz-svg .v3d{display:none}
+html.field.ui-g2 .hz-p.y{fill:#FDD000}
+</style>
 </head><body>
 <!-- V114~V117·V252: 첫 화면 인트로 — 메뉴가 모두 보이는 첫 화면 위에서 빨간 빛(펜 끝)이 12시에서 출발해 손글씨 47 긴 획(hz-47 s0)을 빨간 선으로 그리며 6시에 도착(약 1.8초).
      도착하면 4의 세로선·7의 가로선과 칸·글자·위아래 막대가 떠오른다. 누르면 건너뜀 · 창마다 한 번 · 다른 화면으로 바로 들어오거나 동작 줄이기면 생략 -->
@@ -3786,7 +3858,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v256</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v257</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4806,8 +4878,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V256', SRV_VER='15.33';
+  const APP_VER='V257', SRV_VER='15.34';
   const UPDATES=[
+    {v:'V257', d:'2026-11-28', t:['UI gen2 첫 화면: 새벽 화재 현장 장면(GPT 그림) 위에 유리 카드 — 노란 칸엔 반사띠, 47 획은 더 굵고 입체로','첫 진입에 한 번만: 장면 → 카드가 차례로 솟고 → 47 획이 그려지고 → 노란 칸에 빛 한 번(약 1.3초)','칸을 누르면 그 칸이 화면 전체로 펼쳐지며 넘어가요(0.4초) · 체크하면 살짝 튀고, 보고서 미리보기는 바뀐 줄에 형광펜','머리의 ●현장 단추 = 현장 모드: 효과·배경을 모두 끈 빠른 화면(이 기기에 기억)']},
     {v:'V256', d:'2026-11-28', t:['UI gen2: 체크리스트(CH)·상황 보고서(IL) 글자 표시와 47망 아이콘도 3D로 — 원래 모양 그대로 입체감만 더했어요(UI gen1은 예전 그대로)']},
     {v:'V255', d:'2026-11-28', t:['UI gen2: 메뉴 맨 위 MENU 오른쪽 ‘UI gen1 / UI gen2’ 단추로 화면 버전을 골라요(이 기기에 기억) — gen1은 예전 모습(AI assistant 배경 그림 없음), gen2는 새 모습','gen2: 메뉴 15개 섹션·CP·소화전·디브리핑룸·상태 아이콘을 입체감 있는 3D 아이콘으로(GPT 이미지)','gen2: SACHIL AI 프로필을 AI 에이전트 모습으로 · AI assistant 배경(사람과 AI 교감 + 전기 신호)','gen2: 47망은 지휘·작전 무전망(지휘차·안테나·무전기가 신호로 연결된 도시), 디브리핑룸은 사후 검토 회의실(탁자·헬멧·타임라인 화이트보드) 3D 배경 — 글씨는 그대로 또렷']},
     {v:'V254', d:'2026-11-28', t:['AI assistant 대화창 배경: 교안 ‘AI로 나만의 PT 툴 만들기’ 11장 그림 — 사람과 AI 에이전트가 마주 보고 전기 신호로 교감하는 장면(휴대폰은 사람·신호·로봇이 함께 보이게 따로 자름)','그 위로 파란 전기 신호가 천천히 흐르며 깜빡여요(동작 줄이기 설정이면 멈춤)','말풍선은 흰색 그대로라 글씨는 또렷하고, 어두운 배경 위 이름·시간·추천 질문 제목은 밝게 · 첫 화면 소방관 캐릭터 그림은 배경 장면을 가리지 않게 숨김']},
@@ -10336,6 +10409,85 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     else if(e.key==='Tab'){ const f=[...tip.querySelectorAll('button')]; if(!f.length) return; const k=f.indexOf(document.activeElement); e.preventDefault(); f[(k+(e.shiftKey?-1:1)+f.length)%f.length].focus(); }
   },true);
   addEventListener('resize',()=>place()); addEventListener('orientationchange',()=>setTimeout(place,200));
+})();
+</script>
+<script>
+/* V257: 첫 화면 '현장 장면 + 카드'(gen2) · 첫 진입 연출 1회 · 칸 → 화면 확장 전환 · 현장 모드(효과·배경 끔) · CH 체크 튐 · IL 미리보기 형광펜 */
+(function(){
+  const H=document.documentElement, NS='http://www.w3.org/2000/svg';
+  try{ if(localStorage.getItem('sachil_field_v1')==='1') H.classList.add('field'); }catch(_){}
+  const ORDER={search:0, ai:1, chat:2, board:3, log:4, debrief:5};
+  const g2=()=>H.classList.contains('ui-g2');
+  const lowEnd=()=>(navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2);
+  const calm=()=>H.classList.contains('field')||matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const el=(t,a)=>{ const e=document.createElementNS(NS,t); for(const k in a) e.setAttribute(k,a[k]); return e; };
+  /* 칸 꾸밈: 흰 칸 유리+결, 노란 칸 반사띠·빛 — 칸 모양(d)이 바뀌면 다시 */
+  function decorate(hub){
+    const svg=hub.querySelector('.hz-svg'); if(!svg) return;
+    svg.querySelectorAll('.v3d').forEach(x=>x.remove());
+    const defs=el('defs',{class:'v3d'});
+    defs.innerHTML='<linearGradient id="v3Wh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".55" stop-color="#fff" stop-opacity=".88"/><stop offset="1" stop-color="#fff" stop-opacity=".70"/></linearGradient>'
+      +'<linearGradient id="v3Yel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE15A"/><stop offset=".55" stop-color="#FDD000"/><stop offset="1" stop-color="#F2BE00"/></linearGradient>'
+      +'<pattern id="v3Str" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="14" height="14" fill="#FDD000"/><rect width="7" height="14" fill="#D9DEE6"/></pattern>'
+      +'<pattern id="v3Wv" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0H6" stroke="#0B1B3F" stroke-opacity=".05" stroke-width="1"/></pattern>'
+      +'<linearGradient id="v3Sh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>';
+    svg.insertBefore(defs,svg.firstChild);
+    svg.querySelectorAll('a[data-hub]').forEach(a=>{
+      const k=a.dataset.hub, p=a.querySelector('.hz-p'); if(!p||!p.getAttribute('d')) return;
+      const i=ORDER[k]??0; a.style.setProperty('--i',i); hub.querySelectorAll(`[data-l="${k}"],[data-k="${k}"],[data-tools="${k}"]`).forEach(x=>x.style.setProperty('--i',i));
+      const cid='v3c-'+k, cp=el('clipPath',{id:cid}); cp.appendChild(el('path',{d:p.getAttribute('d')})); defs.appendChild(cp);
+      let bb; try{ bb=p.getBBox(); }catch(_){ return; }
+      const g=el('g',{'clip-path':`url(#${cid})`,class:'v3d','pointer-events':'none'});
+      if(p.classList.contains('y')){
+        g.appendChild(el('rect',{x:bb.x,y:bb.y+bb.height-12,width:bb.width,height:12,fill:'url(#v3Str)'}));
+        const sh=el('rect',{class:'v3-sheen',x:bb.x,y:bb.y,width:bb.width*.55,height:bb.height,fill:'url(#v3Sh)',transform:'skewX(-20)'}); sh.style.transformBox='fill-box'; g.appendChild(sh);
+      } else g.appendChild(el('rect',{class:'v3-weave',x:bb.x,y:bb.y,width:bb.width,height:bb.height,fill:'url(#v3Wv)'}));
+      p.after(g);
+    });
+  }
+  function enter(hub){
+    let seen=false; try{ seen=sessionStorage.getItem('sachil_hub3_seen')==='1'; sessionStorage.setItem('sachil_hub3_seen','1'); }catch(_){}
+    if(seen||calm()||!g2()) return;
+    const go=()=>requestAnimationFrame(()=>{ hub.classList.add('v3in'); setTimeout(()=>hub.classList.remove('v3in'),1700); });
+    document.readyState==='complete'?go():addEventListener('load',go,{once:true});   /* 그림이 다 뜬 뒤 시작(로딩 중에 연출이 지나가 버리지 않게) */
+  }
+  /* 칸(사다리꼴) → 화면 전체 사각형: 칸 둘레 점 N개를 화면 둘레 점 N개로(같은 방향·같은 시작 모서리) 보간 */
+  function zoomFrom(a){
+    const p=a.querySelector('.hz-p'), m=p.getScreenCTM(), L=p.getTotalLength(), N=32; let pts=[];
+    for(let i=0;i<N;i++){ const q=p.getPointAtLength(L*i/N); pts.push([q.x*m.a+q.y*m.c+m.e, q.x*m.b+q.y*m.d+m.f]); }
+    let area=0; pts.forEach((v,i)=>{ const w=pts[(i+1)%N]; area+=v[0]*w[1]-w[0]*v[1]; }); if(area<0) pts.reverse();   // 화면 좌표에서 시계 방향으로
+    let s=0, best=1e9; pts.forEach(([x,y],i)=>{ if(x+y<best){ best=x+y; s=i; } }); pts=pts.slice(s).concat(pts.slice(0,s));   // 왼쪽 위 모서리부터
+    const W=innerWidth+40, Hh=innerHeight+40, per=2*(W+Hh), to=pts.map((_,i)=>{ let d=per*i/N; if(d<W) return [d-20,-20]; d-=W; if(d<Hh) return [W-20,d-20]; d-=Hh; if(d<W) return [W-20-d,Hh-20]; d-=W; return [-20,Hh-20-d]; });
+    const poly=P=>'polygon('+P.map(([x,y])=>x.toFixed(1)+'px '+y.toFixed(1)+'px').join(',')+')';
+    const cx=pts.reduce((t,v)=>t+v[0],0)/N, cy=pts.reduce((t,v)=>t+v[1],0)/N;
+    const k=a.dataset.hub, z=document.createElement('div'); z.className='v3-zoom '+(p.classList.contains('y')?'y':'w'); z.setAttribute('aria-hidden','true');
+    const lab=document.querySelector(`[data-l="${k}"] .sg, [data-k="${k}"] .ic`), nm=document.querySelector(`[data-l="${k}"] b, [data-k="${k}"] b`);
+    z.innerHTML='<div class="z-g">'+(lab?lab.outerHTML:'')+'<b></b></div>'; z.querySelector('b').textContent=nm?nm.textContent:'';
+    z.style.clipPath=poly(pts); document.body.appendChild(z);
+    const g=z.querySelector('.z-g'); g.style.transform=`translate(${cx-innerWidth/2}px,${cy-innerHeight/2}px)`;
+    return z.animate([{clipPath:poly(pts)},{clipPath:poly(to)}],{duration:420,easing:'cubic-bezier(.45,0,.2,1)',fill:'forwards'}).finished.then(()=>{ g.style.transform='translate(0,-8vh) scale(1.15)'; g.style.opacity='0'; return z; });
+  }
+  document.addEventListener('click',e=>{
+    const a=e.target.closest&&e.target.closest('.hz-svg a[data-hub]'); if(!a||a.__v3||!g2()||calm()||lowEnd()) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    const nav=()=>{ a.__v3=1; a.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true})); a.__v3=0; };   // 원래 칸 동작(검색은 goSearch 등) 그대로
+    let z; try{ z=zoomFrom(a); }catch(_){ nav(); return; }
+    z.then(zz=>{ nav(); setTimeout(()=>{ const pn=document.getElementById('panel'); if(pn){ const h=pn.querySelector('.pg-head'); if(h) h.classList.add('v3up'); } zz.classList.add('out'); setTimeout(()=>zz.remove(),260); },60); }, ()=>nav());
+  },true);
+  /* 현장 모드 단추(머리, 초과근무 단추 왼쪽) */
+  function fieldBtn(){ if(document.querySelector('.v3field')) return; const b=document.createElement('button'); b.type='button'; b.className='v3field';
+    const lab=()=>{ const on=H.classList.contains('field'); b.innerHTML='<i aria-hidden="true"></i>현장'; b.title=on?'현장 모드 켜짐 — 효과·배경을 끈 빠른 화면':'현장 모드 — 누르면 효과·배경을 끄고 빠르게'; b.setAttribute('aria-label',b.title); b.setAttribute('aria-pressed',String(on)); }; lab();
+    b.addEventListener('click',()=>{ H.classList.toggle('field'); const on=H.classList.contains('field'); try{ localStorage.setItem('sachil_field_v1',on?'1':'0'); }catch(_){ } lab(); if(window.__toast) __toast(on?'현장 모드 — 효과·배경을 껐어요':'현장 모드를 껐어요'); });
+    const ot=document.getElementById('otBtn'); ot?ot.before(b):document.body.appendChild(b); }
+  document.addEventListener('change',e=>{ const c=e.target; if(c&&c.type==='checkbox'&&c.closest('#panel')){ const box=c.closest('label')||c; box.classList.remove('v3ck'); void box.offsetWidth; box.classList.add('v3ck'); } },true);
+  let prevTxt=new Map();
+  function logPrev(pn){ const pv=pn.querySelectorAll('.il-pv li, .il-pv td'), nx=new Map();
+    pv.forEach((x,i)=>{ const t=x.textContent; nx.set(i,t); if(prevTxt.size&&prevTxt.has(i)&&prevTxt.get(i)!==t){ x.classList.remove('v3hl'); void x.offsetWidth; x.classList.add('v3hl'); } }); prevTxt=nx; }
+  function scan(){ const pn=document.getElementById('panel'); if(!pn) return;
+    const hub=pn.querySelector('.hub.hz'); if(hub&&!hub.dataset.v3){ hub.dataset.v3='1'; requestAnimationFrame(()=>{ decorate(hub); enter(hub); const p0=hub.querySelector('.hz-p'); if(p0) new MutationObserver(()=>decorate(hub)).observe(p0,{attributes:true,attributeFilter:['d']}); }); }
+    if(location.hash==='#log') logPrev(pn); else prevTxt=new Map(); }
+  function boot(){ const pn=document.getElementById('panel'); if(pn) new MutationObserver(scan).observe(pn,{childList:true,subtree:true,characterData:true}); fieldBtn(); scan(); }
+  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot):boot();
 })();
 </script>
 </body></html>
