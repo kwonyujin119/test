@@ -34,6 +34,9 @@ const IMG = 'sachil-img-v1', IMG_PRE = [
   'img/3d/sop.webp',
   'img/3d/updates.webp',
   'img/3d/water.webp',
+  'img/band-search.webp',
+  'img/band-board.webp',
+  'img/band-log.webp',
   'img/hub-scene-m.webp',
   'img/hub-scene-pc.webp',
   'icons/icon-96.png'
