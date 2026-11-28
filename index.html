@@ -2915,6 +2915,23 @@ html.ui-g2 #panel .board .phase{box-shadow:var(--e1)}
 html.ui-g2 #panel .board .phase.cur{box-shadow:inset 4px 0 0 #FDD000,var(--e1)}
 html.ui-g2 #panel .board .done-card img{display:none}
 @media (max-width:520px){ html.ui-g2 #panel .board .phase .items>.item{min-height:52px} html.ui-g2 #panel .board .phase .items>.item input[type=checkbox]{width:28px;height:28px} }
+/* V262: 검색·체크리스트·보고서 머리 띠 장면 — 화면 맨 위 띠에만(카드·글자 뒤에는 그림 없음), 장면은 오른쪽, 왼쪽(제목 자리)과 아래는 바탕색으로 사라짐 */
+html.ui-g2:not(.field) body[data-r="search"] main,html.ui-g2:not(.field) body[data-r="board"] #panel,html.ui-g2:not(.field) body[data-r="log"] #panel{
+  --bandh:240px;background-color:transparent;background-repeat:no-repeat;
+  background-image:linear-gradient(180deg,rgba(243,244,246,0) 45%,var(--bg,#F3F4F6) 100%),linear-gradient(90deg,var(--bg,#F3F4F6) 0,rgba(243,244,246,.94) 34%,rgba(243,244,246,.25) 62%,rgba(243,244,246,0) 82%),var(--band);
+  background-size:100% var(--bandh),100% var(--bandh),auto var(--bandh);background-position:0 0,0 0,right top}
+html.ui-g2 body[data-r="search"] main{--band:url(img/band-search.webp)}
+html.ui-g2 body[data-r="board"] #panel{--band:url(img/band-board.webp)}
+html.ui-g2 body[data-r="log"] #panel{--band:url(img/band-log.webp)}
+/* 장면이 보이도록 머리 위에 여백(PC 80px·휴대폰 44px) — 카드는 그 아래부터 */
+html.ui-g2:not(.field) body[data-r="board"] #panel,html.ui-g2:not(.field) body[data-r="log"] #panel{padding-top:80px}
+@media (max-width:699px){
+  html.ui-g2:not(.field) body[data-r="search"] main,html.ui-g2:not(.field) body[data-r="board"] #panel,html.ui-g2:not(.field) body[data-r="log"] #panel{--bandh:200px;background-image:linear-gradient(180deg,rgba(243,244,246,0) 45%,var(--bg,#F3F4F6) 100%),linear-gradient(90deg,var(--bg,#F3F4F6) 0,rgba(243,244,246,.93) 55%,rgba(243,244,246,.35) 80%,rgba(243,244,246,.1) 100%),var(--band)}
+  html.ui-g2:not(.field) body[data-r="board"] #panel,html.ui-g2:not(.field) body[data-r="log"] #panel{padding-top:44px}
+}
+/* 검색 첫 화면: 웹툰 그림 대신 장면 띠가 위쪽 빈자리를 채움 */
+html.ui-g2:not(.field) body[data-r="search"] main{background-position:0 0,0 0,right top}
+html.ui-g2 body #hero .hero-art{display:none!important}
 /* IL: 카드 그림자 e1 */
 html.ui-g2 #panel .il2 .phase,html.ui-g2 #panel .il-pv{box-shadow:var(--e1)}
 </style>
@@ -3897,7 +3914,7 @@ footer b{color:var(--muted);font-weight:600}
 
 <footer>
   <div class="wrap">
-    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v261</span>
+    <span><b>SACHIL</b> — Search · AI assistant · CHecklist · Incident Log · v262</span>
     <span>인천소방학교 지휘역량강화센터(ICTC)</span>
   </div>
 </footer>
@@ -4917,8 +4934,9 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     if(fo) fo.icon=svg('<rect x="14" y="12" width="24" height="42" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><rect x="38" y="26" width="14" height="28" rx="2" fill="#fff" stroke="#0B1B3F" stroke-width="3.5" stroke-linejoin="round"/><path d="M20 20h4M28 20h4M20 28h4M28 28h4M20 36h4M28 36h4M43 33h4M43 41h4" stroke="#0B1B3F" stroke-width="3.5" stroke-linecap="round"/><path d="M22 54v-9h8v9z" fill="#FDD000" stroke="#0B1B3F" stroke-width="3" stroke-linejoin="round"/>'); }
   // ---------- 업데이트 내역(메뉴 마지막 섹션) ----------
   // 반영할 때마다 맨 위에 한 줄 추가한다(CHANGELOG.md와 같은 내용). 바닥글·서버 APP_VERSION도 같은 번호로.
-  const APP_VER='V261', SRV_VER='15.38';
+  const APP_VER='V262', SRV_VER='15.39';
   const UPDATES=[
+    {v:'V262', d:'2026-11-28', t:['입체 화면: 검색·체크리스트·상황 보고서 맨 위에 장면 띠 — 검색=SOP 바인더 서가, 체크리스트=현장지휘소 상황판, 보고서=지휘차 위 보고서 클립보드(남색 톤 실사)','장면은 머리 띠에만 두고 아래·왼쪽(제목 자리)은 바탕색으로 흐려져요 — 카드·글자 뒤에는 그림이 없어 그대로 또렷 · 현장 모드·기본 화면에서는 나오지 않아요']},
     {v:'V261', d:'2026-11-28', t:['입체 화면 2단계: 첫 화면·47망·디브리핑룸 배경을 한 그림체로 새로 — 남색 톤 실사, 국내 소방차·현장지휘소·브리핑실, 사람은 뒷모습, 위쪽은 비워 글자가 잘 보이게','아이콘 21개를 무광으로 다시: 국내형 헬멧(CP·안전관리), 노란 지상식 소화전 하나로 통일, 다수사상자=중증도 분류표, 위험물=국내 운반 표지, 익명=대화명 표찰','47망·디브리핑룸 빈 방 안내를 흰 바탕 짙은 글씨로 · 첫 화면 칸을 빠르게 두 번 눌러도 한 번만 넘어가요']},
     {v:'V260', d:'2026-11-28', t:['입체 화면 2차 심사 반영: AI 대화창의 로봇 그림·흐르는 신호선을 걷어내고 남색 상황판 바탕으로, 휴대폰 추천 질문은 2열로 다 보이게','첫 화면: 47 획의 푸른 빛·노란 칸의 사선 띠·지나가는 빛·갈색 그림자를 빼고 남색 그림자 한 가지 + 노란 칸 아래 반사띠 한 줄로 차분하게','칸을 누르면 0.2초 안에 화면이 열려요(전보다 2배 이상 빠름) · 메뉴는 그림 대신 깨끗한 바탕, 단추 이름 ‘기본/입체’','현장 모드 단추에 글자 표시(휴대폰은 메뉴 창 머리에) · 보고서 미리보기 형광펜은 바뀐 줄에만 잠깐 · 인터넷이 끊겨도 입체 글자·아이콘이 보여요']},
     {v:'V259', d:'2026-11-28', t:['UI gen2 첫 화면: S·A도 CH·IL처럼 3D 글자로 — 네 글자 크기를 CH 기준으로 균형 있게','가운데 남색 47 획: 4와 7을 떼어 한눈에 ‘4’ ‘7’로 읽히게, 굵기를 고르게(4의 세로획도 같게), 그림자 두께·윗빛으로 입체 + 처음 들어올 때 4→7 순서로 그려지고 빛이 한 번 흘러요']},
@@ -5625,7 +5643,7 @@ document.querySelectorAll('link[media="print"][href*="fonts.googleapis"]').forEa
     document.body.classList.toggle('nosearch', r!=='search');
     document.documentElement.classList.remove('boot-nosearch','boot-hub','boot-chat');   // V168: 미리 숨김 해제(이제 body 클래스가 대신)
     document.body.classList.toggle('home', r==='search' && !state.query.trim());
-    document.body.classList.toggle('chatview', r==='ai' || ROOMS_R.includes(r)); document.body.classList.toggle('r-debrief', r==='debrief');
+    document.body.classList.toggle('chatview', r==='ai' || ROOMS_R.includes(r)); document.body.classList.toggle('r-debrief', r==='debrief'); document.body.dataset.r=r;   /* V262: 화면별 머리 띠 장면(gen2) */
     document.body.classList.toggle('hubview', r==='hub');
     if(r==='search'){ const qi=$('#q'); if(qi&&document.activeElement!==qi&&qi.value!==state.query){ qi.value=state.query; qi.closest('.search')&&qi.closest('.search').classList.toggle('has-text',!!qi.value); } }   // V184: 어느 길로 돌아와도 입력칸 = 보이는 결과
     if(r==='search' && focusSearchAfter){ focusSearchAfter=false; const qi=$('#q'); if(qi){ qi.focus(); qi.select(); } }
