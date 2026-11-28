@@ -1,7 +1,7 @@
 # SACHIL:47 버전 기록 (V1 ~ V55)
 
 인천소방학교 지휘역량강화센터 교육 플랫폼 「SACHIL:47」의 버전별 수정 내용입니다.
-정리일: 2026-10-24 · 현재 배포본: **앱 V272 · 서버 15.49** (github.io + `server/SACHIL47-server-update.zip`)
+정리일: 2026-10-24 · 현재 배포본: **앱 V273 · 서버 15.50** (github.io + `server/SACHIL47-server-update.zip`)
 
 **근거 표기**
 - **패치**: 버전마다 남은 수정 스크립트·작업 기록 기준 (가장 정확)
@@ -225,6 +225,7 @@
 | V252 | ① 첫 화면 인트로: html.intro의 '다른 것 숨기기' 규칙과 intro-float 떠오르기 애니메이션 제거 → 메뉴가 보이는 첫 화면 위에서 빨간 펜이 47 획을 그림, 그리는 중 클릭은 막지 않고 그리기만 끝냄 ② 유해화학물질: HZM(지침 111~174 → 핸드북 쪽 64개, 키인포가이드 UN 101개, 핸드북 UN 목록 1,321개 — 2026-11 서버 PDF에서 추출) + hzLinkify(TreeWalker로 텍스트만, 'ERG 대응 지침번호 NNN'·'지침 NNN'·'UN번호 NNNN')가 핵심 요약·AI 답에 a.hzl(data-pdfv·data-page) 링크, 표에 없으면 /api/search로 찾아 openPdf ③ PDF 보기 찾기(#pvFind): 돋보기·Ctrl+F·F3, pdf.js getTextContent로 쪽 글자(띄어쓰기 무시) 캐시, 지금 쪽부터 찾아 첫 결과로 이동, 쪽 크기 % 기준 노란 표시(지금 자리 주황), Enter·Shift+Enter, Esc는 찾기만 닫음, 찾기 칸 입력 중엔 화살표·+/- 단축키 무시 · 서버 15.29(버전 번호만) | PR #244 |
 | V253 | 메뉴 창(#sheet) 배경(style#v253-menu-bg): img/menu-bg-m.webp(1024×1536)·menu-bg-pc.webp(1536×1024, 700px 이상 가로 화면) — OpenAI 이미지 API gpt-image-2(medium, webp)로 생성한 밝은 선화(모서리에만), 카드 rgba(255,255,255,.86)+blur 3px·옅은 그림자 · 서버 15.30(버전 번호만) | PR #245 |
 | V254 | AI assistant 대화창 배경(style#v254-ai-bg): test0 교안 301 11장 그림(assets/pt37-sech-3.jpg) → img/ai-bg-pc.webp(1600×900)·ai-bg-m.webp(740×1080, 사람·신호·로봇 부분을 세로로) — .botchat > .card 배경 + 어둡게 덮는 그라데이션(::before) + 흐르는 전기 신호(::after, SVG 물결 repeat-x 이동·깜빡임, mix-blend screen, 양끝 흐림), 어두운 배경 위 .t·.who·추천 질문 제목 밝게, 첫 화면 ai-hello 캐릭터는 visibility:hidden(자리 유지), prefers-reduced-motion이면 신호 멈춤 · 서버 15.31(버전 번호만) | PR #246 |
+| V273 | 방명록 본인 글 수정·지우기는 관리자만 · 서버 15.50(방명록 글 고치기 POST /api/messages/{id}/edit 본인만, 방명록 지우기 관리자만) | PR #266 |
 | V272 | 첫 화면 방명록 배너·익명 방명록 페이지 · 서버 15.49(방명록 방: 익명 저장·주간 정리/보관 기한 제외, 공개 읽기 /api/guestbook) | PR #265 |
 | V271 | 첫 화면 캐릭터 무대(누르면 기존 첫 화면) · 서버 15.48(버전 번호만) | PR #264 |
 | V270 | AI 추천 질문 줄 마퀴(G2·누르면 멈춤·이음매 없는 반복) · 서버 15.47(버전 번호만) | PR #263 |
